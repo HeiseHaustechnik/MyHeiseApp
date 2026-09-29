@@ -1,0 +1,16 @@
+{
+  "name": "My Heise App",
+  "short_name": "My Heise",
+  "description": "Die Apps von Heise Haustechnik: Lagerverwaltung, Leiterprüfung und mehr.",
+  "lang": "de",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f5f8",
+  "theme_color": "#1d3a63",
+  "icons": [
+    { "src": "icon.png?v=3", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon.png?v=3", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

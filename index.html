@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My Heise App</title>
+<meta name="theme-color" content="#1d3a63">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Heise">
+<link rel="icon" type="image/png" href="./icon.png?v=3">
+<link rel="apple-touch-icon" href="./icon.png?v=3">
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+:root{
+  --bg:#f4f5f8;--surface:#fff;--surface-2:#eef0f4;--ink:#0d1524;--ink-2:#485468;--ink-3:#8491a3;--line:#e3e7ee;
+  --brand:#1d3a63;--brand-2:#2f5b96;--brand-strong:#1d3a63;--on-brand:#fff;--accent:#e5322d;
+  --ok:#15803d;--ok-bg:#e6f6ec;--blue:#2563eb;--blue-bg:#e8effe;--red:#d92d20;--red-bg:#fdeceb;
+  --amber:#b45309;--amber-bg:#fff2dc;--violet:#6d28d9;--violet-bg:#efe9fe;--teal:#0f766e;--teal-bg:#dcf4f0;--gray:#5b6678;--gray-bg:#eceff3;
+  --shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0a0f17;--surface:#131b27;--surface-2:#1b2535;--ink:#eef2f8;--ink-2:#aab5c6;--ink-3:#6f7d92;--line:#243043;
+  --brand:#3b6cc4;--brand-2:#5b8de0;--brand-strong:#8db1f0;--on-brand:#fff;--accent:#ff5a52;
+  --ok:#4ade80;--ok-bg:#12301e;--blue:#7aa2ff;--blue-bg:#16264a;--red:#ff7a70;--red-bg:#3a1714;
+  --amber:#fbbf5b;--amber-bg:#372611;--violet:#b79cff;--violet-bg:#271c47;--teal:#4fd1c5;--teal-bg:#0f2e2b;--gray:#a3aec0;--gray-bg:#1d2736;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6);
+}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI Variable Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100dvh;overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{letter-spacing:-.02em;line-height:1.15}
+[hidden]{display:none!important}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic.sm{width:16px;height:16px}.ic.lg{width:26px;height:26px}
+.num{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.muted{color:var(--ink-2)}.faint{color:var(--ink-3)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Tönung */
+.tone-ok{--t:var(--ok);--tb:var(--ok-bg)}.tone-blue{--t:var(--blue);--tb:var(--blue-bg)}.tone-red{--t:var(--red);--tb:var(--red-bg)}
+.tone-amber{--t:var(--amber);--tb:var(--amber-bg)}.tone-violet{--t:var(--violet);--tb:var(--violet-bg)}.tone-teal{--t:var(--teal);--tb:var(--teal-bg)}
+.tone-gray{--t:var(--gray);--tb:var(--gray-bg)}
+
+/* Start / Boot */
+.boot{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:200}
+.spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brand);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;font-size:12.5px;font-weight:680;background:var(--tb);color:var(--t);white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--t)}
+.chip .ic{width:14px;height:14px}
+.chip.lg{height:32px;padding:0 14px;font-size:14px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;background:var(--surface-2);border-radius:15px}
+.seg button{min-height:42px;padding:4px 6px;border-radius:12px;font-weight:660;font-size:14px;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;line-height:1.15}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(13,21,36,.16)}
+.seg.tone button.on.t-ok{color:var(--ok)}.seg.tone button.on.t-mangel{color:var(--red)}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(145deg,var(--brand-2),var(--brand));color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 20px;border-radius:15px;font-weight:680;font-size:15px;transition:transform .12s,background .15s,opacity .15s;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--brand);color:var(--on-brand);box-shadow:0 10px 20px -12px var(--brand)}
+.btn-soft{background:var(--surface-2);color:var(--ink)}
+.btn-ghost{background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-sm{height:38px;padding:0 14px;border-radius:12px;font-size:14px}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.iconbtn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow);color:var(--ink)}
+.iconbtn.flat{background:transparent;box-shadow:none}
+.btnrow{display:flex;gap:10px}.btnrow>*{flex:1}
+.field{display:grid;gap:6px;margin-bottom:14px}
+.field>label,.lbl{font-size:12.5px;font-weight:680;color:var(--ink-2)}
+.inp{width:100%;height:50px;padding:0 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s;appearance:none;-webkit-appearance:none}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238491a3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.inp:focus{border-color:var(--brand-2);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand) 18%,transparent)}
+textarea.inp{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
+.switch{position:relative;width:48px;height:28px;border-radius:14px;background:var(--line);transition:background .2s;flex:none}
+.switch::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch.on{background:var(--ok)}.switch.on::after{transform:translateX(20px)}
+.switch[disabled]{opacity:.5;pointer-events:none}
+.backdrop{position:fixed;inset:0;z-index:100;background:rgba(8,13,21,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}}
+.sheet{width:100%;max-width:580px;max-height:93dvh;background:var(--bg);border-radius:28px 28px 0 0;display:flex;flex-direction:column;animation:rise .3s cubic-bezier(.2,.9,.3,1);box-shadow:0 -24px 70px -20px rgba(0,0,0,.5)}
+@keyframes rise{from{transform:translateY(40px);opacity:0}}
+@media(min-width:720px){.backdrop{align-items:center;padding:24px}.sheet{border-radius:28px;max-height:90dvh}}
+.sheet-grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:9px auto 0}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px 6px}
+.sheet-h h2{font-size:20px;font-weight:760}
+.sheet-b{overflow:auto;padding:10px 20px 16px;-webkit-overflow-scrolling:touch}
+.sheet-f{display:flex;gap:10px;padding:12px 20px calc(16px + var(--safe-b));border-top:1px solid var(--line);background:var(--bg);border-radius:0 0 28px 28px}
+.sheet-f .btn{flex:1}
+.callout{display:flex;gap:12px;padding:14px;border-radius:16px;background:var(--tb);color:var(--t);font-size:14px;line-height:1.4;margin-bottom:14px}
+.callout .ic{margin-top:1px}.callout b{display:block;color:var(--t)}.callout span{color:var(--ink)}
+.callout.plain span{color:var(--ink-2)}
+.toast{display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:16px;background:#0f1826;color:#fff;font-weight:600;font-size:14.5px;box-shadow:0 14px 34px -12px rgba(0,0,0,.5);animation:rise .3s cubic-bezier(.2,.9,.3,1)}
+.toast.ok{background:#12683a}.toast.err{background:#b42318}
+.toast.out{opacity:0;transform:translateY(8px);transition:.25s}
+
+/* ===== Hub ===== */
+#toasts{position:fixed;left:0;right:0;bottom:calc(20px + var(--safe-b));display:grid;gap:8px;justify-items:center;z-index:300;padding:0 16px;pointer-events:none}
+.shell{width:100%;max-width:900px;margin:0 auto;padding:14px 16px calc(40px + var(--safe-b));animation:viewIn .3s ease both}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:6px 0 14px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:760;font-size:16px;letter-spacing:-.01em}
+.brand img{width:36px;height:36px;border-radius:11px;display:block}
+.brand small{display:block;font-weight:600;color:var(--ink-3);font-size:11.5px;letter-spacing:.02em}
+.avatar{width:42px;height:42px;font-size:16px}
+.hero{position:relative;overflow:hidden;color:#fff;border-radius:28px;padding:20px 20px 26px;background:linear-gradient(150deg,var(--brand-2) 0%,var(--brand) 62%,#14294a 100%);box-shadow:0 26px 50px -28px var(--brand);display:grid;grid-template-columns:1fr auto;grid-template-areas:"t logo" "p p";gap:4px 14px;align-items:center}
+.hero-t{align-self:end}
+.hero::before{content:"";position:absolute;right:-90px;top:-110px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.16),rgba(255,255,255,0) 70%)}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:6px;background:linear-gradient(90deg,#a8412a 0 25%,#e9c44a 25% 50%,#4767a0 50% 75%,#dd6a2c 75% 100%)}
+.hero-t{grid-area:t;position:relative;z-index:1;min-width:0}
+.hero-t .ey{font-size:13.5px;font-weight:600;opacity:.78}
+.hero-t h1{font-size:clamp(30px,8.6vw,42px);font-weight:790;margin:6px 0 0;line-height:1.05;overflow-wrap:anywhere}
+.hero-p{grid-area:p;position:relative;z-index:1;opacity:.86;font-size:15px;max-width:38ch;margin-top:10px;line-height:1.4}
+.logo-tile{grid-area:logo;position:relative;z-index:1;background:#fff;border-radius:20px;width:150px;padding:8px 10px;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 28px -14px rgba(0,0,0,.45)}
+.logo-tile img{width:100%;height:auto;display:block}
+.logo-tile .wordmark{font-size:13px;letter-spacing:.12em;line-height:1.3}
+.logo-panel{background:#fff;border-radius:22px;height:230px;display:flex;align-items:center;justify-content:center;padding:14px 22px;position:relative;z-index:1}
+.logo-panel img{max-height:100%;max-width:100%;width:auto;height:auto;object-fit:contain;display:block}
+.logo-panel.small{height:auto;padding:10px 20px;margin-bottom:16px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line)}
+.logo-panel.small img{width:190px;max-width:100%;height:auto}
+.wordmark{font-weight:800;letter-spacing:.16em;color:#1d3a63;font-size:20px;text-align:center}
+@media(min-width:640px){.hero{padding:26px 34px 34px;gap:6px 28px;grid-template-areas:"t logo" "p logo";grid-template-rows:1fr 1fr}.hero-t{align-self:end}.hero-p{align-self:start;margin-top:8px}.logo-tile{width:230px;padding:12px 16px;border-radius:24px}.hero-p{font-size:16.5px;margin-top:14px}.logo-tile .wordmark{font-size:16px}}
+.sec-title{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin:30px 6px 12px}
+.apps{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:640px){.apps{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}}
+@media(max-width:340px){.apps{grid-template-columns:1fr}}
+.app{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:16px;min-height:172px;padding:18px 16px 16px;border-radius:26px;color:#fff;background:linear-gradient(150deg,var(--g1),var(--g2));box-shadow:0 18px 34px -20px var(--g2);transition:transform .15s,box-shadow .15s;min-width:0}
+.app::before{content:"";position:absolute;right:-38px;top:-38px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12)}
+.app:hover{transform:translateY(-3px);box-shadow:0 26px 40px -20px var(--g2)}
+.app:active{transform:scale(.98)}
+.app-ico{position:relative;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.2);color:#fff;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.app-ico .ic{width:26px;height:26px}
+.app-t{position:relative;min-width:0;padding-right:4px}
+.app-t b{display:block;font-size:17px;font-weight:760;letter-spacing:-.01em;line-height:1.2}
+.app-t span{padding-right:22px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-size:12.8px;margin-top:5px;line-height:1.35;opacity:.86}
+.app .chev{position:absolute;right:14px;bottom:15px;width:22px;height:22px;opacity:.85}
+.app.plain{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.app.plain::before{background:color-mix(in srgb,var(--g1) 10%,transparent)}
+.app.plain:hover{box-shadow:0 2px 4px rgba(13,21,36,.05),0 18px 36px -16px rgba(13,21,36,.28)}
+.app.plain .app-ico{background:linear-gradient(145deg,var(--g1),var(--g2))}
+.app.plain .app-t span{color:var(--ink-2);opacity:1}
+.app.plain .chev{color:var(--ink-3)}
+.empty{background:var(--surface);border-radius:24px;padding:28px 22px;text-align:center;box-shadow:var(--shadow)}
+.empty .ic{width:36px;height:36px;color:var(--ink-3);margin-bottom:10px}
+.foot{text-align:center;color:var(--ink-3);font-size:12.5px;margin-top:34px}
+/* Login */
+.auth{min-height:100dvh;display:grid;place-items:center;padding:20px;background:radial-gradient(900px 500px at 15% -10%,color-mix(in srgb,var(--brand-2) 22%,transparent),transparent),var(--bg)}
+.auth-card{width:100%;max-width:410px;background:var(--surface);border-radius:30px;padding:26px 24px 24px;box-shadow:0 30px 60px -30px rgba(13,21,36,.35);animation:viewIn .35s ease both}
+.auth-card h1{font-size:26px;font-weight:780;text-align:center}
+.auth-card>p.muted{text-align:center;margin:6px 0 22px}
+.err{color:var(--red);font-size:13.5px;font-weight:600;min-height:20px;margin:-4px 2px 8px}
+/* Zugriff */
+.pagehead{display:flex;align-items:center;gap:12px;margin:4px 0 16px}
+.pagehead h1{font-size:26px;font-weight:770}
+@media(max-width:420px){.pagehead h1{font-size:23px}}
+.urow{background:var(--surface);border-radius:22px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.uhead{display:flex;align-items:center;gap:12px}
+.uhead b{display:block;font-weight:720}.uhead small{color:var(--ink-3)}
+.umods{margin-top:12px;border-top:1px solid var(--line)}
+.umod{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.umod:last-child{border-bottom:0;padding-bottom:0}
+.umod-l{display:flex;align-items:center;gap:10px;font-weight:650;min-width:0}
+.umod-l .mi{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,var(--g1),var(--g2));flex:none}
+.umod-l .mi .ic{width:17px;height:17px}
+.umod-r{display:flex;align-items:center;gap:10px;min-width:0}
+.umod-r select.inp{height:40px;width:auto;min-width:0;max-width:170px;font-weight:650;font-size:14px;padding:0 10px}
+@media(max-width:420px){.umod:has(select){flex-wrap:wrap}.umod:has(select) .umod-r{width:100%;justify-content:space-between}.umod-r select.inp{flex:1;max-width:none}}
+.callout{margin-bottom:14px}
+.rolelist{display:grid;gap:8px;font-size:14px;margin-top:8px}
+.rolelist div{display:grid;grid-template-columns:120px 1fr;gap:10px}
+.rolelist b{font-weight:700}.rolelist span{color:var(--ink-2)}
+@media(max-width:480px){.rolelist div{grid-template-columns:1fr;gap:0}}
+.kv{display:grid;gap:2px;margin-bottom:16px}.kv b{font-size:18px}.kv span{color:var(--ink-3)}
+
+.app-n{position:absolute;z-index:2;top:12px;right:12px;min-width:26px;height:26px;padding:0 8px;border-radius:13px;background:#e5342b;color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center;box-shadow:0 0 0 3px rgba(255,255,255,.55)}
+.app-n[hidden]{display:none}
+/* ===== Nachrichten ===== */
+.top-r{display:flex;align-items:center;gap:10px}
+.bell{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow);color:var(--ink);flex:none}
+.bell .ic{width:21px;height:21px}
+.bell-n{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--red);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2.5px var(--bg);line-height:1}
+.bell-n[hidden]{display:none}
+.msgcard{display:flex;align-items:center;gap:14px;margin-top:14px;padding:14px 16px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.msgcard:hover{transform:translateY(-2px)}.msgcard:active{transform:scale(.99)}
+.msgcard .mi{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:var(--blue-bg);color:var(--blue);flex:none}
+.msgcard.new .mi{background:var(--red-bg);color:var(--red)}
+.msgcard .mt{min-width:0;flex:1}
+.msgcard b{display:block;font-size:16px;font-weight:750}
+.msgcard .s{display:block;font-size:13px;color:var(--ink-2);margin-top:1px}
+.msgcard.new .s{color:var(--ink);font-weight:600}
+.msgcard .cnt{min-width:26px;height:26px;padding:0 8px;border-radius:13px;background:var(--red);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center}
+.msgcard .cnt[hidden]{display:none}
+.msgcard .chev{color:var(--ink-3)}
+.pagehead .head-act{margin-left:auto}
+.nx-tabs{margin-bottom:14px}
+.nx-tabs button{position:relative;gap:7px}
+.tb{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--red);color:#fff;font-size:11.5px;font-weight:800;display:inline-grid;place-items:center}
+.nx-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;flex-wrap:wrap}
+.seg.sm{display:inline-grid;grid-auto-columns:auto}.seg.sm button{min-height:34px;padding:0 14px;font-size:13.5px}
+.msg{background:var(--surface);border-radius:22px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;position:relative;transition:box-shadow .2s}
+.msg.unread{box-shadow:0 0 0 1.6px color-mix(in srgb,var(--brand-2) 45%,transparent),var(--shadow)}
+.msg.wichtig::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--red)}
+.msg-h{display:flex;gap:12px;width:100%;text-align:left;padding:16px 16px 14px;cursor:pointer;outline:none}
+.msg-h:focus-visible{box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--brand) 30%,transparent)}
+.msg-dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:7px;background:transparent;transition:background .2s}
+.msg.unread .msg-dot{background:var(--brand-2)}
+.msg-main{min-width:0;flex:1;display:grid;gap:6px}
+.msg-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.msg-top b{font-size:16px;font-weight:720;line-height:1.25;overflow-wrap:anywhere}
+.msg.unread .msg-top b{font-weight:800}
+.msg-top time{font-size:12px;color:var(--ink-3);white-space:nowrap;flex:none}
+.msg-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12.5px;color:var(--ink-3)}
+.msg-body{font-size:14.5px;line-height:1.5;color:var(--ink-2);white-space:pre-line;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.msg.open .msg-body{display:block;-webkit-line-clamp:unset;color:var(--ink)}
+.msg-body a,.reply a{color:var(--brand-2);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.msg-foot{padding:0 16px 14px 38px}
+.prog{display:flex;align-items:center;gap:10px;padding:0 16px 14px;font-size:12.5px;color:var(--ink-2)}
+.bar{flex:1;height:7px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:4px;transition:width .4s}
+.who{border-top:1px solid var(--line);padding:0 16px}
+.who summary{cursor:pointer;list-style:none;padding:12px 0;font-weight:650;font-size:13.5px;color:var(--brand-2);display:flex;align-items:center;justify-content:space-between}
+.who summary::-webkit-details-marker{display:none}
+.who summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .2s;margin-right:4px}
+.who[open] summary::after{transform:rotate(-135deg)}
+.who ul{list-style:none;display:grid;gap:2px;margin-bottom:12px}
+.who li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:14px;border-bottom:1px dashed var(--line)}
+.who li:last-child{border-bottom:0}
+.who li em{font-style:normal;color:var(--ink-3);font-size:12.5px;display:flex;align-items:center;gap:4px}
+.who li.ok em{color:var(--ok)}
+.who .del{margin-bottom:14px;color:var(--red)}
+.reply{margin:0 16px 12px;padding:10px 12px;border-radius:14px;background:var(--ok-bg)}
+.reply small{display:block;font-weight:700;color:var(--ok);font-size:12px;margin-bottom:2px}
+.reply p{font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
+.meld-act{display:flex;gap:8px;padding:0 16px 14px}
+.nx-hint{display:grid;gap:12px;margin-bottom:16px;padding:16px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow)}
+.head-act .ic{width:16px;height:16px}
+textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line-height:1.45}
+.cnt-l{text-align:right;font-size:12px;color:var(--ink-3)}
+.swrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);margin-bottom:12px}
+.swrow small{display:block;color:var(--ink-3);font-size:12.5px}
+.swrow .switch.on{background:var(--red)}
+.pick-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.link{color:var(--brand-2);font-weight:650;font-size:13.5px}
+.picks{display:grid;gap:6px;max-height:240px;overflow:auto;padding:2px;margin-top:8px}
+.pick{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:14px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);cursor:pointer}
+.pick[hidden]{display:none}
+.pick:has(input:checked){box-shadow:inset 0 0 0 2px var(--brand-2);background:color-mix(in srgb,var(--brand-2) 9%,var(--surface))}
+.pick input{width:20px;height:20px;accent-color:var(--brand);flex:none}
+.pav{width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:750;font-size:13px;flex:none}
+.pt b{display:block;font-weight:680;font-size:14.5px}.pt small{color:var(--ink-3);font-size:12px}
+@media(max-width:420px){.nx-tabs button{font-size:13px;padding:4px 2px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11a2 2 0 0 1 1 .3A2 2 0 0 1 13 4h5.5A1.5 1.5 0 0 1 20 5.5v12a1.5 1.5 0 0 1-1.5 1.5H13a1 1 0 0 0-1 1 1 1 0 0 0-1-1H5.5A1.5 1.5 0 0 1 4 17.5z"/><path d="M12 4.3V20M7.5 8.5H9M15 8.5h1.5M7.5 12H9M15 12h1.5"/></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M3 11.500 12 4l9 7.500"/><path d="M5.500 10v10h13V10"/><path d="M10 20v-5.500h4V20"/></symbol>
+<symbol id="i-hardhat" viewBox="0 0 24 24"><path d="M3 17h18v2.500H3zM5 17a7 7 0 0 1 14 0M12 5v5.500M9 6.500 8 10.500M15 6.500l1 4"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M5.7 16.5H3.5v-4l2-4.5a2 2 0 0 1 1.8-1.2h9.4a2 2 0 0 1 1.8 1.2l2 4.5v4h-2.2M9.3 16.5h5.4M3.5 12.5h17"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/></symbol>
+<symbol id="i-ladder" viewBox="0 0 24 24"><path d="M7 2v20M17 2v20M7 6.5h10M7 11.5h10M7 16.5h10"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.7v.1"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.2 7.8 8 9 4.8-1.2 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0M12 19.5v.1"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7.5 8.5 6 8.5-6"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+<symbol id="i-checks" viewBox="0 0 24 24"><path d="m2 12.5 4.5 4.5L15 8.5M11 16l1.5 1.5L22 8"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19zM12 10v4.5M12 17.5v.1"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+</defs></svg>
+<div id="boot" class="boot"><div class="spinner"></div></div>
+<div id="root"></div>
+<div id="layer"></div>
+<div id="toasts" aria-live="polite"></div>
+<script>
+'use strict';
+/* =====================================================================
+   My Heise App – Startseite (Hub)
+   Login, Modul-Auswahl, Benutzer & Zugriff (Admin)
+   ===================================================================== */
+
+/* ---------- Einstellungen ---------------------------------------------
+   Logos tauschen: Datei mit dem passenden Namen im selben Ordner auf GitHub ersetzen.
+   Es wird das erste Bild aus der Liste genommen, das existiert.            */
+const APP_NAME = 'My Heise App';
+/* Schriftzug 'HEISE / MY HEISE' ohne Icon. Datei logo-schrift.png ersetzen = neuer Schriftzug; fehlt sie, greift die eingebaute Kopie. */
+const LOGO_WILLKOMMEN = ['logo-schrift.png', 'data:image/png;base64,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'];
+const FIRMA = 'Heise Haustechnik GmbH & Co. KG';
+
+/* ---------- Module ------------------------------------------------------
+   NEUES MODUL: hier einen Eintrag ergänzen (id = Kürzel in Kleinbuchstaben, url = Datei).
+   Freigeschaltet wird es dann unter Zugriff & Rollen. Admins sehen immer alle Module. */
+const MODULES = [
+  { id: 'lager', name: 'Lagerverwaltung', desc: 'Viessmann- und Heise-Lager', url: 'lager.html', icon: 'box', g: ['#4a6a99', '#22385c'] },
+  { id: 'leitern', name: 'Leiterprüfung', desc: 'Leitern scannen, buchen und prüfen', url: 'leitern.html', icon: 'ladder', g: ['#f5a524', '#d0650a'],
+    rollen: [
+      { k: 'nutzer', l: 'Nutzer', d: 'Leitern ansehen, scannen, buchen und Mängel melden.' },
+      { k: 'obermonteur', l: 'Obermonteur', d: 'Wie Nutzer, dazu Aufgaben stellen (prüfen, reparieren).' },
+      { k: 'pruefer', l: 'Prüfer (Lagerist)', d: 'Wie Obermonteur, dazu prüfen, Leitern anlegen und Mängel abschließen.' },
+      { k: 'admin', l: 'Admin', d: 'Alles, dazu die Prüf-Checkliste verwalten.' }] },
+  { id: 'fuhrpark', name: 'Fuhrpark', desc: 'Fahrzeuge, Meldungen und Buchungen', url: 'fahrzeuge.html', icon: 'car', g: ['#22a06b', '#0d6b48'],
+    rollen: [
+      { k: 'fahrer', l: 'Fahrer', d: 'Schäden und Anfragen melden, Fahrzeuge buchen, Fahrzeugkontrolle machen.' },
+      { k: 'fuhrpark', l: 'Fuhrpark', d: 'Wie Fahrer, dazu Meldungen bearbeiten, Fahrzeuge, Belege, Termine und Führerscheinkontrollen verwalten.' },
+      { k: 'admin', l: 'Admin', d: 'Alles, dazu Fahrzeuge löschen und Belege entfernen.' }] },
+  { id: 'unterweisung', name: 'Unterweisungen', desc: 'Sicherheit: Folien, Prüfung, Nachweis', url: 'unterweisung.html', icon: 'book', g: ['#8b5cf6', '#5b21b6'] },
+  { id: 'gefaehrdung', name: 'Gefährdungs\u00adbeurteilung', desc: 'Baustellen: Checkliste, Freigabe, PDF', url: 'gefaehrdung.html', icon: 'hardhat', g: ['#f97316', '#c2410c'],
+    rollen: [
+      { k: 'benutzer', l: 'Leser', d: 'Freigegebene Beurteilungen ansehen und als PDF laden.' },
+      { k: 'ersteller', l: 'Ersteller', d: 'Beurteilungen erstellen und unterschreiben, Unterschriften der Beschäftigten einholen (Meister, Fachkraft für Arbeitssicherheit).' }] },
+  { id: 'objekt', name: 'Objektaufnahme', desc: 'Beim Kunden: Anlage, Fotos, PDF', url: 'objekt.html', icon: 'house', g: ['#14b8a6', '#0f766e'],
+    rollen: [
+      { k: 'aufnehmer', l: 'Aufnehmer', d: 'Objekte beim Kunden aufnehmen (Meister, Servicetechniker): eigene Aufnahmen erstellen, bearbeiten und als PDF ausgeben.' },
+      { k: 'buero', l: 'Büro', d: 'Alle Aufnahmen ansehen und als PDF ausgeben, zum Beispiel für das Angebot. Nicht bearbeiten.' }] },
+];
+
+/* ---------- Grundlagen ---------- */
+const SB = 'https://bbjzfoirefcsqqgztjpt.supabase.co', KEY = 'sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H';
+const SESS_KEY = 'heiseSession'; // gemeinsame Anmeldung für alle Module
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ic = (n, c = '') => `<svg class="ic ${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const root = $('#root');
+let ME = null, APPS = {}, ready = false, ZU = [];
+
+function greet() { return 'Hallo' }
+function heute() { return new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Berlin' }) }
+function toast(msg, kind = '') {
+  const t = document.createElement('div'); t.className = 'toast ' + kind; t.textContent = msg; $('#toasts').appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300) }, 3200);
+}
+const niceErr = e => {
+  const m = (e && e.message) || String(e || 'Fehler');
+  if (/failed to fetch|networkerror|load failed|network request/i.test(m)) return 'Keine Verbindung – bitte Internet prüfen.';
+  if (/row-level security|42501|permission denied/i.test(m)) return 'Dafür fehlt dir die Berechtigung.';
+  return m;
+};
+/* Logo laden: erstes vorhandenes aus der Liste, sonst Schriftzug */
+function loadLogo(host, list) {
+  if (!host) return;
+  const img = new Image(); let i = 0;
+  img.alt = 'Heise Haustechnik';
+  img.onload = () => { host.innerHTML = ''; host.appendChild(img) };
+  img.onerror = () => next();
+  const next = () => { if (i >= list.length) { host.innerHTML = '<span class="wordmark">HEISE HAUSTECHNIK</span>'; return } img.src = list[i++] };
+  next();
+}
+
+/* ---------- Sitzung (Supabase Auth) ---------- */
+const AUTH = { access: null, refresh: null, exp: 0 }; let _refreshP = null;
+const storedRefresh = () => { try { return (JSON.parse(localStorage.getItem(SESS_KEY) || 'null') || {}).r || null } catch (e) { return null } };
+function authSave(j) {
+  AUTH.access = j.access_token; AUTH.refresh = j.refresh_token;
+  AUTH.exp = j.expires_at ? j.expires_at * 1000 : Date.now() + (j.expires_in || 3600) * 1000;
+  try { localStorage.setItem(SESS_KEY, JSON.stringify({ r: AUTH.refresh })) } catch (e) { }
+}
+function authClear() { AUTH.access = null; AUTH.refresh = null; AUTH.exp = 0; try { localStorage.removeItem(SESS_KEY) } catch (e) { } }
+async function authToken(grant, body) {
+  const r = await fetch(`${SB}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.error_description || j.msg || 'Anmeldung fehlgeschlagen'); e.auth = true; throw e }
+  authSave(j); return j;
+}
+async function ensureToken() {
+  if (AUTH.access && AUTH.exp - Date.now() > 60000) return AUTH.access;
+  const r = storedRefresh() || AUTH.refresh; // neuesten Token nehmen (ein anderes Modul kann ihn erneuert haben)
+  if (!r) return null;
+  AUTH.refresh = r;
+  if (!_refreshP) _refreshP = authToken('refresh_token', { refresh_token: AUTH.refresh }).catch(e => { if (e.auth) { authClear(); sessionExpired() } throw e }).finally(() => { _refreshP = null });
+  await _refreshP; return AUTH.access;
+}
+async function api(method, table, body = null, query = '', extra = {}) {
+  const tok = await ensureToken();
+  const r = await fetch(`${SB}/rest/v1/${table}${query}`, { method, headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: `Bearer ${tok || KEY}`, Prefer: 'return=representation', ...extra }, body: body ? JSON.stringify(body) : null });
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.code === '42501' ? 'Keine Berechtigung' : (e.message || r.statusText)) }
+  try { return await r.json() } catch (e) { return [] }
+}
+async function rpc(name, args = {}) {
+  const tok = await ensureToken();
+  const r = await fetch(`${SB}/rest/v1/rpc/${name}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: `Bearer ${tok || KEY}` }, body: JSON.stringify(args) });
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.message || r.statusText) }
+  try { return await r.json() } catch (e) { return null }
+}
+const jwtSub = t => { try { return JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).sub } catch (e) { return null } };
+async function loadProfile() {
+  const rows = await api('GET', 'benutzer', null, `?auth_id=eq.${jwtSub(AUTH.access)}`);
+  if (!rows.length) throw new Error('Für dieses Konto ist kein Benutzerprofil hinterlegt.');
+  ME = rows[0];
+}
+async function loadApps() {
+  APPS = {};
+  if (ME.rolle === 'admin') { MODULES.forEach(m => APPS[m.id] = true); return }
+  try { (await api('GET', 'app_zugriff', null, `?select=app&benutzer_id=eq.${ME.id}`)).forEach(r => APPS[r.app] = true) }
+  catch (e) { MODULES.forEach(m => APPS[m.id] = true) } // im Zweifel nicht aussperren – die Module prüfen selbst
+}
+function sessionExpired() { if (!ME) return; ME = null; ready = false; showLogin(); toast('Sitzung abgelaufen – bitte neu anmelden', 'err') }
+
+/* ---------- Ablauf nach der Anmeldung ---------- */
+function safeNext() {
+  const p = new URLSearchParams(location.search).get('next');
+  if (!(p && /^[\w.-]+\.html(#.*)?$/.test(p))) return null;
+  const m = MODULES.find(x => x.url === p.split('#')[0]);
+  return m && APPS[m.id] ? p : null;
+}
+async function afterAuth() {
+  await loadApps();
+  if (ME.pw_aendern) return showForcePw();
+  const next = safeNext();
+  if (next) { location.replace(next); return }
+  if (location.search) history.replaceState(null, '', location.pathname + location.hash);
+  ready = true; $('#boot').hidden = true; route();
+}
+function route() {
+  if (!ME || !ready) return;
+  const h = location.hash;
+  if (h === '#/zugriff' && ME.rolle === 'admin') showZugriff();
+  else if (/^#\/nachrichten(\/(inbox|gesendet|meldungen))?$/.test(h)) showNachrichten(h.split('/')[2]);
+  else showHome();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+async function boot() {
+  try {
+    if (!storedRefresh()) { $('#boot').hidden = true; return showLogin() }
+    await ensureToken(); await loadProfile(); await afterAuth();
+  } catch (e) {
+    $('#boot').hidden = true;
+    if (e && e.auth) { authClear(); showLogin(); return }
+    root.innerHTML = `<div class="auth"><div class="auth-card" style="text-align:center">${ic('wifi', 'lg')}<h1 style="margin:10px 0 6px">Keine Verbindung</h1><p class="muted" style="margin-bottom:18px">${esc(niceErr(e))}</p><button class="btn btn-primary btn-block" onclick="location.reload()">Erneut versuchen</button></div></div>`;
+  }
+}
+/* Sitzung in einem anderen Tab/Modul beendet? */
+window.addEventListener('storage', e => { if (e.key === SESS_KEY && !e.newValue && ME) { ME = null; ready = false; showLogin() } });
+function checkAlive() { if (ME && !storedRefresh()) { ME = null; ready = false; showLogin() } }
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkAlive() });
+window.addEventListener('pageshow', e => { if (e.persisted) checkAlive() });
+
+/* ---------- Login ---------- */
+function showLogin() {
+  ME = null; ready = false; $('#boot').hidden = true; $('#layer').innerHTML = '';
+  root.innerHTML = `<div class="auth"><form class="auth-card" id="loginForm">
+    <div class="logo-panel small" id="lgLogo"></div>
+    <h1>${APP_NAME}</h1><p class="muted">Melde dich mit deinem Benutzernamen an.</p>
+    <div class="field"><label for="lu">Benutzername</label><input class="inp" id="lu" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+    <div class="field"><label for="lp">Passwort</label><input class="inp" id="lp" type="password" autocomplete="current-password"></div>
+    <div class="err" id="lerr" role="alert"></div>
+    <button class="btn btn-primary btn-block" id="lgo" type="submit">Anmelden</button>
+    <p class="faint" style="text-align:center;margin-top:16px;font-size:13px">Noch kein Zugang? Bitte beim Administrator melden.</p></form></div>`;
+  loadLogo($('#lgLogo'), LOGO_WILLKOMMEN);
+  $('#loginForm').onsubmit = e => { e.preventDefault(); doLogin() };
+  setTimeout(() => { const u = $('#lu'); if (u && !('ontouchstart' in window)) u.focus() }, 50);
+}
+async function doLogin() {
+  const u = $('#lu').value.trim(), p = $('#lp').value.trim(), err = m => { $('#lerr').textContent = m || '' };
+  if (!u || !p) return err('Bitte Benutzername und Passwort eingeben.');
+  const b = $('#lgo'); b.disabled = true; err('');
+  try {
+    const mail = await rpc('login_email', { p_name: u });
+    if (!mail) return err('Benutzername oder Passwort stimmt nicht.');
+    try { await authToken('password', { email: mail, password: p }) } catch (e) { if (e.auth) return err('Benutzername oder Passwort stimmt nicht.'); throw e }
+    await loadProfile(); await afterAuth();
+  } catch (e) { authClear(); ME = null; err(niceErr(e)) }
+  finally { const x = $('#lgo'); if (x) x.disabled = false }
+}
+async function logout() {
+  try { if (AUTH.access) await fetch(`${SB}/auth/v1/logout`, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + AUTH.access } }) } catch (e) { }
+  authClear(); history.replaceState(null, '', location.pathname); showLogin();
+}
+
+/* ---------- Passwort ---------- */
+async function setOwnPassword(neu) {
+  const tok = await ensureToken();
+  const r = await fetch(`${SB}/auth/v1/user`, { method: 'PUT', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + tok }, body: JSON.stringify({ password: neu }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(/different from the old/i.test(j.msg || '') ? 'Das neue Passwort muss sich vom bisherigen unterscheiden.' : (j.msg || j.error_description || 'Passwort konnte nicht geändert werden.'));
+}
+function showForcePw() {
+  ready = false; $('#boot').hidden = true;
+  root.innerHTML = `<div class="auth"><form class="auth-card" id="pwForm">
+    <div class="logo-panel small" id="lgLogo"></div>
+    <h1>Neues Passwort festlegen</h1><p class="muted">Bitte vergib jetzt ein eigenes Passwort (mindestens 8 Zeichen).</p>
+    <div class="field"><label for="pn1">Neues Passwort</label><input class="inp" id="pn1" type="password" autocomplete="new-password"></div>
+    <div class="field"><label for="pn2">Passwort wiederholen</label><input class="inp" id="pn2" type="password" autocomplete="new-password"></div>
+    <div class="err" id="perr" role="alert"></div>
+    <div class="btnrow"><button class="btn btn-ghost" type="button" data-act="logout">Abmelden</button><button class="btn btn-primary" id="pgo" type="submit">Speichern &amp; weiter</button></div></form></div>`;
+  loadLogo($('#lgLogo'), LOGO_WILLKOMMEN);
+  $('#pwForm').onsubmit = async e => {
+    e.preventDefault();
+    const a = $('#pn1').value.trim(), b = $('#pn2').value.trim(), err = m => { $('#perr').textContent = m || '' };
+    if (a.length < 8) return err('Mindestens 8 Zeichen.');
+    if (a !== b) return err('Die Passwörter stimmen nicht überein.');
+    const btn = $('#pgo'); btn.disabled = true; err('');
+    try { await setOwnPassword(a); await rpc('pw_geaendert'); ME.pw_aendern = false; toast('Passwort gespeichert – willkommen!', 'ok'); await afterAuth() }
+    catch (ex) { err(niceErr(ex)); btn.disabled = false }
+  };
+}
+function sheet(title, body, footer) {
+  const bd = document.createElement('div'); bd.className = 'backdrop';
+  bd.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="sheet-grab"></div><div class="sheet-h"><h2>${esc(title)}</h2><button class="iconbtn flat" data-act="closeSheet" aria-label="Schließen">${ic('x')}</button></div><div class="sheet-b">${body}</div>${footer ? `<div class="sheet-f">${footer}</div>` : ''}</div>`;
+  bd.addEventListener('mousedown', e => { if (e.target === bd) closeSheet() });
+  $('#layer').appendChild(bd); return bd;
+}
+function closeSheet() { const l = $('#layer'); if (l.lastChild) l.lastChild.remove() }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet() });
+function pwSheet() {
+  const bd = sheet('Passwort ändern', `
+    <div class="field"><label for="po">Aktuelles Passwort</label><input class="inp" id="po" type="password" autocomplete="current-password"></div>
+    <div class="field"><label for="pa">Neues Passwort</label><input class="inp" id="pa" type="password" autocomplete="new-password"></div>
+    <div class="field"><label for="pb">Neues Passwort wiederholen</label><input class="inp" id="pb" type="password" autocomplete="new-password"></div>
+    <div class="err" id="perr2" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="pgo2">Speichern</button>`);
+  $('#pgo2', bd).onclick = async ev => {
+    const o = $('#po', bd).value.trim(), a = $('#pa', bd).value.trim(), b = $('#pb', bd).value.trim(), err = m => { $('#perr2', bd).textContent = m || '' };
+    if (!o || !a || !b) return err('Bitte alle Felder ausfüllen.');
+    if (a.length < 8) return err('Mindestens 8 Zeichen.');
+    if (a !== b) return err('Die Passwörter stimmen nicht überein.');
+    const btn = ev.currentTarget; btn.disabled = true; err('');
+    try {
+      try { await authToken('password', { email: ME.login_email, password: o }) } catch (e) { if (e.auth) { err('Das aktuelle Passwort stimmt nicht.'); btn.disabled = false; return } throw e }
+      await setOwnPassword(a); closeSheet(); toast('Passwort geändert', 'ok');
+    } catch (e) { err(niceErr(e)); btn.disabled = false }
+  };
+}
+function kontoSheet() {
+  sheet('Konto', `<div class="kv"><b>${esc(ME.name)}</b><span>${esc(ME.benutzername || '')}${ME.rolle === 'admin' ? ' · Admin' : ''}</span></div>
+    <div class="btnrow" style="flex-direction:column"><button class="btn btn-soft" data-act="pw">${ic('lock')} Passwort ändern</button><button class="btn btn-ghost" data-act="logout">${ic('logout')} Abmelden</button></div>`);
+}
+
+/* ---------- Startseite ---------- */
+function appTile(m) {
+  return `<a class="app" href="${esc(m.url)}" style="--g1:${m.g[0]};--g2:${m.g[1]}"><span class="app-n" data-app-n="${esc(m.id)}" hidden></span><div class="app-ico">${ic(m.icon)}</div><div class="app-t"><b>${esc(m.name)}</b><span>${esc(m.desc)}</span></div>${ic('chev', 'chev')}</a>`;
+}
+function showHome() {
+  const mods = MODULES.filter(m => APPS[m.id]), first = (ME.name || '').split(' ')[0], adm = ME.rolle === 'admin';
+  root.innerHTML = `<div class="shell">
+    <header class="topbar"><div class="brand"><img src="icon.png?v=3" alt="" onerror="this.remove()"><div>${APP_NAME}<small>${esc(FIRMA)}</small></div></div><div class="top-r"><a class="bell" href="#/nachrichten" data-bell aria-label="Nachrichten">${ic('bell')}<span class="bell-n" hidden></span></a><button class="avatar" data-act="konto" aria-label="Konto">${esc((ME.name || '?').charAt(0).toUpperCase())}</button></div></header>
+    <section class="hero"><div class="hero-t"><div class="ey">${esc(heute())}</div><h1>${esc(greet())}, ${esc(first)}</h1></div><div class="logo-tile" id="heroLogo"></div><p class="hero-p">Willkommen bei Heise Haustechnik. Was möchtest du heute erledigen?</p></section>
+    <a class="msgcard" id="msgcard" href="#/nachrichten">${'<div class="mi">' + ic('mail', 'lg') + '</div>'}<div class="mt"><b>Nachrichten</b><span class="s">${esc(zaehlerText())}</span></div><span class="cnt" hidden></span>${ic('chev', 'chev')}</a>
+    <div class="sec-title">Deine Apps</div>
+    ${mods.length ? `<div class="apps">${mods.map(appTile).join('')}</div>` : `<div class="empty">${ic('lock')}<h3>Noch keine App freigeschaltet</h3><p class="muted" style="margin-top:4px">Bitte melde dich beim Administrator.</p></div>`}
+    ${adm ? `<div class="sec-title">Verwaltung</div><div class="apps"><a class="app plain" href="#/zugriff" style="--g1:#14b8a6;--g2:#0f766e"><div class="app-ico">${ic('users')}</div><div class="app-t"><b>Benutzer &amp; Zugriff</b><span>Benutzer anlegen, Apps und Rollen</span></div>${ic('chev', 'chev')}</a></div>` : ''}
+    <div class="foot">${APP_NAME} · ${esc(FIRMA)}</div></div>`;
+  loadLogo($('#heroLogo'), LOGO_WILLKOMMEN);
+  paintZaehler(); refreshZaehler();
+}
+
+/* ---------- Zugriff & Rollen (Admin) ---------- */
+function roleSelect(uid, m, cur, uname) {
+  return `<select class="inp" data-zr data-u="${uid}" data-m="${m.id}" aria-label="Rolle ${esc(m.name)} für ${esc(uname)}">${m.rollen.map(x => `<option value="${x.k}" ${cur === x.k ? 'selected' : ''}>${esc(x.l)}</option>`).join('')}</select>`;
+}
+async function showZugriff() {
+  root.innerHTML = `<div class="shell"><div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1></div><div class="empty"><div class="spinner" style="margin:6px auto"></div></div></div>`;
+  try {
+    const [users, zg] = await Promise.all([api('GET', 'benutzer', null, '?select=id,name,benutzername,email,rolle&order=name.asc'), api('GET', 'app_zugriff', null, '?select=benutzer_id,app,rolle')]);
+    if (location.hash !== '#/zugriff') return;
+    ZU = users; const map = {}; zg.forEach(z => { (map[z.benutzer_id] = map[z.benutzer_id] || {})[z.app] = z.rolle });
+    const withRoles = MODULES.filter(m => m.rollen);
+    root.innerHTML = `<div class="shell">
+      <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1><button class="btn btn-primary btn-sm" data-act="uNeu" style="margin-left:auto">${ic('plus','sm')} Neu</button></div>
+      <div class="callout plain tone-blue">${ic('info')}<div><b>Benutzer verwalten</b><span>Mit „Neu“ legst du eine Person an. Hier schaltest du auch die Apps frei; Änderungen gelten sofort. Neue Benutzer bekommen zunächst Lagerverwaltung und Leiterprüfung. Über „⋯“ änderst du E-Mail und Rolle, setzt ein Passwort zurück oder löschst einen Benutzer.</span></div></div>
+      ${withRoles.map(m => `<details class="urow" style="padding:14px 16px"><summary style="cursor:pointer;font-weight:700">Rollen in der ${esc(m.name)}</summary><div class="rolelist">${m.rollen.map(r => `<div><b>${esc(r.l)}</b><span>${esc(r.d)}</span></div>`).join('')}</div></details>`).join('')}
+      ${users.map(u => {
+        const isAdm = u.rolle === 'admin';
+        return `<div class="urow"><div class="uhead"><div class="avatar" style="width:40px;height:40px;font-size:15px">${esc((u.name || '?').charAt(0).toUpperCase())}</div><div><b>${esc(u.name)}</b><small>${esc(u.benutzername || '')}${isAdm ? ' · Admin' : ''}${u.email ? '' : ' · <span style="color:var(--red)">keine E-Mail</span>'}</small></div><button class="iconbtn flat" data-act="uMenu" data-u="${u.id}" aria-label="${esc(u.name)} verwalten" style="margin-left:auto;font-size:22px;line-height:1">⋯</button></div>
+          ${isAdm ? `<p class="faint" style="margin-top:10px;font-size:14px">Admins haben überall Zugriff.</p>` : `<div class="umods">${MODULES.map(m => {
+            const r = (map[u.id] || {})[m.id], on = r !== undefined;
+            return `<div class="umod" style="--g1:${m.g[0]};--g2:${m.g[1]}"><div class="umod-l"><span class="mi">${ic(m.icon)}</span><span>${esc(m.name)}</span></div>
+              <div class="umod-r">${m.rollen && on ? roleSelect(u.id, m, r, u.name) : ''}
+              <button class="switch ${on ? 'on' : ''}" data-act="zg" data-u="${u.id}" data-m="${m.id}" data-n="${esc(u.name)}" role="switch" aria-checked="${on}" aria-label="${esc(m.name)} für ${esc(u.name)}"></button></div></div>`;
+          }).join('')}</div>`}</div>`;
+      }).join('')}</div>`;
+  } catch (e) {
+    root.innerHTML = `<div class="shell"><div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1></div><div class="empty">${ic('info')}<h3>Konnte nicht geladen werden</h3><p class="muted">${esc(niceErr(e))}</p></div></div>`;
+  }
+}
+async function setZugriff(uid, mid, on, rolle) {
+  const m = MODULES.find(x => x.id === mid);
+  if (on) await api('POST', 'app_zugriff', { benutzer_id: uid, app: mid, rolle: rolle || (m.rollen ? m.rollen[0].k : 'benutzer') }, '?on_conflict=benutzer_id,app', { Prefer: 'resolution=merge-duplicates,return=representation' });
+  else await api('DELETE', 'app_zugriff', null, `?benutzer_id=eq.${uid}&app=eq.${mid}`);
+}
+
+/* ---------- Benutzer anlegen / Passwort zurücksetzen / löschen (Admin, über Edge Function) ---------- */
+async function adminFn(action, payload) {
+  const tok = await ensureToken();
+  const r = await fetch(`${SB}/functions/v1/admin-users`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, 'x-user-token': tok || '' }, body: JSON.stringify({ action, ...payload }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.error) throw new Error(j.error || ('Fehler ' + r.status));
+  return j;
+}
+function pwVorschlag() {
+  const a = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789', v = new Uint32Array(10); crypto.getRandomValues(v);
+  return [...v].map(x => a[x % a.length]).join('');
+}
+const pwField = (id, label) => `<div class="field"><label for="${id}">${label}</label><div style="display:flex;gap:8px"><input class="inp" id="${id}" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="mind. 8 Zeichen"><button type="button" class="btn btn-soft" data-act="pwGen" data-t="${id}">Vorschlag</button></div><small class="faint">Beim ersten Anmelden vergibt die Person ein eigenes Passwort.</small></div>`;
+function copyText(t) {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t);
+  return new Promise((ok, no) => { const a = document.createElement('textarea'); a.value = t; a.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(a); a.select(); try { document.execCommand('copy') ? ok() : no() } catch (e) { no(e) } a.remove() });
+}
+function zugangsText(name, benutzername, pw) {
+  const url = location.origin + location.pathname.replace(/[^/]*$/, '');
+  return `Hallo ${(name || '').split(' ')[0]},\nhier ist dein Zugang zur ${APP_NAME}:\n\nAdresse: ${url}\nBenutzername: ${benutzername}\nStartpasswort: ${pw}\n\nBeim ersten Anmelden vergibst du dir ein eigenes Passwort.`;
+}
+function zugangSheet(title, intro, name, benutzername, pw) {
+  const txt = zugangsText(name, benutzername, pw);
+  const bd = sheet(title, `<p class="muted" style="margin:2px 0 12px">${intro}</p>
+    <div class="kv" style="margin-bottom:12px"><b>${esc(name)}</b><span>Benutzername: <b style="font-size:inherit;color:var(--ink)">${esc(benutzername)}</b></span><span>Startpasswort: <b style="font-size:inherit;color:var(--ink);user-select:all">${esc(pw)}</b></span></div>
+    <p class="faint" style="font-size:14px">Gib die Zugangsdaten persönlich weiter. Das Startpasswort wird hier nur jetzt angezeigt.</p>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Fertig</button><button class="btn btn-primary" id="zgCopy">Zugangsdaten kopieren</button>`);
+  $('#zgCopy', bd).onclick = async ev => { try { await copyText(txt); ev.currentTarget.textContent = 'Kopiert ✓' } catch (e) { toast('Kopieren nicht möglich – bitte abschreiben', 'err') } };
+}
+function uNeu() {
+  const bd = sheet('Neuer Benutzer', `
+    <div class="field"><label for="nvName">Name</label><input class="inp" id="nvName" autocomplete="off" placeholder="Max Mustermann"></div>
+    <div class="field"><label for="nvUser">Benutzername (für den Login)</label><input class="inp" id="nvUser" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="z. B. mmustermann"></div>
+    ${pwField('nvPw', 'Startpasswort')}
+    <div class="field"><label for="nvMail">E-Mail (optional, für Buchungs-Mails)</label><input class="inp" id="nvMail" type="email" autocomplete="off" placeholder="name@firma.de"></div>
+    <div class="field"><label>Rolle</label><div class="seg" id="nvRolle"><button type="button" class="on" data-act="nvR" data-r="benutzer">Benutzer</button><button type="button" data-act="nvR" data-r="admin">Admin</button></div><small class="faint">Admins haben überall Zugriff und dürfen Nachrichten schreiben und Benutzer verwalten.</small></div>
+    <div class="err" id="nvErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="nvGo">Anlegen</button>`);
+  $('#nvPw', bd).value = pwVorschlag();
+  // Benutzername aus dem Namen vorschlagen, solange er nicht selbst geändert wurde
+  const nm = $('#nvName', bd), us = $('#nvUser', bd); let touched = false; us.oninput = () => { touched = true };
+  nm.oninput = () => { if (touched) return; const p = nm.value.trim().split(/\s+/).filter(Boolean); us.value = p.length ? (p.length > 1 ? p[0][0] + p[p.length - 1] : p[0]).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/ß/g, 'ss').replace(/[^a-z0-9._-]/g, '') : '' };
+  $('#nvGo', bd).onclick = async ev => {
+    const err = m => { $('#nvErr', bd).textContent = m || '' };
+    const name = nm.value.trim(), user = us.value.trim(), pw = $('#nvPw', bd).value.trim(), mail = $('#nvMail', bd).value.trim(), rolle = $('#nvRolle .on', bd).dataset.r;
+    if (!name || !user) return err('Bitte Name und Benutzernamen eingeben.');
+    if (pw.length < 8) return err('Das Startpasswort braucht mindestens 8 Zeichen.');
+    if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return err('Die E-Mail-Adresse ist ungültig.');
+    const b = ev.currentTarget; b.disabled = true; err('');
+    try {
+      await adminFn('create_user', { benutzername: user, password: pw, name, email: mail, rolle });
+      closeSheet();
+      zugangSheet('Benutzer angelegt', rolle === 'admin' ? 'Die Person ist Admin und hat überall Zugriff.' : 'Freigeschaltet sind Lagerverwaltung und Leiterprüfung. Das kannst du in der Liste ändern.', name, user, pw);
+      if (location.hash === '#/zugriff') showZugriff();
+    } catch (e) { err(niceErr(e)); b.disabled = false }
+  };
+  setTimeout(() => nm.focus(), 60);
+}
+function uMenu(el) {
+  const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
+  const self = u.id === ME.id;
+  sheet(u.name, `<div class="kv"><b>${esc(u.name)}</b><span>${esc(u.benutzername || '')}${u.rolle === 'admin' ? ' · Admin' : ''}${u.email ? ' · ' + esc(u.email) : ''}</span></div>
+    <div class="btnrow" style="flex-direction:column"><button class="btn btn-soft" data-act="uMail" data-u="${u.id}">${ic('mail')} E-Mail ${u.email ? 'ändern' : 'hinterlegen'}</button>${self ? '' : `<button class="btn btn-soft" data-act="uRolle" data-u="${u.id}">${ic('shield')} ${u.rolle === 'admin' ? 'Zum normalen Benutzer machen' : 'Zum Admin machen'}</button>`}<button class="btn btn-soft" data-act="uPw" data-u="${u.id}">${ic('lock')} Passwort zurücksetzen</button>${self ? '' : `<button class="btn btn-ghost" style="color:var(--red)" data-act="uDel" data-u="${u.id}">${ic('trash')} Benutzer löschen</button>`}</div>`);
+}
+function uMail(el) {
+  const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
+  closeSheet();
+  const bd = sheet('E-Mail-Adresse', `<div class="kv"><b>${esc(u.name)}</b><span>${esc(u.benutzername || '')}</span></div>
+    <div class="field"><label for="emIn">E-Mail (für Buchungs-Mails)</label><input class="inp" id="emIn" type="email" autocomplete="off" placeholder="name@firma.de"><small class="faint">Leer lassen, um die Adresse zu entfernen.</small></div><div class="err" id="emErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="emGo">Speichern</button>`);
+  $('#emIn', bd).value = u.email || '';
+  $('#emGo', bd).onclick = async ev => {
+    const mail = $('#emIn', bd).value.trim(), err = m => { $('#emErr', bd).textContent = m || '' };
+    if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return err('Bitte eine gültige E-Mail-Adresse eingeben.');
+    const b = ev.currentTarget; b.disabled = true; err('');
+    try { await api('PATCH', 'benutzer', { email: mail || null }, `?id=eq.${u.id}`); closeSheet(); toast('E-Mail gespeichert', 'ok'); if (location.hash === '#/zugriff') showZugriff() }
+    catch (e) { err(niceErr(e)); b.disabled = false }
+  };
+  setTimeout(() => $('#emIn', bd).focus(), 60);
+}
+function uRolle(el) {
+  const u = ZU.find(x => x.id === el.dataset.u); if (!u || u.id === ME.id) return;
+  closeSheet();
+  const neu = u.rolle === 'admin' ? 'benutzer' : 'admin';
+  const bd = sheet(neu === 'admin' ? 'Zum Admin machen?' : 'Admin-Rechte entziehen?',
+    `<p class="muted" style="margin:2px 0 6px"><b>${esc(u.name)}</b> ${neu === 'admin' ? 'bekommt Zugriff auf alle Apps und darf Nachrichten schreiben sowie Benutzer verwalten.' : 'ist danach ein normaler Benutzer. Zugriff auf Apps richtet sich dann nach den Schaltern in der Liste.'}</p><div class="err" id="rlErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="rlGo">${neu === 'admin' ? 'Zum Admin machen' : 'Zum Benutzer machen'}</button>`);
+  $('#rlGo', bd).onclick = async ev => {
+    const b = ev.currentTarget; b.disabled = true;
+    try { await api('PATCH', 'benutzer', { rolle: neu }, `?id=eq.${u.id}`); closeSheet(); toast('Rolle geändert', 'ok'); if (location.hash === '#/zugriff') showZugriff() }
+    catch (e) { $('#rlErr', bd).textContent = niceErr(e); b.disabled = false }
+  };
+}
+function uPw(el) {
+  const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
+  closeSheet();
+  const bd = sheet('Passwort zurücksetzen', `<div class="kv"><b>${esc(u.name)}</b><span>${esc(u.benutzername || '')}</span></div>${pwField('rsPw', 'Neues Startpasswort')}<div class="err" id="rsErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="rsGo">Setzen</button>`);
+  $('#rsPw', bd).value = pwVorschlag();
+  $('#rsGo', bd).onclick = async ev => {
+    const pw = $('#rsPw', bd).value.trim(), err = m => { $('#rsErr', bd).textContent = m || '' };
+    if (pw.length < 8) return err('Mindestens 8 Zeichen.');
+    const b = ev.currentTarget; b.disabled = true; err('');
+    try { await adminFn('set_password', { benutzer_id: u.id, password: pw }); closeSheet(); zugangSheet('Passwort gesetzt', 'Die Person muss beim nächsten Anmelden ein eigenes Passwort vergeben.', u.name, u.benutzername || '', pw) }
+    catch (e) { err(niceErr(e)); b.disabled = false }
+  };
+}
+function uDel(el) {
+  const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
+  closeSheet();
+  const bd = sheet('Benutzer löschen?', `<p class="muted" style="margin:2px 0 6px"><b>${esc(u.name)}</b> (${esc(u.benutzername || '')}) verliert den Zugang zu allen Apps und wird dauerhaft gelöscht. Das lässt sich nicht rückgängig machen.</p><div class="err" id="dlErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-danger" id="dlGo">Löschen</button>`);
+  $('#dlGo', bd).onclick = async ev => {
+    const b = ev.currentTarget; b.disabled = true;
+    try { await adminFn('delete_user', { benutzer_id: u.id }); closeSheet(); toast('Benutzer gelöscht', 'ok'); if (location.hash === '#/zugriff') showZugriff() }
+    catch (e) { $('#dlErr', bd).textContent = niceErr(e); b.disabled = false }
+  };
+}
+
+/* ---------- Klicks ---------- */
+const ACT = {
+  uNeu, uMenu, uMail, uRolle, uPw, uDel,
+  pwGen(el) { const t = $('#' + el.dataset.t); if (t) t.value = pwVorschlag() },
+  nvR(el) { $$('#nvRolle button').forEach(b => b.classList.toggle('on', b === el)) },
+  logout, konto: kontoSheet, pw: () => { closeSheet(); pwSheet() }, closeSheet: () => closeSheet(),
+  async zg(el) {
+    const on = !el.classList.contains('on');
+    el.disabled = true;
+    try {
+      await setZugriff(el.dataset.u, el.dataset.m, on);
+      const m = MODULES.find(x => x.id === el.dataset.m), box = el.closest('.umod-r');
+      el.classList.toggle('on', on); el.setAttribute('aria-checked', on);
+      const old = box.querySelector('select'); if (old) old.remove();
+      if (on && m.rollen) box.insertAdjacentHTML('afterbegin', roleSelect(el.dataset.u, m, m.rollen[0].k, el.dataset.n || ''));
+      toast(on ? 'Zugriff freigeschaltet' : 'Zugriff entfernt', 'ok');
+    } catch (e) { toast(niceErr(e), 'err') }
+    el.disabled = false;
+  },
+};
+document.addEventListener('click', e => { if (e.target.closest('a[target="_blank"]')) return; const el = e.target.closest('[data-act]'); if (el && ACT[el.dataset.act]) { e.preventDefault(); ACT[el.dataset.act](el) } });
+document.addEventListener('change', async e => {
+  const s = e.target.closest('select[data-zr]'); if (!s) return;
+  s.disabled = true;
+  try { await setZugriff(s.dataset.u, s.dataset.m, true, s.value); toast('Rolle gespeichert', 'ok') } catch (err) { toast(niceErr(err), 'err'); showZugriff() }
+  s.disabled = false;
+});
+
+/* ---------- Easter Egg: Klick aufs Logo auf der Startseite = kleines Feuerwerk ---------- */
+const FW = { cv: null, cx: null, p: [], run: false, last: 0 };
+function feuerwerk(x, y) {
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!FW.cv) {
+    const c = document.createElement('canvas'); c.setAttribute('aria-hidden', 'true');
+    c.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+    document.body.appendChild(c); FW.cv = c; FW.cx = c.getContext('2d');
+  }
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), W = innerWidth, H = innerHeight;
+  FW.cv.width = W * dpr; FW.cv.height = H * dpr; FW.cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cols = ['#ffd166', '#ff8a3d', '#ff5d5d', '#4da3ff', '#7bdff2', '#ffffff', '#b78cff', '#5ee59a'];
+  const burst = (bx, by) => {
+    const c1 = cols[Math.random() * cols.length | 0], c2 = cols[Math.random() * cols.length | 0], n = 46;
+    for (let i = 0; i < n; i++) {
+      const a = Math.PI * 2 * i / n + Math.random() * .2, v = 1.6 + Math.random() * 3.4;
+      FW.p.push({ x: bx, y: by, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, dec: .011 + Math.random() * .012, c: i % 2 ? c1 : c2, r: 1.4 + Math.random() * 1.6 });
+    }
+  };
+  burst(x, y);
+  setTimeout(() => burst(W * (.2 + Math.random() * .6), H * (.12 + Math.random() * .3)), 260);
+  setTimeout(() => burst(W * (.15 + Math.random() * .7), H * (.1 + Math.random() * .35)), 520);
+  if (FW.run) return;
+  FW.run = true; FW.last = performance.now();
+  const step = t => {
+    const k = Math.min((t - FW.last) / 16.67, 3); FW.last = t;
+    const cx = FW.cx; cx.clearRect(0, 0, W, H);
+    FW.p = FW.p.filter(q => q.life > 0);
+    for (const q of FW.p) {
+      q.vx *= Math.pow(.985, k); q.vy = q.vy * Math.pow(.985, k) + .06 * k; q.x += q.vx * k; q.y += q.vy * k; q.life -= q.dec * k;
+      cx.globalAlpha = Math.max(q.life, 0); cx.fillStyle = q.c; cx.beginPath(); cx.arc(q.x, q.y, q.r * (.5 + q.life * .5), 0, 6.283); cx.fill();
+    }
+    cx.globalAlpha = 1;
+    if (FW.p.length) requestAnimationFrame(step); else { FW.run = false; cx.clearRect(0, 0, W, H) }
+  };
+  requestAnimationFrame(step);
+}
+document.addEventListener('click', e => {
+  if (!ME || !ready) return;
+  const l = e.target.closest('.brand, #heroLogo'); if (!l || !$('.hero')) return;
+  const r = l.getBoundingClientRect(); feuerwerk(e.clientX || r.left + r.width / 2, e.clientY || r.top + r.height / 2);
+});
+
+/* =====================================================================
+   Nachrichten & Meldungen (für alle Apps in My Heise)
+   - Admin schreibt an alle oder an bestimmte Personen und sieht, wer gelesen hat
+   - Alle lesen ihren Posteingang; Lesestatus liegt pro Person in der Datenbank
+   - Alle können ein Problem melden; Admin bearbeitet die Meldungen
+   ===================================================================== */
+const NX = { tab: null, filter: 'alle', mfilter: 'offen', msgs: [], allGel: [], gel: new Set(), users: [], meld: [], Z: { ungelesen: 0, meldungen: 0, fuhrpark: 0, unterweisung: 0, gefaehrdung: 0, objekt: 0 }, loaded: false };
+const isAdm = () => !!ME && ME.rolle === 'admin';
+
+/* ---------- Hilfen ---------- */
+function utcMs(v) {
+  if (!v) return 0; const s = String(v).replace(' ', 'T');
+  return new Date(/[zZ]$|[+-]\d\d(:?\d\d)?$/.test(s) ? s : s + 'Z').getTime();
+}
+const _tf = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' });
+const _df = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Berlin' });
+function zeit(iso) {
+  const t = utcMs(iso), d = new Date(t), now = new Date(), diff = (now - d) / 60000;
+  if (diff < 1) return 'gerade eben';
+  if (diff < 60) return `vor ${Math.floor(diff)} Min.`;
+  if (_df.format(d) === _df.format(now)) return 'Heute, ' + _tf.format(d);
+  if (_df.format(d) === _df.format(new Date(now.getTime() - 864e5))) return 'Gestern, ' + _tf.format(d);
+  return _df.format(d) + ', ' + _tf.format(d);
+}
+function linkify(t) {
+  return esc(t).replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)"'])/g, u => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`);
+}
+const uuid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16) });
+const uName = u => u ? (u.name || u.benutzername || '?') : 'Gelöscht';
+const plural = (n, a, b) => n === 1 ? a : b;
+
+/* ---------- Zähler (Glocke, Startseite, andere Apps) ---------- */
+async function refreshZaehler() {
+  try {
+    const z = await rpc('hub_zaehler');
+    if (z && typeof z === 'object') NX.Z = { ungelesen: +z.ungelesen || 0, meldungen: +z.meldungen || 0, fuhrpark: +z.fuhrpark || 0, unterweisung: +z.unterweisung || 0, gefaehrdung: +z.gefaehrdung || 0, objekt: +z.objekt || 0 };
+  } catch (e) { return }
+  paintZaehler();
+}
+function zaehlerGesamt() { return NX.Z.ungelesen + (isAdm() ? NX.Z.meldungen : 0) }
+function zaehlerText() {
+  const u = NX.Z.ungelesen, m = isAdm() ? NX.Z.meldungen : 0, p = [];
+  if (u) p.push(`${u} ${plural(u, 'ungelesene Nachricht', 'ungelesene Nachrichten')}`);
+  if (m) p.push(`${m} ${plural(m, 'offene Meldung', 'offene Meldungen')}`);
+  return p.length ? p.join(' · ') : (isAdm() ? 'Schreiben, Gesendetes, Meldungen' : 'Keine neuen Nachrichten');
+}
+function paintZaehler() {
+  const n = zaehlerGesamt();
+  $$('[data-bell] .bell-n').forEach(s => { s.textContent = n > 99 ? '99+' : n; s.hidden = !n });
+  const c = $('#msgcard');
+  if (c) { c.classList.toggle('new', n > 0); $('.s', c).textContent = zaehlerText(); const k = $('.cnt', c); k.textContent = n > 99 ? '99+' : n; k.hidden = !n }
+  $$('[data-app-n]').forEach(b => { const k = NX.Z[b.dataset.appN] || 0; b.textContent = k > 99 ? '99+' : k; b.hidden = !k; b.title = b.dataset.appN === 'unterweisung' ? k + (k === 1 ? ' offene Unterweisung' : ' offene Unterweisungen') : (b.dataset.appN === 'gefaehrdung' || b.dataset.appN === 'objekt') ? k + (k === 1 ? ' offener Entwurf' : ' offene Entwürfe') : k + (k === 1 ? ' offene Meldung' : ' offene Meldungen') });
+  paintTabBadges();
+}
+setInterval(() => { if (ME && ready && !document.hidden) refreshZaehler() }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && ME && ready) { refreshZaehler(); if (/^#\/nachrichten/.test(location.hash) && !$('#layer').firstChild) nxReload(true) } });
+
+/* ---------- Daten ---------- */
+const inboxFilter = m => (m.empfaenger_id === null || m.empfaenger_id === ME.id) && m.absender_id !== ME.id;
+const isUnread = m => inboxFilter(m) && !NX.gel.has(m.id) && utcMs(m.created_at) >= utcMs(ME.created_at);
+async function nxLoad() {
+  const jobs = [
+    api('GET', 'benachrichtigungen', null, '?select=id,titel,nachricht,created_at,empfaenger_id,absender_id,absender,wichtig,gruppe_id&order=created_at.desc&limit=300'),
+    api('GET', 'nachrichten_gelesen', null, '?select=nachricht_id,benutzer_id,gelesen_am&limit=1000'),
+    api('GET', 'meldungen', null, '?select=*&order=created_at.desc&limit=300'),
+    isAdm() ? api('GET', 'benutzer', null, '?select=id,name,benutzername,rolle,created_at&order=name.asc') : Promise.resolve([]),
+  ];
+  const [msgs, gel, meld, users] = await Promise.all(jobs);
+  NX.msgs = msgs; NX.allGel = gel; NX.meld = meld; NX.users = users;
+  NX.gel = new Set(gel.filter(g => g.benutzer_id === ME.id).map(g => g.nachricht_id));
+  NX.loaded = true;
+}
+async function nxReload(quiet) {
+  try { await nxLoad(); if (/^#\/nachrichten/.test(location.hash)) renderNx(); await refreshZaehler() }
+  catch (e) { if (!quiet) toast(niceErr(e), 'err') }
+}
+
+/* ---------- Seite ---------- */
+async function showNachrichten(tab) {
+  if (tab) NX.tab = tab;
+  root.innerHTML = `<div class="shell"><div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Nachrichten</h1></div>
+    <div class="empty"><div class="spinner" style="margin:6px auto"></div></div></div>`;
+  try {
+    await nxLoad();
+    if (!/^#\/nachrichten/.test(location.hash)) return;
+    renderNx(); refreshZaehler();
+  } catch (e) {
+    root.innerHTML = `<div class="shell"><div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Nachrichten</h1></div>
+      <div class="empty">${ic('wifi')}<h3>Konnte nicht geladen werden</h3><p class="muted" style="margin:4px 0 14px">${esc(niceErr(e))}</p><button class="btn btn-primary" data-act="nxRetry">Erneut versuchen</button></div></div>`;
+  }
+}
+function nxTabs() {
+  const adm = isAdm(), inbox = NX.msgs.filter(inboxFilter), un = inbox.filter(isUnread).length;
+  const offen = NX.meld.filter(m => m.status === 'offen').length, t = [];
+  if (adm) t.push(['gesendet', 'Gesendet', 0]);
+  if (!adm || inbox.length) t.push(['inbox', 'Posteingang', un]);
+  t.push(['meldungen', adm ? 'Meldungen' : 'Meine Meldungen', adm ? offen : 0]);
+  return { list: t, inbox, un };
+}
+function renderNx() {
+  const { list, inbox, un } = nxTabs();
+  if (!list.some(x => x[0] === NX.tab)) NX.tab = list[0][0];
+  const head = `<div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Nachrichten</h1>
+    ${isAdm() ? `<button class="btn btn-primary btn-sm head-act" data-act="nxNeu">${ic('plus', 'sm')} Neu</button>` : ''}</div>`;
+  const tabs = `<div class="seg nx-tabs" role="tablist">${list.map(([k, l, n]) => `<button role="tab" aria-selected="${NX.tab === k}" class="${NX.tab === k ? 'on' : ''}" data-act="nxTab" data-tab="${k}">${l}${n ? `<span class="tb" data-tb="${k}">${n}</span>` : ''}</button>`).join('')}</div>`;
+  let body = '';
+  if (NX.tab === 'inbox') body = viewInbox(inbox, un);
+  else if (NX.tab === 'gesendet') body = viewGesendet();
+  else body = viewMeldungen();
+  root.innerHTML = `<div class="shell">${head}${tabs}<div id="nxBody">${body}</div></div>`;
+}
+function paintTabBadges() {
+  if (!/^#\/nachrichten/.test(location.hash) || !NX.loaded) return;
+  const b = $('.nx-tabs'); if (!b) return;
+  const { list, un } = nxTabs();
+  const f = $('[data-act="nxFilter"][data-f="ungelesen"]'); if (f) f.textContent = 'Ungelesen' + (un ? ` (${un})` : '');
+  const al = $('[data-act="nxAlleLesen"]'); if (al) al.hidden = !un;
+  list.forEach(([k, , n]) => { const btn = b.querySelector(`[data-tab="${k}"]`); if (!btn) return; let s = btn.querySelector('.tb'); if (!n) { if (s) s.remove(); return } if (!s) { s = document.createElement('span'); s.className = 'tb'; btn.appendChild(s) } s.textContent = n });
+}
+
+/* ---------- Posteingang ---------- */
+function msgCard(m) {
+  const un = isUnread(m);
+  return `<article class="msg ${un ? 'unread' : ''} ${m.wichtig ? 'wichtig' : ''}" data-id="${m.id}">
+    <div class="msg-h" role="button" tabindex="0" data-act="msgToggle" aria-expanded="false">
+      <span class="msg-dot" aria-hidden="true"></span>
+      <span class="msg-main">
+        <span class="msg-top"><b>${esc(m.titel)}</b><time>${esc(zeit(m.created_at))}</time></span>
+        <span class="msg-meta">${m.wichtig ? `<span class="chip tone-red">${ic('alert')} Wichtig</span>` : ''}<span>${esc(m.absender || 'Admin')} · ${m.empfaenger_id ? 'Persönlich an dich' : 'An alle'}</span></span>
+        <span class="msg-body">${linkify(m.nachricht)}</span>
+      </span>
+    </div>
+    <div class="msg-foot" hidden><button class="btn btn-soft btn-sm" data-act="msgUnread" data-id="${m.id}">Als ungelesen markieren</button></div>
+  </article>`;
+}
+function viewInbox(inbox, un) {
+  const list = NX.filter === 'ungelesen' ? inbox.filter(isUnread) : inbox;
+  return `<div class="nx-bar"><div class="seg sm" role="group" aria-label="Filter">
+      <button class="${NX.filter === 'alle' ? 'on' : ''}" data-act="nxFilter" data-f="alle">Alle</button>
+      <button class="${NX.filter === 'ungelesen' ? 'on' : ''}" data-act="nxFilter" data-f="ungelesen">Ungelesen${un ? ` (${un})` : ''}</button></div>
+      ${un ? `<button class="btn btn-soft btn-sm" data-act="nxAlleLesen">${ic('checks', 'sm')} Alle gelesen</button>` : ''}</div>
+    ${list.length ? list.map(msgCard).join('') : `<div class="empty">${ic('mail')}<h3>${NX.filter === 'ungelesen' ? 'Alles gelesen' : 'Noch keine Nachrichten'}</h3><p class="muted" style="margin-top:4px">${NX.filter === 'ungelesen' ? 'Du hast keine ungelesenen Nachrichten.' : 'Hier erscheinen Mitteilungen vom Admin.'}</p></div>`}`;
+}
+async function markRead(id, on) {
+  const card = $(`.msg[data-id="${id}"]`), was = NX.gel.has(id);
+  if (on === was) return;
+  const m = NX.msgs.find(x => x.id === id); if (!m) return;
+  // sofort anzeigen …
+  on ? NX.gel.add(id) : NX.gel.delete(id);
+  if (card) card.classList.toggle('unread', !on && isUnread(m));
+  const un = NX.msgs.filter(isUnread).length; NX.Z.ungelesen = un; paintZaehler();
+  // … und speichern
+  try {
+    if (on) await api('POST', 'nachrichten_gelesen', { nachricht_id: id, benutzer_id: ME.id }, '?on_conflict=nachricht_id,benutzer_id', { Prefer: 'resolution=ignore-duplicates,return=minimal' });
+    else await api('DELETE', 'nachrichten_gelesen', null, `?nachricht_id=eq.${id}&benutzer_id=eq.${ME.id}`);
+  } catch (e) {
+    on ? NX.gel.delete(id) : NX.gel.add(id);
+    if (card) card.classList.toggle('unread', isUnread(m));
+    NX.Z.ungelesen = NX.msgs.filter(isUnread).length; paintZaehler(); toast('Konnte nicht gespeichert werden – ' + niceErr(e), 'err');
+  }
+}
+
+/* ---------- Gesendet (Admin) ---------- */
+function gruppen() {
+  const map = new Map();
+  NX.msgs.forEach(m => { if (!map.has(m.gruppe_id)) map.set(m.gruppe_id, { id: m.gruppe_id, rows: [] }); map.get(m.gruppe_id).rows.push(m) });
+  const gelKey = new Set(NX.allGel.map(g => g.nachricht_id + '|' + g.benutzer_id)), gelAt = new Map(NX.allGel.map(g => [g.nachricht_id + '|' + g.benutzer_id, g.gelesen_am]));
+  const out = [];
+  map.forEach(g => {
+    const first = g.rows[0], alle = first.empfaenger_id === null;
+    let rec;
+    if (alle) rec = NX.users.filter(u => u.id !== first.absender_id && utcMs(u.created_at) <= utcMs(first.created_at)).map(u => ({ u, key: first.id + '|' + u.id }));
+    else rec = g.rows.map(r => ({ u: NX.users.find(u => u.id === r.empfaenger_id), key: r.id + '|' + r.empfaenger_id }));
+    rec.forEach(r => { r.gelesen = gelKey.has(r.key); r.am = gelAt.get(r.key) });
+    out.push({ ...g, first, alle, rec, gelesen: rec.filter(r => r.gelesen).length });
+  });
+  return out.sort((a, b) => utcMs(b.first.created_at) - utcMs(a.first.created_at));
+}
+function sentCard(g) {
+  const m = g.first, n = g.rec.length, pct = n ? Math.round(g.gelesen / n * 100) : 0;
+  const an = g.alle ? `An alle (${n})` : (n <= 2 ? 'An ' + g.rec.map(r => uName(r.u)).join(', ') : `An ${n} Personen`);
+  return `<article class="msg sent ${m.wichtig ? 'wichtig' : ''}" data-g="${g.id}">
+    <div class="msg-h" role="button" tabindex="0" data-act="msgToggle" aria-expanded="false">
+      <span class="msg-main">
+        <span class="msg-top"><b>${esc(m.titel)}</b><time>${esc(zeit(m.created_at))}</time></span>
+        <span class="msg-meta">${m.wichtig ? `<span class="chip tone-red">${ic('alert')} Wichtig</span>` : ''}<span>${esc(an)}</span></span>
+        <span class="msg-body">${linkify(m.nachricht)}</span>
+      </span>
+    </div>
+    <div class="prog" title="${g.gelesen} von ${n} gelesen"><div class="bar"><i style="width:${pct}%"></i></div><span>${g.gelesen} von ${n} gelesen</span></div>
+    <details class="who"><summary>Wer hat gelesen?</summary>
+      <ul>${g.rec.map(r => `<li class="${r.gelesen ? 'ok' : ''}"><span>${esc(uName(r.u))}</span><em>${r.gelesen ? `${ic('check', 'sm')} ${esc(zeit(r.am))}` : 'noch nicht'}</em></li>`).join('') || '<li><span>Keine Empfänger</span></li>'}</ul>
+      <button class="btn btn-ghost btn-sm del" data-act="nxDel" data-g="${g.id}">${ic('trash', 'sm')} Nachricht löschen</button></details>
+  </article>`;
+}
+function viewGesendet() {
+  const gs = gruppen();
+  return gs.length ? gs.map(sentCard).join('') : `<div class="empty">${ic('send')}<h3>Noch nichts gesendet</h3><p class="muted" style="margin:4px 0 14px">Schreibe die erste Nachricht an dein Team.</p><button class="btn btn-primary" data-act="nxNeu">${ic('plus', 'sm')} Neue Nachricht</button></div>`;
+}
+
+/* ---------- Neue Nachricht (Admin) ---------- */
+function nxNeu() {
+  const users = NX.users.filter(u => u.id !== ME.id);
+  const bd = sheet('Neue Nachricht', `
+    <div class="field"><label>Empfänger</label>
+      <div class="seg" id="cMode"><button type="button" class="on" data-act="cMode" data-m="alle">Alle</button><button type="button" data-act="cMode" data-m="wahl">Bestimmte Personen</button></div></div>
+    <div class="field" id="cPickBox" hidden>
+      <div class="pick-h"><span class="lbl" id="cCount">Niemand ausgewählt</span><button type="button" class="link" data-act="cAll">Alle auswählen</button></div>
+      ${users.length > 8 ? `<input class="inp" id="cSearch" type="search" placeholder="Person suchen …" autocomplete="off">` : ''}
+      <div class="picks" id="cPicks">${users.map(u => `<label class="pick" data-s="${esc((uName(u) + ' ' + (u.benutzername || '')).toLowerCase())}"><input type="checkbox" value="${u.id}"><span class="pav">${esc(uName(u).charAt(0).toUpperCase())}</span><span class="pt"><b>${esc(uName(u))}</b>${u.benutzername && u.benutzername !== u.name ? `<small>${esc(u.benutzername)}</small>` : ''}</span></label>`).join('')}</div>
+    </div>
+    <div class="field"><label for="cTitel">Titel</label><input class="inp" id="cTitel" maxlength="120" placeholder="z. B. Neue Öffnungszeiten im Lager" autocomplete="off"></div>
+    <div class="field"><label for="cText">Nachricht</label><textarea class="inp" id="cText" maxlength="4000" rows="6" placeholder="Was möchtest du mitteilen?"></textarea><div class="cnt-l"><span id="cLen">0</span> / 4000</div></div>
+    <div class="swrow"><div><b>Als wichtig markieren</b><small>Wird rot hervorgehoben</small></div><button type="button" class="switch" id="cWichtig" role="switch" aria-checked="false" aria-label="Wichtig" data-act="cWichtig"></button></div>
+    <div class="err" id="cErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="cSend">${ic('send', 'sm')} Senden</button>`);
+  const upd = () => { const n = $$('#cPicks input:checked', bd).length; $('#cCount', bd).textContent = n ? `${n} ${plural(n, 'Person', 'Personen')} ausgewählt` : 'Niemand ausgewählt' };
+  bd.addEventListener('change', e => { if (e.target.closest('#cPicks')) upd() });
+  const se = $('#cSearch', bd); if (se) se.oninput = () => { const q = se.value.trim().toLowerCase(); $$('#cPicks .pick', bd).forEach(l => l.hidden = q && !l.dataset.s.includes(q)) };
+  $('#cText', bd).oninput = e => { $('#cLen', bd).textContent = e.target.value.length };
+  $('#cSend', bd).onclick = () => nxSenden(bd, upd);
+  setTimeout(() => { const t = $('#cTitel', bd); if (t) t.focus() }, 60);
+}
+async function nxSenden(bd, upd) {
+  const err = m => { $('#cErr', bd).textContent = m || '' };
+  const wahl = $('#cMode .on', bd).dataset.m === 'wahl';
+  const ids = wahl ? $$('#cPicks input:checked', bd).map(i => i.value) : [];
+  const titel = $('#cTitel', bd).value.trim(), text = $('#cText', bd).value.trim(), wichtig = $('#cWichtig', bd).classList.contains('on');
+  if (wahl && !ids.length) return err('Bitte mindestens eine Person auswählen.');
+  if (!titel) return err('Bitte einen Titel eingeben.');
+  if (!text) return err('Bitte eine Nachricht eingeben.');
+  const btn = $('#cSend', bd); btn.disabled = true; err('');
+  const gid = uuid();
+  const rows = wahl ? ids.map(id => ({ titel, nachricht: text, wichtig, gruppe_id: gid, empfaenger_id: id })) : [{ titel, nachricht: text, wichtig, gruppe_id: gid }];
+  try {
+    await api('POST', 'benachrichtigungen', rows, '', { Prefer: 'return=minimal' });
+    closeSheet(); toast(wahl ? `Gesendet an ${ids.length} ${plural(ids.length, 'Person', 'Personen')}` : 'An alle gesendet', 'ok');
+    NX.tab = 'gesendet'; if (location.hash !== '#/nachrichten/gesendet') history.replaceState(null, '', '#/nachrichten/gesendet');
+    await nxReload();
+  } catch (e) { err(niceErr(e)); btn.disabled = false }
+}
+
+/* ---------- Meldungen ---------- */
+function meldCard(m) {
+  const adm = isAdm(), offen = m.status === 'offen';
+  return `<article class="msg meld ${offen ? 'unread' : ''}" data-m="${m.id}">
+    <div class="msg-h" role="button" tabindex="0" data-act="msgToggle" aria-expanded="false">
+      <span class="msg-main">
+        <span class="msg-top"><b>${esc(m.titel)}</b><time>${esc(zeit(m.created_at))}</time></span>
+        <span class="msg-meta"><span class="chip ${offen ? 'tone-amber' : 'tone-ok'}">${offen ? 'Offen' : ic('check') + ' Erledigt'}</span>${adm ? `<span>von ${esc(m.benutzer || '–')}</span>` : ''}</span>
+        <span class="msg-body">${linkify(m.nachricht)}</span>
+      </span>
+    </div>
+    ${m.antwort ? `<div class="reply"><small>Antwort${m.bearbeitet_von ? ' von ' + esc(m.bearbeitet_von) : ''}</small><p>${linkify(m.antwort)}</p></div>` : ''}
+    ${adm ? `<div class="meld-act">${offen ? `<button class="btn btn-ok btn-sm" data-act="mErl" data-id="${m.id}">${ic('check', 'sm')} Erledigt</button>` : `<button class="btn btn-soft btn-sm" data-act="mOpen" data-id="${m.id}">Wieder öffnen</button>`}<button class="btn btn-ghost btn-sm" data-act="mDel" data-id="${m.id}" aria-label="Meldung löschen">${ic('trash', 'sm')}</button></div>` : ''}
+  </article>`;
+}
+function viewMeldungen() {
+  const adm = isAdm(), all = NX.meld, list = adm && NX.mfilter === 'offen' ? all.filter(m => m.status === 'offen') : all;
+  const top = adm
+    ? `<div class="nx-bar"><div class="seg sm" role="group"><button class="${NX.mfilter === 'offen' ? 'on' : ''}" data-act="mFilter" data-f="offen">Offen (${all.filter(m => m.status === 'offen').length})</button><button class="${NX.mfilter === 'alle' ? 'on' : ''}" data-act="mFilter" data-f="alle">Alle</button></div></div>`
+    : `<div class="nx-hint"><p class="muted">Etwas funktioniert nicht oder du hast einen Hinweis? Melde es direkt dem Admin.</p><button class="btn btn-primary" data-act="mNeu">${ic('flag', 'sm')} Problem melden</button></div>`;
+  return top + (list.length ? list.map(meldCard).join('') : `<div class="empty">${ic('check')}<h3>${adm ? 'Keine offenen Meldungen' : 'Noch keine Meldungen'}</h3><p class="muted" style="margin-top:4px">${adm ? 'Alles erledigt.' : 'Deine Meldungen an den Admin erscheinen hier.'}</p></div>`);
+}
+function meldNeu() {
+  const bd = sheet('Problem melden', `
+    <div class="field"><label for="mT">Betreff</label><input class="inp" id="mT" maxlength="120" placeholder="z. B. Artikel nicht auffindbar" autocomplete="off"></div>
+    <div class="field"><label for="mB">Beschreibung</label><textarea class="inp" id="mB" maxlength="4000" rows="5" placeholder="Was ist das Problem?"></textarea></div>
+    <div class="err" id="mErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="mGo">${ic('send', 'sm')} Melden</button>`);
+  $('#mGo', bd).onclick = async ev => {
+    const t = $('#mT', bd).value.trim(), b = $('#mB', bd).value.trim(), err = m => { $('#mErr', bd).textContent = m || '' };
+    if (!t || !b) return err('Bitte Betreff und Beschreibung ausfüllen.');
+    const btn = ev.currentTarget; btn.disabled = true; err('');
+    try { await api('POST', 'meldungen', { titel: t, nachricht: b }, '', { Prefer: 'return=minimal' }); closeSheet(); toast('Meldung gesendet', 'ok'); await nxReload() }
+    catch (e) { err(niceErr(e)); btn.disabled = false }
+  };
+  setTimeout(() => { const t = $('#mT', bd); if (t) t.focus() }, 60);
+}
+function meldErledigt(id) {
+  const m = NX.meld.find(x => x.id === id); if (!m) return;
+  const bd = sheet('Meldung erledigen', `<div class="kv"><b>${esc(m.titel)}</b><span>von ${esc(m.benutzer || '–')}</span></div>
+    <div class="field"><label for="mA">Antwort an ${esc(m.benutzer || 'die Person')} (optional)</label><textarea class="inp" id="mA" maxlength="2000" rows="4" placeholder="z. B. Ist behoben – danke für den Hinweis."></textarea></div><div class="err" id="mAErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-ok" id="mAGo">${ic('check', 'sm')} Erledigt</button>`);
+  $('#mAGo', bd).onclick = async ev => {
+    const btn = ev.currentTarget; btn.disabled = true;
+    try { await api('PATCH', 'meldungen', { status: 'erledigt', antwort: $('#mA', bd).value.trim() || null }, `?id=eq.${id}`, { Prefer: 'return=minimal' }); closeSheet(); toast('Meldung erledigt', 'ok'); await nxReload() }
+    catch (e) { $('#mAErr', bd).textContent = niceErr(e); btn.disabled = false }
+  };
+}
+function confirmSheet(title, text, label, fn) {
+  const bd = sheet(title, `<p class="muted" style="margin:2px 0 6px">${esc(text)}</p><div class="err" id="cfErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-danger" id="cfGo">${esc(label)}</button>`);
+  $('#cfGo', bd).onclick = async ev => { const b = ev.currentTarget; b.disabled = true; try { await fn(); closeSheet() } catch (e) { $('#cfErr', bd).textContent = niceErr(e); b.disabled = false } };
+}
+
+/* ---------- Klicks ---------- */
+Object.assign(ACT, {
+  nxRetry: () => showNachrichten(),
+  nxNeu, mNeu: meldNeu,
+  nxTab(el) { NX.tab = el.dataset.tab; history.replaceState(null, '', '#/nachrichten/' + NX.tab); renderNx() },
+  nxFilter(el) { NX.filter = el.dataset.f; renderNx() },
+  mFilter(el) { NX.mfilter = el.dataset.f; renderNx() },
+  msgToggle(el) {
+    const card = el.closest('.msg'); if (!card) return;
+    const open = !card.classList.contains('open'); card.classList.toggle('open', open); el.setAttribute('aria-expanded', open);
+    const f = $('.msg-foot', card); if (f) f.hidden = !open;
+    if (open && card.dataset.id) { const m = NX.msgs.find(x => x.id === card.dataset.id); if (m && isUnread(m)) markRead(m.id, true) }
+  },
+  msgUnread(el) { const id = el.dataset.id, card = el.closest('.msg'); markRead(id, false); if (card) { card.classList.remove('open'); const f = $('.msg-foot', card); if (f) f.hidden = true } },
+  async nxAlleLesen(el) {
+    el.disabled = true;
+    try { await rpc('nachrichten_alle_lesen'); await nxLoad(); renderNx(); await refreshZaehler(); toast('Alles als gelesen markiert', 'ok') }
+    catch (e) { toast(niceErr(e), 'err'); el.disabled = false }
+  },
+  nxDel(el) {
+    const g = el.dataset.g;
+    confirmSheet('Nachricht löschen?', 'Die Nachricht verschwindet bei allen Empfängern und kann nicht wiederhergestellt werden.', 'Löschen', async () => {
+      await api('DELETE', 'benachrichtigungen', null, `?gruppe_id=eq.${g}`, { Prefer: 'return=minimal' }); toast('Gelöscht', 'ok'); await nxReload();
+    });
+  },
+  mErl: el => meldErledigt(el.dataset.id),
+  async mOpen(el) { el.disabled = true; try { await api('PATCH', 'meldungen', { status: 'offen' }, `?id=eq.${el.dataset.id}`, { Prefer: 'return=minimal' }); await nxReload() } catch (e) { toast(niceErr(e), 'err'); el.disabled = false } },
+  mDel(el) {
+    const id = el.dataset.id;
+    confirmSheet('Meldung löschen?', 'Die Meldung wird endgültig entfernt.', 'Löschen', async () => { await api('DELETE', 'meldungen', null, `?id=eq.${id}`, { Prefer: 'return=minimal' }); toast('Gelöscht', 'ok'); await nxReload() });
+  },
+  cMode(el) {
+    $$('#cMode button').forEach(b => b.classList.toggle('on', b === el));
+    $('#cPickBox').hidden = el.dataset.m !== 'wahl';
+  },
+  cAll() {
+    const boxes = $$('#cPicks input'), vis = boxes.filter(b => !b.closest('.pick').hidden), all = vis.every(b => b.checked);
+    vis.forEach(b => b.checked = !all); boxes[0] && boxes[0].dispatchEvent(new Event('change', { bubbles: true }));
+    $('.link[data-act="cAll"]').textContent = all ? 'Alle auswählen' : 'Keine auswählen';
+  },
+  cWichtig(el) { const on = !el.classList.contains('on'); el.classList.toggle('on', on); el.setAttribute('aria-checked', on) },
+});
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.msg-h[role="button"]')) { e.preventDefault(); ACT.msgToggle(e.target) }
+});
+
+
+boot();
+</script>
+</body>
+</html>
