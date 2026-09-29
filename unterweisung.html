@@ -10,8 +10,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="My Heise">
-<link rel="icon" type="image/png" href="./icon.png?v=4">
-<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=4">
+<link rel="icon" type="image/png" href="./icon.png?v=5">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=5">
 <link rel="manifest" href="./manifest.webmanifest">
 <style>
 :root{
@@ -993,7 +993,7 @@ function renderShell(){
   const tb=$('#tabbar');tb.style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
   tb.innerHTML=tabs.map(([k,i,l,h])=>`<a class="tab" data-nav="${k}" href="${h}">${ic(i)}<span>${l}</span></a>`).join('');
   $('#rail').innerHTML=
-    `<div class="rail-brand"><div class="rail-logo">${ic('book','lg')}<img src="icon.png?v=4" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Unterweisungen</b><small>Heise Haustechnik</small></div></div>`+
+    `<div class="rail-brand"><div class="rail-logo">${ic('book','lg')}<img src="icon.png?v=5" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Unterweisungen</b><small>Heise Haustechnik</small></div></div>`+
     `<nav class="rail-nav">`+
       `<a class="rail-item" data-nav="start" href="#/">${ic('home')} Start</a>`+
       `<a class="rail-item" data-nav="nachweise" href="#/nachweise">${ic('clip')} Meine Nachweise</a>`+
