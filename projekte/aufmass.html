@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Aufmaß</title>
+<link rel="stylesheet" href="lib/heise-ui.css">
+<style>
+/* Aufmaß-App – seitenspezifisch; Grundlagen in /lib/heise-ui.css */
+:root{--pri:var(--brand);--muted:var(--ink-2);--card:var(--surface);--acc:var(--surface-2);--or:var(--accent);--or2:var(--accent-2);--warn:var(--amber);--warnbg:var(--amber-bg);--okbg:var(--ok-bg);--del:var(--red)}
+header.topbar .sync{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:650;color:var(--ink-3);max-width:40%;text-align:right;line-height:1.25}
+header.topbar .sync .ic{width:16px;height:16px}
+main{max-width:900px;margin:0 auto;padding:4px 16px calc(110px + var(--safe-b))}
+.view{display:none}.view.on{display:block;animation:fade .2s}
+.toolbar{position:sticky;top:calc(64px + var(--safe-t));z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:6px 0 10px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.searchbox{position:relative}
+.searchbox .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-3)}
+.search{width:100%;min-height:48px;padding:0 14px 0 42px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-size:16px;outline:none}
+.search:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;background:var(--surface-2);border-radius:15px;margin-top:10px}
+.seg .chip{min-height:40px;padding:4px 4px;border-radius:12px;font-weight:660;font-size:12.5px;color:var(--ink-2);line-height:1.15}
+.seg .chip.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(13,21,36,.16)}
+.tbar2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.tbar2 .lnk{color:var(--brand-2);font-weight:650;font-size:13.5px;padding:6px 4px}
+.btn-free{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 14px;border-radius:12px;background:var(--amber-bg);color:var(--accent-2);font-weight:700;font-size:14px}
+.los{margin:22px 6px 8px;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.grp{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;margin:10px 0 6px;padding:14px 16px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow);font-weight:720;color:var(--ink);font-size:15px}
+.grp .arr{display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:var(--surface-2);color:var(--ink-2);transition:transform .2s;flex:0 0 auto}
+.grp.open .arr{transform:rotate(90deg)}
+.grp .arr .ic{width:15px;height:15px}
+.grp .n{color:var(--ink-3);font-weight:680;font-variant-numeric:tabular-nums;padding-top:2px}
+.grp .tt{flex:1;min-width:0;padding-top:2px}
+.grp .gc{display:block;font-size:12.5px;color:var(--ink-3);font-weight:600;margin-top:3px}
+.grp .gc b{color:var(--ok)}
+.sgrp{margin:12px 8px 6px;font-size:12.5px;color:var(--ink-3);font-weight:680}
+.pos{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:16px;padding:12px 14px;margin:6px 0;cursor:pointer;box-shadow:inset 0 0 0 1.5px var(--line);transition:transform .12s}
+.pos:active{transform:scale(.99);background:var(--surface-2)}
+.pos .l{flex:1;min-width:0}
+.pos .nr{font-size:12px;color:var(--ink-3);font-weight:600;font-variant-numeric:tabular-nums}
+.pos .bz{font-weight:650;overflow-wrap:anywhere;margin-top:1px}
+.pos .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;display:grid;justify-items:end;gap:4px}
+.pos .lv{font-size:12px;color:var(--ink-3)}
+.badge{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;background:var(--ok-bg);color:var(--ok);font-weight:750;font-size:13px}
+.badge.over{background:var(--amber-bg);color:var(--amber)}
+.pos.free{box-shadow:inset 0 0 0 1.5px var(--line);border:1.5px dashed var(--ink-3)}
+.empty{margin-top:14px}
+.card h2{font-size:17px;font-weight:760;margin-bottom:12px}
+label{display:block;margin:12px 0 6px}
+input.f,textarea.f,select.f{width:100%;min-height:50px;padding:0 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);outline:none;font-size:16px;-webkit-appearance:none;appearance:none}
+textarea.f{min-height:80px;padding:12px 14px;resize:vertical}
+input.f:focus,textarea.f:focus,select.f:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+input.f[readonly]{background:var(--surface-2);color:var(--ink-2)}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.ent{border-top:1px solid var(--line);padding:10px 0;display:flex;gap:10px;align-items:flex-start}
+.ent:first-child{border-top:0}
+.ent .q{font-weight:750;min-width:78px;font-variant-numeric:tabular-nums;padding-top:6px}
+.ent .o{flex:1;min-width:0;overflow-wrap:anywhere;padding-top:6px}
+.ent .o small{display:block;color:var(--ink-2);font-size:13px}
+.ent .x{display:flex;gap:4px}
+.icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:var(--ink-2);background:var(--surface-2)}
+.icon:active{transform:scale(.95)}
+.icon.ok{background:var(--ok-bg);color:var(--ok)}
+.icon .ic{width:18px;height:18px}
+.sum{display:flex;justify-content:space-between;align-items:center;font-weight:760;padding-top:10px;border-top:2px solid var(--ink);margin-top:4px}
+.ov{position:fixed;inset:0;background:rgba(8,13,21,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:50;display:none}
+.ov.on{display:block;animation:fade .2s}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--bg);border-radius:28px 28px 0 0;max-height:93dvh;overflow:auto;padding:22px 20px calc(20px + var(--safe-b));transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.9,.3,1);max-width:640px;margin:0 auto;box-shadow:0 -24px 70px -20px rgba(0,0,0,.5)}
+.sheet::before{content:"";position:absolute;top:9px;left:50%;width:40px;height:5px;border-radius:3px;background:var(--line);transform:translateX(-50%)}
+.sheet.on{transform:none}
+@media(min-width:720px){.sheet{bottom:auto;top:50%;border-radius:28px;transform:translateY(-40%) scale(.98);opacity:0;pointer-events:none;transition:.2s}.sheet.on{transform:translateY(-50%);opacity:1;pointer-events:auto}.sheet::before{display:none}}
+.sheet .hd{display:flex;gap:12px;align-items:flex-start;margin-bottom:6px}
+.sheet .hd .t{flex:1;min-width:0}
+.sheet .nr{font-size:12.5px;color:var(--ink-3);font-weight:600}
+.sheet h3{margin:4px 0 2px;font-size:19px;font-weight:760;overflow-wrap:anywhere}
+.sheet .card{box-shadow:none;border:1.5px solid var(--line)}
+.calc{font-size:13px;color:var(--ok);min-height:18px;margin-top:4px;font-weight:600}
+.calc.err{color:var(--red)}
+.qwrap{display:flex;align-items:center;gap:10px}
+.qwrap input{flex:1}
+.qwrap .me{font-weight:750;color:var(--ink-2);min-width:36px}
+.stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.stepper button{min-height:40px;border-radius:12px;background:var(--surface-2);font-weight:700}
+.stepper button:active{transform:scale(.96)}
+.sig{border:1.5px dashed var(--ink-3);border-radius:16px;background:var(--surface);touch-action:none;width:100%;height:170px;display:block}
+.sigbar{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px;color:var(--ink-3)}
+.note{background:var(--amber-bg);color:var(--amber);border-radius:16px;padding:12px 14px;font-size:14px;margin:0 0 12px;font-weight:600}
+button.note{display:flex;gap:10px;align-items:center;width:100%;text-align:left;margin:6px 0 4px}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat>div{background:var(--surface);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow);font-size:12.5px;color:var(--ink-2);font-weight:600}
+.stat b{display:block;font-size:24px;color:var(--ink);font-weight:780;font-variant-numeric:tabular-nums}
+.stat .warn{grid-column:1/-1;background:var(--amber-bg);color:var(--amber);box-shadow:none}
+.stat .warn b{color:var(--amber)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+.src{display:block;font-size:12px;color:var(--ink-3)}
+.src.pre{color:var(--amber);font-weight:680}
+.pick{border-radius:16px;padding:10px;margin-top:10px;background:var(--surface-2);max-height:46vh;overflow:auto}
+.pick .pg{font-size:11.5px;font-weight:700;color:var(--ink-3);margin:12px 4px 6px;text-transform:uppercase;letter-spacing:.06em}
+.pi{display:block;width:100%;text-align:left;background:var(--surface);border-radius:12px;padding:11px 12px;margin:5px 0;font-size:15px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.pi.u{box-shadow:inset 0 0 0 2px var(--ok);background:var(--ok-bg)}
+.al{display:flex;align-items:center;gap:6px;border-top:1px solid var(--line);padding:6px 0}
+.al:first-of-type{border-top:0}
+.al span{flex:1;min-width:0;overflow-wrap:anywhere;font-size:14px}
+details.ag{border-radius:16px;padding:4px 12px;margin:8px 0;background:var(--surface-2)}
+details.ag summary{font-weight:700;cursor:pointer;padding:10px 0}
+nav.tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + var(--safe-b));z-index:40;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:5px;width:min(460px,calc(100% - 24px));background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:22px;box-shadow:0 10px 34px -10px rgba(13,21,36,.35),0 0 0 1px var(--line)}
+nav.tabs button{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:54px;justify-content:center;border-radius:17px;font-size:12px;font-weight:680;color:var(--ink-3);position:relative}
+nav.tabs button .ic{width:22px;height:22px}
+nav.tabs button.on{background:var(--brand);color:#fff}
+nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+.hint{font-size:13px;color:var(--ink-3);margin-top:8px}
+</style>
+
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="iconbtn" id="backBtn" aria-label="Zur Projektübersicht"></a>
+  <div class="brand"><div class="lt"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div><div style="min-width:0"><b id="hdrTitle">Aufmaß</b><small id="hdrSub"></small></div></div>
+  <span class="sync" id="saveState"></span>
+</header>
+
+<main>
+  <!-- POSITIONEN -->
+  <section class="view on" id="v-pos">
+    <div class="toolbar">
+      <div class="searchbox"><span id="icSearch"></span><input class="search" id="q" type="search" placeholder="Suchen, z. B. DN 100 Bogen" autocomplete="off"></div>
+      <div class="seg">
+        <button class="chip on" data-f="list">Aufmaß-Liste</button>
+        <button class="chip" data-f="all">Gesamtes LV</button>
+        <button class="chip" data-f="done">Erfasste</button>
+        <button class="chip" data-f="pre">Vorschläge</button>
+      </div>
+      <div class="tbar2"><span id="grpTools"></span><button class="btn-free" id="btnFree"></button></div>
+    </div>
+    <div id="preBanner"></div>
+    <div id="posList"></div>
+  </section>
+
+  <!-- ERFASST -->
+  <section class="view" id="v-sum">
+    <div class="stat" id="statBox"></div>
+    <div id="sumList"></div>
+  </section>
+
+  <!-- ABSCHLUSS -->
+  <section class="view" id="v-end">
+    <div class="card">
+      <h2>Kopfdaten</h2>
+      <label for="h_bv">Bauvorhaben</label>
+      <input class="f" id="h_bv" readonly style="background:var(--bg)">
+      <label for="h_bez">Aufmaß</label>
+      <input class="f" id="h_bez">
+      <div class="row">
+        <div><label for="h_dat">Datum</label><input class="f" id="h_dat" type="date"></div>
+        <div><label for="h_mon">Aufgemessen von</label><input class="f" id="h_mon" placeholder="Name Monteur"></div>
+      </div>
+      <label for="h_ag">Anwesend für Auftraggeber / Bauleitung</label>
+      <input class="f" id="h_ag" placeholder="Name, Firma/Funktion">
+      <label for="h_bem">Allgemeine Bemerkung</label>
+      <textarea class="f" id="h_bem" placeholder="optional"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>Unterschriften</h2>
+      <div id="sigNote"></div>
+      <div class="grid2">
+        <div>
+          <label>Auftragnehmer (Heise Haustechnik)</label>
+          <canvas class="sig" id="sig1"></canvas>
+          <div class="sigbar"><span id="sig1t">Mit Finger oder Stift unterschreiben</span><button class="btn ghost" data-clr="sig1">Löschen</button></div>
+        </div>
+        <div>
+          <label>Auftraggeber / Bauleitung</label>
+          <canvas class="sig" id="sig2"></canvas>
+          <div class="sigbar"><span id="sig2t">Mit Finger oder Stift unterschreiben</span><button class="btn ghost" data-clr="sig2">Löschen</button></div>
+        </div>
+      </div>
+      <p class="hint">Wird das Aufmaß nach der Unterschrift geändert, werden die Unterschriften automatisch zurückgesetzt.</p>
+    </div>
+
+    <div class="card">
+      <h2>Ausgabe</h2>
+      <div class="grid2">
+        <button class="btn" id="btnPdf">PDF erstellen</button>
+        <button class="btn" id="btnXlsx">Excel erstellen</button>
+      </div>
+      <button class="btn sec block" id="btnShare" style="margin-top:10px;display:none">PDF + Excel teilen (Mail, Teams …)</button>
+      <p class="hint">Die Dateien landen im Download-Ordner des Geräts.</p>
+    </div>
+
+    <div class="card">
+      <h2>Bereiche (Raum / Ort)</h2>
+      <p class="hint" style="margin-top:0">Die Bereiche gelten für das ganze Projekt und werden mit allen Geräten abgeglichen. Sie können hier gelöscht, ergänzt und umbenannt werden.</p>
+      <div id="areaList"></div>
+      <label for="a_g">Gruppe</label>
+      <input class="f" id="a_g" list="dl_ag" placeholder="z. B. Fahrzeughalle (Achse 11–31)" autocomplete="off"><datalist id="dl_ag"></datalist>
+      <label for="a_n">Neuer Bereich</label>
+      <div class="qwrap"><input class="f" id="a_n" placeholder="z. B. Achse 12, Dachablauf H4.3" autocomplete="off"><button class="btn" id="a_add">Hinzufügen</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Speichern</h2>
+      <p class="hint" style="margin-top:0">Alles wird sofort auf diesem Gerät gespeichert und automatisch mit der Datenbank abgeglichen, sobald Netz da ist. Oben rechts steht der Stand.</p>
+      <div class="grid2">
+        <button class="btn sec" id="btnSync">Jetzt abgleichen</button>
+        <button class="btn sec" id="btnBak">Sicherungsdatei speichern</button>
+      </div>
+      <a class="btn ghost" href="index.html" style="display:inline-block;margin-top:10px;text-decoration:none">← Zur Projektübersicht</a>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs">
+  <button class="on" data-v="v-pos"><span data-ic="list"></span>Positionen</button>
+  <button data-v="v-sum"><span data-ic="ruler"></span>Erfasst<span class="cnt" id="cntTab">0</span></button>
+  <button data-v="v-end"><span data-ic="clip"></span>Abschluss</button>
+</nav>
+
+<div class="ov" id="ov"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<script src="lib/heise-icons.js"></script>
+<script src="lib/pj-api.js"></script>
+<script src="lib/exceljs.min.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.plugin.autotable.min.js"></script>
+<script>
+let LV = [];
+document.querySelectorAll('[data-ic]').forEach(e=>e.outerHTML=IC(e.dataset.ic));
+document.getElementById('backBtn').innerHTML=IC('back');
+document.getElementById('icSearch').outerHTML=IC('search');
+document.getElementById('btnFree').innerHTML=IC('plus','sm')+'Freie Position';
+const FIRMA = 'Heise Haustechnik GmbH & Co. KG · Braunlage';
+const AID = new URLSearchParams(location.search).get('id');
+const KEY = 'aufmass_'+AID;
+
+/* ---------- State ---------- */
+const DEF = () => ({
+  head:{bv:'', bez:'', dat:'', mon:'', ag:'', bem:''},
+  entries:[], free:[], sig:{sig1:null,sig2:null,ts:null}, filter:'list', lastOrt:'', open:{}, areas:[]
+});
+let S;
+S = DEF();
+let BASE = null;      // letzter bekannter Serverstand (für Änderungserkennung)
+let PROJ = null;      // Projektdaten
+
+let POS={}, TIT={}, TITIDX={}, TITEND={};
+function initLV(){
+  POS={}; TIT={}; TITIDX={}; TITEND={};
+  LV.forEach((o,i)=>{ if(o.k==='P'){ o.i=i; POS[o.p]=o; }});
+  let cur=null; LV.forEach((o,i)=>{ if(o.k==='T'){ if(cur) TITEND[cur]=i; cur=o.p; TIT[o.p]=o.b; TITIDX[o.p]=i; } else if(o.k==='L'){ if(cur) TITEND[cur]=i; } else if(o.k==='P') o.t=cur; }); if(cur) TITEND[cur]=LV.length;
+}
+function titelOf(key){ const p=posOf(key); return p&&p.t&&TIT[p.t]? p.t+' '+TIT[p.t] : ''; }
+function posOf(key){ return POS[key] || S.free.find(f=>f.p===key); }
+
+let saveT;
+function save(){
+  clearTimeout(saveT);
+  saveT=setTimeout(()=>{
+    try{ localStorage.setItem(KEY, JSON.stringify({S,BASE,PROJ,LV})); }
+    catch(e){ setSync('err','⚠ lokal nicht gespeichert'); }
+    scheduleSync();
+  },150);
+}
+function dataChanged(){
+  if(S.sig.sig1||S.sig.sig2){ S.sig={sig1:null,sig2:null,ts:null}; toast('Aufmaß geändert – Unterschriften wurden zurückgesetzt'); drawSigs(); }
+  save(); renderAll();
+}
+
+/* ---------- Helpers ---------- */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nf = n=>(Math.round(n*1000)/1000).toLocaleString('de-DE',{maximumFractionDigits:3});
+const uid = ()=> (crypto.randomUUID? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2,10));
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2200); }
+function parseQty(s){
+  s=String(s||'').trim().replace(/\s/g,'').replace(/,/g,'.').replace(/x/gi,'*');
+  if(!s) return null;
+  if(!/^[0-9.+\-*/()]+$/.test(s)) return NaN;
+  try{ const v=Function('"use strict";return ('+s+')')(); return (typeof v==='number'&&isFinite(v))?Math.round(v*1000)/1000:NaN; }catch(e){ return NaN; }
+}
+function sumOf(key){ return S.entries.filter(e=>e.key===key).reduce((a,e)=>a+e.qty,0); }
+function sortKey(key){ const p=POS[key]; if(p) return p.i; const i=S.free.findIndex(f=>f.p===key), f=S.free[i]; return (f&&f.t&&TITEND[f.t]!==undefined)? TITEND[f.t]-0.5+i*0.001 : 100000+i; }
+function areas(){ return S.areas||[]; }
+function orte(){ const set=new Set(); S.entries.forEach(e=>e.ort&&set.add(e.ort)); return [...set].sort((a,b)=>a.localeCompare(b,'de')); }
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===b.dataset.v));
+  window.scrollTo(0,0);
+  if(b.dataset.v==='v-end') setTimeout(sizeSigs,30);
+});
+
+/* ---------- Positionsliste ---------- */
+document.querySelectorAll('.chip[data-f]').forEach(c=>c.onclick=()=>{ S.filter=c.dataset.f; save(); renderPos(); });
+$('#q').addEventListener('input',renderPos);
+
+function posRow(p,free){
+  const s=sumOf(p.p), has=S.entries.some(e=>e.key===p.p), npre=S.entries.filter(e=>e.key===p.p&&e.pre).length;
+  const over = !free && p.m>0 && s>p.m;
+  return `<div class="pos${free?' free':''}" data-k="${esc(p.p)}">
+    <div class="l"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.ref?' · '+esc(p.ref):''):''}${!free&&!p.v&&S.filter==='list'?' · <span style="color:var(--warn)">nicht in Aufmaß-Liste</span>':''}</div><div class="bz">${esc(p.b)}</div>${npre?`<div class="src pre">Vorschlag aus Rechnung · bitte prüfen</div>`:''}</div>
+    <div class="r">${has?`<span class="badge${over?' over':''}">${nf(s)} ${esc(p.me)}</span>`:''}
+    ${!free?`<div class="lv">LV: ${nf(p.m)} ${esc(p.me)}</div>`:''}</div></div>`;
+}
+function renderPreBanner(){
+  const np=S.entries.filter(e=>e.pre).length;
+  $('#preBanner').innerHTML=np?`<button class="note" onclick="showPre()">${IC('receipt')}<span><b>${np} Vorschläge aus Rechnungen</b> warten auf Prüfung. Hier tippen, um sie anzuzeigen.</span></button>`:'';
+}
+function showPre(){ S.filter='pre'; $('#q').value=''; save(); renderPos(); window.scrollTo(0,0); }
+function renderPos(){
+  renderPreBanner();
+  document.querySelectorAll('.chip[data-f]').forEach(c=>c.classList.toggle('on',c.dataset.f===S.filter));
+  const q=$('#q').value.trim().toLowerCase();
+  const terms=q.split(/\s+/).filter(Boolean);
+  const match=p=>{ const t=(p.p+' '+p.b+' '+p.me).toLowerCase(); return terms.every(w=>t.includes(w)); };
+  const done=new Set(S.entries.map(e=>e.key));
+  const show=p=>{
+    const pre=new Set(S.entries.filter(e=>e.pre).map(e=>e.key));
+    if(S.filter==='pre') return pre.has(p.p) && (!q||match(p));
+    if(q) return match(p) && (S.filter!=='done' || done.has(p.p));
+    if(S.filter==='list') return p.v===1 || done.has(p.p);
+    if(S.filter==='done') return done.has(p.p);
+    return true;
+  };
+  // Gruppen je Titel aufbauen
+  const groups=[]; let g=null, los=null;
+  for(const o of LV){
+    if(o.k==='L'){ los=o; continue; }
+    if(o.k==='T'){ g={t:o,los,items:[],n:0,d:0}; groups.push(g); los=null; continue; }
+    if(!g) continue;
+    if(o.k==='X'){ g.items.push({x:o}); continue; }
+    if(!show(o)) continue;
+    g.items.push({p:o}); g.n++; if(done.has(o.p)) g.d++;
+  }
+  const preK=new Set(S.entries.filter(e=>e.pre).map(e=>e.key));
+  const showF=f=>(!q||match(f)) && (S.filter!=='done'||done.has(f.p)) && (S.filter!=='pre'||preK.has(f.p));
+  groups.forEach(G=>{ G.fr=S.free.filter(f=>f.t===G.t.p && showF(f)); G.n+=G.fr.length; G.d+=G.fr.filter(f=>done.has(f.p)).length; });
+  const O=S.open[S.filter]||(S.open[S.filter]={});
+  const defOpen = S.filter!=='all';
+  let html='', n=0;
+  $('#grpTools').innerHTML = q? '' : `<button class="lnk" onclick="toggleAll(true)">Alle auf</button><button class="lnk" onclick="toggleAll(false)">Alle zu</button>`;
+  for(const G of groups){
+    if(!G.n) continue;
+    if(G.los) html+=`<div class="los">Los ${esc(G.los.p)} · ${esc(G.los.b)}</div>`;
+    const open = q ? true : (O[G.t.p]!==undefined ? O[G.t.p] : defOpen);
+    html+=`<button class="grp${open?' open':''}" data-t="${esc(G.t.p)}"><span class="arr">${IC('chev')}</span><span class="n">${esc(G.t.p)}</span><span class="tt">${esc(G.t.b)}<span class="gc">${G.n} Positionen${G.d?` · <b>${G.d} erfasst</b>`:''}</span></span></button>`;
+    if(open){
+      let pendX=null;
+      for(const it of G.items){
+        if(it.x){ pendX=it.x; continue; }
+        if(pendX){ html+=`<div class="sgrp">${esc(pendX.b)}</div>`; pendX=null; }
+        html+=posRow(it.p,false);
+      }
+      if(G.fr.length) html+=`<div class="sgrp">Freie Positionen in diesem Titel</div>`+G.fr.map(f=>posRow(f,true)).join('');
+    }
+    n+=G.n;
+  }
+  const fr=S.free.filter(f=>!(f.t&&TIT[f.t]) && showF(f));
+  if(fr.length){
+    html+=`<div class="los">Freie Positionen ohne Zuordnung</div>`+fr.map(f=>posRow(f,true)).join('');
+    n+=fr.length;
+  }
+  if(!n) html=`<div class="empty">${S.filter==='pre'&&!q?'Alle Vorschläge sind geprüft.':S.filter==='done'&&!q?'Noch nichts erfasst.':'Keine Position gefunden.'}<br><br><button class="btn sec" onclick="openFree('${esc($('#q').value).replace(/'/g,'')}')">+ Als freie Position anlegen</button></div>`;
+  if(q && S.filter==='list') html=`<div class="hint" style="margin:0 0 6px">Suche läuft über das gesamte LV.</div>`+html;
+  $('#posList').innerHTML=html;
+}
+function toggleAll(v){ const O=S.open[S.filter]||(S.open[S.filter]={}); LV.forEach(o=>{ if(o.k==='T') O[o.p]=v; }); save(); renderPos(); }
+$('#posList').addEventListener('click',e=>{ const t=e.target.closest('.grp[data-t]'); if(!t) return;
+  const O=S.open[S.filter]||(S.open[S.filter]={}); O[t.dataset.t]=!t.classList.contains('open'); save(); renderPos(); });
+$('#posList').addEventListener('click',e=>{ const r=e.target.closest('.pos'); if(r) openPos(r.dataset.k); });
+
+/* ---------- Erfassungs-Sheet ---------- */
+let cur=null, editId=null;
+function closeSheet(){ $('#sheet').classList.remove('on'); $('#ov').classList.remove('on'); cur=null; editId=null; }
+$('#ov').onclick=closeSheet;
+
+function openPos(key, eid){
+  cur=key; editId=eid||null;
+  const p=posOf(key); const free=!POS[key];
+  const ents=S.entries.filter(e=>e.key===key);
+  const ed=editId? S.entries.find(e=>e.id===editId):null;
+  const s=sumOf(key);
+  $('#sheet').innerHTML=`
+    <div class="hd"><div class="t"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.t?' · Zuordnung '+esc(titelOf(p.p)):' · ohne Zuordnung'):` · LV-Menge ${nf(p.m)} ${esc(p.me)}`}</div><h3>${esc(p.b)}</h3></div>
+      <button class="icon" onclick="closeSheet()" aria-label="Schließen">${IC('x')}</button></div>
+    ${free?`<div style="text-align:right"><button class="btn ghost" onclick="openFree(null,'${esc(p.p)}')">Position bearbeiten</button></div>`:''}
+    <div class="card" style="margin-top:8px">
+      <label for="e_q">Menge${ed?' (bearbeiten)':''}</label>
+      <div class="qwrap"><input class="f" id="e_q" inputmode="decimal" autocomplete="off" placeholder="z. B. 3,5 oder 2,4+1,8" value="${ed?String(ed.qty).replace('.',','):''}"><span class="me">${esc(p.me)}</span></div>
+      <div class="calc" id="e_calc"></div>
+      ${p.me.toLowerCase().startsWith('st')?`<div class="stepper"><button data-add="1">+1</button><button data-add="2">+2</button><button data-add="5">+5</button><button data-add="10">+10</button></div>`:''}
+      <label for="e_o">Raum / Ort</label>
+      <div class="qwrap"><input class="f" id="e_o" autocomplete="off" placeholder="Bereich wählen oder frei eintragen" value="${esc(ed?ed.ort:S.lastOrt)}"><button type="button" class="btn sec" id="e_pick" style="white-space:nowrap">Liste ▾</button></div>
+      <div id="pickPanel" class="pick" hidden></div>
+      <label for="e_b">Bemerkung</label>
+      <input class="f" id="e_b" autocomplete="off" placeholder="optional" value="${esc(ed?ed.bem:'')}">
+      <div class="row" style="margin-top:12px">
+        ${ed?`<button class="btn sec" onclick="openPos('${esc(key)}')">Abbrechen</button>`:''}
+        <button class="btn cta" id="e_add">${ed?'Änderung speichern':'Aufmaß hinzufügen'}</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2 style="margin-bottom:4px">Bisher erfasst (${ents.length})</h2>
+      ${ents.length? ents.map(e=>`<div class="ent"><div class="q">${nf(e.qty)} ${esc(p.me)}</div>
+        <div class="o">${esc(e.ort)||'<span class="hint">ohne Ort</span>'}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
+        <div class="x">${e.pre?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(key)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')
+        + `<div class="sum"><span>Summe</span><span>${nf(s)} ${esc(p.me)}</span></div>`
+        : '<div class="hint">Noch nichts erfasst.</div>'}
+    </div>`;
+  $('#ov').classList.add('on'); $('#sheet').classList.add('on');
+  const qi=$('#e_q');
+  const upd=()=>{ const v=parseQty(qi.value); const c=$('#e_calc');
+    if(v===null){c.textContent='';c.className='calc';}
+    else if(isNaN(v)){c.textContent='Ungültige Eingabe';c.className='calc err';}
+    else if(/[+\-*/x]/i.test(qi.value.replace(/^-/,''))){c.textContent='= '+nf(v)+' '+p.me;c.className='calc';}
+    else {c.textContent='';c.className='calc';} };
+  qi.addEventListener('input',upd); upd();
+  document.querySelectorAll('.stepper button').forEach(b=>b.onclick=()=>{ const v=parseQty(qi.value)||0; qi.value=String((isNaN(v)?0:v)+(+b.dataset.add)).replace('.',','); upd(); });
+  $('#e_add').onclick=addEnt;
+  $('#e_pick').onclick=()=>togglePick();
+  ['e_q','e_o','e_b'].forEach(id=>$('#'+id).addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); addEnt(); }}));
+  if(!ed) setTimeout(()=>qi.focus(),250);
+}
+function togglePick(force){
+  const pp=$('#pickPanel'); const show=force!==undefined?force:pp.hidden; pp.hidden=!show; if(!show) return;
+  pp.innerHTML=`<input class="f" id="pickQ" placeholder="Bereich filtern, z. B. WC, Achse 14" autocomplete="off"><div id="pickList"></div>`;
+  $('#pickQ').addEventListener('input',renderPick); renderPick();
+}
+function renderPick(){
+  const q=($('#pickQ').value||'').toLowerCase().split(/\s+/).filter(Boolean);
+  const m=n=>q.every(w=>n.toLowerCase().includes(w));
+  const used=orte().filter(m);
+  const known=new Set(areas().map(a=>a.n));
+  let html='';
+  const recent=used.filter(o=>!known.has(o));
+  if(recent.length) html+=`<div class="pg">Bereits verwendet</div>`+recent.map(o=>`<button class="pi" data-o="${esc(o)}">${esc(o)}</button>`).join('');
+  const gs=[...new Set(areas().map(a=>a.g))];
+  gs.forEach(g=>{ const it=areas().filter(a=>a.g===g && (m(a.n)||m(g))); if(!it.length) return;
+    html+=`<div class="pg">${esc(g)}</div>`+it.map(a=>`<button class="pi${used.includes(a.n)?' u':''}" data-o="${esc(a.n)}">${esc(a.n)}</button>`).join(''); });
+  $('#pickList').innerHTML=html||'<div class="hint" style="padding:8px 0">Nichts gefunden. Einfach frei ins Feld eintragen.</div>';
+  $('#pickList').querySelectorAll('.pi').forEach(b=>b.onclick=()=>{ $('#e_o').value=b.dataset.o; togglePick(false); $('#e_b').focus(); });
+}
+function entSrc(e){ return e.rg? `<small class="src${e.pre?' pre':''}">${e.pre?'Vorschlag aus ':'geprüft · '}${esc(e.rg)}</small>`:''; }
+function okEnt(id){ const e=S.entries.find(x=>x.id===id); if(!e) return; e.pre=false; e.ts=new Date().toISOString(); const k=e.key; dataChanged(); if(cur) openPos(k); toast('Menge bestätigt'); }
+function addEnt(){
+  const v=parseQty($('#e_q').value);
+  if(v===null||isNaN(v)||v===0){ toast('Bitte eine gültige Menge eintragen'); $('#e_q').focus(); return; }
+  const ort=$('#e_o').value.trim(), bem=$('#e_b').value.trim();
+  if(editId){ const e=S.entries.find(x=>x.id===editId); Object.assign(e,{qty:v,ort,bem,pre:false,ts:new Date().toISOString()}); toast('Geändert'); }
+  else { S.entries.push({id:uid(),key:cur,qty:v,ort,bem,ts:new Date().toISOString()}); toast('+ '+nf(v)+' '+posOf(cur).me+' erfasst'); }
+  S.lastOrt=ort;
+  const k=cur; dataChanged(); openPos(k);
+}
+function delEnt(id){
+  const e=S.entries.find(x=>x.id===id); if(!e) return;
+  if(!confirm('Diesen Eintrag löschen?\n'+nf(e.qty)+' '+posOf(e.key).me+(e.ort?' – '+e.ort:''))) return;
+  S.entries=S.entries.filter(x=>x.id!==id);
+  const k=e.key; dataChanged(); if(cur) openPos(k);
+}
+
+/* ---------- Freie Position ---------- */
+$('#btnFree').onclick=()=>openFree($('#q').value.trim());
+function nextFreeNr(){ let n=1; while(S.free.some(f=>f.p==='Z-'+String(n).padStart(3,'0'))) n++; return 'Z-'+String(n).padStart(3,'0'); }
+function openFree(prefill, editKey){
+  const f=editKey? S.free.find(x=>x.p===editKey):null;
+  cur=null;
+  const mes=['Stck','m','m²','m³','kg','h','psch','Wo'];
+  $('#sheet').innerHTML=`
+    <div class="hd"><div class="t"><div class="nr">${f?esc(f.p):'Neue freie Position'}</div><h3>${f?'Position bearbeiten':'Position, die nicht im LV steht'}</h3></div>
+    <button class="icon" onclick="closeSheet()" aria-label="Schließen">${IC('x')}</button></div>
+    <div class="card">
+      <label for="f_b">Bezeichnung *</label>
+      <input class="f" id="f_b" value="${esc(f?f.b:(prefill||''))}" placeholder="z. B. Brandschutzmanschette DN 100">
+      <div class="row">
+        <div><label for="f_me">Einheit *</label>
+          <select class="f" id="f_me">${mes.map(m=>`<option ${f&&f.me===m?'selected':''}>${m}</option>`).join('')}${f&&!mes.includes(f.me)?`<option selected>${esc(f.me)}</option>`:''}</select></div>
+        <div><label for="f_r">Bezug / Hinweis</label><input class="f" id="f_r" value="${esc(f?f.ref||'':'')}" placeholder="z. B. Anordnung BL"></div>
+      </div>
+      <label for="f_t">Zuordnung im LV</label>
+      <select class="f" id="f_t"><option value="">keine Zuordnung (Büro ordnet zu)</option>
+        ${LV.filter(o=>o.k==='T').map(o=>`<option value="${esc(o.p)}" ${f&&f.t===o.p?'selected':(!f&&S.lastT===o.p?'selected':'')}>${esc(o.p)} ${esc(o.b)}</option>`).join('')}</select>
+      <div class="row" style="margin-top:12px">
+        ${f?`<button class="btn del" id="f_del">Löschen</button>`:''}
+        <button class="btn cta" id="f_ok">${f?'Speichern':'Anlegen und aufmessen'}</button>
+      </div>
+    </div>`;
+  $('#ov').classList.add('on'); $('#sheet').classList.add('on');
+  setTimeout(()=>$('#f_b').focus(),250);
+  $('#f_ok').onclick=()=>{
+    const b=$('#f_b').value.trim(); if(!b){ toast('Bitte eine Bezeichnung eintragen'); return; }
+    const t=$('#f_t').value; S.lastT=t;
+    if(f){ Object.assign(f,{b,me:$('#f_me').value,ref:$('#f_r').value.trim(),t}); dataChanged(); openPos(f.p); }
+    else { const p=nextFreeNr(); S.free.push({id:uid(),p,b,me:$('#f_me').value,ref:$('#f_r').value.trim(),t}); $('#q').value=''; dataChanged(); openPos(p); }
+  };
+  if(f) $('#f_del').onclick=()=>{
+    const n=S.entries.filter(e=>e.key===f.p).length;
+    if(!confirm('Freie Position löschen?'+(n?`\n${n} Aufmaß-Einträge werden mitgelöscht.`:''))) return;
+    S.free=S.free.filter(x=>x!==f); S.entries=S.entries.filter(e=>e.key!==f.p); dataChanged(); closeSheet();
+  };
+}
+
+/* ---------- Erfasst / Summen ---------- */
+function groups(){
+  const keys=[...new Set(S.entries.map(e=>e.key))].sort((a,b)=>sortKey(a)-sortKey(b));
+  return keys.map(k=>({p:posOf(k),free:!POS[k],ents:S.entries.filter(e=>e.key===k),sum:sumOf(k)}));
+}
+function renderSum(){
+  const g=groups();
+  $('#cntTab').textContent=g.length;
+  const np=S.entries.filter(e=>e.pre).length;
+  $('#statBox').innerHTML=`<div><b>${g.length}</b>Positionen</div><div><b>${S.entries.length}</b>Einzelaufmaße</div><div><b>${S.free.length}</b>freie Positionen</div>`+
+    (np?`<div class="warn"><b>${np}</b>Vorschläge aus Rechnungen noch nicht geprüft. Menge vor Ort kontrollieren, dann mit Haken bestätigen oder mit Stift anpassen.</div>`:'');
+  if(!g.length){ $('#sumList').innerHTML='<div class="empty">Noch nichts erfasst. Unter „Positionen“ eine Position antippen und Menge eintragen.</div>'; return; }
+  $('#sumList').innerHTML=g.map(x=>`<div class="card">
+    <div style="display:flex;gap:10px;cursor:pointer" onclick="openPos('${esc(x.p.p)}')"><div style="flex:1;min-width:0"><div class="hint">${esc(x.p.p)}${x.free?' · freie Position · '+(x.p.t?'Zuordnung '+esc(titelOf(x.p.p)):'ohne Zuordnung'):` · LV ${nf(x.p.m)} ${esc(x.p.me)}`}</div><b style="overflow-wrap:anywhere">${esc(x.p.b)}</b></div>
+    <div><span class="badge${!x.free&&x.p.m>0&&x.sum>x.p.m?' over':''}">${nf(x.sum)} ${esc(x.p.me)}</span></div></div>
+    <div style="margin-top:6px">${x.ents.map(e=>`<div class="ent"><div class="q">${nf(e.qty)}</div><div class="o">${esc(e.ort)||'<span class="hint">ohne Ort</span>'}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
+      <div class="x">${e.pre?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(x.p.p)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')}</div></div>`).join('');
+}
+
+/* ---------- Kopfdaten ---------- */
+const HF={h_bv:'bv',h_bez:'bez',h_dat:'dat',h_mon:'mon',h_ag:'ag',h_bem:'bem'};
+Object.entries(HF).forEach(([id,k])=>{ const el=$('#'+id); el.addEventListener('input',()=>{ S.head[k]=el.value; save(); renderHdr(); }); });
+function fillHead(){ Object.entries(HF).forEach(([id,k])=>{ const el=$('#'+id); if(document.activeElement!==el) el.value=S.head[k]||''; }); }
+function renderHdr(){ $('#hdrSub').textContent=(S.head.bez||'Aufmaß')+(S.head.dat?' · '+new Date(S.head.dat).toLocaleDateString('de-DE'):''); }
+
+/* ---------- Unterschrift ---------- */
+function setupSig(id){
+  const c=$('#'+id), ctx=c.getContext('2d'); let draw=false, last=null, dirty=false;
+  const pt=e=>{ const r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
+  c.addEventListener('pointerdown',e=>{ e.preventDefault(); c.setPointerCapture(e.pointerId); draw=true; last=pt(e); ctx.beginPath(); ctx.arc(last.x,last.y,1.1,0,7); ctx.fill(); dirty=true; });
+  c.addEventListener('pointermove',e=>{ if(!draw) return; const p=pt(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; });
+  const end=()=>{ if(!draw) return; draw=false; if(dirty){ S.sig[id]=c.toDataURL('image/png'); S.sig.ts=new Date().toISOString(); save(); sigText(); } };
+  c.addEventListener('pointerup',end); c.addEventListener('pointercancel',end); c.addEventListener('pointerleave',end);
+}
+function sizeSigs(){
+  ['sig1','sig2'].forEach(id=>{ const c=$('#'+id); const r=c.getBoundingClientRect(); if(!r.width) return;
+    const d=window.devicePixelRatio||1; c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,0,0);
+    x.lineWidth=2.2; x.lineCap='round'; x.lineJoin='round'; x.strokeStyle='#0b1a33'; x.fillStyle='#0b1a33'; });
+  drawSigs();
+}
+function drawSigs(){
+  ['sig1','sig2'].forEach(id=>{ const c=$('#'+id), x=c.getContext('2d'); const r=c.getBoundingClientRect(); x.clearRect(0,0,r.width,r.height);
+    if(S.sig[id]){ const im=new Image(); im.onload=()=>x.drawImage(im,0,0,r.width,r.height); im.src=S.sig[id]; } });
+  sigText();
+}
+function sigText(){
+  ['sig1','sig2'].forEach(id=>$('#'+id+'t').textContent=S.sig[id]?'✓ unterschrieben '+new Date(S.sig.ts).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'}):'Mit Finger oder Stift unterschreiben');
+  $('#sigNote').innerHTML=(!S.sig.sig1||!S.sig.sig2)&&S.entries.length?'<div class="note">Vor dem Erstellen der Dateien bitte beide Unterschriften einholen (optional).</div>':'';
+}
+document.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{ S.sig[b.dataset.clr]=null; if(!S.sig.sig1&&!S.sig.sig2) S.sig.ts=null; save(); drawSigs(); });
+setupSig('sig1'); setupSig('sig2');
+window.addEventListener('resize',()=>{ if($('#v-end').classList.contains('on')) sizeSigs(); });
+
+/* ---------- Export ---------- */
+function fileBase(){ const d=S.head.dat||new Date().toISOString().slice(0,10); return ('Aufmass_'+(PROJ?PROJ.name:'')+'_'+(S.head.bez||'')).replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss').replace(/[^A-Za-z0-9]+/g,'_').replace(/_+$/,'')+'_'+d; }
+function dl(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500); }
+function checkReady(){
+  if(!S.entries.length){ toast('Es ist noch nichts erfasst'); return false; }
+  const np=S.entries.filter(e=>e.pre).length;
+  if(np && !confirm(np+' Vorschläge aus Rechnungen sind noch nicht geprüft. Trotzdem erstellen? (Sie werden als „ungeprüft“ gekennzeichnet)')) return false;
+  if((!S.sig.sig1||!S.sig.sig2) && !confirm('Es fehlen Unterschriften. Trotzdem erstellen?')) return false;
+  return true;
+}
+const dDE=d=>d?new Date(d).toLocaleDateString('de-DE'):'';
+const tsDE=d=>d?new Date(d).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'}):'';
+
+let LOGO=null;
+async function logoData(){ if(LOGO) return LOGO;
+  try{ const b=await (await fetch('lib/heise-logo.png')).blob(); LOGO=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(b); }); }catch(e){ LOGO=''; }
+  return LOGO; }
+async function makePdf(){
+  const { jsPDF } = window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'}); const W=210, M=14;
+  const g=groups();
+  const lg=await logoData();
+  if(lg) doc.addImage(lg,'PNG',W-M-38,6,38,38*91.014/200);
+  doc.setTextColor(47,59,83); doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.text('Aufmaß',M,17);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100); doc.text('Heise Haustechnik GmbH & Co. KG · Ramsenweg 2c · 38700 Braunlage',M,22); doc.setTextColor(58,58,58);
+  doc.setDrawColor(226,83,4); doc.setLineWidth(0.8); doc.line(M,27,W-M,27); doc.setLineWidth(0.2);
+  doc.autoTable({startY:30,theme:'plain',styles:{fontSize:9.5,cellPadding:1.2},columnStyles:{0:{fontStyle:'bold',cellWidth:42}},margin:{left:M,right:M},
+    body:[['Bauvorhaben',S.head.bv],['Aufmaß',S.head.bez],['Datum',dDE(S.head.dat)],['Aufgemessen von',S.head.mon],['Für AG / Bauleitung',S.head.ag]].concat(S.head.bem?[['Bemerkung',S.head.bem]]:[])});
+  const hs={fillColor:[47,59,83],textColor:255,fontStyle:'bold',fontSize:9};
+  doc.setTextColor(47,59,83); doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.text('1. Zusammenstellung je Position',M,doc.lastAutoTable.finalY+8);
+  doc.autoTable({startY:doc.lastAutoTable.finalY+10,margin:{left:M,right:M},headStyles:hs,styles:{fontSize:8.5,cellPadding:1.6,valign:'top'},
+    head:[['Pos.-Nr.','Bezeichnung','LV-Menge','Aufmaß','ME']],
+    columnStyles:{0:{cellWidth:24},2:{halign:'right',cellWidth:20},3:{halign:'right',cellWidth:20,fontStyle:'bold'},4:{cellWidth:12}},
+    body:g.map(x=>[x.p.p,x.p.b+(x.free?'\n(freie Position'+(x.p.t?', Zuordnung '+titelOf(x.p.p):', ohne Zuordnung')+(x.p.ref?', '+x.p.ref:'')+')':''),x.free?'–':nf(x.p.m),nf(x.sum),x.p.me])});
+  doc.setFont('helvetica','bold'); doc.setFontSize(11.5);
+  let y=doc.lastAutoTable.finalY+10; if(y>265){doc.addPage();y=20;}
+  doc.text('2. Einzelaufmaße',M,y);
+  const body=[]; g.forEach(x=>{ x.ents.forEach((e,i)=>body.push([i?'':x.p.p,i?'':x.p.b,nf(e.qty),x.p.me,e.ort||'',[e.bem,e.rg?(e.pre?'UNGEPRÜFT, aus ':'lt. ')+e.rg:''].filter(Boolean).join(' · ')])); body.push([{content:'Summe '+x.p.p,colSpan:2,styles:{fontStyle:'bold',halign:'right'}},{content:nf(x.sum),styles:{fontStyle:'bold',halign:'right'}},{content:x.p.me,styles:{fontStyle:'bold'}},'','']); });
+  doc.autoTable({startY:y+2,margin:{left:M,right:M},headStyles:hs,styles:{fontSize:8,cellPadding:1.4,valign:'top'},
+    head:[['Pos.-Nr.','Bezeichnung','Menge','ME','Raum / Ort','Bemerkung']],
+    columnStyles:{0:{cellWidth:22},1:{cellWidth:52},2:{halign:'right',cellWidth:16},3:{cellWidth:11},4:{cellWidth:38}},
+    body,didParseCell:d=>{ if(d.section==='body' && String(d.row.raw[0]?.content||'').startsWith('Summe')) d.cell.styles.fillColor=[244,245,247]; }});
+  y=doc.lastAutoTable.finalY+10; if(y>235){doc.addPage();y=24;}
+  doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.text('3. Bestätigung',M,y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.text('Das vorstehende Aufmaß wurde gemeinsam vor Ort festgestellt.',M,y+5);
+  const bw=(W-2*M-10)/2;
+  [['sig1','Auftragnehmer: '+(S.head.mon||'')+' (Heise Haustechnik)'],['sig2','Auftraggeber / Bauleitung: '+(S.head.ag||'')]].forEach(([id,lab],i)=>{
+    const x=M+i*(bw+10);
+    if(S.sig[id]){ const ip=doc.getImageProperties(S.sig[id]); let h=24, w=h*ip.width/ip.height; if(w>bw){ w=bw; h=w*ip.height/ip.width; } doc.addImage(S.sig[id],'PNG',x,y+33-h,w,h); }
+    doc.setDrawColor(60); doc.line(x,y+34,x+bw,y+34);
+    doc.setFontSize(8); doc.text(doc.splitTextToSize(lab,bw),x,y+38);
+    doc.text('Ort, Datum: Ebergötzen, '+(S.sig[id]?tsDE(S.sig.ts):'____________'),x,y+(doc.splitTextToSize(lab,bw).length*3.5)+39);
+  });
+  const n=doc.getNumberOfPages();
+  for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(110);
+    doc.text((S.head.bez||'Aufmaß')+' · '+dDE(S.head.dat),M,290); doc.text('Seite '+i+' von '+n,W-M,290,{align:'right'}); doc.setTextColor(0); }
+  return doc.output('blob');
+}
+
+function xlDate(iso){ const d=new Date(iso); return new Date(d.getTime()-d.getTimezoneOffset()*60000); }
+function imgSize(src){ return new Promise(r=>{ const i=new Image(); i.onload=()=>r({w:i.naturalWidth,h:i.naturalHeight}); i.onerror=()=>r({w:400,h:170}); i.src=src; }); }
+async function makeXlsx(){
+  const wb=new ExcelJS.Workbook(); wb.creator='Aufmaß-App Heise Haustechnik';
+  const g=groups();
+  const hdrFill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2F3B53'}};
+  const bd={top:{style:'thin',color:{argb:'FFBFC7D1'}},bottom:{style:'thin',color:{argb:'FFBFC7D1'}},left:{style:'thin',color:{argb:'FFBFC7D1'}},right:{style:'thin',color:{argb:'FFBFC7D1'}}};
+  const styleHead=r=>{ r.eachCell(c=>{c.fill=hdrFill;c.font={bold:true,color:{argb:'FFFFFFFF'}};c.alignment={vertical:'middle',wrapText:true};c.border=bd;}); r.height=22; };
+  const numFmt='#,##0.###';
+
+  // Blatt 1: Zusammenstellung (Spalten wie im Kalkulationsblatt: Menge Aufmaß / Ort Aufmaß / Bemerkung)
+  const ws=wb.addWorksheet('Aufmaß Summen',{pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0},views:[{state:'frozen',ySplit:8}]});
+  ws.columns=[{width:14},{width:60},{width:12},{width:7},{width:14},{width:40},{width:40},{width:12},{width:40}];
+  ws.getCell('A1').value='Aufmaß'; ws.getCell('A1').font={bold:true,size:16};
+  ws.getCell('A1').font={bold:true,size:16,color:{argb:'FF2F3B53'},name:'Montserrat'};
+  const lgx=await logoData(); if(lgx){ const li=wb.addImage({base64:lgx,extension:'png'}); ws.addImage(li,{tl:{col:6.2,row:0.2},ext:{width:170,height:170*91.014/200}}); }
+  ws.getCell('C1').value=FIRMA; ws.getCell('C1').font={color:{argb:'FF646B78'}};
+  [['Bauvorhaben',S.head.bv],['Aufmaß',S.head.bez],['Datum',S.head.dat?new Date(S.head.dat):''],['Aufgemessen von',S.head.mon],['Für AG / Bauleitung',S.head.ag]].forEach((r,i)=>{
+    ws.getCell('A'+(i+2)).value=r[0]; ws.getCell('A'+(i+2)).font={bold:true}; ws.getCell('B'+(i+2)).value=r[1]||''; });
+  ws.getCell('B4').numFmt='dd.mm.yyyy'; ws.getCell('B4').alignment={horizontal:'left'};
+  if(S.head.bem){ ws.getCell('C2').value='Bemerkung: '+S.head.bem; }
+  ws.getRow(8).values=['Pos.-Nr.','Bezeichnung','LV-Menge','ME','Menge Aufmaß','Ort Aufmaß','Bemerkung','Anz. Einzelaufmaße','LV-Titel / Zuordnung'];
+  styleHead(ws.getRow(8));
+  g.forEach(x=>{
+    const r=ws.addRow([x.p.p,x.p.b+(x.free?' (freie Position'+(x.p.ref?': '+x.p.ref:'')+')':''),x.free?null:x.p.m,x.p.me,null,[...new Set(x.ents.map(e=>e.ort).filter(Boolean))].join('; '),x.ents.map(e=>e.bem).filter(Boolean).join('; '),x.ents.length,titelOf(x.p.p)||(x.free?'ohne Zuordnung':'')]);
+    r.eachCell({includeEmpty:true},c=>{c.border=bd;c.alignment={vertical:'top',wrapText:true};});
+    r.getCell(3).numFmt=numFmt; r.getCell(5).numFmt=numFmt; r.getCell(5).font={bold:true};
+    if(x.free) r.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF4E0'}};
+  });
+  // Formeln: Summe aus Einzelaufmaße
+  let rr=9; g.forEach(x=>{ ws.getCell('E'+rr).value={formula:`SUMIF('Einzelaufmaße'!A:A,A${rr},'Einzelaufmaße'!C:C)`,result:x.sum}; rr++; });
+
+  // Unterschriften
+  let sy=rr+2;
+  ws.getCell('A'+sy).value='Das vorstehende Aufmaß wurde gemeinsam vor Ort festgestellt.'; ws.getCell('A'+sy).font={italic:true};
+  const sigs=[['sig1','Auftragnehmer: '+(S.head.mon||'')+' (Heise Haustechnik)',1],['sig2','Auftraggeber / Bauleitung: '+(S.head.ag||''),5]];
+  for(const [id,lab,col] of sigs){
+    if(S.sig[id]){ const d=await imgSize(S.sig[id]); const h=110, w=Math.min(380,h*d.w/d.h); const img=wb.addImage({base64:S.sig[id],extension:'png'}); ws.addImage(img,{tl:{col:col,row:sy},ext:{width:w,height:w*d.h/d.w}}); }
+    const c=ws.getCell(sy+7,col+1); c.value=lab; c.border={top:{style:'thin'}}; c.font={size:9};
+    ws.getCell(sy+8,col+1).value=S.sig[id]?'unterschrieben am '+tsDE(S.sig.ts):'nicht unterschrieben'; ws.getCell(sy+8,col+1).font={size:9,color:{argb:'FF666666'}};
+  }
+
+  // Blatt 2: Einzelaufmaße
+  const w2=wb.addWorksheet('Einzelaufmaße',{views:[{state:'frozen',ySplit:1}],pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0}});
+  w2.columns=[{header:'Pos.-Nr.',width:14},{header:'Bezeichnung',width:55},{header:'Menge',width:11},{header:'ME',width:7},{header:'Raum / Ort',width:32},{header:'Bemerkung',width:40},{header:'Erfasst am',width:17},{header:'Art',width:12},{header:'LV-Titel / Zuordnung',width:40},{header:'Quelle',width:22},{header:'Rechnung',width:26}];
+  styleHead(w2.getRow(1));
+  g.forEach(x=>x.ents.forEach(e=>{ const r=w2.addRow([x.p.p,x.p.b,e.qty,x.p.me,e.ort,e.bem,xlDate(e.ts),x.free?'frei':'LV',titelOf(x.p.p)||(x.free?'ohne Zuordnung':''),e.rg?(e.pre?'Rechnung, UNGEPRÜFT':'Rechnung, geprüft'):'Aufmaß vor Ort',e.rg||'']);
+    if(e.pre) r.eachCell(c=>c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF4E0'}});
+    r.getCell(3).numFmt=numFmt; r.getCell(7).numFmt='dd.mm.yyyy hh:mm'; r.eachCell({includeEmpty:true},c=>{c.border=bd;c.alignment={vertical:'top',wrapText:true};}); }));
+  w2.autoFilter={from:'A1',to:'K1'};
+
+  const buf=await wb.xlsx.writeBuffer();
+  return new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+
+async function busy(btn,fn){ const t=btn.textContent; btn.disabled=true; btn.textContent='Wird erstellt …'; try{ await fn(); }catch(e){ console.error(e); alert('Fehler beim Erstellen: '+e.message); } btn.disabled=false; btn.textContent=t; }
+$('#btnPdf').onclick=e=>{ if(checkReady()) busy(e.target,async()=>{ dl(await makePdf(),fileBase()+'.pdf'); }); };
+$('#btnXlsx').onclick=e=>{ if(checkReady()) busy(e.target,async()=>{ dl(await makeXlsx(),fileBase()+'.xlsx'); }); };
+try{
+  const probe=new File([''],'a.pdf',{type:'application/pdf'});
+  if(navigator.canShare && navigator.canShare({files:[probe]})){ $('#btnShare').style.display='block'; }
+}catch(e){}
+$('#btnShare').onclick=e=>{ if(checkReady()) busy(e.target,async()=>{
+  const b=fileBase();
+  const files=[new File([await makePdf()],b+'.pdf',{type:'application/pdf'}),new File([await makeXlsx()],b+'.xlsx',{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})];
+  try{ await navigator.share({files,title:'Aufmaß '+(S.head.bez||''),text:'Aufmaß '+(PROJ?PROJ.name:'')+' – '+(S.head.bez||'')+' vom '+dDE(S.head.dat)}); }catch(err){ if(err.name!=='AbortError') throw err; }
+}); };
+
+/* ---------- Sicherung ---------- */
+$('#btnBak').onclick=()=>dl(new Blob([JSON.stringify(S)],{type:'application/json'}),fileBase()+'_Sicherung.json');
+
+function renderAreas(){
+  const A=areas(); const gs=[...new Set(A.map(a=>a.g))];
+  const openG=new Set([...document.querySelectorAll('details.ag[open]')].map(d=>d.dataset.g));
+  $('#areaList').innerHTML=gs.map(g=>`<details class="ag" data-g="${esc(g)}" ${openG.has(g)?'open':''}><summary>${esc(g)} <span class="hint">(${A.filter(a=>a.g===g).length})</span></summary>`+
+    A.map((a,i)=>a.g!==g?'':`<div class="al"><span>${esc(a.n)}</span><button class="icon" data-ren="${i}" aria-label="Umbenennen">${IC('edit')}</button><button class="icon" data-del="${i}" aria-label="Löschen">${IC('x')}</button></div>`).join('')+`</details>`).join('');
+  $('#dl_ag').innerHTML=gs.map(g=>`<option value="${esc(g)}">`).join('');
+  $('#areaList').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ const A2=areas().slice(); A2.splice(+b.dataset.del,1); S.areas=A2; save(); renderAreas(); });
+  $('#areaList').querySelectorAll('[data-ren]').forEach(b=>b.onclick=()=>{ const A2=areas().map(a=>({...a})); const a=A2[+b.dataset.ren]; const n=prompt('Bereich umbenennen:',a.n); if(n&&n.trim()){ a.n=n.trim(); S.areas=A2; save(); renderAreas(); } });
+}
+$('#a_add').onclick=()=>{ const n=$('#a_n').value.trim(); if(!n){ toast('Bitte einen Namen eintragen'); return; } const g=$('#a_g').value.trim()||'Eigene Bereiche';
+  const A2=areas().slice(); let idx=-1; A2.forEach((a,i)=>{ if(a.g===g) idx=i; }); const it={g,n}; if(idx<0) A2.push(it); else A2.splice(idx+1,0,it);
+  S.areas=A2; save(); $('#a_n').value=''; renderAreas(); toast('Bereich hinzugefügt'); };
+function renderAll(){ renderAreas(); renderPos(); renderSum(); renderHdr(); sigText(); }
+
+/* ---------- Datenbank-Abgleich ---------- */
+const eKey=e=>JSON.stringify([e.key,e.qty,e.ort||'',e.bem||'',e.rg||'',!!e.pre]);
+const fKey=f=>JSON.stringify([f.p,f.b,f.me||'',f.t||'',f.ref||'']);
+const hKey=()=>JSON.stringify([S.head.bez||'',S.head.dat||'',S.head.mon||'',S.head.ag||'',S.head.bem||'',S.sig.sig1||null,S.sig.sig2||null,S.sig.ts||null]);
+const aKey=a=>JSON.stringify((a||[]).map(x=>[x.g||'',x.n]));
+const fromE=e=>({id:e.id,key:e.pos_key,qty:e.menge,ort:e.ort||'',bem:e.bemerkung||'',rg:e.rg||'',pre:!!e.pre,ts:e.created_at||e.updated_at,von:e.erfasst_von||''});
+const fromF=f=>({id:f.id,p:f.nr,b:f.bez,me:f.me||'',t:f.titel||'',ref:f.ref||''});
+function baseFrom(srv){ // Serverstand in Vergleichswerte übersetzen
+  const e={}, f={};
+  srv.eintraege.forEach(x=>{ const l=fromE(x); e[l.id]=eKey(l); });
+  srv.freipos.forEach(x=>{ const l=fromF(x); f[l.id]=fKey(l); });
+  return {e,f};
+}
+function diff(){
+  if(!BASE) return {e:[],f:[],de:[],df:[],head:false,areas:false,n:0};
+  const e=S.entries.filter(x=>BASE.e[x.id]!==eKey(x));
+  const f=S.free.filter(x=>BASE.f[x.id]!==fKey(x));
+  const ids=new Set(S.entries.map(x=>x.id)), fids=new Set(S.free.map(x=>x.id));
+  const de=Object.keys(BASE.e).filter(id=>!ids.has(id)), df=Object.keys(BASE.f).filter(id=>!fids.has(id));
+  const head=BASE.h!==hKey(), ar=BASE.a!==aKey(S.areas);
+  return {e,f,de,df,head,areas:ar,n:e.length+f.length+de.length+df.length+(head?1:0)+(ar?1:0)};
+}
+function setSync(kind,txt){ const el=$('#saveState'); el.innerHTML=IC(kind==='err'?'cloudoff':(txt.startsWith('✓')?'cloud':'sync'))+'<span>'+esc(txt.replace(/^✓ /,''))+'</span>'; el.style.color=kind==='err'?'var(--amber)':(txt.startsWith('✓')?'var(--ok)':''); }
+function syncStatus(){
+  const d=diff();
+  if(!navigator.onLine) setSync('err', d.n? `offline · ${d.n} Änderung${d.n>1?'en':''} warten` : 'offline · lokal gespeichert');
+  else if(d.n) setSync('', `${d.n} Änderung${d.n>1?'en':''} werden gespeichert …`);
+  else setSync('', '✓ gespeichert '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}));
+}
+const api=(path,opt={})=>PJ.api(path,opt);
+function applyServer(srv, keepLocal){
+  // Projekt, LV, Bereiche
+  PROJ=srv.projekt;
+  LV=srv.lv.map(o=>({k:o.typ,p:o.pos,b:o.bez,m:o.menge,me:o.me,v:o.in_liste?1:0})); initLV();
+  const srvE=srv.eintraege.map(fromE), srvF=srv.freipos.map(fromF);
+  const k=srv.kopf;
+  const srvHead={bez:k.bez||'',dat:k.datum||'',mon:k.monteur||'',ag:k.ag||'',bem:k.bemerkung||''}, srvSig={sig1:k.sig1||null,sig2:k.sig2||null,ts:k.sig_ts||null};
+  const srvAreas=(srv.bereiche||[]).map(b=>({g:b.gruppe||'',n:b.name}));
+  if(keepLocal && BASE){
+    const d=diff();
+    const chE=new Map(d.e.map(x=>[x.id,x])), delE=new Set(d.de), chF=new Map(d.f.map(x=>[x.id,x])), delF=new Set(d.df);
+    const ents=srvE.filter(x=>!delE.has(x.id)).map(x=>chE.get(x.id)||x);
+    d.e.forEach(x=>{ if(!ents.some(y=>y.id===x.id)) ents.push(x); });
+    const frs=srvF.filter(x=>!delF.has(x.id)).map(x=>chF.get(x.id)||x);
+    d.f.forEach(x=>{ if(!frs.some(y=>y.id===x.id)) frs.push(x); });
+    S.entries=ents; S.free=frs;
+    if(!d.head){ S.head=Object.assign(S.head,srvHead); S.sig=srvSig; }
+    if(!d.areas) S.areas=srvAreas;
+  } else {
+    S.entries=srvE; S.free=srvF; S.head=Object.assign(S.head,srvHead); S.sig=srvSig; S.areas=srvAreas;
+  }
+  S.head.bv=[PROJ.nr,PROJ.name,PROJ.adresse].filter(Boolean).join(' · ');
+  BASE=baseFrom(srv);
+  BASE.h=JSON.stringify([srvHead.bez,srvHead.dat,srvHead.mon,srvHead.ag,srvHead.bem,srvSig.sig1,srvSig.sig2,srvSig.ts]);
+  BASE.a=aKey(srvAreas);
+}
+let syncT=null, syncing=false, syncAgain=false;
+function scheduleSync(){ clearTimeout(syncT); syncStatus(); syncT=setTimeout(syncNow,1500); }
+async function syncNow(){
+  if(!AID||!BASE) return;
+  if(syncing){ syncAgain=true; return; }
+  if(!navigator.onLine){ syncStatus(); return; }
+  syncing=true;
+  try{
+    const d=diff(), t=new Date().toISOString();
+    if(d.head) await api('aufmasse/'+AID,{method:'PUT',body:JSON.stringify({bez:S.head.bez,datum:S.head.dat,monteur:S.head.mon,ag:S.head.ag,bemerkung:S.head.bem,sig1:S.sig.sig1,sig2:S.sig.sig2,sig_ts:S.sig.ts})});
+    if(d.areas) await api('projekte/'+PROJ.id+'/bereiche',{method:'PUT',body:JSON.stringify(S.areas.map(a=>({gruppe:a.g,name:a.n})))});
+    const body={
+      eintraege:[...d.e.map(e=>({id:e.id,pos_key:e.key,menge:e.qty,ort:e.ort,bemerkung:e.bem,rg:e.rg,pre:e.pre?1:0,created_at:e.ts,updated_at:t})),
+                 ...d.de.map(id=>({id,pos_key:'-',menge:0,updated_at:t,deleted:1}))],
+      freipos:[...d.f.map(f=>({id:f.id,nr:f.p,bez:f.b,me:f.me,titel:f.t,ref:f.ref,updated_at:t})),
+               ...d.df.map(id=>({id,nr:'-',bez:'-',updated_at:t,deleted:1}))]
+    };
+    await api('aufmasse/'+AID+'/sync',{method:'POST',body:JSON.stringify(body)});
+    const srv=await api('aufmasse/'+AID);
+    applyServer(srv,true);
+    localStorage.setItem(KEY, JSON.stringify({S,BASE,PROJ,LV}));
+    renderAll(); fillHead(); syncStatus();
+  }catch(e){ console.error(e); setSync('err','⚠ nicht abgeglichen: '+e.message.slice(0,60)); }
+  syncing=false;
+  if(syncAgain){ syncAgain=false; scheduleSync(); }
+}
+async function pull(){
+  if(!navigator.onLine||syncing) return;
+  try{ const srv=await api('aufmasse/'+AID); applyServer(srv,true); localStorage.setItem(KEY, JSON.stringify({S,BASE,PROJ,LV})); renderAll(); fillHead(); syncStatus(); if(diff().n) scheduleSync(); }
+  catch(e){ setSync('err','⚠ '+e.message.slice(0,60)); }
+}
+async function boot(){
+  if(!AID){ document.body.innerHTML='<p style="padding:20px">Kein Aufmaß gewählt. <a href="index.html">Zur Projektübersicht</a></p>'; return; }
+  let cache=null; try{ cache=JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){}
+  if(cache&&cache.BASE){ S=Object.assign(DEF(),cache.S); BASE=cache.BASE; PROJ=cache.PROJ; LV=cache.LV||[]; initLV(); renderAll(); fillHead(); drawSigs(); }
+  try{
+    const srv=await api('aufmasse/'+AID);
+    applyServer(srv,!!(cache&&cache.BASE));
+    localStorage.setItem(KEY, JSON.stringify({S,BASE,PROJ,LV}));
+    renderAll(); fillHead(); drawSigs(); syncStatus(); if(diff().n) scheduleSync();
+  }catch(e){
+    if(!cache){ document.querySelector('main').innerHTML=`<div class="empty">Aufmaß konnte nicht geladen werden.<br>${esc(e.message)}<br><br><a href="index.html">Zur Projektübersicht</a></div>`; return; }
+    syncStatus();
+  }
+  document.title='Aufmaß · '+(PROJ?PROJ.name:'');
+  $('#hdrTitle').textContent=PROJ?PROJ.name:'Aufmaß';
+}
+window.addEventListener('online',()=>{ syncStatus(); syncNow(); });
+window.addEventListener('offline',syncStatus);
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') pull(); });
+setInterval(()=>{ if(document.visibilityState==='visible' && !diff().n) pull(); },60000);
+$('#btnSync').onclick=()=>{ syncNow().then(pull); };
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+boot();
+</script>
+</body>
+</html>

@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Leiterprüfung – My Heise App</title>
-<meta name="theme-color" content="#1d3a63">
+<meta name="theme-color" content="#2f3b53">
 <meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="My Heise">
-<link rel="icon" type="image/png" href="./icon.png?v=3">
-<link rel="apple-touch-icon" href="./icon.png?v=3">
+<link rel="icon" type="image/png" href="./icon.png?v=4">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=4">
 <link rel="manifest" href="./manifest.webmanifest">
 <style>
 :root{
@@ -368,6 +368,7 @@ textarea.inp{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
 
 .rail-logo{overflow:hidden}.rail-logo img{width:100%;height:100%;object-fit:cover;display:block}
 </style>
+<link rel="stylesheet" href="heise-ci.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -840,7 +841,7 @@ function renderShell(){
     `<a class="tab" data-nav="aufgaben" href="#/aufgaben">${ic('tasks')}<span>Aufgaben</span>${dot}</a>`+
     `<a class="tab" data-nav="mehr" href="#/mehr">${ic('more')}<span>Mehr</span></a>`;
   $('#rail').innerHTML=
-    `<div class="rail-brand"><div class="rail-logo">${ic('ladder','lg')}<img src="icon.png?v=3" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Leiterprüfung</b><small>Heise Haustechnik</small></div></div>`+
+    `<div class="rail-brand"><div class="rail-logo">${ic('ladder','lg')}<img src="icon.png?v=4" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Leiterprüfung</b><small>Heise Haustechnik</small></div></div>`+
     `<button class="btn btn-primary" data-act="scan">${ic('scan')} Leiter scannen</button>`+
     `<nav class="rail-nav">`+
       `<a class="rail-item" data-nav="start" href="#/">${ic('home')} Start</a>`+

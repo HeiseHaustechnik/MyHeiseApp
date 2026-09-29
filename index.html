@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>My Heise App</title>
-<meta name="theme-color" content="#1d3a63">
+<meta name="theme-color" content="#2f3b53">
 <meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="My Heise">
-<link rel="icon" type="image/png" href="./icon.png?v=3">
-<link rel="apple-touch-icon" href="./icon.png?v=3">
+<link rel="icon" type="image/png" href="./icon.png?v=4">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=4">
 <link rel="manifest" href="./manifest.webmanifest">
 <style>
 :root{
@@ -258,9 +258,11 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 .pt b{display:block;font-weight:680;font-size:14.5px}.pt small{color:var(--ink-3);font-size:12px}
 @media(max-width:420px){.nx-tabs button{font-size:13px;padding:4px 2px}}
 </style>
+<link rel="stylesheet" href="heise-ci.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-ruler" viewBox="0 0 24 24"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0ZM14.5 12.5l2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2"/></symbol>
 <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
 <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11a2 2 0 0 1 1 .3A2 2 0 0 1 13 4h5.5A1.5 1.5 0 0 1 20 5.5v12a1.5 1.5 0 0 1-1.5 1.5H13a1 1 0 0 0-1 1 1 1 0 0 0-1-1H5.5A1.5 1.5 0 0 1 4 17.5z"/><path d="M12 4.3V20M7.5 8.5H9M15 8.5h1.5M7.5 12H9M15 12h1.5"/></symbol>
 <symbol id="i-house" viewBox="0 0 24 24"><path d="M3 11.500 12 4l9 7.500"/><path d="M5.500 10v10h13V10"/><path d="M10 20v-5.500h4V20"/></symbol>
@@ -309,27 +311,31 @@ const FIRMA = 'Heise Haustechnik GmbH & Co. KG';
    NEUES MODUL: hier einen Eintrag ergänzen (id = Kürzel in Kleinbuchstaben, url = Datei).
    Freigeschaltet wird es dann unter Zugriff & Rollen. Admins sehen immer alle Module. */
 const MODULES = [
-  { id: 'lager', name: 'Lagerverwaltung', desc: 'Viessmann- und Heise-Lager', url: 'lager.html', icon: 'box', g: ['#4a6a99', '#22385c'] },
-  { id: 'leitern', name: 'Leiterprüfung', desc: 'Leitern scannen, buchen und prüfen', url: 'leitern.html', icon: 'ladder', g: ['#f5a524', '#d0650a'],
+  { id: 'lager', name: 'Lagerverwaltung', desc: 'Viessmann- und Heise-Lager', url: 'lager.html', icon: 'box', g: ['#4a5a7a', '#2f3b53'] },
+  { id: 'leitern', name: 'Leiterprüfung', desc: 'Leitern scannen, buchen und prüfen', url: 'leitern.html', icon: 'ladder', g: ['#f08a3c', '#e25304'],
     rollen: [
       { k: 'nutzer', l: 'Nutzer', d: 'Leitern ansehen, scannen, buchen und Mängel melden.' },
       { k: 'obermonteur', l: 'Obermonteur', d: 'Wie Nutzer, dazu Aufgaben stellen (prüfen, reparieren).' },
       { k: 'pruefer', l: 'Prüfer (Lagerist)', d: 'Wie Obermonteur, dazu prüfen, Leitern anlegen und Mängel abschließen.' },
       { k: 'admin', l: 'Admin', d: 'Alles, dazu die Prüf-Checkliste verwalten.' }] },
-  { id: 'fuhrpark', name: 'Fuhrpark', desc: 'Fahrzeuge, Meldungen und Buchungen', url: 'fahrzeuge.html', icon: 'car', g: ['#22a06b', '#0d6b48'],
+  { id: 'fuhrpark', name: 'Fuhrpark', desc: 'Fahrzeuge, Meldungen und Buchungen', url: 'fahrzeuge.html', icon: 'car', g: ['#4a7fc4', '#2c60a7'],
     rollen: [
       { k: 'fahrer', l: 'Fahrer', d: 'Schäden und Anfragen melden, Fahrzeuge buchen, Fahrzeugkontrolle machen.' },
       { k: 'fuhrpark', l: 'Fuhrpark', d: 'Wie Fahrer, dazu Meldungen bearbeiten, Fahrzeuge, Belege, Termine und Führerscheinkontrollen verwalten.' },
       { k: 'admin', l: 'Admin', d: 'Alles, dazu Fahrzeuge löschen und Belege entfernen.' }] },
-  { id: 'unterweisung', name: 'Unterweisungen', desc: 'Sicherheit: Folien, Prüfung, Nachweis', url: 'unterweisung.html', icon: 'book', g: ['#8b5cf6', '#5b21b6'] },
-  { id: 'gefaehrdung', name: 'Gefährdungs\u00adbeurteilung', desc: 'Baustellen: Checkliste, Freigabe, PDF', url: 'gefaehrdung.html', icon: 'hardhat', g: ['#f97316', '#c2410c'],
+  { id: 'unterweisung', name: 'Unterweisungen', desc: 'Sicherheit: Folien, Prüfung, Nachweis', url: 'unterweisung.html', icon: 'book', g: ['#d8474b', '#c32328'] },
+  { id: 'gefaehrdung', name: 'Gefährdungs\u00adbeurteilung', desc: 'Baustellen: Checkliste, Freigabe, PDF', url: 'gefaehrdung.html', icon: 'hardhat', g: ['#e2b93b', '#b98a00'],
     rollen: [
       { k: 'benutzer', l: 'Leser', d: 'Freigegebene Beurteilungen ansehen und als PDF laden.' },
       { k: 'ersteller', l: 'Ersteller', d: 'Beurteilungen erstellen und unterschreiben, Unterschriften der Beschäftigten einholen (Meister, Fachkraft für Arbeitssicherheit).' }] },
-  { id: 'objekt', name: 'Objektaufnahme', desc: 'Beim Kunden: Anlage, Fotos, PDF', url: 'objekt.html', icon: 'house', g: ['#14b8a6', '#0f766e'],
+  { id: 'objekt', name: 'Objektaufnahme', desc: 'Beim Kunden: Anlage, Fotos, PDF', url: 'objekt.html', icon: 'house', g: ['#5a86c8', '#1f4f8f'],
     rollen: [
       { k: 'aufnehmer', l: 'Aufnehmer', d: 'Objekte beim Kunden aufnehmen (Meister, Servicetechniker): eigene Aufnahmen erstellen, bearbeiten und als PDF ausgeben.' },
       { k: 'buero', l: 'Büro', d: 'Alle Aufnahmen ansehen und als PDF ausgeben, zum Beispiel für das Angebot. Nicht bearbeiten.' }] },
+  { id: 'projekte', name: 'Projekte', desc: 'Aufmaß und Bautagebuch', url: 'projekte.html', icon: 'ruler', g: ['#e8742f', '#c94a03'],
+    rollen: [
+      { k: 'monteur', l: 'Monteur', d: 'Aufmaße erfassen, Bautagebuch führen, Fotos und Unterschriften.' },
+      { k: 'bauleitung', l: 'Bauleitung', d: 'Wie Monteur, dazu Projekte anlegen, LV aus Excel einlesen und Aufmaße löschen.' }] },
 ];
 
 /* ---------- Grundlagen ---------- */
@@ -551,7 +557,7 @@ function appTile(m) {
 function showHome() {
   const mods = MODULES.filter(m => APPS[m.id]), first = (ME.name || '').split(' ')[0], adm = ME.rolle === 'admin';
   root.innerHTML = `<div class="shell">
-    <header class="topbar"><div class="brand"><img src="icon.png?v=3" alt="" onerror="this.remove()"><div>${APP_NAME}<small>${esc(FIRMA)}</small></div></div><div class="top-r"><a class="bell" href="#/nachrichten" data-bell aria-label="Nachrichten">${ic('bell')}<span class="bell-n" hidden></span></a><button class="avatar" data-act="konto" aria-label="Konto">${esc((ME.name || '?').charAt(0).toUpperCase())}</button></div></header>
+    <header class="topbar"><div class="brand"><img src="icon.png?v=4" alt="" onerror="this.remove()"><div>${APP_NAME}<small>${esc(FIRMA)}</small></div></div><div class="top-r"><a class="bell" href="#/nachrichten" data-bell aria-label="Nachrichten">${ic('bell')}<span class="bell-n" hidden></span></a><button class="avatar" data-act="konto" aria-label="Konto">${esc((ME.name || '?').charAt(0).toUpperCase())}</button></div></header>
     <section class="hero"><div class="hero-t"><div class="ey">${esc(heute())}</div><h1>${esc(greet())}, ${esc(first)}</h1></div><div class="logo-tile" id="heroLogo"></div><p class="hero-p">Willkommen bei Heise Haustechnik. Was möchtest du heute erledigen?</p></section>
     <a class="msgcard" id="msgcard" href="#/nachrichten">${'<div class="mi">' + ic('mail', 'lg') + '</div>'}<div class="mt"><b>Nachrichten</b><span class="s">${esc(zaehlerText())}</span></div><span class="cnt" hidden></span>${ic('chev', 'chev')}</a>
     <div class="sec-title">Deine Apps</div>

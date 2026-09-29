@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f8">
+<title>Bautagebuch</title>
+<link rel="stylesheet" href="lib/heise-ui.css">
+<style>
+.pagehead{display:flex;align-items:center;gap:12px;margin:4px 0 16px}
+.pagehead h1{font-size:24px;font-weight:770;overflow-wrap:anywhere}
+.pagehead small{display:block;color:var(--ink-3);font-size:13px;font-weight:600;margin-top:2px}
+.sync{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:650;color:var(--ink-3);text-align:right;line-height:1.25;max-width:42%}
+.sync .ic{width:16px;height:16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr .8fr;gap:10px}
+.card .field:last-child{margin-bottom:0}
+.hours{display:flex;align-items:center;gap:8px;margin-top:4px;font-weight:700;color:var(--brand)}
+.wx{display:flex;align-items:center;gap:14px}
+.wx .wi{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:var(--blue-bg);color:var(--blue);flex:0 0 auto}
+.wx .wi .ic{width:30px;height:30px}
+.wx .wt{flex:1;min-width:0}
+.wx .wt b{display:block;font-size:16px}
+.wx .wt small{display:block;color:var(--ink-2);font-size:13px}
+.people{display:flex;flex-wrap:wrap;gap:8px}
+.pp{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 14px 0 6px;border-radius:21px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:650;font-size:14px;text-align:left}
+.pp .av{width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:12px;font-weight:780;color:var(--ink-2);flex:0 0 auto}
+.pp small{display:block;font-size:11.5px;color:var(--ink-3);font-weight:600;line-height:1.1}
+.pp.on{background:color-mix(in srgb,var(--brand) 8%,var(--surface));box-shadow:inset 0 0 0 2px var(--brand)}
+.pp.on .av{background:var(--brand);color:#fff}
+.pp.add{padding:0 14px;color:var(--accent-2);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 45%,transparent);background:var(--amber-bg)}
+.sig{border:1.5px dashed var(--ink-3);border-radius:16px;background:var(--surface);touch-action:none;width:100%;height:160px;display:block}
+.sigbar{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px;color:var(--ink-3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}.row3{grid-template-columns:1fr 1fr}.row3>:last-child{grid-column:1/-1}}
+.lnk{color:var(--brand-2);font-weight:650;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;padding:6px 0}
+.lnk .ic{width:16px;height:16px}
+.day{display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:var(--surface-2);color:var(--brand);flex:0 0 auto;line-height:1}
+.day b{font-size:19px;font-weight:800}
+.day small{font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--ink-3)}
+.row-card .mt .desc{display:block;font-size:13px;color:var(--ink-2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ov{position:fixed;inset:0;background:rgba(8,13,21,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:50;display:none}
+.ov.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--bg);border-radius:28px 28px 0 0;padding:24px 20px calc(20px + var(--safe-b));transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.9,.3,1);max-width:560px;margin:0 auto;box-shadow:0 -24px 70px -20px rgba(0,0,0,.5)}
+.sheet::before{content:"";position:absolute;top:9px;left:50%;width:40px;height:5px;border-radius:3px;background:var(--line);transform:translateX(-50%)}
+.sheet.on{transform:none}
+.sheet h2{font-size:20px;font-weight:760;margin-bottom:14px}
+.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.fotos .ft{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;background:var(--surface-2);padding:0}
+.fotos .ft img{width:100%;height:100%;object-fit:cover;display:block}
+.fotos .ft .nt{position:absolute;left:0;right:0;bottom:0;padding:14px 6px 5px;font-size:11px;font-weight:650;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65));text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fotos .ft .up{position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 2px #fff}
+.fotos .fadd{aspect-ratio:1;border-radius:14px;display:grid;place-items:center;align-content:center;gap:6px;color:var(--accent-2);background:var(--amber-bg);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 45%,transparent);font-weight:700;font-size:12.5px;text-align:center;padding:6px}
+.fotos .fadd .ic{width:26px;height:26px}
+.fbig{width:100%;max-height:52vh;object-fit:contain;border-radius:14px;background:#000;display:block;margin-bottom:12px}
+.bottombar{position:sticky;bottom:0;z-index:5;padding:12px 0 calc(8px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:10px}
+.bottombar .btn{flex:1}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="iconbtn" id="backBtn" aria-label="Zurück"></a>
+  <div class="brand"><div class="lt"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div><div style="min-width:0"><b id="hTitle">Bautagebuch</b><small id="hSub"></small></div></div>
+  <span class="sync" id="syncState"></span>
+</header>
+<main class="shell" id="app"><div class="empty">Lädt …</div></main>
+<div class="ov" id="ov"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<script src="lib/heise-icons.js"></script>
+<script src="lib/pj-api.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.plugin.autotable.min.js"></script>
+<script>
+/* ================= Grundlagen ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+const nowIso=()=>new Date().toISOString();
+const todayIso=()=>{ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+const WT=['So','Mo','Di','Mi','Do','Fr','Sa'], WTL=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const dDE=d=>d?new Date(d+'T12:00').toLocaleDateString('de-DE'):'';
+const dLong=d=>d?WTL[new Date(d+'T12:00').getDay()]+', '+new Date(d+'T12:00').toLocaleDateString('de-DE',{day:'numeric',month:'long',year:'numeric'}):'';
+const tsDE=t=>t?new Date(t).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'}):'';
+const initials=n=>String(n||'?').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2400); }
+const ls={ get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
+const api=(path,opt={})=>PJ.api(path,opt);
+const Q=new URLSearchParams(location.search);
+const PID=Q.get('p');
+let PROJ=null, PERS=[], LIST=[], E=null;   // Projekt, Personen, Liste, aktueller Eintrag
+const K={proj:'btb_proj_'+PID, pers:'btb_pers_'+PID, list:'btb_list_'+PID, queue:'btb_queue', ent:id=>'btb_e_'+id};
+
+$('#backBtn').innerHTML=IC('back');
+function setSync(kind,txt){ const el=$('#syncState'); el.innerHTML=IC(kind==='err'?'cloudoff':kind==='ok'?'cloud':'sync')+'<span>'+esc(txt)+'</span>'; el.style.color=kind==='err'?'var(--amber)':kind==='ok'?'var(--ok)':''; }
+
+/* ================= Warteschlange (offline) ================= */
+// Jede Änderung wird lokal gespeichert und in eine Warteschlange gelegt. Sobald Netz da ist, wird sie übertragen.
+function queue(){ return ls.get(K.queue,[]); }
+function enqueue(item){ const q=queue().filter(x=>!(x.kind===item.kind && x.id===item.id)); q.push(item); ls.set(K.queue,q); flushSoon(); }
+let flushT=null, flushing=false;
+function flushSoon(){ clearTimeout(flushT); updSync(); flushT=setTimeout(flush,1200); }
+function updSync(){ const n=queue().length; if(!navigator.onLine) setSync('err', n?`offline · ${n} Änderung${n>1?'en':''} warten`:'offline'); else if(n) setSync('', `${n} Änderung${n>1?'en':''} werden gespeichert …`); else setSync('ok','gespeichert '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})); }
+async function flush(){
+  if(flushing||!navigator.onLine) { updSync(); return; }
+  flushing=true;
+  try{
+    let q=queue();
+    while(q.length){
+      const it=q[0];
+      if(it.kind==='person') await api('projekte/'+it.pid+'/personen',{method:'POST',body:JSON.stringify(it.data)});
+      else if(it.kind==='entry') await api('bautagebuch/'+it.id,{method:'PUT',body:JSON.stringify(it.data)});
+      else if(it.kind==='del') await api('bautagebuch/'+it.id,{method:'DELETE'});
+      else if(it.kind==='proj') await api('projekte/'+it.id,{method:'PUT',body:JSON.stringify(it.data)});
+      else if(it.kind==='foto'){ const f=await idb.get(it.id); if(f){ const d={...f}; delete d.pending; if(d.deleted) delete d.bild; await api('fotos/'+it.id,{method:'PUT',body:JSON.stringify(d)}); if(f.deleted) await idb.del(f.id); else { const g=await idb.get(f.id); if(g&&g.updated_at===f.updated_at){ g.pending=false; await idb.put(g); } } } }
+      q=queue().filter(x=>!(x.kind===it.kind && x.id===it.id && x.data?.updated_at===it.data?.updated_at)); ls.set(K.queue,q);
+    }
+    updSync(); if(E&&$('#fList')){ idb.byEntry(E.id).then(a=>{ FOTOS=a.filter(f=>!f.deleted).sort((x,y)=>(x.sort-y.sort)||x.created_at.localeCompare(y.created_at)); renderFotos(); }).catch(()=>{}); }
+  }catch(e){ console.error(e); setSync('err','nicht gespeichert: '+e.message.slice(0,50)); }
+  flushing=false;
+}
+window.addEventListener('online',()=>{ updSync(); flush(); });
+window.addEventListener('offline',updSync);
+
+/* ================= Laden ================= */
+async function loadBase(){
+  PROJ=ls.get(K.proj,null); PERS=ls.get(K.pers,[]); LIST=ls.get(K.list,[]);
+  try{
+    const [p,pers,list]=await Promise.all([api('projekte/'+PID),api('projekte/'+PID+'/personen'),api('projekte/'+PID+'/bautagebuch')]);
+    PROJ=p.projekt; ls.set(K.proj,PROJ);
+    // lokal angelegte, noch nicht übertragene Personen behalten
+    const pend=queue().filter(x=>x.kind==='person').map(x=>x.data);
+    PERS=[...pers.filter(x=>!pend.some(y=>y.id===x.id)),...pend.filter(x=>!x.deleted)]; ls.set(K.pers,PERS);
+    const pendE=queue().filter(x=>x.kind==='entry').map(x=>x.data);
+    LIST=[...list.filter(x=>!pendE.some(y=>y.id===x.id)),...pendE.map(listRow)].sort((a,b)=>b.datum.localeCompare(a.datum)); ls.set(K.list,LIST);
+  }catch(e){ if(!PROJ) throw e; }
+}
+const listRow=e=>({id:e.id,datum:e.datum,von:e.von,bis:e.bis,pause_min:e.pause_min,wetter:e.wetter,personen:typeof e.personen==='string'?e.personen:JSON.stringify(e.personen||[]),verfasser:e.verfasser,taetigkeit:(e.taetigkeit||'').slice(0,160),sig_ma:!!e.sig1,sig_ag:!!e.sig2,fotos:e.fotos_n??(LIST.find(x=>x.id===e.id)?.fotos||0)});
+
+/* ================= Liste ================= */
+function hours(von,bis,pause){ if(!von||!bis) return 0; const [a,b]=[von,bis].map(t=>{ const [h,m]=t.split(':').map(Number); return h*60+m; }); let d=b-a; if(d<0) d+=1440; return Math.max(0,(d-(Number(pause)||0))/60); }
+const hStr=h=>h.toLocaleString('de-DE',{maximumFractionDigits:2})+' h';
+function renderList(){
+  $('#hTitle').textContent='Bautagebuch'; $('#hSub').textContent=PROJ?PROJ.name:'';
+  $('#backBtn').href='index.html#p='+PID;
+  const today=todayIso(), hasToday=LIST.find(x=>x.datum===today);
+  $('#app').innerHTML=`
+    <section class="hero">
+      <div><div class="ey">${esc(PROJ?.name||'')}</div><h1>Bautagebuch</h1></div>
+      <div class="logo-tile"><img src="lib/heise-logo.svg" alt=""></div>
+      <p>${LIST.length} ${LIST.length==1?'Eintrag':'Einträge'} · ${hasToday?'Heute bereits eingetragen':'Heute noch kein Eintrag'}</p>
+    </section>
+    <div style="margin:16px 0 4px"><button class="btn cta block" id="bToday">${IC(hasToday?'edit':'plus')}${hasToday?'Heutigen Eintrag öffnen':'Heute eintragen'}</button></div>
+    <div style="text-align:right"><button class="lnk" id="bOther">${IC('cal')}Anderen Tag nachtragen</button></div>
+    <div class="sec-title">Einträge</div>
+    ${LIST.length? LIST.map(e=>{ const d=new Date(e.datum+'T12:00'); let pc=0; try{ pc=JSON.parse(e.personen||'[]').length; }catch(x){}
+      return `<a class="row-card" href="?p=${PID}&id=${e.id}">
+        <div class="day"><small>${WT[d.getDay()]}</small><b>${d.getDate()}.${d.getMonth()+1}.</b></div>
+        <div class="mt"><b>${e.von&&e.bis?esc(e.von)+' – '+esc(e.bis)+' Uhr':'ohne Arbeitszeit'}</b>
+          <small>${hStr(hours(e.von,e.bis,e.pause_min))} · ${pc} ${pc==1?'Person':'Personen'}${e.fotos?' · '+e.fotos+' Foto'+(e.fotos>1?'s':''):''}${e.wetter?' · '+esc(e.wetter.split(' · ')[0]):''}</small>
+          ${e.taetigkeit?`<span class="desc">${esc(e.taetigkeit)}</span>`:''}
+          <div class="tags">${e.sig_ma?'<span class="pill tone-ok"><i></i>Mitarbeiter</span>':'<span class="pill tone-amber"><i></i>nicht unterschrieben</span>'}${e.sig_ag?'<span class="pill tone-ok"><i></i>Auftraggeber</span>':''}</div></div>
+        <span class="chev">${IC('chev')}</span></a>`; }).join('')
+      : `<div class="empty">${IC('book')}<div>Noch keine Einträge.</div></div>`}`;
+  $('#bToday').onclick=()=>{ if(hasToday) location.href=`?p=${PID}&id=${hasToday.id}`; else newEntry(today); };
+  $('#bOther').onclick=()=>openSheet(`<h2>Anderen Tag nachtragen</h2><div class="field"><label>Datum</label><input class="inp" type="date" id="nd" value="${today}" max="${today}"></div><button class="btn cta block" id="ndOk">Eintrag öffnen</button>`,()=>{
+    $('#ndOk').onclick=()=>{ const d=$('#nd').value; if(!d) return; const ex=LIST.find(x=>x.datum===d); if(ex) location.href=`?p=${PID}&id=${ex.id}`; else newEntry(d); }; });
+}
+function newEntry(datum){
+  const last=LIST[0];
+  let lastPers=[]; try{ lastPers=JSON.parse(last?.personen||'[]'); }catch(e){}
+  const id=uid();
+  const e={id,projekt_id:PID,datum,von:last?.von||'07:00',bis:last?.bis||'16:00',pause_min:last?.pause_min??30,wetter:'',wetter_daten:null,
+    personen:lastPers.filter(p=>PERS.some(x=>x.id===p.id)),taetigkeit:'',besonderheiten:'',verfasser:ls.get('btb_verfasser',''),ag_name:'',sig1:null,sig2:null,sig_ts:null,created_at:nowIso(),updated_at:nowIso()};
+  ls.set(K.ent(id),e); saveEntry(e,true);
+  location.href=`?p=${PID}&id=${id}`;
+}
+
+/* ================= Eintrag ================= */
+function saveEntry(e,silent){
+  e.updated_at=nowIso(); ls.set(K.ent(e.id),e);
+  const i=LIST.findIndex(x=>x.id===e.id); const row=listRow(e); if(i>=0) LIST[i]=row; else LIST.unshift(row); LIST.sort((a,b)=>b.datum.localeCompare(a.datum)); ls.set(K.list,LIST);
+  enqueue({kind:'entry',id:e.id,data:{...e,personen:JSON.stringify(e.personen),wetter_daten:e.wetter_daten?JSON.stringify(e.wetter_daten):null}});
+}
+let saveT=null;
+function changed(field){
+  // Nach Unterschrift geändert → Unterschriften zurücksetzen
+  if(!['sig','verfasser','ag_name'].includes(field) && (E.sig1||E.sig2)){ E.sig1=null; E.sig2=null; E.sig_ts=null; drawSigs(); toast('Eintrag geändert – Unterschriften wurden zurückgesetzt'); }
+  clearTimeout(saveT); saveT=setTimeout(()=>saveEntry(E),500); setSync('','wird gespeichert …');
+}
+async function loadEntry(id){
+  const local=ls.get(K.ent(id),null);
+  const pending=queue().some(x=>x.kind==='entry'&&x.id===id);
+  if(local&&pending) return local;
+  try{ const s=await api('bautagebuch/'+id); s.personen=JSON.parse(s.personen||'[]'); s.wetter_daten=s.wetter_daten?JSON.parse(s.wetter_daten):null; ls.set(K.ent(id),s); return s; }
+  catch(err){ if(local) return local; throw err; }
+}
+
+function renderEntry(){
+  const e=E;
+  $('#hTitle').textContent='Bautagebuch '+dDE(e.datum); $('#hSub').textContent=PROJ?.name||'';
+  $('#backBtn').href='?p='+PID;
+  $('#app').innerHTML=`
+    <div class="pagehead"><div class="day" style="width:58px;height:58px"><small>${WT[new Date(e.datum+'T12:00').getDay()]}</small><b>${new Date(e.datum+'T12:00').getDate()}.</b></div>
+      <div style="min-width:0"><h1>${dLong(e.datum)}</h1><small>${esc(PROJ?.name||'')}</small></div></div>
+
+    <div class="card"><h2>Arbeitszeit</h2>
+      <div class="row3">
+        <div class="field"><label>Von</label><input class="inp" type="time" id="f_von" value="${esc(e.von)}"></div>
+        <div class="field"><label>Bis</label><input class="inp" type="time" id="f_bis" value="${esc(e.bis)}"></div>
+        <div class="field"><label>Pause</label><select class="inp" id="f_pause">${[0,15,30,45,60,90].map(m=>`<option value="${m}" ${Number(e.pause_min)===m?'selected':''}>${m} min</option>`).join('')}</select></div>
+      </div>
+      <div class="hours">${IC('clock','sm')}<span id="f_h"></span></div>
+    </div>
+
+    <div class="card"><h2>Wetter</h2>
+      <div class="wx"><div class="wi" id="wIco">${IC('cloud')}</div><div class="wt"><b id="wHead">Wetter wird geladen …</b><small id="wSub"></small></div>
+        <button class="iconbtn flat" id="wReload" aria-label="Wetter neu laden">${IC('sync')}</button></div>
+      <div class="field" style="margin-top:12px"><label>Wetter (kann angepasst werden)</label><input class="inp" id="f_wetter" value="${esc(e.wetter)}" placeholder="z. B. bewölkt, 8–12 °C, trocken"></div>
+    </div>
+
+    <div class="card"><h2>Personen auf der Baustelle</h2>
+      <div class="people" id="pList"></div>
+      <p class="hint" style="margin-top:10px">Antippen zum Auswählen. Die Liste gilt für das ganze Projekt.</p>
+    </div>
+
+    <div class="card"><h2>Tätigkeiten</h2>
+      <div class="field"><label>Was wurde heute gemacht?</label><textarea class="inp" id="f_t" rows="5" placeholder="z. B. Regenwasserleitung PE 160 Achse 12–15 verlegt, Dachabläufe H4.3–H4.5 angeschlossen">${esc(e.taetigkeit)}</textarea></div>
+      <div class="field"><label>Besonderheiten, Behinderungen, Anordnungen (optional)</label><textarea class="inp" id="f_b" rows="3" placeholder="z. B. Gerüst fehlte bis 10 Uhr, Anordnung Bauleitung zu …">${esc(e.besonderheiten)}</textarea></div>
+    </div>
+
+    <div class="card"><h2>Fotos</h2>
+      <div class="fotos" id="fList"></div>
+      <input type="file" id="fIn" accept="image/*" multiple hidden>
+      <p class="hint" style="margin-top:10px">Aufnehmen oder aus der Galerie wählen. Antippen zum Beschriften oder Löschen.</p>
+    </div>
+
+    <div class="card"><h2>Unterschriften</h2>
+      <div class="grid2">
+        <div>
+          <div class="field"><label>Mitarbeiter Heise Haustechnik</label><input class="inp" id="f_verf" value="${esc(e.verfasser)}" placeholder="Name"></div>
+          <canvas class="sig" id="sig1"></canvas>
+          <div class="sigbar"><span id="sig1t"></span><button class="lnk" data-clr="sig1">Löschen</button></div>
+        </div>
+        <div>
+          <div class="field"><label>Auftraggeber / Vertreter (optional)</label><input class="inp" id="f_ag" value="${esc(e.ag_name)}" placeholder="Name, Funktion"></div>
+          <canvas class="sig" id="sig2"></canvas>
+          <div class="sigbar"><span id="sig2t"></span><button class="lnk" data-clr="sig2">Löschen</button></div>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:10px">Werden Arbeitszeit, Wetter, Personen oder Tätigkeiten nach der Unterschrift geändert, werden die Unterschriften zurückgesetzt. Namen und Fotos können jederzeit ergänzt werden.</p>
+    </div>
+
+    <div class="bottombar">
+      <button class="btn ghost" id="bPdf">${IC('file')}PDF</button>
+      <button class="btn cta" id="bMail">${IC('mail')}PDF senden</button>
+    </div>
+    <div style="text-align:center;margin-top:6px"><button class="lnk" id="bDel" style="color:var(--red)">${IC('trash')}Eintrag löschen</button></div>`;
+
+  const bind=(id,field,conv=v=>v)=>{ const el=$('#'+id); el.addEventListener('input',()=>{ E[field]=conv(el.value); if(field==='verfasser') ls.set('btb_verfasser',E.verfasser); if(['von','bis','pause_min'].includes(field)) updHours(); changed(field); }); };
+  bind('f_von','von'); bind('f_bis','bis'); bind('f_pause','pause_min',Number); bind('f_wetter','wetter'); bind('f_t','taetigkeit'); bind('f_b','besonderheiten'); bind('f_verf','verfasser'); bind('f_ag','ag_name');
+  $('#f_von').addEventListener('change',()=>loadWeather(false)); $('#f_bis').addEventListener('change',()=>loadWeather(false));
+  updHours(); renderPeople(); setupSigs(); showWeather(); setupFotos();
+  if(!E.wetter_daten) loadWeather(true);
+  $('#wReload').onclick=()=>loadWeather(true,true);
+  $('#bPdf').onclick=async()=>{ if(!ready()) return; const b=await makePdf(); dl(b,fileName()); };
+  $('#bMail').onclick=sendPdf;
+  $('#bDel').onclick=()=>{ if(!confirm('Diesen Tageseintrag endgültig löschen?')) return; LIST=LIST.filter(x=>x.id!==E.id); ls.set(K.list,LIST); localStorage.removeItem(K.ent(E.id)); FOTOS.forEach(f=>idb.del(f.id)); ls.set(K.queue,queue().filter(x=>!(x.kind==='foto'&&FOTOS.some(f=>f.id===x.id))));
+    const q=queue().filter(x=>!(x.kind==='entry'&&x.id===E.id)); ls.set(K.queue,q); enqueue({kind:'del',id:E.id,data:{updated_at:nowIso()}}); setTimeout(()=>location.href='?p='+PID,300); };
+}
+function updHours(){ $('#f_h').textContent='Arbeitszeit '+hStr(hours(E.von,E.bis,E.pause_min)); }
+
+/* ================= Personen ================= */
+function renderPeople(){
+  const sel=new Set(E.personen.map(p=>p.id));
+  // Personen, die im Eintrag stehen, aber aus der Liste entfernt wurden, trotzdem anzeigen
+  const all=[...PERS, ...E.personen.filter(p=>!PERS.some(x=>x.id===p.id))];
+  $('#pList').innerHTML=all.map(p=>`<button class="pp${sel.has(p.id)?' on':''}" data-id="${p.id}"><span class="av">${esc(initials(p.name))}</span><span>${esc(p.name)}${p.firma?`<small>${esc(p.firma)}</small>`:''}</span></button>`).join('')
+    +`<button class="pp add" id="pAdd">${IC('userplus','sm')}Person anlegen</button>`;
+  $('#pList').querySelectorAll('.pp[data-id]').forEach(b=>{
+    b.onclick=()=>{ const id=b.dataset.id; if(sel.has(id)) E.personen=E.personen.filter(x=>x.id!==id); else { const p=all.find(x=>x.id===id); E.personen.push({id:p.id,name:p.name,firma:p.firma||''}); } renderPeople(); changed('personen'); };
+    let t; b.addEventListener('pointerdown',()=>{ t=setTimeout(()=>editPerson(b.dataset.id),650); }); ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>clearTimeout(t)));
+  });
+  $('#pAdd').onclick=()=>editPerson(null);
+}
+function editPerson(id){
+  const p=id?PERS.find(x=>x.id===id):null; if(id&&!p) return;
+  openSheet(`<h2>${p?'Person bearbeiten':'Person anlegen'}</h2>
+    <div class="field"><label>Name *</label><input class="inp" id="pn" value="${esc(p?.name||'')}" placeholder="Vor- und Nachname"></div>
+    <div class="field"><label>Firma / Funktion</label><input class="inp" id="pf" value="${esc(p?.firma??'Heise Haustechnik')}" list="dlF"><datalist id="dlF">${[...new Set(['Heise Haustechnik',...PERS.map(x=>x.firma).filter(Boolean)])].map(f=>`<option value="${esc(f)}">`).join('')}</datalist></div>
+    <div class="btnrow">${p?'<button class="btn del" id="pDel">Entfernen</button>':''}<button class="btn cta" id="pOk">${p?'Speichern':'Anlegen und auswählen'}</button></div>`,()=>{
+    setTimeout(()=>$('#pn').focus(),250);
+    $('#pOk').onclick=()=>{ const name=$('#pn').value.trim(); if(!name) return toast('Bitte einen Namen eintragen');
+      const d={id:p?.id||uid(),name,firma:$('#pf').value.trim(),rolle:'',updated_at:nowIso()};
+      if(p) Object.assign(p,d); else PERS.push(d); PERS.sort((a,b)=>a.name.localeCompare(b.name,'de')); ls.set(K.pers,PERS);
+      enqueue({kind:'person',id:d.id,pid:PID,data:d});
+      if(!p){ E.personen.push({id:d.id,name:d.name,firma:d.firma}); changed('personen'); }
+      else { E.personen=E.personen.map(x=>x.id===d.id?{id:d.id,name:d.name,firma:d.firma}:x); }
+      closeSheet(); renderPeople(); };
+    if(p) $('#pDel').onclick=()=>{ if(!confirm(p.name+' aus der Projektliste entfernen? Bestehende Einträge bleiben unverändert.')) return;
+      PERS=PERS.filter(x=>x.id!==p.id); ls.set(K.pers,PERS); enqueue({kind:'person',id:p.id,pid:PID,data:{...p,deleted:1,updated_at:nowIso()}}); closeSheet(); renderPeople(); };
+  });
+}
+
+/* ================= Wetter (Open-Meteo, ohne Schlüssel) ================= */
+const WMO={0:['Sonnig','sun'],1:['Überwiegend sonnig','sun'],2:['Teilweise bewölkt','cloudsun'],3:['Bedeckt','cloud'],45:['Nebel','fog'],48:['Nebel mit Reif','fog'],
+  51:['Leichter Nieselregen','rain'],53:['Nieselregen','rain'],55:['Starker Nieselregen','rain'],56:['Gefrierender Nieselregen','rain'],57:['Gefrierender Nieselregen','rain'],
+  61:['Leichter Regen','rain'],63:['Regen','rain'],65:['Starker Regen','rain'],66:['Gefrierender Regen','rain'],67:['Gefrierender Regen','rain'],
+  71:['Leichter Schneefall','snow'],73:['Schneefall','snow'],75:['Starker Schneefall','snow'],77:['Schneegriesel','snow'],80:['Regenschauer','rain'],81:['Regenschauer','rain'],82:['Starke Regenschauer','rain'],
+  85:['Schneeschauer','snow'],86:['Starke Schneeschauer','snow'],95:['Gewitter','storm'],96:['Gewitter mit Hagel','storm'],99:['Gewitter mit Hagel','storm']};
+const SEV=c=>c>=95?9:c>=71&&c<=86&&c!==80&&c!==81&&c!==82?8:c>=61?7:c>=51?6:c>=45?5:c;
+async function coords(){
+  if(PROJ?.lat&&PROJ?.lon) return {lat:PROJ.lat,lon:PROJ.lon,src:'Projektadresse'};
+  // Ort aus der Adresse (nach der Postleitzahl) suchen
+  const adr=PROJ?.adresse||''; const m=adr.match(/\b\d{5}\s+([^,]+)/); const ort=(m?m[1]:adr.split(',').pop()||'').trim();
+  if(ort){ try{ const r=await (await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=de&countryCode=DE&name='+encodeURIComponent(ort))).json();
+      if(r.results?.length){ const {latitude:lat,longitude:lon}=r.results[0]; PROJ.lat=lat; PROJ.lon=lon; ls.set(K.proj,PROJ); enqueue({kind:'proj',id:PID,data:{lat,lon,updated_at:nowIso()}}); return {lat,lon,src:ort}; } }catch(e){} }
+  // sonst Standort des Geräts
+  return new Promise(res=>{ if(!navigator.geolocation) return res(null);
+    navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lon:p.coords.longitude,src:'Standort'}),()=>res(null),{timeout:8000,maximumAge:600000}); });
+}
+async function loadWeather(setText,force){
+  if(!navigator.onLine){ if(force) toast('Kein Netz – Wetter bitte von Hand eintragen'); if(!E.wetter_daten) { $('#wHead').textContent='Offline'; $('#wSub').textContent='Wetter von Hand eintragen oder später neu laden'; } return; }
+  $('#wHead').textContent='Wetter wird geladen …';
+  try{
+    const c=await coords(); if(!c) throw new Error('Kein Ort gefunden');
+    const q=`latitude=${c.lat}&longitude=${c.lon}&hourly=temperature_2m,precipitation,weather_code,wind_speed_10m&timezone=Europe%2FBerlin&start_date=${E.datum}&end_date=${E.datum}`;
+    let r=await fetch('https://api.open-meteo.com/v1/forecast?'+q);
+    if(!r.ok) r=await fetch('https://archive-api.open-meteo.com/v1/archive?'+q);
+    const d=await r.json(); if(!d.hourly) throw new Error(d.reason||'Keine Wetterdaten');
+    const h0=parseInt((E.von||'07:00').split(':')[0]), h1=Math.max(h0,parseInt((E.bis||'16:00').split(':')[0]));
+    const idx=d.hourly.time.map((t,i)=>i).filter(i=>{ const h=+d.hourly.time[i].slice(11,13); return h>=h0&&h<=h1; });
+    const pick=a=>idx.map(i=>a[i]).filter(v=>v!=null);
+    const T=pick(d.hourly.temperature_2m), P=pick(d.hourly.precipitation), W=pick(d.hourly.wind_speed_10m), C=pick(d.hourly.weather_code);
+    if(!T.length) throw new Error('Für diesen Tag liegen noch keine Daten vor');
+    // häufigster Zustand, bei Niederschlag der schwerste
+    const cnt={}; C.forEach(x=>cnt[x]=(cnt[x]||0)+1); let code=+Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]; const worst=C.reduce((a,b)=>SEV(b)>SEV(a)?b:a,0); if(SEV(worst)>=6) code=worst;
+    const tmin=Math.round(Math.min(...T)), tmax=Math.round(Math.max(...T)), psum=P.reduce((a,b)=>a+b,0), wmax=Math.round(Math.max(...W));
+    E.wetter_daten={code,tmin,tmax,psum:Math.round(psum*10)/10,wmax,ort:c.src,von:h0,bis:h1,geladen:nowIso()};
+    if(setText||!E.wetter){ E.wetter=wText(E.wetter_daten); const f=$('#f_wetter'); if(f) f.value=E.wetter; }
+    showWeather(); saveEntry(E);
+  }catch(err){ $('#wHead').textContent='Wetter nicht verfügbar'; $('#wSub').textContent=err.message+' – bitte von Hand eintragen'; }
+}
+function wText(w){ const n=(WMO[w.code]||['Wetter'])[0]; return `${n} · ${w.tmin===w.tmax?w.tmin:w.tmin+'–'+w.tmax} °C · ${w.psum>0?'Niederschlag '+w.psum.toLocaleString('de-DE')+' mm':'trocken'} · Wind bis ${w.wmax} km/h`; }
+function showWeather(){
+  const w=E.wetter_daten; if(!w){ return; }
+  const [n,ic]=WMO[w.code]||['Wetter','cloud'];
+  $('#wIco').innerHTML=IC(ic); $('#wHead').textContent=`${n}, ${w.tmin===w.tmax?w.tmin:w.tmin+' bis '+w.tmax} °C`;
+  $('#wSub').textContent=`${w.psum>0?'Niederschlag '+w.psum.toLocaleString('de-DE')+' mm':'Kein Niederschlag'} · Wind bis ${w.wmax} km/h · ${w.von}–${w.bis} Uhr · ${w.ort}`;
+}
+
+/* ================= Fotos ================= */
+// Fotos liegen lokal in IndexedDB (zu groß für localStorage) und werden über die Warteschlange hochgeladen.
+const idb=(()=>{ let dbp=null;
+  const open=()=>dbp||(dbp=new Promise((res,rej)=>{ const r=indexedDB.open('heise-btb',1); r.onupgradeneeded=()=>{ const s=r.result.createObjectStore('fotos',{keyPath:'id'}); s.createIndex('eintrag','eintrag_id'); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }));
+  const tx=async(mode,fn)=>{ const db=await open(); return new Promise((res,rej)=>{ const t=db.transaction('fotos',mode); const st=t.objectStore('fotos'); const rq=fn(st); t.oncomplete=()=>res(rq?.result); t.onerror=()=>rej(t.error); }); };
+  return { get:id=>tx('readonly',s=>s.get(id)), put:o=>tx('readwrite',s=>s.put(o)), del:id=>tx('readwrite',s=>s.delete(id)),
+    byEntry:eid=>tx('readonly',s=>s.index('eintrag').getAll(eid)) };
+})();
+let FOTOS=[];
+async function loadFotos(){
+  let local=[]; try{ local=await idb.byEntry(E.id); }catch(e){}
+  FOTOS=local.filter(f=>!f.deleted).sort((a,b)=>(a.sort-b.sort)||a.created_at.localeCompare(b.created_at)); renderFotos();
+  if(!navigator.onLine) return;
+  try{
+    const srv=await api('bautagebuch/'+E.id+'/fotos');
+    for(const f of srv){ const l=local.find(x=>x.id===f.id); if(!l||(!l.pending&&l.updated_at!==f.updated_at)) await idb.put({...f,projekt_id:PID,pending:false}); }
+    for(const l of local){ if(!l.pending&&!srv.some(f=>f.id===l.id)) await idb.del(l.id); }
+    const all=await idb.byEntry(E.id);
+    FOTOS=all.filter(f=>!f.deleted).sort((a,b)=>(a.sort-b.sort)||a.created_at.localeCompare(b.created_at)); renderFotos();
+  }catch(e){ console.warn('Fotos',e); }
+}
+function renderFotos(){
+  const el=$('#fList'); if(!el) return;
+  el.innerHTML=FOTOS.map(f=>`<button class="ft" data-id="${f.id}"><img src="${f.bild}" alt="">${f.notiz?`<span class="nt">${esc(f.notiz)}</span>`:''}${f.pending?'<span class="up" title="wird hochgeladen"></span>':''}</button>`).join('')
+    +`<button class="fadd" id="fAdd">${IC('camera')}Foto hinzufügen</button>`;
+  el.querySelectorAll('.ft').forEach(b=>b.onclick=()=>editFoto(b.dataset.id));
+  $('#fAdd').onclick=()=>$('#fIn').click();
+  const row=LIST.find(x=>x.id===E.id); if(row&&row.fotos!==FOTOS.length){ row.fotos=FOTOS.length; ls.set(K.list,LIST); }
+  E.fotos_n=FOTOS.length;
+}
+function setupFotos(){
+  $('#fIn').onchange=async ev=>{
+    const files=[...ev.target.files]; ev.target.value=''; if(!files.length) return;
+    toast(files.length>1?files.length+' Fotos werden verarbeitet …':'Foto wird verarbeitet …');
+    for(const file of files){
+      try{
+        const bild=await shrink(file);
+        const t=nowIso(); const f={id:uid(),eintrag_id:E.id,projekt_id:PID,sort:(FOTOS.at(-1)?.sort||0)+1,notiz:'',bild,created_at:t,updated_at:t,deleted:0,pending:true};
+        await idb.put(f); FOTOS.push(f); renderFotos(); enqueue({kind:'foto',id:f.id,data:{updated_at:t}});
+      }catch(e){ console.error(e); toast('Foto konnte nicht gelesen werden'); }
+    }
+  };
+  loadFotos();
+}
+// Verkleinern auf max. 1600 px (lange Seite), JPEG
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('Bild')); i.src=url; });
+    const max=1600, s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement('canvas'); c.width=Math.round(img.naturalWidth*s); c.height=Math.round(img.naturalHeight*s);
+    const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height);
+    let q=.75, d=c.toDataURL('image/jpeg',q); while(d.length>1400000&&q>.35){ q-=.1; d=c.toDataURL('image/jpeg',q); }
+    return d;
+  }finally{ URL.revokeObjectURL(url); }
+}
+function editFoto(id){
+  const f=FOTOS.find(x=>x.id===id); if(!f) return;
+  openSheet(`<img class="fbig" src="${f.bild}" alt="">
+    <div class="field"><label>Beschriftung (optional)</label><input class="inp" id="fn" value="${esc(f.notiz)}" placeholder="z. B. Achse 12, Leitung vor dem Verfüllen"></div>
+    <div class="btnrow"><button class="btn del" id="fDel">Löschen</button><button class="btn cta" id="fOk">Fertig</button></div>`,()=>{
+    $('#fOk').onclick=async()=>{ const n=$('#fn').value.trim(); if(n!==f.notiz){ f.notiz=n; f.updated_at=nowIso(); f.pending=true; await idb.put(f); enqueue({kind:'foto',id:f.id,data:{updated_at:f.updated_at}}); } closeSheet(); renderFotos(); };
+    $('#fDel').onclick=async()=>{ if(!confirm('Dieses Foto löschen?')) return; f.deleted=1; f.updated_at=nowIso(); f.pending=true; await idb.put(f); FOTOS=FOTOS.filter(x=>x.id!==f.id); enqueue({kind:'foto',id:f.id,data:{updated_at:f.updated_at}}); closeSheet(); renderFotos(); };
+  });
+}
+
+/* ================= Unterschriften ================= */
+function setupSigs(){
+  ['sig1','sig2'].forEach(id=>{
+    const c=$('#'+id), ctx=c.getContext('2d'); let draw=false,last=null,dirty=false;
+    const size=()=>{ const r=c.getBoundingClientRect(), d=devicePixelRatio||1; c.width=r.width*d; c.height=r.height*d; ctx.setTransform(d,0,0,d,0,0); ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#0d1524'; ctx.fillStyle='#0d1524';
+      if(E[id]){ const im=new Image(); im.onload=()=>ctx.drawImage(im,0,0,r.width,r.height); im.src=E[id]; } };
+    c._size=size; size();
+    const pt=e=>{ const r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
+    c.addEventListener('pointerdown',e=>{ e.preventDefault(); c.setPointerCapture(e.pointerId); draw=true; dirty=true; last=pt(e); ctx.beginPath(); ctx.arc(last.x,last.y,1.1,0,7); ctx.fill(); });
+    c.addEventListener('pointermove',e=>{ if(!draw) return; const p=pt(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; });
+    const end=()=>{ if(!draw) return; draw=false; if(dirty){ E[id]=c.toDataURL('image/png'); E.sig_ts=nowIso(); sigText(); changed('sig'); } };
+    ['pointerup','pointercancel','pointerleave'].forEach(ev=>c.addEventListener(ev,end));
+  });
+  document.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{ E[b.dataset.clr]=null; if(!E.sig1&&!E.sig2) E.sig_ts=null; drawSigs(); changed('sig'); });
+  sigText();
+}
+function drawSigs(){ ['sig1','sig2'].forEach(id=>{ const c=$('#'+id); if(c){ c.getContext('2d').clearRect(0,0,c.width,c.height); c._size&&c._size(); } }); sigText(); }
+function sigText(){ ['sig1','sig2'].forEach(id=>{ const el=$('#'+id+'t'); if(el) el.textContent=E[id]?'unterschrieben '+tsDE(E.sig_ts):'Mit Finger oder Stift unterschreiben'; }); }
+window.addEventListener('resize',()=>{ if(E) drawSigs(); });
+
+/* ================= PDF ================= */
+let LOGO=null;
+async function logoData(){ if(LOGO!==null) return LOGO; try{ const b=await (await fetch('lib/heise-logo.png')).blob(); LOGO=await new Promise(r=>{ const f=new FileReader(); f.onload=()=>r(f.result); f.readAsDataURL(b); }); }catch(e){ LOGO=''; } return LOGO; }
+function ready(){
+  if(!E.taetigkeit.trim()){ toast('Bitte eintragen, was gemacht wurde'); $('#f_t').focus(); return false; }
+  if(!E.sig1 && !confirm('Der Eintrag ist noch nicht vom Mitarbeiter unterschrieben. Trotzdem PDF erstellen?')) return false;
+  return true;
+}
+const fileName=()=>('Bautagebuch_'+(PROJ?.name||'')+'_'+E.datum).replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss').replace(/[^A-Za-z0-9-]+/g,'_')+'.pdf';
+async function makePdf(){
+  const { jsPDF } = window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'}); const W=210,M=16;
+  const lg=await logoData(); if(lg) doc.addImage(lg,'PNG',W-M-38,8,38,38*91.014/200);
+  doc.setTextColor(47,59,83); doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.text('Bautagebuch',M,18);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100); doc.text('Heise Haustechnik GmbH & Co. KG · Ramsenweg 2c · 38700 Braunlage',M,23);
+  doc.setDrawColor(226,83,4); doc.setLineWidth(0.8); doc.line(M,29,W-M,29); doc.setLineWidth(0.2); doc.setTextColor(58,58,58);
+  const h=hours(E.von,E.bis,E.pause_min);
+  doc.autoTable({startY:33,theme:'plain',margin:{left:M,right:M},styles:{fontSize:10,cellPadding:1.4},columnStyles:{0:{fontStyle:'bold',cellWidth:40,textColor:[47,59,83]}},
+    body:[['Bauvorhaben',[PROJ?.nr,PROJ?.name,PROJ?.adresse].filter(Boolean).join(' · ')],['Datum',dLong(E.datum)],
+      ['Arbeitszeit',E.von&&E.bis?`${E.von} – ${E.bis} Uhr${E.pause_min?`, Pause ${E.pause_min} min`:''} (${hStr(h)})`:'–'],['Wetter',E.wetter||'–']]});
+  let y=doc.lastAutoTable.finalY+7;
+  const sec=t=>{ if(y>262){ doc.addPage(); y=20; } doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(47,59,83); doc.text(t,M,y); doc.setTextColor(58,58,58); y+=2; };
+  sec('Personen auf der Baustelle ('+E.personen.length+')');
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:[47,59,83],textColor:255,fontStyle:'bold',fontSize:9},styles:{fontSize:9.5,cellPadding:1.6},
+    head:[['Name','Firma / Funktion']],body:E.personen.length?E.personen.map(p=>[p.name,p.firma||'']):[['–','']]});
+  y=doc.lastAutoTable.finalY+8;
+  const para=(title,text)=>{ sec(title); doc.setFont('helvetica','normal'); doc.setFontSize(10); const lines=doc.splitTextToSize(text||'–',W-2*M);
+    lines.forEach(l=>{ y+=5; if(y>275){ doc.addPage(); y=20; } doc.text(l,M,y); }); y+=8; };
+  para('Ausgeführte Arbeiten',E.taetigkeit);
+  if(E.besonderheiten.trim()) para('Besonderheiten, Behinderungen, Anordnungen',E.besonderheiten);
+  if(FOTOS.length){
+    sec('Fotos ('+FOTOS.length+')'); y+=3;
+    const gw=(W-2*M-8)/2, gh=gw*0.75;
+    FOTOS.forEach((f,i)=>{
+      const col=i%2; if(col===0&&i>0) y+=gh+(8);
+      if(col===0&&y+gh+6>280){ doc.addPage(); y=20; }
+      const x=M+col*(gw+8);
+      try{ const ip=doc.getImageProperties(f.bild); let ww=gw, hh=ww*ip.height/ip.width; if(hh>gh){ hh=gh; ww=hh*ip.width/ip.height; }
+        doc.addImage(f.bild,'JPEG',x+(gw-ww)/2,y+(gh-hh)/2,ww,hh,undefined,'FAST'); }catch(e){}
+      doc.setFontSize(8); doc.setTextColor(90); doc.text(doc.splitTextToSize((i+1)+(f.notiz?' · '+f.notiz:''),gw)[0],x,y+gh+4); doc.setTextColor(58,58,58);
+    });
+    y+=gh+12;
+  }
+  if(y>235){ doc.addPage(); y=24; }
+  sec('Unterschriften'); y+=4;
+  const bw=(W-2*M-12)/2;
+  [['sig1','Mitarbeiter Heise Haustechnik',E.verfasser],['sig2','Auftraggeber / Vertreter',E.ag_name]].forEach(([id,lab,name],i)=>{
+    const x=M+i*(bw+12);
+    if(E[id]){ const ip=doc.getImageProperties(E[id]); let hh=22, ww=hh*ip.width/ip.height; if(ww>bw){ ww=bw; hh=ww*ip.height/ip.width; } doc.addImage(E[id],'PNG',x,y+24-hh,ww,hh); }
+    doc.setDrawColor(90); doc.line(x,y+25,x+bw,y+25); doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+    doc.text(`${lab}${name?': '+name:''}`,x,y+29); doc.setTextColor(120); doc.text(E[id]?'unterschrieben am '+tsDE(E.sig_ts):'nicht unterschrieben',x,y+33); doc.setTextColor(58,58,58);
+  });
+  const n=doc.getNumberOfPages();
+  for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120); doc.text('Bautagebuch '+(PROJ?.name||'')+' · '+dDE(E.datum),M,290); doc.text('Seite '+i+' von '+n,W-M,290,{align:'right'}); }
+  return doc.output('blob');
+}
+function dl(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500); }
+async function sendPdf(){
+  if(!ready()) return;
+  const blob=await makePdf(), name=fileName();
+  const subject=`Bautagebuch ${PROJ?.name||''} – ${dDE(E.datum)}`;
+  const text=`Guten Tag,\n\nanbei das Bautagebuch vom ${dLong(E.datum)} für das Bauvorhaben ${PROJ?.name||''}.\n\nMit freundlichen Grüßen\n${E.verfasser||''}\nHeise Haustechnik GmbH & Co. KG`;
+  const file=new File([blob],name,{type:'application/pdf'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file],title:subject,text}); return; }catch(e){ if(e.name==='AbortError') return; }
+  }
+  // Fallback: PDF speichern und Mailprogramm öffnen (Anhang muss dann von Hand angefügt werden)
+  dl(blob,name);
+  toast('PDF gespeichert – bitte an die E-Mail anhängen');
+  setTimeout(()=>location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`,600);
+}
+
+/* ================= Sheet ================= */
+function openSheet(html,after){ $('#sheet').innerHTML=html; $('#ov').classList.add('on'); $('#sheet').classList.add('on'); after&&after(); }
+function closeSheet(){ $('#sheet').classList.remove('on'); $('#ov').classList.remove('on'); }
+$('#ov').onclick=closeSheet;
+
+/* ================= Start ================= */
+(async function(){
+  if(!PID){ $('#app').innerHTML='<div class="empty">Kein Projekt gewählt. <a href="index.html">Zur Projektübersicht</a></div>'; return; }
+  try{ await loadBase(); }catch(e){ $('#app').innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="index.html">Zur Projektübersicht</a>`; return; }
+  const id=Q.get('id');
+  if(id){ try{ E=await loadEntry(id); E.personen=E.personen||[]; renderEntry(); }catch(e){ $('#app').innerHTML=`<div class="err">Eintrag nicht gefunden.</div><a class="btn ghost" href="?p=${PID}">Zurück</a>`; } }
+  else renderList();
+  document.title='Bautagebuch · '+(PROJ?.name||'');
+  updSync(); flush();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>

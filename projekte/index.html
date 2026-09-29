@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f8">
+<title>Heise Projekte</title>
+<link rel="stylesheet" href="lib/heise-ui.css">
+<style>
+.pagehead{display:flex;align-items:center;gap:12px;margin:4px 0 16px}
+.pagehead h1{font-size:24px;font-weight:770;overflow-wrap:anywhere}
+.pagehead small{display:block;color:var(--ink-3);font-size:13px;font-weight:600;margin-top:2px}
+.form-b{padding:0 0 4px}
+.form-b .field{margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.row2{grid-template-columns:1fr}}
+.delbtn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--ink-3)}
+.delbtn:active{background:var(--red-bg);color:var(--red)}
+.kv{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+input[type=file].inp{padding:12px 14px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="../index.html" class="brand" title="Zur My Heise App"><div class="lt"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div><div style="min-width:0"><b>Heise Projekte</b><small>Aufmaß · Bautagebuch</small></div></a>
+</header>
+<main class="shell" id="app"><div class="empty">Lädt …</div></main>
+<div class="toast" id="toast"></div>
+<script src="lib/heise-icons.js"></script>
+<script src="lib/pj-api.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dDE=d=>d?new Date(d).toLocaleDateString('de-DE'):'';
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2200); }
+const api=(path,opt={})=>PJ.api(path,opt);
+function route(){ const m=location.hash.match(/^#p=(.+)$/); window.scrollTo(0,0); m? showProjekt(m[1]) : showListe(); }
+window.addEventListener('hashchange',route);
+const plural=(n,a,b)=>n+' '+(n==1?a:b);
+
+/* ---------- Startseite ---------- */
+async function showListe(){
+  const app=$('#app');
+  let list=[];
+  try{ list=await api('projekte'); }catch(e){ app.innerHTML=`<div class="err">${esc(e.message)}</div>`; return; }
+  const h=new Date().getHours(), gruss=h<11?'Guten Morgen':h<18?'Guten Tag':'Guten Abend';
+  const aktiv=list.filter(p=>p.status!=='archiv');
+  app.innerHTML=`
+    <section class="hero">
+      <div><div class="ey">${gruss}</div><h1>Projekte</h1></div>
+      <div class="logo-tile"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div>
+      <p>${plural(aktiv.length,'aktives Projekt','aktive Projekte')} · Aufmaße erfassen, prüfen und unterschreiben lassen.</p>
+    </section>
+    <div class="sec-title">Projekte</div>
+    ${list.length? list.map(p=>`<a class="row-card" href="#p=${p.id}">
+        <div class="mi tone-brand">${IC('building')}</div>
+        <div class="mt"><b>${esc(p.name)}</b><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}</small>
+          <div class="tags"><span class="pill tone-blue">${plural(p.anz_aufmasse,'Aufmaß','Aufmaße')}</span><span class="pill tone-gray">${p.anz_lv} LV-Positionen</span></div></div>
+        <span class="chev">${IC('chev')}</span></a>`).join('')
+      :`<div class="empty">${IC('building')}<div>Noch keine Projekte angelegt.</div></div>`}
+    <div class="sec-title nur-leitung">Verwaltung</div>
+    <details class="fold nur-leitung"><summary>${IC('plus')}Neues Projekt anlegen</summary><div class="fold-b">
+      <div class="row2"><div class="field"><label>Projekt-Nr.</label><input class="inp" id="np_nr"></div><div class="field"><label>Name *</label><input class="inp" id="np_name"></div></div>
+      <div class="field"><label>Adresse</label><input class="inp" id="np_adr"></div>
+      <button class="btn cta block" id="np_ok">Projekt anlegen</button>
+      <p class="hint" style="margin-top:10px">Das LV wird danach im Projekt aus der Kalkulations-Excel importiert.</p></div></details>
+    <details class="fold nur-leitung"><summary>${IC('upload')}Projekt aus Importdatei anlegen</summary><div class="fold-b">
+      <p class="hint" style="margin-bottom:10px">Für vorbereitete Projektdateien mit LV, Bereichen und Vorschlägen (.json).</p>
+      <div class="field"><input type="file" class="inp" id="imp_f" accept=".json,application/json"></div>
+      <button class="btn block" id="imp_ok">Importieren</button><div id="imp_msg"></div></div></details>
+    <details class="fold nur-admin"><summary>${IC('upload')}Daten aus der alten Projekte-Seite übernehmen</summary><div class="fold-b">
+      <p class="hint" style="margin-bottom:10px">Einmalig: die Datei <b>daten-uebernahme.json</b> wählen. Sie enthält alle Projekte, LVs, Aufmaße und Bautagebücher der alten Seite. Kann gefahrlos wiederholt werden, nichts wird doppelt angelegt.</p>
+      <div class="field"><input type="file" class="inp" id="mig_f" accept=".json,application/json"></div>
+      <button class="btn block" id="mig_ok">Daten übernehmen</button><div id="mig_msg"></div></div></details>
+    <p class="hint" style="text-align:center;margin-top:30px">Heise Haustechnik GmbH &amp; Co. KG · Braunlage</p>`;
+  $('#mig_ok').onclick=migration;
+  $('#np_ok').onclick=async()=>{ const name=$('#np_name').value.trim(); if(!name) return toast('Bitte einen Namen eintragen');
+    try{ const r=await api('projekte',{method:'POST',body:JSON.stringify({nr:$('#np_nr').value.trim(),name,adresse:$('#np_adr').value.trim()})}); location.hash='#p='+r.id; }catch(e){ toast(e.message); } };
+  $('#imp_ok').onclick=async()=>{ const f=$('#imp_f').files[0]; if(!f) return toast('Bitte eine Datei wählen');
+    const b=$('#imp_ok'); b.disabled=true; b.textContent='Importiere …';
+    try{ const d=JSON.parse(await f.text()); const r=await api('import',{method:'POST',body:JSON.stringify(d)}); location.hash='#p='+r.projekt_id; }
+    catch(e){ $('#imp_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; b.disabled=false; b.textContent='Importieren'; } };
+}
+
+/* ---------- Einmalige Datenübernahme (nur Admin) ---------- */
+async function migration(){
+  const f=$('#mig_f').files[0]; if(!f) return toast('Bitte die Datei daten-uebernahme.json wählen');
+  const b=$('#mig_ok'), msg=$('#mig_msg'); b.disabled=true; b.textContent='Spiele Daten ein …';
+  try{
+    const d=JSON.parse(await f.text());
+    const x=await api('migration',{method:'POST',body:JSON.stringify(d)});
+    msg.innerHTML=`<p style="margin-top:10px">Fertig: ${x.projekte} Projekte, ${x.aufmasse} Aufmaße mit ${x.eintraege} Einträgen, ${x.bautagebuch} Bautagebuch-Einträge, ${x.fotos} Fotos.</p>`;
+    b.textContent='Erneut übernehmen'; b.disabled=false; setTimeout(route,1800);
+  }catch(e){ msg.innerHTML=`<div class="err">${esc(e.message)}</div>`; b.disabled=false; b.textContent='Daten übernehmen'; }
+}
+
+/* ---------- Projekt ---------- */
+async function showProjekt(id){
+  const app=$('#app');
+  let d, am;
+  let bt=[];
+  try{ [d,am,bt]=await Promise.all([api('projekte/'+id),api('projekte/'+id+'/aufmasse'),api('projekte/'+id+'/bautagebuch').catch(()=>[])]); }catch(e){ app.innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="#">Zurück</a>`; return; }
+  const p=d.projekt;
+  const nP=d.lv.filter(o=>o.typ==='P').length, nL=d.lv.filter(o=>o.typ==='P'&&o.in_liste).length;
+  const offen=am.reduce((a,x)=>a+(x.anz_ungeprueft||0),0);
+  app.innerHTML=`
+    <div class="pagehead"><a class="iconbtn" href="#" aria-label="Zurück">${IC('back')}</a><div style="min-width:0"><h1>${esc(p.name)}</h1><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}</small></div></div>
+    <div class="apps">
+      <button class="app" style="--g1:#4a5a7a;--g2:#2f3b53" onclick="document.getElementById('amList').scrollIntoView({behavior:'smooth'})">
+        ${offen?`<span class="app-n">${offen}</span>`:''}<div class="app-ico">${IC('ruler')}</div><div><b>Aufmaß</b><span>${plural(am.length,'Aufmaß','Aufmaße')} · ${nP} LV-Positionen</span></div></button>
+      <a class="app" href="bautagebuch.html?p=${id}" style="--g1:#e8742f;--g2:#c94a03">${bt.some(x=>x.datum===new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10))?'':'<span class="app-n">!</span>'}<div class="app-ico">${IC('book')}</div><div><b>Bautagebuch</b><span>${plural(bt.length,'Eintrag','Einträge')} · ${bt.length&&bt[0]?'zuletzt '+dDE(bt[0].datum):'noch leer'}</span></div></a>
+    </div>
+    <div class="sec-title" id="amList">Aufmaße</div>
+    ${am.length? am.map(a=>`<div class="row-card" onclick="location.href='aufmass.html?id=${a.id}'">
+        <div class="mi tone-${a.unterschrieben?'ok':'brand'}">${IC(a.unterschrieben?'check':'clip')}</div>
+        <div class="mt"><b>${esc(a.bez)}</b><small>${dDE(a.datum)}${a.monteur?' · '+esc(a.monteur):''}</small>
+          <div class="tags"><span class="pill tone-gray">${plural(a.anz_eintraege,'Eintrag','Einträge')}</span>${a.anz_ungeprueft?`<span class="pill tone-amber"><i></i>${a.anz_ungeprueft} ungeprüft</span>`:''}${a.unterschrieben?'<span class="pill tone-ok"><i></i>unterschrieben</span>':''}</div></div>
+        <button class="delbtn nur-leitung" title="Löschen" onclick="event.stopPropagation();delAufmass('${a.id}','${esc(a.bez).replace(/'/g,'')}')">${IC('trash','sm')}</button>
+        <span class="chev">${IC('chev')}</span></div>`).join('')
+      :`<div class="empty">${IC('clip')}<div>Noch kein Aufmaß angelegt.</div></div>`}
+    <details class="fold" style="margin-top:12px"><summary>${IC('plus')}Neues Aufmaß</summary><div class="fold-b">
+      <div class="field"><label>Bezeichnung *</label><input class="inp" id="na_bez" placeholder="z. B. Aufmaß 2 – Trinkwasser OG"></div>
+      <div class="row2"><div class="field"><label>Datum</label><input class="inp" type="date" id="na_dat" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Monteur</label><input class="inp" id="na_mon"></div></div>
+      <button class="btn cta block" id="na_ok" ${nP?'':'disabled'}>Anlegen und öffnen</button>${nP?'':'<p class="hint">Zuerst das LV importieren.</p>'}</div></details>
+    <div class="sec-title nur-leitung">Leistungsverzeichnis</div>
+    <details class="fold nur-leitung"><summary>${IC('sheet')}${nP? `${nP} Positionen · ${nL} in der Aufmaß-Liste` : 'Noch kein LV importiert'}</summary><div class="fold-b">
+      <p class="hint" style="margin-bottom:10px">LV aus der Kalkulations-Excel importieren${nP?' (ersetzt das bestehende)':''}. Erwartet die Spalten Typ (Los / Titel / Text-Pos. / Position), Pos.-Nr., Bezeichnung, Menge, ME. Ausgeblendete Zeilen landen im „Gesamten LV“, sichtbare in der „Aufmaß-Liste“.</p>
+      <div class="field"><input type="file" class="inp" id="lv_f" accept=".xlsx"></div><div id="lv_sheet" class="field"></div><div id="lv_msg"></div></div></details>`;
+  $('#na_ok').onclick=async()=>{ const bez=$('#na_bez').value.trim(); if(!bez) return toast('Bitte eine Bezeichnung eintragen');
+    try{ const r=await api('projekte/'+id+'/aufmasse',{method:'POST',body:JSON.stringify({bez,datum:$('#na_dat').value,monteur:$('#na_mon').value.trim()})}); location.href='aufmass.html?id='+r.id; }catch(e){ toast(e.message); } };
+  $('#lv_f').onchange=()=>lvImport(id);
+}
+async function delAufmass(id,bez){
+  if(!confirm(`Aufmaß „${bez}“ mit allen Einträgen endgültig löschen?`)) return;
+  try{ await api('aufmasse/'+id,{method:'DELETE'}); route(); toast('Aufmaß gelöscht'); }catch(e){ toast(e.message); }
+}
+
+/* ---------- LV-Import aus Excel ---------- */
+function loadExcelJS(){ return window.ExcelJS? Promise.resolve() : new Promise((ok,err)=>{ const s=document.createElement('script'); s.src='lib/exceljs.min.js'; s.onload=ok; s.onerror=()=>err(new Error('ExcelJS konnte nicht geladen werden')); document.head.appendChild(s); }); }
+const cellVal=v=>{ if(v==null) return ''; if(typeof v==='object'){ if('result' in v) return v.result??''; if(v.richText) return v.richText.map(t=>t.text).join(''); if(v.text) return v.text; } return v; };
+async function lvImport(pid){
+  const f=$('#lv_f').files[0]; if(!f) return;
+  $('#lv_msg').innerHTML='<p class="hint">Lese Datei …</p>';
+  try{
+    await loadExcelJS();
+    const wb=new ExcelJS.Workbook(); await wb.xlsx.load(await f.arrayBuffer());
+    const names=wb.worksheets.map(w=>w.name);
+    $('#lv_sheet').innerHTML=`<label>Blatt</label><select class="inp" id="lv_ws">${names.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`;
+    const upd=()=>{ try{ const r=parseLV(wb.getWorksheet($('#lv_ws').value)); window._lv=r;
+        $('#lv_msg').innerHTML=`<p>${r.filter(o=>o.typ==='P').length} Positionen erkannt, davon ${r.filter(o=>o.typ==='P'&&o.in_liste).length} sichtbar (Aufmaß-Liste), ${r.filter(o=>o.typ==='T').length} Titel.</p><button class="btn cta block" id="lv_ok">LV übernehmen</button>`;
+        $('#lv_ok').onclick=async()=>{ $('#lv_ok').disabled=true; try{ await api('projekte/'+pid+'/lv',{method:'PUT',body:JSON.stringify(window._lv)}); route(); }catch(e){ alert(e.message); $('#lv_ok').disabled=false; } };
+      }catch(e){ $('#lv_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; } };
+    $('#lv_ws').onchange=upd;
+    const pref=names.findIndex(n=>/aufma/i.test(n)); if(pref>=0) $('#lv_ws').selectedIndex=pref;
+    upd();
+  }catch(e){ $('#lv_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; }
+}
+function parseLV(ws){
+  // Kopfzeile suchen
+  let hr=0, col={};
+  for(let r=1;r<=Math.min(20,ws.rowCount);r++){
+    const vals=Array.from(ws.getRow(r).values||[],v=>String(cellVal(v)).trim().toLowerCase());
+    const pi=vals.findIndex(v=>v.startsWith('pos')), bi=vals.findIndex(v=>v.startsWith('bezeichnung'));
+    if(pi>0&&bi>0){ hr=r; col={pos:pi,bez:bi,menge:vals.findIndex(v=>v==='menge'),me:vals.findIndex(v=>v==='me'),typ:1}; break; }
+  }
+  if(!hr) throw new Error('Kopfzeile mit „Pos.-Nr.“ und „Bezeichnung“ nicht gefunden');
+  const out=[]; let started=false;
+  for(let r=hr+1;r<=ws.rowCount;r++){
+    const row=ws.getRow(r); const g=c=>c>0?cellVal(row.getCell(c).value):'';
+    const typ=String(g(col.typ)).trim(), pos=String(g(col.pos)).trim().replace(/\.$/,''), bez=String(g(col.bez)).trim();
+    const vis=!row.hidden;
+    if(typ==='Los'){ started=true; out.push({typ:'L',pos,bez}); }
+    else if(typ==='Titel'){ out.push({typ:'T',pos,bez}); }
+    else if(typ==='Position'){ let me=String(g(col.me)).trim(); if(/^st/i.test(me)) me='Stck'; if(me==='M') me='m';
+      out.push({typ:'P',pos,bez:bez.split('\n')[0],menge:Number(g(col.menge))||0,me,in_liste:vis?1:0}); }
+    else if(/^text/i.test(typ) && started){ const first=bez.split('\n')[0].trim(); if(first && first.length<=70) out.push({typ:'X',bez:first}); }
+  }
+  if(!out.some(o=>o.typ==='P')) throw new Error('Keine Positionen gefunden (Spalte A muss „Position“ enthalten)');
+  return out;
+}
+route();
+</script>
+</body>
+</html>

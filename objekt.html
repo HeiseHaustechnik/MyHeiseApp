@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Objektaufnahme – My Heise App</title>
-<meta name="theme-color" content="#1d3a63">
+<meta name="theme-color" content="#2f3b53">
 <meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="My Heise">
-<link rel="icon" type="image/png" href="./icon.png?v=3">
-<link rel="apple-touch-icon" href="./icon.png?v=3">
+<link rel="icon" type="image/png" href="./icon.png?v=4">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=4">
 <link rel="manifest" href="./manifest.webmanifest">
 <style>
 :root{
@@ -676,6 +676,7 @@ button.ph{padding:0;display:block}
 .stepdots i.on{background:var(--brand-2)}
 .stepdots i.done{background:var(--ok)}
 </style>
+<link rel="stylesheet" href="heise-ci.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -1191,7 +1192,7 @@ function renderShell(){
   const tb=$('#tabbar');tb.style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
   tb.innerHTML=tabs.map(([k,i,l,h])=>`<a class="tab" data-nav="${k}" href="${h}">${ic(i)}<span>${l}</span></a>`).join('');
   $('#rail').innerHTML=
-    `<div class="rail-brand"><div class="rail-logo">${ic('house','lg')}<img src="icon.png?v=3" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Objektaufnahme</b><small>Heise Haustechnik</small></div></div>`+
+    `<div class="rail-brand"><div class="rail-logo">${ic('house','lg')}<img src="icon.png?v=4" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Objektaufnahme</b><small>Heise Haustechnik</small></div></div>`+
     (darf()?`<button class="btn btn-primary" data-act="newA" style="margin:0 12px 14px;width:calc(100% - 24px)">${ic('plus')} Neue Aufnahme</button>`:'')+
     `<nav class="rail-nav">`+
       `<a class="rail-item" data-nav="start" href="#/">${ic('home')} Aufnahmen</a>`+

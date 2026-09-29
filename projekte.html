@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Projekte – My Heise App</title><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body><script>
+// Weiche für das Modul „Projekte“ (Aufmaß + Bautagebuch). Die Seiten liegen im Ordner projekte/.
+// projekte.html#aufmass.html?id=… führt nach dem Login direkt wieder an die richtige Stelle.
+var h = decodeURIComponent(location.hash.slice(1));
+location.replace('projekte/' + (/^[\w.-]+\.html([?#].*)?$/.test(h) ? h : 'index.html'));
+</script></body></html>

@@ -1,0 +1,48 @@
+/* =====================================================================
+   Heise Haustechnik – CI-Anpassung für die My Heise App
+   Farben, Schrift und Farbstreifen nach Corporate Design.
+   Einbinden in JEDER Seite direkt NACH dem eigenen <style>-Block:
+     <link rel="stylesheet" href="heise-ci.css">
+   Es werden nur Variablen und wenige Stellen überschrieben, am
+   bestehenden Aufbau der App ändert sich nichts.
+   ===================================================================== */
+
+/* Hausschrift Montserrat (lokal, kein Google-Abruf nötig) */
+@font-face{font-family:'Montserrat';src:url(montserrat.woff2) format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+
+/* CI-Farben
+   Dunkelblau  #2F3B53   Hauptfarbe
+   Orange      #E25304   Akzent, Hauptknöpfe
+   Rot         #C32328   Heizung
+   Blau        #2C60A7   Sanitär
+   Gelb        #F5D423   Lüftung / Klima
+   Hellgrau    #F4F5F7   Hintergrund
+   Mittelgrau  #D0D3D9   Linien
+   Text        #3A3A3A */
+:root{
+  --bg:#f4f5f7;--surface:#fff;--surface-2:#eceef2;--ink:#1f2633;--ink-2:#4b5363;--ink-3:#868d9b;--line:#e1e4e9;
+  --brand:#2f3b53;--brand-2:#4a5a7a;--brand-strong:#2f3b53;--on-brand:#fff;--accent:#e25304;
+  --blue:#2c60a7;--blue-bg:#e8eff9;--red:#c32328;--red-bg:#fbe9ea;--amber:#b54203;--amber-bg:#fdeee5;
+  --ci-rot:#c32328;--ci-gelb:#f5d423;--ci-blau:#2c60a7;--ci-orange:#e25304;--ci-dunkel:#2f3b53;
+  --shadow:0 1px 2px rgba(47,59,83,.05),0 10px 30px -14px rgba(47,59,83,.2);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f131a;--surface:#181e28;--surface-2:#212835;--ink:#eef1f6;--ink-2:#b0b7c4;--ink-3:#79818f;--line:#2a3240;
+  --brand:#46587a;--brand-2:#6b7fa6;--brand-strong:#a9b8d6;--on-brand:#fff;--accent:#ff7a2e;
+  --blue:#6f9ae0;--blue-bg:#16264a;--red:#ff6b6f;--red-bg:#3a1714;--amber:#ffab70;--amber-bg:#3a2112;
+}}
+
+/* Schrift */
+body{font-family:Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+
+/* Startbereich: Dunkelblau-Verlauf und der Farbstreifen der vier Gewerke */
+.hero{background:linear-gradient(150deg,var(--brand-2) 0%,var(--brand) 62%,#1e2738 100%)}
+.hero::after{background:linear-gradient(90deg,var(--ci-rot) 0 25%,var(--ci-gelb) 25% 50%,var(--ci-blau) 50% 75%,var(--ci-orange) 75% 100%)}
+
+/* Hauptknöpfe in CI-Orange, wie in der Projekte-App */
+.btn-primary{background:var(--accent);box-shadow:0 10px 20px -12px var(--accent)}
+.btn-primary:active{filter:brightness(.92)}
+
+/* Schriftzug-Ersatz, falls kein Logo geladen werden kann */
+.wordmark{color:var(--ci-dunkel)}
+@media (prefers-color-scheme:dark){.wordmark{color:var(--ci-dunkel)}}
