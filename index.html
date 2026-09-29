@@ -287,6 +287,7 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 <symbol id="i-checks" viewBox="0 0 24 24"><path d="m2 12.5 4.5 4.5L15 8.5M11 16l1.5 1.5L22 8"/></symbol>
 <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19zM12 10v4.5M12 17.5v.1"/></symbol>
 <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+<symbol id="i-tablet" viewBox="0 0 24 24"><rect x="4.5" y="2.5" width="15" height="19" rx="2.4"/><path d="M11 18.5h2"/></symbol>
 </defs></svg>
 <div id="boot" class="boot"><div class="spinner"></div></div>
 <div id="root"></div>
@@ -336,6 +337,10 @@ const MODULES = [
     rollen: [
       { k: 'monteur', l: 'Monteur', d: 'Aufmaße erfassen, Bautagebuch führen, Fotos und Unterschriften.' },
       { k: 'bauleitung', l: 'Bauleitung', d: 'Wie Monteur, dazu Projekte anlegen, LV aus Excel einlesen und Aufmaße löschen.' }] },
+  { id: 'geraete', name: 'Geräteverwaltung', desc: 'iPads, Handys, Apps, Kosten', url: 'geraete.html', icon: 'tablet', g: ['#6b7a99', '#465573'],
+    rollen: [
+      { k: 'verwalter', l: 'Verwalter', d: 'Geräte, Apps und Abos anlegen und ändern, Geräte mit Unterschrift ausgeben und zurücknehmen, Kosten und Fristen sehen.' },
+      { k: 'leser', l: 'Leser', d: 'Alles ansehen (z. B. Buchhaltung), Kostenübersicht und PDFs, nichts ändern.' }] },
 ];
 
 /* ---------- Grundlagen ---------- */
@@ -828,7 +833,7 @@ const plural = (n, a, b) => n === 1 ? a : b;
 async function refreshZaehler() {
   try {
     const z = await rpc('hub_zaehler');
-    if (z && typeof z === 'object') NX.Z = { ungelesen: +z.ungelesen || 0, meldungen: +z.meldungen || 0, fuhrpark: +z.fuhrpark || 0, unterweisung: +z.unterweisung || 0, gefaehrdung: +z.gefaehrdung || 0, objekt: +z.objekt || 0 };
+    if (z && typeof z === 'object') NX.Z = { ungelesen: +z.ungelesen || 0, meldungen: +z.meldungen || 0, fuhrpark: +z.fuhrpark || 0, unterweisung: +z.unterweisung || 0, gefaehrdung: +z.gefaehrdung || 0, objekt: +z.objekt || 0, geraete: +z.geraete || 0 };
   } catch (e) { return }
   paintZaehler();
 }
@@ -844,7 +849,7 @@ function paintZaehler() {
   $$('[data-bell] .bell-n').forEach(s => { s.textContent = n > 99 ? '99+' : n; s.hidden = !n });
   const c = $('#msgcard');
   if (c) { c.classList.toggle('new', n > 0); $('.s', c).textContent = zaehlerText(); const k = $('.cnt', c); k.textContent = n > 99 ? '99+' : n; k.hidden = !n }
-  $$('[data-app-n]').forEach(b => { const k = NX.Z[b.dataset.appN] || 0; b.textContent = k > 99 ? '99+' : k; b.hidden = !k; b.title = b.dataset.appN === 'unterweisung' ? k + (k === 1 ? ' offene Unterweisung' : ' offene Unterweisungen') : (b.dataset.appN === 'gefaehrdung' || b.dataset.appN === 'objekt') ? k + (k === 1 ? ' offener Entwurf' : ' offene Entwürfe') : k + (k === 1 ? ' offene Meldung' : ' offene Meldungen') });
+  $$('[data-app-n]').forEach(b => { const k = NX.Z[b.dataset.appN] || 0; b.textContent = k > 99 ? '99+' : k; b.hidden = !k; b.title = b.dataset.appN === 'unterweisung' ? k + (k === 1 ? ' offene Unterweisung' : ' offene Unterweisungen') : (b.dataset.appN === 'gefaehrdung' || b.dataset.appN === 'objekt') ? k + (k === 1 ? ' offener Entwurf' : ' offene Entwürfe') : b.dataset.appN === 'geraete' ? k + (k === 1 ? ' Frist in den nächsten 30 Tagen' : ' Fristen in den nächsten 30 Tagen') : k + (k === 1 ? ' offene Meldung' : ' offene Meldungen') });
   paintTabBadges();
 }
 setInterval(() => { if (ME && ready && !document.hidden) refreshZaehler() }, 60000);
