@@ -167,6 +167,10 @@ textarea.inp{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
 .umods{margin-top:12px;border-top:1px solid var(--line)}
 .umod{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
 .umod:last-child{border-bottom:0;padding-bottom:0}
+.umod:has(.lrechte){flex-wrap:wrap}.lrechte{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px;padding-left:42px}
+.lrecht{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:17px;background:var(--surface-2,#f1f3f6);font-size:13.5px;font-weight:650;cursor:pointer}
+.lrecht input{width:17px;height:17px;accent-color:var(--accent,#e25304);margin:0}
+@media(max-width:420px){.lrechte{padding-left:0}}
 .umod-l{display:flex;align-items:center;gap:10px;font-weight:650;min-width:0}
 .umod-l .mi{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,var(--g1),var(--g2));flex:none}
 .umod-l .mi .ic{width:17px;height:17px}
@@ -312,7 +316,7 @@ const FIRMA = 'Heise Haustechnik GmbH & Co. KG';
    NEUES MODUL: hier einen Eintrag ergänzen (id = Kürzel in Kleinbuchstaben, url = Datei).
    Freigeschaltet wird es dann unter Zugriff & Rollen. Admins sehen immer alle Module. */
 const MODULES = [
-  { id: 'lager', name: 'Lagerverwaltung', desc: 'Viessmann- und Heise-Lager', url: 'lager.html', icon: 'box', g: ['#4a5a7a', '#2f3b53'] },
+  { id: 'lager', name: 'Lagerverwaltung', desc: 'Kommission, eigenes Lager, Reste', url: 'lagerverwaltung.html', also: ['lager.html'], icon: 'box', g: ['#4a5a7a', '#2f3b53'] },
   { id: 'leitern', name: 'Leiterprüfung', desc: 'Leitern scannen, buchen und prüfen', url: 'leitern.html', icon: 'ladder', g: ['#f08a3c', '#e25304'],
     rollen: [
       { k: 'nutzer', l: 'Nutzer', d: 'Leitern ansehen, scannen, buchen und Mängel melden.' },
@@ -428,7 +432,7 @@ function sessionExpired() { if (!ME) return; ME = null; ready = false; showLogin
 function safeNext() {
   const p = new URLSearchParams(location.search).get('next');
   if (!(p && /^[\w.-]+\.html(#.*)?$/.test(p))) return null;
-  const m = MODULES.find(x => x.url === p.split('#')[0]);
+  const f = p.split('#')[0], m = MODULES.find(x => x.url === f || (x.also || []).includes(f));
   return m && APPS[m.id] ? p : null;
 }
 async function afterAuth() {
@@ -580,7 +584,8 @@ function roleSelect(uid, m, cur, uname) {
 async function showZugriff() {
   root.innerHTML = `<div class="shell"><div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1></div><div class="empty"><div class="spinner" style="margin:6px auto"></div></div></div>`;
   try {
-    const [users, zg] = await Promise.all([api('GET', 'benutzer', null, '?select=id,name,benutzername,email,rolle&order=name.asc'), api('GET', 'app_zugriff', null, '?select=benutzer_id,app,rolle')]);
+    const [users, zg, lr] = await Promise.all([api('GET', 'benutzer', null, '?select=id,name,benutzername,email,rolle&order=name.asc'), api('GET', 'app_zugriff', null, '?select=benutzer_id,app,rolle'), api('GET', 'lager_rechte', null, '?select=benutzer_id,lager').catch(() => null)]);
+    LR = {}; (lr || []).forEach(r => { (LR[r.benutzer_id] = LR[r.benutzer_id] || {})[r.lager] = true }); LR_OK = !!lr;
     if (location.hash !== '#/zugriff') return;
     ZU = users; const map = {}; zg.forEach(z => { (map[z.benutzer_id] = map[z.benutzer_id] || {})[z.app] = z.rolle });
     const withRoles = MODULES.filter(m => m.rollen);
@@ -595,12 +600,25 @@ async function showZugriff() {
             const r = (map[u.id] || {})[m.id], on = r !== undefined;
             return `<div class="umod" style="--g1:${m.g[0]};--g2:${m.g[1]}"><div class="umod-l"><span class="mi">${ic(m.icon)}</span><span>${esc(m.name)}</span></div>
               <div class="umod-r">${m.rollen && on ? roleSelect(u.id, m, r, u.name) : ''}
-              <button class="switch ${on ? 'on' : ''}" data-act="zg" data-u="${u.id}" data-m="${m.id}" data-n="${esc(u.name)}" role="switch" aria-checked="${on}" aria-label="${esc(m.name)} für ${esc(u.name)}"></button></div></div>`;
+              <button class="switch ${on ? 'on' : ''}" data-act="zg" data-u="${u.id}" data-m="${m.id}" data-n="${esc(u.name)}" role="switch" aria-checked="${on}" aria-label="${esc(m.name)} für ${esc(u.name)}"></button></div>${m.id === 'lager' && on ? lagerRechteHTML(u.id, u.name) : ''}</div>`;
           }).join('')}</div>`}</div>`;
       }).join('')}</div>`;
   } catch (e) {
     root.innerHTML = `<div class="shell"><div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1></div><div class="empty">${ic('info')}<h3>Konnte nicht geladen werden</h3><p class="muted">${esc(niceErr(e))}</p></div></div>`;
   }
+}
+/* ---------- Rechte pro Lager (Lagerverwaltung) ---------- */
+let LR = {}, LR_OK = false;
+const LAGER_RECHTE = [['kommission', 'Viessmann Kommission'], ['eigen', 'Eigenes Lager'], ['rest', 'Restelager']];
+function lagerRechteHTML(uid, name, alle) {
+  if (!LR_OK) return '';
+  const r = LR[uid] || {};
+  return `<div class="lrechte" role="group" aria-label="Lager für ${esc(name)}">${LAGER_RECHTE.map(([k, l]) => `<label class="lrecht"><input type="checkbox" data-lr="${k}" data-u="${uid}" ${alle || r[k] ? 'checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>`;
+}
+async function setLagerRecht(uid, lager, on) {
+  if (on) await api('POST', 'lager_rechte', { benutzer_id: uid, lager }, '?on_conflict=benutzer_id,lager', { Prefer: 'resolution=ignore-duplicates,return=minimal' });
+  else await api('DELETE', 'lager_rechte', null, `?benutzer_id=eq.${uid}&lager=eq.${lager}`);
+  (LR[uid] = LR[uid] || {})[lager] = on;
 }
 async function setZugriff(uid, mid, on, rolle) {
   const m = MODULES.find(x => x.id === mid);
@@ -742,6 +760,7 @@ const ACT = {
       el.classList.toggle('on', on); el.setAttribute('aria-checked', on);
       const old = box.querySelector('select'); if (old) old.remove();
       if (on && m.rollen) box.insertAdjacentHTML('afterbegin', roleSelect(el.dataset.u, m, m.rollen[0].k, el.dataset.n || ''));
+      if (m.id === 'lager') { const row = box.closest('.umod'), lx = row.querySelector('.lrechte'); if (lx) lx.remove(); if (on) { LR[el.dataset.u] = { kommission: true, eigen: true, rest: true }; row.insertAdjacentHTML('beforeend', lagerRechteHTML(el.dataset.u, el.dataset.n || '', true)) } else delete LR[el.dataset.u] }
       toast(on ? 'Zugriff freigeschaltet' : 'Zugriff entfernt', 'ok');
     } catch (e) { toast(niceErr(e), 'err') }
     el.disabled = false;
@@ -749,6 +768,8 @@ const ACT = {
 };
 document.addEventListener('click', e => { if (e.target.closest('a[target="_blank"]')) return; const el = e.target.closest('[data-act]'); if (el && ACT[el.dataset.act]) { e.preventDefault(); ACT[el.dataset.act](el) } });
 document.addEventListener('change', async e => {
+  const cb = e.target.closest('input[data-lr]');
+  if (cb) { cb.disabled = true; try { await setLagerRecht(cb.dataset.u, cb.dataset.lr, cb.checked); toast(cb.checked ? 'Lager freigeschaltet' : 'Lager gesperrt', 'ok') } catch (err) { cb.checked = !cb.checked; toast(niceErr(err), 'err') } cb.disabled = false; return }
   const s = e.target.closest('select[data-zr]'); if (!s) return;
   s.disabled = true;
   try { await setZugriff(s.dataset.u, s.dataset.m, true, s.value); toast('Rolle gespeichert', 'ok') } catch (err) { toast(niceErr(err), 'err'); showZugriff() }
