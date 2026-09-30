@@ -1056,7 +1056,10 @@ const LAGER={
   rest:{name:'Restelager',sub:'Reste & Sonderartikel',ic:'scissors',tone:'teal',href:'#/reste'},
 };
 const EINHEITEN=['Stück','Meter','Pack','Rolle','Box','Paar','Satz','Karton','Liter','kg'];
-const BILD_DIR='lager-bilder/';
+/* Produktbilder liegen auf 8 Ordner verteilt (lager-bilder1 … lager-bilder8, je unter 100 Dateien – GitHub-Upload-Grenze).
+   Der Ordner ergibt sich fest aus dem Dateinamen. Neue Bilder: Ordner mit  bildOrdner('name.jpg')  in der Browser-Konsole ermitteln. */
+const bildOrdner=n=>{let h=0;for(const c of String(n))h=(h*31+c.charCodeAt(0))%1000003;return h%8+1};
+const bildSrc=n=>`lager-bilder${bildOrdner(n)}/${n}`;
 const darfL=l=>S.lager.includes(l);
 
 /* Supabase liefert höchstens 1000 Zeilen pro Abfrage → seitenweise laden */
@@ -1237,7 +1240,7 @@ ACT.csvReste=()=>csvSave(`Restelager_${berlinToday()}.csv`,['Bezeichnung','Besch
 /* =====================================================================
    Eigenes Lager: Standort → Raum → Regal → Artikel, Suche, Detail, Buchen, Bearbeiten
    ===================================================================== */
-const thumb=a=>a.bild?`<img class="athumb" src="${esc(BILD_DIR+a.bild)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'athumb none'}))">`:`<span class="athumb none">${ic('box')}</span>`;
+const thumb=a=>a.bild?`<img class="athumb" src="${esc(bildSrc(a.bild))}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'athumb none'}))">`:`<span class="athumb none">${ic('box')}</span>`;
 function elCard(a){
   const unter=a.min!=null&&+a.bestand<+a.min;
   const tags=[`<span class="chip tone-amber">${ic('pin','sm')}${esc([a.standort!=='Ramsenweg'?a.standort:'',raumOf(a),a.platz].filter(Boolean).join(' · '))}</span>`,
@@ -1306,7 +1309,7 @@ async function viewArtikel(id,tk){
   paint(`
   ${backHead(`#/r/${encodeURIComponent(a.standort)}/${encodeURIComponent(raumOf(a))}`,'Eigenes Lager',elName(a))}
   ${lagerBadge('eigen')}
-  ${a.bild?`<div class="card" style="padding:0;overflow:hidden;margin:12px 0"><img src="${esc(BILD_DIR+a.bild)}" alt="${esc(a.bezeichnung)}" style="width:100%;max-height:300px;object-fit:contain;background:#fff;display:block"></div>`:''}
+  ${a.bild?`<div class="card" style="padding:0;overflow:hidden;margin:12px 0"><img src="${esc(bildSrc(a.bild))}" alt="${esc(a.bezeichnung)}" style="width:100%;max-height:300px;object-fit:contain;background:#fff;display:block"></div>`:''}
   <div class="wobox"><div>${ic('pin')}</div><div><small>Hier liegt der Artikel</small><b>${esc(ST_LANG[a.standort])}</b><span>${esc([raumOf(a),a.bereich,a.platz].filter(Boolean).join(' › '))}</span></div></div>
   ${zoneOfRaum(a.standort,raumOf(a))?`<div class="card plancard" id="aPlan" style="margin-top:12px">${planSVG(a.standort,{hl:zoneOfRaum(a.standort,raumOf(a)).id,counts:false,klein:true})}</div>`:''}
   <div class="sumtiles s3" style="margin-top:12px"><div class="sumtile"><small>Bestand</small><b style="color:${unter?'var(--red)':'inherit'}">${nf2(a.bestand)}</b><div class="muted" style="font-size:12px">${esc(a.einheit)}</div></div><div class="sumtile"><small>Min</small><b>${nf2(a.min)}</b></div><div class="sumtile"><small>Max</small><b>${nf2(a.max)}</b></div></div>
@@ -1695,7 +1698,7 @@ async function viewInventur(id,raum,tk){
 function drawInvRaum(raum){
   const {i,pos}=INV,offen=i.status==='offen';
   const list=pos.filter(p=>(p.raum||'Ohne Raum')===raum);
-  const bild=p=>{const a=p.artikel_id&&elById(p.artikel_id);return a&&a.bild?`<img class="athumb sm" src="${esc(BILD_DIR+a.bild)}" alt="" loading="lazy">`:''};
+  const bild=p=>{const a=p.artikel_id&&elById(p.artikel_id);return a&&a.bild?`<img class="athumb sm" src="${esc(bildSrc(a.bild))}" alt="" loading="lazy">`:''};
   paint(`
   ${backHead('#/inv/'+i.id,`Inventur ${LAGER[i.lager].name} · ${i.standort}`,raum)}
   ${lagerBadge(i.lager)}
