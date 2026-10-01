@@ -18,6 +18,15 @@
 .delbtn:active{background:var(--red-bg);color:var(--red)}
 .kv{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
 input[type=file].inp{padding:12px 14px}
+.eyebtn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--ink-3);flex:0 0 auto}
+.eyebtn:active{background:var(--surface-2)}
+.row-card.aus{opacity:.55}
+.chk{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--accent);flex:0 0 auto}
+.chk b{display:block;font-size:14.5px}
+.emrow{display:grid;grid-template-columns:1fr 1fr 110px 40px;gap:8px;align-items:end;margin-bottom:8px}
+@media(max-width:560px){.emrow{grid-template-columns:1fr 1fr 40px}.emrow .er{grid-column:1/3}}
+.emrow .field{margin:0}
 </style>
 </head>
 <body>
@@ -45,18 +54,25 @@ async function showListe(){
   try{ list=await api('projekte'); }catch(e){ app.innerHTML=`<div class="err">${esc(e.message)}</div>`; return; }
   const h=new Date().getHours(), gruss=h<11?'Guten Morgen':h<18?'Guten Tag':'Guten Abend';
   const aktiv=list.filter(p=>p.status!=='archiv');
+  // „Meine Projekte“: eigene Einstellung zuerst, sonst zugeordnet bzw. ohne Team (Bauleitung sieht standardmäßig alle)
+  const mein=p=>p.ansicht===true || (p.ansicht!==false && (PJ.leitung() || p.meins || !p.team_n));
+  let modus='meine'; try{ modus=localStorage.getItem('pj_modus')||'meine'; }catch(e){}
+  const zeig=modus==='alle'? list : list.filter(mein);
   app.innerHTML=`
     <section class="hero">
       <div><div class="ey">${gruss}</div><h1>Projekte</h1></div>
       <div class="logo-tile"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div>
       <p>${plural(aktiv.length,'aktives Projekt','aktive Projekte')} · Aufmaße erfassen, prüfen und unterschreiben lassen.</p>
     </section>
-    <div class="sec-title">Projekte</div>
-    ${list.length? list.map(p=>`<a class="row-card" href="#p=${p.id}">
+    <div class="segc" style="margin:18px 0 6px"><button data-modus="meine" class="${modus==='meine'?'on':''}">Meine Projekte (${list.filter(mein).length})</button><button data-modus="alle" class="${modus==='alle'?'on':''}">Alle (${list.length})</button></div>
+    <p class="hint" style="margin:0 0 12px">Mit dem Auge blendest du ein Projekt für dich ein oder aus. Unter „Alle“ findest du jederzeit jedes Projekt.</p>
+    ${zeig.length? zeig.map(p=>`<a class="row-card${mein(p)?'':' aus'}" href="#p=${p.id}">
         <div class="mi tone-brand">${IC('building')}</div>
         <div class="mt"><b>${esc(p.name)}</b><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}</small>
-          <div class="tags"><span class="pill tone-blue">${plural(p.anz_aufmasse,'Aufmaß','Aufmaße')}</span><span class="pill tone-gray">${p.anz_lv} LV-Positionen</span></div></div>
+          <div class="tags"><span class="pill tone-blue">${plural(p.anz_aufmasse,'Aufmaß','Aufmaße')}</span><span class="pill tone-gray">${p.anz_lv} LV-Positionen</span>${p.meins?'<span class="pill tone-ok"><i></i>zugeordnet</span>':''}${mein(p)?'':'<span class="pill tone-gray">ausgeblendet</span>'}</div></div>
+        <button class="eyebtn" data-eye="${p.id}" data-on="${mein(p)?1:0}" title="${mein(p)?'Für mich ausblenden':'Für mich einblenden'}" aria-label="${mein(p)?'Für mich ausblenden':'Für mich einblenden'}">${IC(mein(p)?'eye':'eyeoff')}</button>
         <span class="chev">${IC('chev')}</span></a>`).join('')
+      : list.length? `<div class="empty">${IC('eyeoff')}<div>In deiner Ansicht sind gerade keine Projekte. Unter „Alle“ kannst du Projekte mit dem Auge einblenden.</div></div>`
       :`<div class="empty">${IC('building')}<div>Noch keine Projekte angelegt.</div></div>`}
     <div class="sec-title nur-leitung">Verwaltung</div>
     <details class="fold nur-leitung"><summary>${IC('plus')}Neues Projekt anlegen</summary><div class="fold-b">
@@ -73,6 +89,11 @@ async function showListe(){
       <div class="field"><input type="file" class="inp" id="mig_f" accept=".json,application/json"></div>
       <button class="btn block" id="mig_ok">Daten übernehmen</button><div id="mig_msg"></div></div></details>
     <p class="hint" style="text-align:center;margin-top:30px">Heise Haustechnik GmbH &amp; Co. KG · Braunlage</p>`;
+  document.querySelectorAll('[data-modus]').forEach(b=>b.onclick=()=>{ try{ localStorage.setItem('pj_modus',b.dataset.modus); }catch(e){} showListe(); });
+  document.querySelectorAll('[data-eye]').forEach(b=>b.onclick=async ev=>{ ev.preventDefault(); ev.stopPropagation();
+    const an=b.dataset.on!=='1'; b.disabled=true;
+    try{ await api('projekte/'+b.dataset.eye+'/ansicht',{method:'PUT',body:JSON.stringify({sichtbar:an})}); toast(an?'Projekt eingeblendet':'Projekt ausgeblendet'); showListe(); }
+    catch(e){ toast(e.message); b.disabled=false; } });
   $('#mig_ok').onclick=migration;
   $('#np_ok').onclick=async()=>{ const name=$('#np_name').value.trim(); if(!name) return toast('Bitte einen Namen eintragen');
     try{ const r=await api('projekte',{method:'POST',body:JSON.stringify({nr:$('#np_nr').value.trim(),name,adresse:$('#np_adr').value.trim()})}); location.hash='#p='+r.id; }catch(e){ toast(e.message); } };
@@ -122,6 +143,12 @@ async function showProjekt(id){
       <div class="field"><label>Bezeichnung *</label><input class="inp" id="na_bez" placeholder="z. B. Aufmaß 2 – Trinkwasser OG"></div>
       <div class="row2"><div class="field"><label>Datum</label><input class="inp" type="date" id="na_dat" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Monteur</label><input class="inp" id="na_mon"></div></div>
       <button class="btn cta block" id="na_ok" ${nP?'':'disabled'}>Anlegen und öffnen</button>${nP?'':'<p class="hint">Zuerst das LV importieren.</p>'}</div></details>
+    <div class="sec-title nur-leitung">Team und Empfänger</div>
+    <details class="fold nur-leitung" id="teamFold"><summary>${IC('users')}Team (wer sieht das Projekt unter „Meine Projekte“)</summary><div class="fold-b" id="teamBox"><p class="hint">Lädt …</p></div></details>
+    <details class="fold nur-leitung"><summary>${IC('mail')}E-Mail-Empfänger für Bautagebücher (${empfListe(p).length})</summary><div class="fold-b">
+      <p class="hint" style="margin-bottom:10px">Diese Adressen stehen beim Senden eines Bautagebuchs zur Auswahl, z. B. Bauherr, Architekt oder Planungsbüro.</p>
+      <div id="emList"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn ghost sm" id="emAdd">${IC('plus','sm')}Empfänger hinzufügen</button><button class="btn cta sm" id="emSave">Speichern</button></div></div></details>
     <div class="sec-title nur-leitung">Leistungsverzeichnis</div>
     <details class="fold nur-leitung"><summary>${IC('sheet')}${nP? `${nP} Positionen · ${nL} in der Aufmaß-Liste` : 'Noch kein LV importiert'}</summary><div class="fold-b">
       <p class="hint" style="margin-bottom:10px">LV aus der Kalkulations-Excel importieren${nP?' (ersetzt das bestehende)':''}. Erwartet die Spalten Typ (Los / Titel / Text-Pos. / Position), Pos.-Nr., Bezeichnung, Menge, ME. Ausgeblendete Zeilen landen im „Gesamten LV“, sichtbare in der „Aufmaß-Liste“.</p>
@@ -129,6 +156,41 @@ async function showProjekt(id){
   $('#na_ok').onclick=async()=>{ const bez=$('#na_bez').value.trim(); if(!bez) return toast('Bitte eine Bezeichnung eintragen');
     try{ const r=await api('projekte/'+id+'/aufmasse',{method:'POST',body:JSON.stringify({bez,datum:$('#na_dat').value,monteur:$('#na_mon').value.trim()})}); location.href='aufmass.html?id='+r.id; }catch(e){ toast(e.message); } };
   $('#lv_f').onchange=()=>lvImport(id);
+  if(PJ.leitung()){ teamSetup(id); empfSetup(id,p); }
+}
+/* ---------- Team (nur Ansicht, keine Sperre) ---------- */
+function teamSetup(pid){
+  const fold=$('#teamFold'); let geladen=false;
+  fold.addEventListener('toggle',async()=>{ if(!fold.open||geladen) return; geladen=true;
+    const box=$('#teamBox');
+    try{
+      const t=await api('projekte/'+pid+'/team');
+      box.innerHTML=(t.length? t.map(u=>`<label class="chk"><input type="checkbox" value="${esc(u.id)}" ${u.zugeordnet?'checked':''}><b>${esc(u.name)}</b></label>`).join('') : '<p class="hint">Noch niemand hat Zugriff auf das Modul Projekte.</p>')
+        +`<p class="hint" style="margin:10px 0">Zugeordnete Personen sehen das Projekt unter „Meine Projekte“. Ohne Zuordnung sehen alle das Projekt. Über „Alle“ bleibt jedes Projekt erreichbar.</p><button class="btn cta sm" id="teamSave">Team speichern</button>`;
+      if(t.length) $('#teamSave').onclick=async()=>{ const ids=[...box.querySelectorAll('input:checked')].map(c=>c.value);
+        try{ await api('projekte/'+pid+'/team',{method:'PUT',body:JSON.stringify(ids)}); toast('Team gespeichert'); }catch(e){ toast(e.message); } };
+      else $('#teamSave').remove();
+    }catch(e){ box.innerHTML=`<div class="err">${esc(e.message)}</div>`; geladen=false; }
+  });
+}
+/* ---------- E-Mail-Empfänger für Bautagebücher ---------- */
+function empfListe(p){ try{ const a=JSON.parse(p.empfaenger||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function empfSetup(pid,p){
+  let L=empfListe(p).map(x=>({name:x.name||'',email:x.email||'',rolle:x.rolle||''}));
+  const draw=()=>{ $('#emList').innerHTML=L.length? L.map((r,i)=>`<div class="emrow">
+      <div class="field"><label>Name / Firma</label><input class="inp" data-i="${i}" data-k="name" value="${esc(r.name)}" placeholder="z. B. Landkreis Göttingen"></div>
+      <div class="field"><label>E-Mail *</label><input class="inp" type="email" data-i="${i}" data-k="email" value="${esc(r.email)}" placeholder="name@firma.de"></div>
+      <div class="field er"><label>Rolle</label><input class="inp" data-i="${i}" data-k="rolle" value="${esc(r.rolle)}" placeholder="Bauherr" list="emRollen"></div>
+      <button class="delbtn" data-del="${i}" title="Entfernen">${IC('trash','sm')}</button></div>`).join('')+`<datalist id="emRollen"><option>Bauherr</option><option>Architekt</option><option>Planungsbüro</option><option>Bauleitung</option><option>Projektsteuerung</option></datalist>`
+      : '<p class="hint">Noch keine Empfänger eingetragen.</p>';
+    document.querySelectorAll('#emList [data-k]').forEach(el=>el.oninput=()=>{ L[+el.dataset.i][el.dataset.k]=el.value; });
+    document.querySelectorAll('#emList [data-del]').forEach(b=>b.onclick=()=>{ L.splice(+b.dataset.del,1); draw(); }); };
+  draw();
+  $('#emAdd').onclick=()=>{ L.push({name:'',email:'',rolle:''}); draw(); const x=document.querySelectorAll('#emList [data-k="name"]'); x[x.length-1].focus(); };
+  $('#emSave').onclick=async()=>{
+    const out=L.map(r=>({name:r.name.trim(),email:r.email.trim(),rolle:r.rolle.trim()})).filter(r=>r.name||r.email);
+    const bad=out.find(r=>!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email)); if(bad) return toast('Bitte eine gültige E-Mail-Adresse eintragen'+(bad.name?' ('+bad.name+')':''));
+    try{ await api('projekte/'+pid,{method:'PUT',body:JSON.stringify({empfaenger:out})}); L=out; draw(); toast('Empfänger gespeichert'); }catch(e){ toast(e.message); } };
 }
 async function delAufmass(id,bez){
   if(!confirm(`Aufmaß „${bez}“ mit allen Einträgen endgültig löschen?`)) return;

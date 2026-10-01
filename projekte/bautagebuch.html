@@ -55,6 +55,17 @@
 .fbig{width:100%;max-height:52vh;object-fit:contain;border-radius:14px;background:#000;display:block;margin-bottom:12px}
 .bottombar{position:sticky;bottom:0;z-index:5;padding:12px 0 calc(8px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:10px}
 .bottombar .btn{flex:1}
+.aend{margin-top:12px;padding:12px 14px;border-radius:16px;background:var(--amber-bg)}
+.aend b{display:block;font-size:13.5px;color:var(--amber);margin-bottom:8px}
+.chk{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--accent);flex:0 0 auto}
+.chk b{display:block;font-size:14.5px}.chk small{display:block;font-size:12.5px;color:var(--ink-3)}
+.row-card.pick{box-shadow:inset 0 0 0 1.5px var(--line)}
+.row-card.pick.on{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+.row-card .box{width:26px;height:26px;border-radius:8px;box-shadow:inset 0 0 0 2px var(--line);display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.row-card.pick.on .box{background:var(--accent);box-shadow:none}
+.selhead{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:18px 0 8px}
+.selhead b{flex:1;font-size:15px}
 </style>
 </head>
 <body>
@@ -151,18 +162,30 @@ function renderList(){
       <div class="logo-tile"><img src="lib/heise-logo.svg" alt=""></div>
       <p>${LIST.length} ${LIST.length==1?'Eintrag':'Einträge'} · ${hasToday?'Heute bereits eingetragen':'Heute noch kein Eintrag'}</p>
     </section>
-    <div style="margin:16px 0 4px"><button class="btn cta block" id="bToday">${IC(hasToday?'edit':'plus')}${hasToday?'Heutigen Eintrag öffnen':'Heute eintragen'}</button></div>
-    <div style="text-align:right"><button class="lnk" id="bOther">${IC('cal')}Anderen Tag nachtragen</button></div>
-    <div class="sec-title">Einträge</div>
+    ${SEL?`<div class="selhead"><b>${SEL.size} von ${LIST.length} ausgewählt</b><button class="lnk" id="sAll">Alle</button><button class="lnk" id="sNone">Keine</button><button class="lnk" id="sEnd">${IC('x')}Fertig</button></div>`
+    :`<div style="margin:16px 0 4px"><button class="btn cta block" id="bToday">${IC(hasToday?'edit':'plus')}${hasToday?'Heutigen Eintrag öffnen':'Heute eintragen'}</button></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">${LIST.length?`<button class="lnk" id="bSel">${IC('file')}Mehrere als PDF exportieren</button>`:'<span></span>'}<button class="lnk" id="bOther">${IC('cal')}Anderen Tag nachtragen</button></div>
+    <div class="sec-title">Einträge</div>`}
     ${LIST.length? LIST.map(e=>{ const d=new Date(e.datum+'T12:00'); let pc=0; try{ pc=JSON.parse(e.personen||'[]').length; }catch(x){}
-      return `<a class="row-card" href="?p=${PID}&id=${e.id}">
+      return `<${SEL?'div':'a'} class="row-card${SEL?' pick'+(SEL.has(e.id)?' on':''):''}" ${SEL?`data-pick="${e.id}"`:`href="?p=${PID}&id=${e.id}"`}>
+        ${SEL?`<span class="box">${SEL.has(e.id)?IC('check','sm'):''}</span>`:''}
         <div class="day"><small>${WT[d.getDay()]}</small><b>${d.getDate()}.${d.getMonth()+1}.</b></div>
         <div class="mt"><b>${e.von&&e.bis?esc(e.von)+' – '+esc(e.bis)+' Uhr':'ohne Arbeitszeit'}</b>
           <small>${hStr(hours(e.von,e.bis,e.pause_min))} · ${pc} ${pc==1?'Person':'Personen'}${e.fotos?' · '+e.fotos+' Foto'+(e.fotos>1?'s':''):''}${e.wetter?' · '+esc(e.wetter.split(' · ')[0]):''}</small>
           ${e.taetigkeit?`<span class="desc">${esc(e.taetigkeit)}</span>`:''}
           <div class="tags">${e.sig_ma?'<span class="pill tone-ok"><i></i>Mitarbeiter</span>':'<span class="pill tone-amber"><i></i>nicht unterschrieben</span>'}${e.sig_ag?'<span class="pill tone-ok"><i></i>Auftraggeber</span>':''}</div></div>
-        <span class="chev">${IC('chev')}</span></a>`; }).join('')
-      : `<div class="empty">${IC('book')}<div>Noch keine Einträge.</div></div>`}`;
+        ${SEL?'':`<span class="chev">${IC('chev')}</span>`}</${SEL?'div':'a'}>`; }).join('')
+      : `<div class="empty">${IC('book')}<div>Noch keine Einträge.</div></div>`}
+    ${SEL?`<div class="bottombar"><button class="btn ghost" id="mPdf" ${SEL.size?'':'disabled'}>${IC('file')}PDF${SEL.size?' ('+SEL.size+')':''}</button><button class="btn cta" id="mMail" ${SEL.size?'':'disabled'}>${IC('mail')}Senden</button></div>`:''}`;
+  if(SEL){
+    document.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>{ const id=el.dataset.pick; SEL.has(id)?SEL.delete(id):SEL.add(id); renderList(); });
+    $('#sAll').onclick=()=>{ LIST.forEach(x=>SEL.add(x.id)); renderList(); };
+    $('#sNone').onclick=()=>{ SEL.clear(); renderList(); };
+    $('#sEnd').onclick=()=>{ SEL=null; renderList(); };
+    $('#mPdf').onclick=manyPdf; $('#mMail').onclick=manySend;
+    return;
+  }
+  if($('#bSel')) $('#bSel').onclick=()=>{ SEL=new Set(); renderList(); };
   $('#bToday').onclick=()=>{ if(hasToday) location.href=`?p=${PID}&id=${hasToday.id}`; else newEntry(today); };
   $('#bOther').onclick=()=>openSheet(`<h2>Anderen Tag nachtragen</h2><div class="field"><label>Datum</label><input class="inp" type="date" id="nd" value="${today}" max="${today}"></div><button class="btn cta block" id="ndOk">Eintrag öffnen</button>`,()=>{
     $('#ndOk').onclick=()=>{ const d=$('#nd').value; if(!d) return; const ex=LIST.find(x=>x.datum===d); if(ex) location.href=`?p=${PID}&id=${ex.id}`; else newEntry(d); }; });
@@ -181,19 +204,33 @@ function newEntry(datum){
 function saveEntry(e,silent){
   e.updated_at=nowIso(); ls.set(K.ent(e.id),e);
   const i=LIST.findIndex(x=>x.id===e.id); const row=listRow(e); if(i>=0) LIST[i]=row; else LIST.unshift(row); LIST.sort((a,b)=>b.datum.localeCompare(a.datum)); ls.set(K.list,LIST);
-  enqueue({kind:'entry',id:e.id,data:{...e,personen:JSON.stringify(e.personen),wetter_daten:e.wetter_daten?JSON.stringify(e.wetter_daten):null}});
+  const d={...e,personen:JSON.stringify(e.personen),wetter_daten:e.wetter_daten?JSON.stringify(e.wetter_daten):null,sig_aenderung:e.sig_aend?JSON.stringify(e.sig_aend):''}; delete d.sig_aend;
+  enqueue({kind:'entry',id:e.id,data:d});
 }
 let saveT=null;
+const parseAend=v=>{ if(!v) return null; try{ const o=JSON.parse(v); return o&&o.ts?{text:o.text||'',ts:o.ts}:null; }catch(e){ return null; } };
+function renderAend(){
+  const el=$('#sAend'); if(!el) return;
+  const a=E.sig_aend;
+  if(!a||!E.sig2){ el.innerHTML=''; return; }
+  const lab='Nach der Unterschrift des Auftraggebers geändert am '+tsDE(a.ts);
+  if(document.activeElement&&document.activeElement.id==='f_sa'){ const b=el.querySelector('b'); if(b) b.textContent=lab; return; }
+  el.innerHTML=`<div class="aend"><b>${esc(lab)}</b><div class="field" style="margin:0"><label for="f_sa">Was wurde geändert? (optional, erscheint im PDF unter den Unterschriften)</label><textarea class="inp" id="f_sa" rows="2" placeholder="z. B. Rechtschreibung korrigiert">${esc(a.text||'')}</textarea></div></div>`;
+  $('#f_sa').addEventListener('input',ev=>{ if(E.sig_aend){ E.sig_aend.text=ev.target.value; changed('sig_aend'); } });
+}
 function changed(field){
-  // Nach Unterschrift geändert → Unterschriften zurücksetzen
-  if(!['sig','verfasser','ag_name'].includes(field) && (E.sig1||E.sig2)){ E.sig1=null; E.sig2=null; E.sig_ts=null; drawSigs(); toast('Eintrag geändert – Unterschriften wurden zurückgesetzt'); }
+  // Nach der Unterschrift geändert: Unterschriften bleiben, die Änderung wird mit Datum vermerkt
+  // Unterschriften bleiben immer erhalten. Hat der Auftraggeber schon unterschrieben, wird die Änderung vermerkt.
+  if(!['sig','verfasser','ag_name','sig_aend'].includes(field) && E.sig2){
+    const first=!E.sig_aend; E.sig_aend={text:(E.sig_aend&&E.sig_aend.text)||'',ts:nowIso()}; renderAend();
+    if(first) toast('Unterschrift des Auftraggebers bleibt – bitte unten kurz notieren, was geändert wurde'); }
   clearTimeout(saveT); saveT=setTimeout(()=>saveEntry(E),500); setSync('','wird gespeichert …');
 }
 async function loadEntry(id){
   const local=ls.get(K.ent(id),null);
   const pending=queue().some(x=>x.kind==='entry'&&x.id===id);
   if(local&&pending) return local;
-  try{ const s=await api('bautagebuch/'+id); s.personen=JSON.parse(s.personen||'[]'); s.wetter_daten=s.wetter_daten?JSON.parse(s.wetter_daten):null; ls.set(K.ent(id),s); return s; }
+  try{ const s=await api('bautagebuch/'+id); s.personen=JSON.parse(s.personen||'[]'); s.wetter_daten=s.wetter_daten?JSON.parse(s.wetter_daten):null; s.sig_aend=parseAend(s.sig_aenderung); delete s.sig_aenderung; ls.set(K.ent(id),s); return s; }
   catch(err){ if(local) return local; throw err; }
 }
 
@@ -222,7 +259,7 @@ function renderEntry(){
 
     <div class="card"><h2>Personen auf der Baustelle</h2>
       <div class="people" id="pList"></div>
-      <p class="hint" style="margin-top:10px">Antippen zum Auswählen. Die Liste gilt für das ganze Projekt.</p>
+      <p class="hint" style="margin-top:10px">Antippen zum Auswählen, gedrückt halten zum Bearbeiten. Die Liste gilt für das ganze Projekt.</p>
     </div>
 
     <div class="card"><h2>Tätigkeiten</h2>
@@ -249,7 +286,8 @@ function renderEntry(){
           <div class="sigbar"><span id="sig2t"></span><button class="lnk" data-clr="sig2">Löschen</button></div>
         </div>
       </div>
-      <p class="hint" style="margin-top:10px">Werden Arbeitszeit, Wetter, Personen oder Tätigkeiten nach der Unterschrift geändert, werden die Unterschriften zurückgesetzt. Namen und Fotos können jederzeit ergänzt werden.</p>
+      <div id="sAend"></div>
+      <p class="hint" style="margin-top:10px">Änderungen nach der Unterschrift sind möglich, die Unterschriften bleiben erhalten. Hat der Auftraggeber schon unterschrieben, wird die Änderung mit Datum vermerkt und kann kurz begründet werden.</p>
     </div>
 
     <div class="bottombar">
@@ -426,14 +464,14 @@ function setupSigs(){
     const pt=e=>{ const r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
     c.addEventListener('pointerdown',e=>{ e.preventDefault(); c.setPointerCapture(e.pointerId); draw=true; dirty=true; last=pt(e); ctx.beginPath(); ctx.arc(last.x,last.y,1.1,0,7); ctx.fill(); });
     c.addEventListener('pointermove',e=>{ if(!draw) return; const p=pt(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; });
-    const end=()=>{ if(!draw) return; draw=false; if(dirty){ E[id]=c.toDataURL('image/png'); E.sig_ts=nowIso(); sigText(); changed('sig'); } };
+    const end=()=>{ if(!draw) return; draw=false; if(dirty){ E[id]=c.toDataURL('image/png'); E.sig_ts=nowIso(); if(id==='sig2') E.sig_aend=null; sigText(); changed('sig'); } };
     ['pointerup','pointercancel','pointerleave'].forEach(ev=>c.addEventListener(ev,end));
   });
-  document.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{ E[b.dataset.clr]=null; if(!E.sig1&&!E.sig2) E.sig_ts=null; drawSigs(); changed('sig'); });
+  document.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{ E[b.dataset.clr]=null; if(b.dataset.clr==='sig2') E.sig_aend=null; if(!E.sig1&&!E.sig2) E.sig_ts=null; drawSigs(); changed('sig'); });
   sigText();
 }
 function drawSigs(){ ['sig1','sig2'].forEach(id=>{ const c=$('#'+id); if(c){ c.getContext('2d').clearRect(0,0,c.width,c.height); c._size&&c._size(); } }); sigText(); }
-function sigText(){ ['sig1','sig2'].forEach(id=>{ const el=$('#'+id+'t'); if(el) el.textContent=E[id]?'unterschrieben '+tsDE(E.sig_ts):'Mit Finger oder Stift unterschreiben'; }); }
+function sigText(){ ['sig1','sig2'].forEach(id=>{ const el=$('#'+id+'t'); if(el) el.textContent=E[id]?'unterschrieben '+tsDE(E.sig_ts):'Mit Finger oder Stift unterschreiben'; }); renderAend(); }
 window.addEventListener('resize',()=>{ if(E) drawSigs(); });
 
 /* ================= PDF ================= */
@@ -446,7 +484,24 @@ function ready(){
 }
 const fileName=()=>('Bautagebuch_'+(PROJ?.name||'')+'_'+E.datum).replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss').replace(/[^A-Za-z0-9-]+/g,'_')+'.pdf';
 async function makePdf(){
-  const { jsPDF } = window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'}); const W=210,M=16;
+  const { jsPDF } = window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'});
+  await drawEntry(doc,E,FOTOS); pdfFooter(doc,[{from:1,datum:E.datum}]);
+  return doc.output('blob');
+}
+// Mehrere Einträge in einem PDF, jeder Tag beginnt auf einer neuen Seite
+async function makePdfMany(es){
+  const { jsPDF } = window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'}); const marks=[];
+  for(let i=0;i<es.length;i++){ if(i) doc.addPage(); marks.push({from:doc.getNumberOfPages(),datum:es[i].e.datum}); await drawEntry(doc,es[i].e,es[i].f); }
+  pdfFooter(doc,marks);
+  return doc.output('blob');
+}
+function pdfFooter(doc,marks){
+  const W=210,M=16, n=doc.getNumberOfPages();
+  for(let i=1;i<=n;i++){ doc.setPage(i); const mk=marks.filter(x=>x.from<=i).pop()||marks[0]; doc.setFontSize(7.5); doc.setTextColor(120);
+    doc.text('Bautagebuch '+(PROJ?.name||'')+' · '+dDE(mk.datum),M,290); doc.text('Seite '+i+' von '+n,W-M,290,{align:'right'}); }
+}
+async function drawEntry(doc,E,FOTOS){
+  const W=210,M=16;
   const lg=await logoData(); if(lg) doc.addImage(lg,'PNG',W-M-38,8,38,38*91.014/200);
   doc.setTextColor(47,59,83); doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.text('Bautagebuch',M,18);
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100); doc.text('Heise Haustechnik GmbH & Co. KG · Ramsenweg 2c · 38700 Braunlage',M,23);
@@ -478,33 +533,86 @@ async function makePdf(){
     });
     y+=gh+12;
   }
-  if(y>235){ doc.addPage(); y=24; }
+  if(y>(E.sig_aend?222:235)){ doc.addPage(); y=24; }
   sec('Unterschriften'); y+=4;
   const bw=(W-2*M-12)/2;
   [['sig1','Mitarbeiter Heise Haustechnik',E.verfasser],['sig2','Auftraggeber / Vertreter',E.ag_name]].forEach(([id,lab,name],i)=>{
     const x=M+i*(bw+12);
-    if(E[id]){ const ip=doc.getImageProperties(E[id]); let hh=22, ww=hh*ip.width/ip.height; if(ww>bw){ ww=bw; hh=ww*ip.height/ip.width; } doc.addImage(E[id],'PNG',x,y+24-hh,ww,hh); }
+    if(E[id]){ try{ const ip=doc.getImageProperties(E[id]); let hh=22, ww=hh*ip.width/ip.height; if(ww>bw){ ww=bw; hh=ww*ip.height/ip.width; } doc.addImage(E[id],'PNG',x,y+24-hh,ww,hh); }catch(e){ console.warn('Unterschrift',e); } }
     doc.setDrawColor(90); doc.line(x,y+25,x+bw,y+25); doc.setFontSize(8.5); doc.setFont('helvetica','normal');
     doc.text(`${lab}${name?': '+name:''}`,x,y+29); doc.setTextColor(120); doc.text(E[id]?'unterschrieben am '+tsDE(E.sig_ts):'nicht unterschrieben',x,y+33); doc.setTextColor(58,58,58);
   });
-  const n=doc.getNumberOfPages();
-  for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120); doc.text('Bautagebuch '+(PROJ?.name||'')+' · '+dDE(E.datum),M,290); doc.text('Seite '+i+' von '+n,W-M,290,{align:'right'}); }
-  return doc.output('blob');
+  if(E.sig_aend&&E.sig2){
+    const t='Nach der Unterschrift des Auftraggebers geändert am '+tsDE(E.sig_aend.ts)+(E.sig_aend.text&&E.sig_aend.text.trim()?': '+E.sig_aend.text.trim():'');
+    doc.setFontSize(8.5); doc.setTextColor(150,80,0); doc.text(doc.splitTextToSize(t,W-2*M),M,y+41); doc.setTextColor(58,58,58);
+  }
 }
 function dl(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500); }
 async function sendPdf(){
   if(!ready()) return;
-  const blob=await makePdf(), name=fileName();
   const subject=`Bautagebuch ${PROJ?.name||''} – ${dDE(E.datum)}`;
   const text=`Guten Tag,\n\nanbei das Bautagebuch vom ${dLong(E.datum)} für das Bauvorhaben ${PROJ?.name||''}.\n\nMit freundlichen Grüßen\n${E.verfasser||''}\nHeise Haustechnik GmbH & Co. KG`;
-  const file=new File([blob],name,{type:'application/pdf'});
-  if(navigator.canShare && navigator.canShare({files:[file]})){
-    try{ await navigator.share({files:[file],title:subject,text}); return; }catch(e){ if(e.name==='AbortError') return; }
-  }
-  // Fallback: PDF speichern und Mailprogramm öffnen (Anhang muss dann von Hand angefügt werden)
-  dl(blob,name);
-  toast('PDF gespeichert – bitte an die E-Mail anhängen');
-  setTimeout(()=>location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`,600);
+  sendDialog(()=>makePdf(),fileName(),subject,text);
+}
+/* Voreingestellte Empfänger des Projekts (pflegt die Bauleitung in der Projektübersicht) */
+function empfaenger(){ try{ const a=JSON.parse(PROJ?.empfaenger||'[]'); return Array.isArray(a)?a.filter(x=>x&&x.email):[]; }catch(e){ return []; } }
+const canShareFiles=()=>{ try{ return !!(navigator.canShare&&navigator.canShare({files:[new File(['x'],'x.pdf',{type:'application/pdf'})]})); }catch(e){ return false; } };
+function sendDialog(build,name,subject,text){
+  const em=empfaenger(), share=canShareFiles();
+  openSheet(`<h2>PDF senden</h2>
+    ${em.length?`<label style="font-size:13px;font-weight:700;color:var(--ink-3)">Empfänger</label>`+em.map((r,i)=>`<label class="chk"><input type="checkbox" data-em="${i}" checked><span><b>${esc(r.name||r.email)}</b><small>${esc([r.rolle,r.email].filter(Boolean).join(' · '))}</small></span></label>`).join('')
+      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Bauleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
+    <div class="field" style="margin-top:12px"><label for="em_x">Weitere Adresse (optional)</label><input class="inp" id="em_x" type="email" inputmode="email" placeholder="name@firma.de"></div>
+    <p class="hint" id="em_st">PDF wird erstellt …</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      ${share?`<button class="btn cta block" id="em_share" disabled>${IC('share')}Teilen mit PDF-Anhang</button>`:''}
+      <button class="btn ${share?'ghost':'cta'} block" id="em_mail" disabled>${IC('mail')}Im Mailprogramm öffnen</button></div>
+    <p class="hint" style="margin-top:10px">${share?'Beim Teilen werden die Empfänger in die Zwischenablage kopiert, im Mailprogramm ins Feld „An“ einfügen. ':''}„Im Mailprogramm öffnen“ trägt die Empfänger ein und speichert das PDF, das dann noch angehängt werden muss.</p>`,async()=>{
+    const to=()=>{ const a=[...document.querySelectorAll('[data-em]')].filter(c=>c.checked).map(c=>em[+c.dataset.em].email); const x=$('#em_x').value.trim(); if(x) a.push(x); return [...new Set(a)]; };
+    let blob=null;
+    try{ const r=await build(); if(r&&r.blob){ blob=r.blob; name=r.name; } else blob=r; }catch(e){ $('#em_st').textContent='PDF konnte nicht erstellt werden: '+e.message; return; }
+    if(!blob){ closeSheet(); return; }
+    $('#em_st').textContent='PDF ist fertig.';
+    const file=new File([blob],name,{type:'application/pdf'});
+    if($('#em_share')){ $('#em_share').disabled=false; $('#em_share').onclick=async()=>{
+      const a=to(); if(a.length&&navigator.clipboard) navigator.clipboard.writeText(a.join(', ')).catch(()=>{});
+      try{ await navigator.share({files:[file],title:subject,text}); closeSheet(); if(a.length) toast('Empfänger wurden kopiert'); }catch(e){ if(e.name!=='AbortError') toast('Teilen nicht möglich: '+e.message); } }; }
+    $('#em_mail').disabled=false; $('#em_mail').onclick=()=>{
+      const a=to(); dl(blob,name); closeSheet(); toast('PDF gespeichert – bitte an die E-Mail anhängen');
+      setTimeout(()=>location.href=`mailto:${a.map(encodeURIComponent).join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`,600); };
+  });
+}
+
+/* ================= Mehrere Einträge exportieren ================= */
+let SEL=null;   // Auswahlmodus: Set mit Eintrags-IDs
+async function fotosFor(id){
+  let local=[]; try{ local=await idb.byEntry(id); }catch(e){}
+  let srv=null; if(navigator.onLine){ try{ srv=await api('bautagebuch/'+id+'/fotos'); }catch(e){} }
+  const all=srv? [...srv, ...local.filter(l=>l.pending&&!srv.some(f=>f.id===l.id))].map(f=>{ const l=local.find(x=>x.id===f.id); return l&&l.pending?l:f; }) : local;
+  return all.filter(f=>!f.deleted&&f.bild).sort((a,b)=>(a.sort-b.sort)||String(a.created_at).localeCompare(String(b.created_at)));
+}
+async function loadMany(ids){
+  const es=[];
+  for(const id of ids){ const e=await loadEntry(id); e.personen=e.personen||[]; e.taetigkeit=e.taetigkeit||''; e.besonderheiten=e.besonderheiten||''; es.push({e,f:await fotosFor(id)}); }
+  return es.sort((a,b)=>a.e.datum.localeCompare(b.e.datum));
+}
+const manyName=es=>('Bautagebuch_'+(PROJ?.name||'')+'_'+es[0].e.datum+(es.length>1?'_bis_'+es[es.length-1].e.datum:'')).replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss').replace(/[^A-Za-z0-9-]+/g,'_')+'.pdf';
+function selIds(){ return LIST.filter(x=>SEL&&SEL.has(x.id)).map(x=>x.id); }
+function warnUnsigned(){ const n=LIST.filter(x=>SEL.has(x.id)&&!x.sig_ma).length; return !n||confirm(n+(n==1?' Eintrag ist':' Einträge sind')+' noch nicht vom Mitarbeiter unterschrieben. Trotzdem exportieren?'); }
+async function manyPdf(){
+  const ids=selIds(); if(!ids.length) return; if(!warnUnsigned()) return;
+  const b=$('#mPdf'); b.disabled=true; b.textContent='PDF wird erstellt …';
+  try{ const es=await loadMany(ids); dl(await makePdfMany(es),manyName(es)); toast(es.length+' Einträge exportiert'); }
+  catch(e){ toast('Export fehlgeschlagen: '+e.message); }
+  renderList();
+}
+function manySend(){
+  const ids=selIds(); if(!ids.length) return; if(!warnUnsigned()) return;
+  const sorted=LIST.filter(x=>ids.includes(x.id)).map(x=>x.datum).sort();
+  const d1=sorted[0], d2=sorted[sorted.length-1];
+  const subject=`Bautagebuch ${PROJ?.name||''} – ${dDE(d1)}${d2!==d1?' bis '+dDE(d2):''}`;
+  const text=`Guten Tag,\n\nanbei ${ids.length>1?'die Bautagebücher vom '+dDE(d1)+' bis '+dDE(d2)+' ('+ids.length+' Tage)':'das Bautagebuch vom '+dLong(d1)} für das Bauvorhaben ${PROJ?.name||''}.\n\nMit freundlichen Grüßen\n${ls.get('btb_verfasser','')}\nHeise Haustechnik GmbH & Co. KG`;
+  sendDialog(async()=>{ const es=await loadMany(ids); return {blob:await makePdfMany(es),name:manyName(es)}; },'',subject,text);
 }
 
 /* ================= Sheet ================= */

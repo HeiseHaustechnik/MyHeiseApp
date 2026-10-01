@@ -84,6 +84,9 @@ input.f[readonly]{background:var(--surface-2);color:var(--ink-2)}
 .stepper button:active{transform:scale(.96)}
 .sig{border:1.5px dashed var(--ink-3);border-radius:16px;background:var(--surface);touch-action:none;width:100%;height:170px;display:block}
 .sigbar{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px;color:var(--ink-3)}
+.aend{margin-top:12px;padding:12px 14px;border-radius:16px;background:var(--amber-bg)}
+.aend b{display:block;font-size:13.5px;color:var(--amber);margin-bottom:8px}
+.aend textarea{min-height:64px}
 .note{background:var(--amber-bg);color:var(--amber);border-radius:16px;padding:12px 14px;font-size:14px;margin:0 0 12px;font-weight:600}
 button.note{display:flex;gap:10px;align-items:center;width:100%;text-align:left;margin:6px 0 4px}
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
@@ -176,7 +179,8 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
           <div class="sigbar"><span id="sig2t">Mit Finger oder Stift unterschreiben</span><button class="btn ghost" data-clr="sig2">Löschen</button></div>
         </div>
       </div>
-      <p class="hint">Wird das Aufmaß nach der Unterschrift geändert, werden die Unterschriften automatisch zurückgesetzt.</p>
+      <div id="sigAend"></div>
+      <p class="hint">Änderungen nach der Unterschrift sind möglich, die Unterschriften bleiben erhalten. Hat der Auftraggeber schon unterschrieben, wird die Änderung mit Datum vermerkt und kann hier kurz begründet werden. Der Vermerk steht im PDF und in der Excel-Datei unter den Unterschriften.</p>
     </div>
 
     <div class="card">
@@ -239,7 +243,7 @@ const KEY = 'aufmass_'+AID;
 /* ---------- State ---------- */
 const DEF = () => ({
   head:{bv:'', bez:'', dat:'', mon:'', ag:'', bem:''},
-  entries:[], free:[], sig:{sig1:null,sig2:null,ts:null}, filter:'list', lastOrt:'', open:{}, areas:[]
+  entries:[], free:[], sig:{sig1:null,sig2:null,ts:null,aend:null}, filter:'list', lastOrt:'', open:{}, areas:[]
 });
 let S;
 S = DEF();
@@ -265,8 +269,20 @@ function save(){
   },150);
 }
 function dataChanged(){
-  if(S.sig.sig1||S.sig.sig2){ S.sig={sig1:null,sig2:null,ts:null}; toast('Aufmaß geändert – Unterschriften wurden zurückgesetzt'); drawSigs(); }
+  // Nach der Unterschrift geändert: Unterschriften bleiben, Änderung wird mit Datum vermerkt
+  // Unterschriften bleiben immer erhalten. Hat der Auftraggeber schon unterschrieben, wird die Änderung vermerkt.
+  if(S.sig.sig2){ const first=!S.sig.aend; S.sig.aend={text:(S.sig.aend&&S.sig.aend.text)||'',ts:new Date().toISOString()};
+    if(first) toast('Unterschrift des Auftraggebers bleibt – bitte kurz notieren, was geändert wurde'); }
   save(); renderAll();
+}
+function renderAend(){
+  const el=$('#sigAend'); if(!el) return;
+  const a=S.sig.aend;
+  if(!a||!S.sig.sig2){ el.innerHTML=''; return; }
+  const lab='Nach der Unterschrift des Auftraggebers geändert am '+new Date(a.ts).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'});
+  if(document.activeElement&&document.activeElement.id==='sa_t'){ const b=el.querySelector('b'); if(b) b.textContent=lab; return; }
+  el.innerHTML=`<div class="aend"><b>${esc(lab)}</b><label for="sa_t">Was wurde geändert? (optional, z. B. „Rechtschreibung korrigiert“)</label><textarea class="f" id="sa_t" placeholder="Kurzer Kommentar zur Änderung">${esc(a.text||'')}</textarea></div>`;
+  $('#sa_t').addEventListener('input',e=>{ if(S.sig.aend){ S.sig.aend.text=e.target.value; save(); } });
 }
 
 /* ---------- Helpers ---------- */
@@ -534,7 +550,7 @@ function setupSig(id){
   const pt=e=>{ const r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
   c.addEventListener('pointerdown',e=>{ e.preventDefault(); c.setPointerCapture(e.pointerId); draw=true; last=pt(e); ctx.beginPath(); ctx.arc(last.x,last.y,1.1,0,7); ctx.fill(); dirty=true; });
   c.addEventListener('pointermove',e=>{ if(!draw) return; const p=pt(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; });
-  const end=()=>{ if(!draw) return; draw=false; if(dirty){ S.sig[id]=c.toDataURL('image/png'); S.sig.ts=new Date().toISOString(); save(); sigText(); } };
+  const end=()=>{ if(!draw) return; draw=false; if(dirty){ S.sig[id]=c.toDataURL('image/png'); S.sig.ts=new Date().toISOString(); if(id==='sig2') S.sig.aend=null; save(); sigText(); } };
   c.addEventListener('pointerup',end); c.addEventListener('pointercancel',end); c.addEventListener('pointerleave',end);
 }
 function sizeSigs(){
@@ -550,9 +566,10 @@ function drawSigs(){
 }
 function sigText(){
   ['sig1','sig2'].forEach(id=>$('#'+id+'t').textContent=S.sig[id]?'✓ unterschrieben '+new Date(S.sig.ts).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'}):'Mit Finger oder Stift unterschreiben');
+  renderAend();
   $('#sigNote').innerHTML=(!S.sig.sig1||!S.sig.sig2)&&S.entries.length?'<div class="note">Vor dem Erstellen der Dateien bitte beide Unterschriften einholen (optional).</div>':'';
 }
-document.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{ S.sig[b.dataset.clr]=null; if(!S.sig.sig1&&!S.sig.sig2) S.sig.ts=null; save(); drawSigs(); });
+document.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{ S.sig[b.dataset.clr]=null; if(b.dataset.clr==='sig2') S.sig.aend=null; if(!S.sig.sig1&&!S.sig.sig2) S.sig.ts=null; save(); drawSigs(); });
 setupSig('sig1'); setupSig('sig2');
 window.addEventListener('resize',()=>{ if($('#v-end').classList.contains('on')) sizeSigs(); });
 
@@ -598,7 +615,7 @@ async function makePdf(){
     head:[['Pos.-Nr.','Bezeichnung','Menge','ME','Raum / Ort','Bemerkung']],
     columnStyles:{0:{cellWidth:22},1:{cellWidth:52},2:{halign:'right',cellWidth:16},3:{cellWidth:11},4:{cellWidth:38}},
     body,didParseCell:d=>{ if(d.section==='body' && String(d.row.raw[0]?.content||'').startsWith('Summe')) d.cell.styles.fillColor=[244,245,247]; }});
-  y=doc.lastAutoTable.finalY+10; if(y>235){doc.addPage();y=24;}
+  y=doc.lastAutoTable.finalY+10; if(y>(S.sig.aend?220:235)){doc.addPage();y=24;}
   doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.text('3. Bestätigung',M,y);
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.text('Das vorstehende Aufmaß wurde gemeinsam vor Ort festgestellt.',M,y+5);
   const bw=(W-2*M-10)/2;
@@ -609,6 +626,10 @@ async function makePdf(){
     doc.setFontSize(8); doc.text(doc.splitTextToSize(lab,bw),x,y+38);
     doc.text('Ort, Datum: Ebergötzen, '+(S.sig[id]?tsDE(S.sig.ts):'____________'),x,y+(doc.splitTextToSize(lab,bw).length*3.5)+39);
   });
+  if(S.sig.aend&&S.sig.sig2){
+    const t='Nach der Unterschrift des Auftraggebers geändert am '+tsDE(S.sig.aend.ts)+(S.sig.aend.text&&S.sig.aend.text.trim()?': '+S.sig.aend.text.trim():'');
+    doc.setFontSize(8.5); doc.setTextColor(150,80,0); doc.text(doc.splitTextToSize(t,W-2*M),M,y+52); doc.setTextColor(0);
+  }
   const n=doc.getNumberOfPages();
   for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(110);
     doc.text((S.head.bez||'Aufmaß')+' · '+dDE(S.head.dat),M,290); doc.text('Seite '+i+' von '+n,W-M,290,{align:'right'}); doc.setTextColor(0); }
@@ -656,6 +677,7 @@ async function makeXlsx(){
     const c=ws.getCell(sy+7,col+1); c.value=lab; c.border={top:{style:'thin'}}; c.font={size:9};
     ws.getCell(sy+8,col+1).value=S.sig[id]?'unterschrieben am '+tsDE(S.sig.ts):'nicht unterschrieben'; ws.getCell(sy+8,col+1).font={size:9,color:{argb:'FF666666'}};
   }
+  if(S.sig.aend&&S.sig.sig2){ const c=ws.getCell(sy+10,2); c.value='Nach der Unterschrift des Auftraggebers geändert am '+tsDE(S.sig.aend.ts)+(S.sig.aend.text&&S.sig.aend.text.trim()?': '+S.sig.aend.text.trim():''); c.font={size:9,italic:true,color:{argb:'FF965000'}}; }
 
   // Blatt 2: Einzelaufmaße
   const w2=wb.addWorksheet('Einzelaufmaße',{views:[{state:'frozen',ySplit:1}],pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0}});
@@ -703,7 +725,8 @@ function renderAll(){ renderAreas(); renderPos(); renderSum(); renderHdr(); sigT
 /* ---------- Datenbank-Abgleich ---------- */
 const eKey=e=>JSON.stringify([e.key,e.qty,e.ort||'',e.bem||'',e.rg||'',!!e.pre]);
 const fKey=f=>JSON.stringify([f.p,f.b,f.me||'',f.t||'',f.ref||'']);
-const hKey=()=>JSON.stringify([S.head.bez||'',S.head.dat||'',S.head.mon||'',S.head.ag||'',S.head.bem||'',S.sig.sig1||null,S.sig.sig2||null,S.sig.ts||null]);
+const hKey=()=>JSON.stringify([S.head.bez||'',S.head.dat||'',S.head.mon||'',S.head.ag||'',S.head.bem||'',S.sig.sig1||null,S.sig.sig2||null,S.sig.ts||null,S.sig.aend?JSON.stringify(S.sig.aend):null]);
+const parseAend=v=>{ if(!v) return null; try{ const o=JSON.parse(v); return o&&o.ts?{text:o.text||'',ts:o.ts}:null; }catch(e){ return null; } };
 const aKey=a=>JSON.stringify((a||[]).map(x=>[x.g||'',x.n]));
 const fromE=e=>({id:e.id,key:e.pos_key,qty:e.menge,ort:e.ort||'',bem:e.bemerkung||'',rg:e.rg||'',pre:!!e.pre,ts:e.created_at||e.updated_at,von:e.erfasst_von||''});
 const fromF=f=>({id:f.id,p:f.nr,b:f.bez,me:f.me||'',t:f.titel||'',ref:f.ref||''});
@@ -736,7 +759,7 @@ function applyServer(srv, keepLocal){
   LV=srv.lv.map(o=>({k:o.typ,p:o.pos,b:o.bez,m:o.menge,me:o.me,v:o.in_liste?1:0})); initLV();
   const srvE=srv.eintraege.map(fromE), srvF=srv.freipos.map(fromF);
   const k=srv.kopf;
-  const srvHead={bez:k.bez||'',dat:k.datum||'',mon:k.monteur||'',ag:k.ag||'',bem:k.bemerkung||''}, srvSig={sig1:k.sig1||null,sig2:k.sig2||null,ts:k.sig_ts||null};
+  const srvHead={bez:k.bez||'',dat:k.datum||'',mon:k.monteur||'',ag:k.ag||'',bem:k.bemerkung||''}, srvSig={sig1:k.sig1||null,sig2:k.sig2||null,ts:k.sig_ts||null,aend:parseAend(k.sig_aenderung)};
   const srvAreas=(srv.bereiche||[]).map(b=>({g:b.gruppe||'',n:b.name}));
   if(keepLocal && BASE){
     const d=diff();
@@ -753,7 +776,7 @@ function applyServer(srv, keepLocal){
   }
   S.head.bv=[PROJ.nr,PROJ.name,PROJ.adresse].filter(Boolean).join(' · ');
   BASE=baseFrom(srv);
-  BASE.h=JSON.stringify([srvHead.bez,srvHead.dat,srvHead.mon,srvHead.ag,srvHead.bem,srvSig.sig1,srvSig.sig2,srvSig.ts]);
+  BASE.h=JSON.stringify([srvHead.bez,srvHead.dat,srvHead.mon,srvHead.ag,srvHead.bem,srvSig.sig1,srvSig.sig2,srvSig.ts,srvSig.aend?JSON.stringify(srvSig.aend):null]);
   BASE.a=aKey(srvAreas);
 }
 let syncT=null, syncing=false, syncAgain=false;
@@ -765,7 +788,7 @@ async function syncNow(){
   syncing=true;
   try{
     const d=diff(), t=new Date().toISOString();
-    if(d.head) await api('aufmasse/'+AID,{method:'PUT',body:JSON.stringify({bez:S.head.bez,datum:S.head.dat,monteur:S.head.mon,ag:S.head.ag,bemerkung:S.head.bem,sig1:S.sig.sig1,sig2:S.sig.sig2,sig_ts:S.sig.ts})});
+    if(d.head) await api('aufmasse/'+AID,{method:'PUT',body:JSON.stringify({bez:S.head.bez,datum:S.head.dat,monteur:S.head.mon,ag:S.head.ag,bemerkung:S.head.bem,sig1:S.sig.sig1,sig2:S.sig.sig2,sig_ts:S.sig.ts,sig_aenderung:S.sig.aend?JSON.stringify(S.sig.aend):''})});
     if(d.areas) await api('projekte/'+PROJ.id+'/bereiche',{method:'PUT',body:JSON.stringify(S.areas.map(a=>({gruppe:a.g,name:a.n})))});
     const body={
       eintraege:[...d.e.map(e=>({id:e.id,pos_key:e.key,menge:e.qty,ort:e.ort,bemerkung:e.bem,rg:e.rg,pre:e.pre?1:0,created_at:e.ts,updated_at:t})),
