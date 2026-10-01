@@ -27,6 +27,9 @@ input[type=file].inp{padding:12px 14px}
 .emrow{display:grid;grid-template-columns:1fr 1fr 110px 40px;gap:8px;align-items:end;margin-bottom:8px}
 @media(max-width:560px){.emrow{grid-template-columns:1fr 1fr 40px}.emrow .er{grid-column:1/3}}
 .emrow .field{margin:0}
+.btn.danger{color:var(--red)}
+.btn.danger:active{background:var(--red-bg)}
+.fold-b .sep{border-top:1px solid var(--line);margin:16px 0 12px}
 </style>
 </head>
 <body>
@@ -55,7 +58,7 @@ async function showListe(){
   const h=new Date().getHours(), gruss=h<11?'Guten Morgen':h<18?'Guten Tag':'Guten Abend';
   const aktiv=list.filter(p=>p.status!=='archiv');
   // „Meine Projekte“: eigene Einstellung zuerst, sonst zugeordnet bzw. ohne Team (Bauleitung sieht standardmäßig alle)
-  const mein=p=>p.ansicht===true || (p.ansicht!==false && (PJ.leitung() || p.meins || !p.team_n));
+  const mein=p=>p.status!=='archiv' && (p.ansicht===true || (p.ansicht!==false && (PJ.leitung() || p.meins || !p.team_n)));
   let modus='meine'; try{ modus=localStorage.getItem('pj_modus')||'meine'; }catch(e){}
   const zeig=modus==='alle'? list : list.filter(mein);
   app.innerHTML=`
@@ -65,11 +68,11 @@ async function showListe(){
       <p>${plural(aktiv.length,'aktives Projekt','aktive Projekte')} · Aufmaße erfassen, prüfen und unterschreiben lassen.</p>
     </section>
     <div class="segc" style="margin:18px 0 6px"><button data-modus="meine" class="${modus==='meine'?'on':''}">Meine Projekte (${list.filter(mein).length})</button><button data-modus="alle" class="${modus==='alle'?'on':''}">Alle (${list.length})</button></div>
-    <p class="hint" style="margin:0 0 12px">Mit dem Auge blendest du ein Projekt für dich ein oder aus. Unter „Alle“ findest du jederzeit jedes Projekt.</p>
+    <p class="hint" style="margin:0 0 12px">Mit dem Auge blendest du ein Projekt für dich ein oder aus. Unter „Alle“ findest du jederzeit jedes Projekt, auch archivierte.</p>
     ${zeig.length? zeig.map(p=>`<a class="row-card${mein(p)?'':' aus'}" href="#p=${p.id}">
         <div class="mi tone-brand">${IC('building')}</div>
         <div class="mt"><b>${esc(p.name)}</b><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}</small>
-          <div class="tags"><span class="pill tone-blue">${plural(p.anz_aufmasse,'Aufmaß','Aufmaße')}</span><span class="pill tone-gray">${p.anz_lv} LV-Positionen</span>${p.meins?'<span class="pill tone-ok"><i></i>zugeordnet</span>':''}${mein(p)?'':'<span class="pill tone-gray">ausgeblendet</span>'}</div></div>
+          <div class="tags"><span class="pill tone-blue">${plural(p.anz_aufmasse,'Aufmaß','Aufmaße')}</span><span class="pill tone-gray">${p.anz_lv} LV-Positionen</span>${p.meins?'<span class="pill tone-ok"><i></i>zugeordnet</span>':''}${p.status==='archiv'?'<span class="pill tone-gray">archiviert</span>':mein(p)?'':'<span class="pill tone-gray">ausgeblendet</span>'}</div></div>
         <button class="eyebtn" data-eye="${p.id}" data-on="${mein(p)?1:0}" title="${mein(p)?'Für mich ausblenden':'Für mich einblenden'}" aria-label="${mein(p)?'Für mich ausblenden':'Für mich einblenden'}">${IC(mein(p)?'eye':'eyeoff')}</button>
         <span class="chev">${IC('chev')}</span></a>`).join('')
       : list.length? `<div class="empty">${IC('eyeoff')}<div>In deiner Ansicht sind gerade keine Projekte. Unter „Alle“ kannst du Projekte mit dem Auge einblenden.</div></div>`
@@ -125,7 +128,7 @@ async function showProjekt(id){
   const nP=d.lv.filter(o=>o.typ==='P').length, nL=d.lv.filter(o=>o.typ==='P'&&o.in_liste).length;
   const offen=am.reduce((a,x)=>a+(x.anz_ungeprueft||0),0);
   app.innerHTML=`
-    <div class="pagehead"><a class="iconbtn" href="#" aria-label="Zurück">${IC('back')}</a><div style="min-width:0"><h1>${esc(p.name)}</h1><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}</small></div></div>
+    <div class="pagehead"><a class="iconbtn" href="#" aria-label="Zurück">${IC('back')}</a><div style="min-width:0"><h1>${esc(p.name)}</h1><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}${p.status==='archiv'?' · archiviert':''}</small></div></div>
     <div class="apps">
       <button class="app" style="--g1:#4a5a7a;--g2:#2f3b53" onclick="document.getElementById('amList').scrollIntoView({behavior:'smooth'})">
         ${offen?`<span class="app-n">${offen}</span>`:''}<div class="app-ico">${IC('ruler')}</div><div><b>Aufmaß</b><span>${plural(am.length,'Aufmaß','Aufmaße')} · ${nP} LV-Positionen</span></div></button>
@@ -143,6 +146,17 @@ async function showProjekt(id){
       <div class="field"><label>Bezeichnung *</label><input class="inp" id="na_bez" placeholder="z. B. Aufmaß 2 – Trinkwasser OG"></div>
       <div class="row2"><div class="field"><label>Datum</label><input class="inp" type="date" id="na_dat" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Monteur</label><input class="inp" id="na_mon"></div></div>
       <button class="btn cta block" id="na_ok" ${nP?'':'disabled'}>Anlegen und öffnen</button>${nP?'':'<p class="hint">Zuerst das LV importieren.</p>'}</div></details>
+    <div class="sec-title nur-leitung">Projekt</div>
+    <details class="fold nur-leitung"><summary>${IC('edit')}Projektdaten bearbeiten</summary><div class="fold-b">
+      <div class="row2"><div class="field"><label>Projekt-Nr.</label><input class="inp" id="ep_nr" value="${esc(p.nr)}"></div><div class="field"><label>Name *</label><input class="inp" id="ep_name" value="${esc(p.name)}"></div></div>
+      <div class="field"><label>Adresse</label><input class="inp" id="ep_adr" value="${esc(p.adresse)}"></div>
+      <button class="btn cta block" id="ep_ok">Speichern</button>
+      <div class="sep"></div>
+      <p class="hint" style="margin-bottom:10px">${p.status==='archiv'?'Das Projekt ist archiviert. Es erscheint nicht mehr unter „Meine Projekte“, nur noch unter „Alle“.':'Abgeschlossene Projekte archivieren: Sie verschwinden aus „Meine Projekte“, alle Daten bleiben erhalten.'}</p>
+      <button class="btn ghost block" id="ep_arch">${p.status==='archiv'?'Wieder aktivieren':'Projekt archivieren'}</button>
+      <div class="sep"></div>
+      <p class="hint" style="margin-bottom:10px">${am.length||bt.length?`Das Projekt enthält ${plural(am.length,'Aufmaß','Aufmaße')} und ${plural(bt.length,'Bautagebuch-Eintrag','Bautagebuch-Einträge')}. Löschen kann es nur ein Admin, alle Daten gehen dabei endgültig verloren. Besser archivieren.`:'Das Projekt ist noch leer und kann gelöscht werden.'}</p>
+      <button class="btn ghost block danger ${am.length||bt.length?'nur-admin':''}" id="ep_del">${IC('trash','sm')}Projekt löschen</button></div></details>
     <div class="sec-title nur-leitung">Team und Empfänger</div>
     <details class="fold nur-leitung" id="teamFold"><summary>${IC('users')}Team (wer sieht das Projekt unter „Meine Projekte“)</summary><div class="fold-b" id="teamBox"><p class="hint">Lädt …</p></div></details>
     <details class="fold nur-leitung"><summary>${IC('mail')}E-Mail-Empfänger für Bautagebücher (${empfListe(p).length})</summary><div class="fold-b">
@@ -156,7 +170,7 @@ async function showProjekt(id){
   $('#na_ok').onclick=async()=>{ const bez=$('#na_bez').value.trim(); if(!bez) return toast('Bitte eine Bezeichnung eintragen');
     try{ const r=await api('projekte/'+id+'/aufmasse',{method:'POST',body:JSON.stringify({bez,datum:$('#na_dat').value,monteur:$('#na_mon').value.trim()})}); location.href='aufmass.html?id='+r.id; }catch(e){ toast(e.message); } };
   $('#lv_f').onchange=()=>lvImport(id);
-  if(PJ.leitung()){ teamSetup(id); empfSetup(id,p); }
+  if(PJ.leitung()){ teamSetup(id); empfSetup(id,p); projektSetup(id,p,am.length+bt.length>0); }
 }
 /* ---------- Team (nur Ansicht, keine Sperre) ---------- */
 function teamSetup(pid){
@@ -191,6 +205,22 @@ function empfSetup(pid,p){
     const out=L.map(r=>({name:r.name.trim(),email:r.email.trim(),rolle:r.rolle.trim()})).filter(r=>r.name||r.email);
     const bad=out.find(r=>!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email)); if(bad) return toast('Bitte eine gültige E-Mail-Adresse eintragen'+(bad.name?' ('+bad.name+')':''));
     try{ await api('projekte/'+pid,{method:'PUT',body:JSON.stringify({empfaenger:out})}); L=out; draw(); toast('Empfänger gespeichert'); }catch(e){ toast(e.message); } };
+}
+/* ---------- Projektdaten, Archiv, Löschen ---------- */
+function projektSetup(id,p,hatDaten){
+  $('#ep_ok').onclick=async()=>{ const name=$('#ep_name').value.trim(); if(!name) return toast('Bitte einen Namen eintragen');
+    try{ await api('projekte/'+id,{method:'PUT',body:JSON.stringify({nr:$('#ep_nr').value.trim(),name,adresse:$('#ep_adr').value.trim()})}); toast('Projektdaten gespeichert'); route(); }catch(e){ toast(e.message); } };
+  $('#ep_arch').onclick=async()=>{ const neu=p.status==='archiv'?'aktiv':'archiv';
+    try{ await api('projekte/'+id,{method:'PUT',body:JSON.stringify({status:neu})}); toast(neu==='archiv'?'Projekt archiviert':'Projekt wieder aktiv'); route(); }catch(e){ toast(e.message); } };
+  $('#ep_del').onclick=async()=>{
+    let body={};
+    if(hatDaten){
+      const ein=prompt(`Achtung: Alle Aufmaße, Bautagebuch-Einträge, Fotos und das LV von „${p.name}“ werden endgültig gelöscht.\n\nZur Bestätigung den Projektnamen genau eintragen:`);
+      if(ein===null) return;
+      if(ein.trim()!==p.name) return toast('Der Name stimmt nicht, nichts gelöscht');
+      body={bestaetigung:p.name};
+    } else if(!confirm(`Projekt „${p.name}“ löschen?`)) return;
+    try{ await api('projekte/'+id,{method:'DELETE',body:JSON.stringify(body)}); toast('Projekt gelöscht'); location.hash=''; }catch(e){ toast(e.message); } };
 }
 async function delAufmass(id,bez){
   if(!confirm(`Aufmaß „${bez}“ mit allen Einträgen endgültig löschen?`)) return;
