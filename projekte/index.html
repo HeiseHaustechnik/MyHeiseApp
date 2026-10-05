@@ -165,8 +165,8 @@ async function showProjekt(id){
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn ghost sm" id="emAdd">${IC('plus','sm')}Empfänger hinzufügen</button><button class="btn cta sm" id="emSave">Speichern</button></div></div></details>
     <div class="sec-title nur-leitung">Leistungsverzeichnis</div>
     <details class="fold nur-leitung"><summary>${IC('sheet')}${nP? `${nP} Positionen · ${nL} in der Aufmaß-Liste` : 'Noch kein LV importiert'}</summary><div class="fold-b">
-      <p class="hint" style="margin-bottom:10px">LV aus der Kalkulations-Excel oder dem Addison-Export importieren (.xlsx oder .xls)${nP?', ersetzt das bestehende':''}. Erwartet die Spalten Typ (Los / Titel / Text-Pos. / Position), Pos.-Nr., Bezeichnung, Menge, ME. Ausgeblendete Zeilen landen im „Gesamten LV“, sichtbare in der „Aufmaß-Liste“. Eine Spalte „Zeit“ (Minuten je Einheit) wird als Soll-Zeit für das Team übernommen, Preise nicht.</p>
-      <div class="field"><input type="file" class="inp" id="lv_f" accept=".xlsx,.xls"></div><div id="lv_sheet" class="field"></div><div id="lv_msg"></div></div></details>`;
+      <p class="hint" style="margin-bottom:10px">LV aus der Kalkulations-Excel, dem Addison-Export (.xlsx, .xls) oder dem pds-Export „pds XML ohne Anhang“ (.xml) importieren${nP?', ersetzt das bestehende':''}. Erwartet die Spalten Typ (Los / Titel / Text-Pos. / Position), Pos.-Nr., Bezeichnung, Menge, ME. Ausgeblendete Zeilen landen im „Gesamten LV“, sichtbare in der „Aufmaß-Liste“. Eine Spalte „Zeit“ (Minuten je Einheit) wird als Soll-Zeit für das Team übernommen, Preise nicht.</p>
+      <div class="field"><input type="file" class="inp" id="lv_f" accept=".xlsx,.xls,.xml"></div><div id="lv_sheet" class="field"></div><div id="lv_msg"></div></div></details>`;
   $('#na_ok').onclick=async()=>{ const bez=$('#na_bez').value.trim(); if(!bez) return toast('Bitte eine Bezeichnung eintragen');
     try{ const r=await api('projekte/'+id+'/aufmasse',{method:'POST',body:JSON.stringify({bez,datum:$('#na_dat').value,monteur:$('#na_mon').value.trim()})}); location.href='aufmass.html?id='+r.id; }catch(e){ toast(e.message); } };
   $('#lv_f').onchange=()=>lvImport(id);
@@ -245,24 +245,53 @@ async function readSheets(f){
     for(let r=R.s.r;r<=R.e.r;r++){ const v=[''], t=['']; for(let c=0;c<=R.e.c;c++){ const cell=ws[XLSX.utils.encode_cell({r,c})]; v.push(cell?cell.v:''); t.push(cell?String(cell.w!=null?cell.w:cell.v):''); } out.push({v,t,hidden:!!(meta[r]&&meta[r].hidden)}); }
     return out; }}));
 }
+/* pds-Export „pds XML (XML ohne Anhang)“: Export > Auftrag (o. ä.) > EbenenListe > Ebene (Los) > Ebene (Titel) > PositionenListe > Position.
+   Positionen vom Typ TEXT (ohne Nummer) werden zu Zwischenüberschriften. Lohnzeit steht je Einheit in Sekunden
+   (geprüft an FTZ: 3000 = 50 min laut Kalkulation) und wird in Minuten übernommen. Preise werden ignoriert.
+   Alle Positionen kommen in die Aufmaß-Liste, weil pds keine ausgeblendeten Zeilen kennt. */
+function parsePdsXml(txt){
+  const doc=new DOMParser().parseFromString(txt,'application/xml');
+  if(doc.getElementsByTagName('parsererror').length) throw new Error('Die XML-Datei ist nicht lesbar');
+  const kids=(e,n)=>e?[...e.children].filter(c=>c.localName===n):[], kid=(e,n)=>kids(e,n)[0], tx=(e,n)=>{ const c=kid(e,n); return c?c.textContent.trim():''; };
+  const root=doc.documentElement, vorgang=[...root.children].find(c=>kid(c,'EbenenListe'));
+  if(!vorgang) throw new Error('Keine pds-Vorgangsdatei: „EbenenListe“ nicht gefunden. Bitte in pds „Export pds XML (XML ohne Anhang)“ verwenden.');
+  const out=[];
+  const posListe=e=>{ for(const P of kids(kid(e,'PositionenListe'),'Position')){
+      const nr=tx(P,'Nummer'), kurz=tx(P,'Kurztext').split(/\r?\n/)[0].trim();
+      if(tx(P,'Typ')==='TEXT' || !nr){ if(kurz) out.push({typ:'X',bez:kurz.length>70? kurz.slice(0,67).replace(/\s+\S*$/,'')+' …' : kurz}); continue; }
+      let me=tx(P,'Masseinheit'); if(/^st/i.test(me)) me='Stck'; if(me==='M') me='m';
+      const lz=parseFloat(tx(P,'Lohnzeit'))||0, z=Math.round(lz/60*100)/100;
+      out.push({typ:'P',pos:nr,bez:kurz||tx(P,'Name'),menge:parseFloat(tx(P,'Menge'))||0,me,in_liste:1,zeit:z>0?z:null}); } };
+  const ebene=(E,prefix)=>{
+    const nr=[prefix,tx(E,'Nummer')].filter(Boolean).join('.'), bez=tx(E,'Bezeichnung').split(/\r?\n/)[0].trim(), unter=kids(E,'Ebene');
+    if(unter.length){ out.push({typ:'L',pos:nr,bez}); unter.forEach(u=>ebene(u,nr)); if(kids(kid(E,'PositionenListe'),'Position').length){ out.push({typ:'T',pos:nr,bez:bez+' (weitere Positionen)'}); posListe(E); } }
+    else { out.push({typ:'T',pos:nr,bez}); posListe(E); }
+  };
+  kids(kid(vorgang,'EbenenListe'),'Ebene').forEach(E=>ebene(E,''));
+  if(!out.some(o=>o.typ==='P')) throw new Error('Keine Positionen in der pds-Datei gefunden');
+  return {lv:out, info:{nr:tx(vorgang,'Nummer'), bez:tx(vorgang,'Bezeichnung')}};
+}
 async function lvImport(pid){
   const f=$('#lv_f').files[0]; if(!f) return;
   $('#lv_msg').innerHTML='<p class="hint">Lese Datei …</p>';
   try{
-    if(!/\.(xlsx|xls)$/i.test(f.name)) throw new Error('Bitte eine Excel-Datei wählen (.xlsx oder .xls)');
+    if(!/\.(xlsx|xls|xml)$/i.test(f.name)) throw new Error('Bitte eine Excel-Datei (.xlsx, .xls) oder einen pds-Export (.xml) wählen');
+    if(/\.xml$/i.test(f.name)){ const {lv,info}=parsePdsXml(await f.text()); $('#lv_sheet').innerHTML=''; zeigLV(pid,lv,`pds-Vorgang ${info.nr} ${info.bez}`.trim()); return; }
     const sheets=await readSheets(f), names=sheets.map(w=>w.name);
     $('#lv_sheet').innerHTML=`<label>Blatt</label><select class="inp" id="lv_ws">${names.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`;
-    const upd=()=>{ try{ const r=parseLV(sheets.find(w=>w.name===$('#lv_ws').value).rows()); window._lv=r;
-        const P=r.filter(o=>o.typ==='P'), mitZeit=P.filter(o=>o.zeit>0), h=P.reduce((a,o)=>a+(o.zeit||0)*(o.menge||0),0)/60;
-        $('#lv_msg').innerHTML=`<p>${P.length} Positionen erkannt, davon ${P.filter(o=>o.in_liste).length} sichtbar (Aufmaß-Liste), ${r.filter(o=>o.typ==='T').length} Titel.</p>
-          <p class="hint" style="margin-top:4px">${mitZeit.length?`Zeiten übernommen: ${mitZeit.length} Positionen, zusammen ${h.toLocaleString('de-DE',{maximumFractionDigits:1})} h. Sie sind nur im Aufmaß für das Team sichtbar, nicht im PDF und nicht bei der Unterschrift.`:'Keine Zeit-Spalte gefunden, das LV wird ohne Zeiten übernommen.'} Preise werden nicht übernommen.</p>
-          <button class="btn cta block" id="lv_ok" style="margin-top:10px">LV übernehmen</button>`;
-        $('#lv_ok').onclick=async()=>{ $('#lv_ok').disabled=true; try{ await api('projekte/'+pid+'/lv',{method:'PUT',body:JSON.stringify(window._lv)}); route(); }catch(e){ alert(e.message); $('#lv_ok').disabled=false; } };
-      }catch(e){ $('#lv_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; } };
+    const upd=()=>{ try{ zeigLV(pid,parseLV(sheets.find(w=>w.name===$('#lv_ws').value).rows()),''); }catch(e){ $('#lv_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; } };
     $('#lv_ws').onchange=upd;
     let pref=names.findIndex(n=>/aufma/i.test(n)); if(pref<0) pref=0; $('#lv_ws').selectedIndex=pref;
     upd();
   }catch(e){ $('#lv_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; }
+}
+function zeigLV(pid,r,quelle){
+        window._lv=r;
+        const P=r.filter(o=>o.typ==='P'), mitZeit=P.filter(o=>o.zeit>0), h=P.reduce((a,o)=>a+(o.zeit||0)*(o.menge||0),0)/60;
+        $('#lv_msg').innerHTML=`${quelle?`<p class="hint" style="margin-bottom:4px">${esc(quelle)}</p>`:''}<p>${P.length} Positionen erkannt, davon ${P.filter(o=>o.in_liste).length} sichtbar (Aufmaß-Liste), ${r.filter(o=>o.typ==='L').length?r.filter(o=>o.typ==='L').length+' Lose, ':''}${r.filter(o=>o.typ==='T').length} Titel.</p>
+          <p class="hint" style="margin-top:4px">${mitZeit.length?`Zeiten übernommen: ${mitZeit.length} Positionen, zusammen ${h.toLocaleString('de-DE',{maximumFractionDigits:1})} h. Sie sind nur im Aufmaß für das Team sichtbar, nicht im PDF und nicht bei der Unterschrift.`:'Keine Zeit-Spalte gefunden, das LV wird ohne Zeiten übernommen.'} Preise werden nicht übernommen.</p>
+          <button class="btn cta block" id="lv_ok" style="margin-top:10px">LV übernehmen</button>`;
+        $('#lv_ok').onclick=async()=>{ $('#lv_ok').disabled=true; try{ await api('projekte/'+pid+'/lv',{method:'PUT',body:JSON.stringify(window._lv)}); route(); }catch(e){ alert(e.message); $('#lv_ok').disabled=false; } };
 }
 /* Spalten über die Kopfzeile finden: Typ (Spalte A), Pos.-Nr., Bezeichnung, Menge, ME,
    dazu die Zeit je Einheit: „Zeit in min pro Stück“ (pds/Kalkulation), „Zeit“ (Addison, Minuten)
