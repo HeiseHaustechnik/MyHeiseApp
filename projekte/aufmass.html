@@ -34,6 +34,14 @@ main{max-width:900px;margin:0 auto;padding:4px 16px calc(110px + var(--safe-b))}
 .grp .gc{display:block;font-size:12.5px;color:var(--ink-3);font-weight:600;margin-top:3px}
 .grp .gc b{color:var(--ok)}
 .sgrp{margin:12px 8px 6px;font-size:12.5px;color:var(--ink-3);font-weight:680}
+button.sgrp{display:flex;align-items:center;gap:8px;width:calc(100% - 8px);text-align:left;margin:12px 4px 6px;padding:6px 6px;border-radius:12px}
+button.sgrp:active{background:var(--surface-2)}
+button.sgrp .arr{display:grid;place-items:center;width:20px;height:20px;border-radius:7px;background:var(--surface-2);transition:transform .2s;flex:0 0 auto}
+button.sgrp.open .arr{transform:rotate(90deg)}
+button.sgrp .arr .ic{width:12px;height:12px}
+button.sgrp .st{flex:1;min-width:0;overflow-wrap:anywhere}
+button.sgrp .sc{font-weight:600;white-space:nowrap}
+.gz{color:var(--blue)}
 .pos{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:16px;padding:12px 14px;margin:6px 0;cursor:pointer;box-shadow:inset 0 0 0 1.5px var(--line);transition:transform .12s}
 .pos:active{transform:scale(.99);background:var(--surface-2)}
 .pos .l{flex:1;min-width:0}
@@ -275,13 +283,17 @@ const fmtH=h=>(Math.round(h*10)/10).toLocaleString('de-DE',{maximumFractionDigit
 const zeitAktiv=()=>ZEIT_ON && document.getElementById('v-pos').classList.contains('on');
 function sollText(p){ return p&&p.z>0? `Soll ${fmtMin(p.z)}/${esc(p.me)} · ${fmtH(p.z*(p.m||0)/60)}` : ''; }
 function setZeit(on){ ZEIT_ON=on; try{ localStorage.setItem('pj_zeiten',on?'1':'0'); }catch(e){} renderPos(); }
+let VIEWZ=null; // Soll-Stunden der aktuellen Ansicht (null = gesamtes LV)
+const VIEWNAME={list:'Aufmaß-Liste',done:'Erfasste Positionen',pre:'Vorgeschlagene Positionen'};
 function renderZeitBox(){
   const el=$('#zeitBox'); if(!el) return;
   if(!hatZeiten()){ el.innerHTML=''; return; }
   if(!ZEIT_ON){ el.innerHTML=`<div class="zeitaus"><button onclick="setZeit(true)">Soll-Zeiten einblenden</button></div>`; return; }
   const P=LV.filter(o=>o.k==='P'&&o.z>0);
   const soll=P.reduce((a,o)=>a+o.z*(o.m||0),0)/60, ist=P.reduce((a,o)=>a+o.z*sumOf(o.p),0)/60;
-  el.innerHTML=`<div class="zeitbox"><div class="zt">Zeitbudget laut Kalkulation <b>${fmtH(soll)}</b><small>Erfasste Mengen entsprechen ${fmtH(ist)} · nur für das Team, nicht im PDF</small></div><button onclick="setZeit(false)">Ausblenden</button></div>`;
+  const qa=($('#q')&&$('#q').value.trim())? 'Suchergebnis' : VIEWNAME[S.filter];
+  const ansicht = VIEWZ!==null && qa ? `<div style="margin-top:3px">${esc(qa)}: <b>${fmtH(VIEWZ)}</b></div>` : '';
+  el.innerHTML=`<div class="zeitbox"><div class="zt">Zeitbudget laut Kalkulation <b>${fmtH(soll)}</b>${ansicht}<small>Erfasste Mengen entsprechen ${fmtH(ist)} · nur für das Team, nicht im PDF</small></div><button onclick="setZeit(false)">Ausblenden</button></div>`;
 }
 function titelOf(key){ const p=posOf(key); return p&&p.t&&TIT[p.t]? p.t+' '+TIT[p.t] : ''; }
 function posOf(key){ return POS[key] || S.free.find(f=>f.p===key); }
@@ -370,15 +382,24 @@ function renderPos(){
     return true;
   };
   // Gruppen je Titel aufbauen
-  const groups=[]; let g=null, los=null;
+  // Untergruppen = Text-Positionen innerhalb eines Titels. Soll-Stunden je Los, Titel und Untergruppe:
+  // unter „Gesamtes LV“ über alle Positionen, sonst nur über die Positionen der aktuellen Ansicht
+  // (Aufmaß-Liste, Erfasste, Vorschläge), jeweils mit der LV-Menge.
+  const groups=[]; let g=null, los=null, curLos=null; const losZ=new Map(), losZs=new Map();
   for(const o of LV){
-    if(o.k==='L'){ los=o; continue; }
-    if(o.k==='T'){ g={t:o,los,items:[],n:0,d:0}; groups.push(g); los=null; continue; }
+    if(o.k==='L'){ los=o; curLos=o; losZ.set(o,0); losZs.set(o,0); continue; }
+    if(o.k==='T'){ g={t:o,los,losRef:curLos,subs:[{x:null,ps:[],z:0,zs:0,k:''}],n:0,d:0,z:0,zs:0}; groups.push(g); los=null; continue; }
     if(!g) continue;
-    if(o.k==='X'){ g.items.push({x:o}); continue; }
+    if(o.k==='X'){ g.subs.push({x:o,ps:[],z:0,zs:0,k:g.t.p+'#'+g.subs.length}); continue; }
+    const zh=o.z>0? o.z*(o.m||0)/60 : 0, sub=g.subs[g.subs.length-1];
+    g.z+=zh; sub.z+=zh; if(g.losRef) losZ.set(g.losRef,(losZ.get(g.losRef)||0)+zh);
     if(!show(o)) continue;
-    g.items.push({p:o}); g.n++; if(done.has(o.p)) g.d++;
+    sub.ps.push(o); g.n++; if(done.has(o.p)) g.d++;
+    g.zs+=zh; sub.zs+=zh; if(g.losRef) losZs.set(g.losRef,(losZs.get(g.losRef)||0)+zh);
   }
+  const gesamt = S.filter==='all' && !q;
+  const zOn=ZEIT_ON && hatZeiten(), zTxt=h=> zOn&&h>0? ` · <span class="gz">Soll ${fmtH(h)}</span>` : '';
+  const zG=x=> gesamt? x.z : x.zs, zL=l=> gesamt? losZ.get(l) : losZs.get(l);
   const preK=new Set(S.entries.filter(e=>e.pre).map(e=>e.key));
   const showF=f=>(!q||match(f)) && (S.filter!=='done'||done.has(f.p)) && (S.filter!=='pre'||preK.has(f.p));
   groups.forEach(G=>{ G.fr=S.free.filter(f=>f.t===G.t.p && showF(f)); G.n+=G.fr.length; G.d+=G.fr.filter(f=>done.has(f.p)).length; });
@@ -388,20 +409,23 @@ function renderPos(){
   $('#grpTools').innerHTML = q? '' : `<button class="lnk" onclick="toggleAll(true)">Alle auf</button><button class="lnk" onclick="toggleAll(false)">Alle zu</button>`;
   for(const G of groups){
     if(!G.n) continue;
-    if(G.los) html+=`<div class="los">Los ${esc(G.los.p)} · ${esc(G.los.b)}</div>`;
+    if(G.los) html+=`<div class="los">Los ${esc(G.los.p)} · ${esc(G.los.b)}${zTxt(zL(G.los))}</div>`;
     const open = q ? true : (O[G.t.p]!==undefined ? O[G.t.p] : defOpen);
-    html+=`<button class="grp${open?' open':''}" data-t="${esc(G.t.p)}"><span class="arr">${IC('chev')}</span><span class="n">${esc(G.t.p)}</span><span class="tt">${esc(G.t.b)}<span class="gc">${G.n} Positionen${G.d?` · <b>${G.d} erfasst</b>`:''}</span></span></button>`;
+    html+=`<button class="grp${open?' open':''}" data-t="${esc(G.t.p)}"><span class="arr">${IC('chev')}</span><span class="n">${esc(G.t.p)}</span><span class="tt">${esc(G.t.b)}<span class="gc">${G.n} Positionen${G.d?` · <b>${G.d} erfasst</b>`:''}${zTxt(zG(G))}</span></span></button>`;
     if(open){
-      let pendX=null;
-      for(const it of G.items){
-        if(it.x){ pendX=it.x; continue; }
-        if(pendX){ html+=`<div class="sgrp">${esc(pendX.b)}</div>`; pendX=null; }
-        html+=posRow(it.p,false);
+      for(const sub of G.subs){
+        if(!sub.ps.length) continue;
+        if(!sub.x){ html+=sub.ps.map(p=>posRow(p,false)).join(''); continue; }
+        const so = q ? true : (O['s:'+sub.k]!==undefined ? O['s:'+sub.k] : true);
+        html+=`<button class="sgrp${so?' open':''}" data-s="${esc(sub.k)}"><span class="arr">${IC('chev')}</span><span class="st">${esc(sub.x.b)}</span><span class="sc">${sub.ps.length}${zTxt(zG(sub))}</span></button>`;
+        if(so) html+=sub.ps.map(p=>posRow(p,false)).join('');
       }
       if(G.fr.length) html+=`<div class="sgrp">Freie Positionen in diesem Titel</div>`+G.fr.map(f=>posRow(f,true)).join('');
     }
     n+=G.n;
   }
+  VIEWZ = gesamt? null : groups.reduce((a,G)=>a+G.zs,0);
+  renderZeitBox();
   const fr=S.free.filter(f=>!(f.t&&TIT[f.t]) && showF(f));
   if(fr.length){
     html+=`<div class="los">Freie Positionen ohne Zuordnung</div>`+fr.map(f=>posRow(f,true)).join('');
@@ -411,7 +435,10 @@ function renderPos(){
   if(q && S.filter==='list') html=`<div class="hint" style="margin:0 0 6px">Suche läuft über das gesamte LV.</div>`+html;
   $('#posList').innerHTML=html;
 }
-function toggleAll(v){ const O=S.open[S.filter]||(S.open[S.filter]={}); LV.forEach(o=>{ if(o.k==='T') O[o.p]=v; }); save(); renderPos(); }
+function toggleAll(v){ const O=S.open[S.filter]||(S.open[S.filter]={}); let t=null,i=0;
+  LV.forEach(o=>{ if(o.k==='T'){ O[o.p]=v; t=o.p; i=0; } else if(o.k==='X'&&t){ i++; O['s:'+t+'#'+i]=v; } }); save(); renderPos(); }
+$('#posList').addEventListener('click',e=>{ const b=e.target.closest('.sgrp[data-s]'); if(!b) return;
+  const O=S.open[S.filter]||(S.open[S.filter]={}); O['s:'+b.dataset.s]=!b.classList.contains('open'); save(); renderPos(); });
 $('#posList').addEventListener('click',e=>{ const t=e.target.closest('.grp[data-t]'); if(!t) return;
   const O=S.open[S.filter]||(S.open[S.filter]={}); O[t.dataset.t]=!t.classList.contains('open'); save(); renderPos(); });
 $('#posList').addEventListener('click',e=>{ const r=e.target.closest('.pos'); if(r) openPos(r.dataset.k); });

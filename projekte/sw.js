@@ -1,6 +1,6 @@
 // Service Worker: hält App und Bibliotheken für den Offline-Betrieb auf der Baustelle vor.
 // Gilt nur für den Ordner /projekte/. Daten (Supabase) werden NICHT hier gecacht, sondern von der App selbst lokal gespeichert.
-const CACHE = 'heise-projekte-v4';
+const CACHE = 'heise-projekte-v6';
 const LIBS = ['lib/exceljs.min.js', 'lib/jspdf.umd.min.js', 'lib/jspdf.plugin.autotable.min.js', 'lib/heise-logo.svg', 'lib/heise-logo.png', 'lib/montserrat.woff2', 'lib/heise-ui.css', 'lib/heise-icons.js', 'lib/pj-api.js'];
 
 self.addEventListener('install', e => {
