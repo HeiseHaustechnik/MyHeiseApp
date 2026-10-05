@@ -165,8 +165,8 @@ async function showProjekt(id){
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn ghost sm" id="emAdd">${IC('plus','sm')}Empfänger hinzufügen</button><button class="btn cta sm" id="emSave">Speichern</button></div></div></details>
     <div class="sec-title nur-leitung">Leistungsverzeichnis</div>
     <details class="fold nur-leitung"><summary>${IC('sheet')}${nP? `${nP} Positionen · ${nL} in der Aufmaß-Liste` : 'Noch kein LV importiert'}</summary><div class="fold-b">
-      <p class="hint" style="margin-bottom:10px">LV aus der Kalkulations-Excel importieren${nP?' (ersetzt das bestehende)':''}. Erwartet die Spalten Typ (Los / Titel / Text-Pos. / Position), Pos.-Nr., Bezeichnung, Menge, ME. Ausgeblendete Zeilen landen im „Gesamten LV“, sichtbare in der „Aufmaß-Liste“.</p>
-      <div class="field"><input type="file" class="inp" id="lv_f" accept=".xlsx"></div><div id="lv_sheet" class="field"></div><div id="lv_msg"></div></div></details>`;
+      <p class="hint" style="margin-bottom:10px">LV aus der Kalkulations-Excel oder dem Addison-Export importieren (.xlsx oder .xls)${nP?', ersetzt das bestehende':''}. Erwartet die Spalten Typ (Los / Titel / Text-Pos. / Position), Pos.-Nr., Bezeichnung, Menge, ME. Ausgeblendete Zeilen landen im „Gesamten LV“, sichtbare in der „Aufmaß-Liste“. Eine Spalte „Zeit“ (Minuten je Einheit) wird als Soll-Zeit für das Team übernommen, Preise nicht.</p>
+      <div class="field"><input type="file" class="inp" id="lv_f" accept=".xlsx,.xls"></div><div id="lv_sheet" class="field"></div><div id="lv_msg"></div></div></details>`;
   $('#na_ok').onclick=async()=>{ const bez=$('#na_bez').value.trim(); if(!bez) return toast('Bitte eine Bezeichnung eintragen');
     try{ const r=await api('projekte/'+id+'/aufmasse',{method:'POST',body:JSON.stringify({bez,datum:$('#na_dat').value,monteur:$('#na_mon').value.trim()})}); location.href='aufmass.html?id='+r.id; }catch(e){ toast(e.message); } };
   $('#lv_f').onchange=()=>lvImport(id);
@@ -228,43 +228,69 @@ async function delAufmass(id,bez){
 }
 
 /* ---------- LV-Import aus Excel ---------- */
-function loadExcelJS(){ return window.ExcelJS? Promise.resolve() : new Promise((ok,err)=>{ const s=document.createElement('script'); s.src='lib/exceljs.min.js'; s.onload=ok; s.onerror=()=>err(new Error('ExcelJS konnte nicht geladen werden')); document.head.appendChild(s); }); }
+function loadScript(src,test,name){ return test()? Promise.resolve() : new Promise((ok,err)=>{ const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>err(new Error(name+' konnte nicht geladen werden')); document.head.appendChild(s); }); }
+const loadExcelJS=()=>loadScript('lib/exceljs.min.js',()=>window.ExcelJS,'ExcelJS');
+const loadSheetJS=()=>loadScript('lib/xlsx.core.min.js',()=>window.XLSX,'SheetJS');
 const cellVal=v=>{ if(v==null) return ''; if(typeof v==='object'){ if('result' in v) return v.result??''; if(v.richText) return v.richText.map(t=>t.text).join(''); if(v.text) return v.text; } return v; };
+/* Liest .xlsx (ExcelJS) und alte .xls-Exporte, z. B. aus Addison (SheetJS).
+   Ergebnis je Blatt: Zeilen {v:[Rohwerte], t:[Text], hidden} mit Spalten ab Index 1 wie in Excel. */
+async function readSheets(f){
+  const buf=await f.arrayBuffer();
+  if(/\.xlsx$/i.test(f.name)){
+    await loadExcelJS(); const wb=new ExcelJS.Workbook(); await wb.xlsx.load(buf);
+    return wb.worksheets.map(ws=>({name:ws.name,rows:()=>{ const out=[]; for(let r=1;r<=ws.rowCount;r++){ const row=ws.getRow(r), v=[''], t=['']; for(let c=1;c<=Math.max(ws.columnCount,row.cellCount);c++){ const cell=row.getCell(c); const x=cellVal(cell.value); v.push(x); let tx=''; try{ tx=cell.text; }catch(e){} t.push(String(tx||x||'')); } out.push({v,t,hidden:!!row.hidden}); } return out; }}));
+  }
+  await loadSheetJS(); const wb=XLSX.read(new Uint8Array(buf),{type:'array',cellStyles:true});
+  return wb.SheetNames.map(n=>({name:n,rows:()=>{ const ws=wb.Sheets[n]; if(!ws['!ref']) return []; const R=XLSX.utils.decode_range(ws['!ref']), meta=ws['!rows']||[], out=[];
+    for(let r=R.s.r;r<=R.e.r;r++){ const v=[''], t=['']; for(let c=0;c<=R.e.c;c++){ const cell=ws[XLSX.utils.encode_cell({r,c})]; v.push(cell?cell.v:''); t.push(cell?String(cell.w!=null?cell.w:cell.v):''); } out.push({v,t,hidden:!!(meta[r]&&meta[r].hidden)}); }
+    return out; }}));
+}
 async function lvImport(pid){
   const f=$('#lv_f').files[0]; if(!f) return;
   $('#lv_msg').innerHTML='<p class="hint">Lese Datei …</p>';
   try{
-    await loadExcelJS();
-    const wb=new ExcelJS.Workbook(); await wb.xlsx.load(await f.arrayBuffer());
-    const names=wb.worksheets.map(w=>w.name);
+    if(!/\.(xlsx|xls)$/i.test(f.name)) throw new Error('Bitte eine Excel-Datei wählen (.xlsx oder .xls)');
+    const sheets=await readSheets(f), names=sheets.map(w=>w.name);
     $('#lv_sheet').innerHTML=`<label>Blatt</label><select class="inp" id="lv_ws">${names.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`;
-    const upd=()=>{ try{ const r=parseLV(wb.getWorksheet($('#lv_ws').value)); window._lv=r;
-        $('#lv_msg').innerHTML=`<p>${r.filter(o=>o.typ==='P').length} Positionen erkannt, davon ${r.filter(o=>o.typ==='P'&&o.in_liste).length} sichtbar (Aufmaß-Liste), ${r.filter(o=>o.typ==='T').length} Titel.</p><button class="btn cta block" id="lv_ok">LV übernehmen</button>`;
+    const upd=()=>{ try{ const r=parseLV(sheets.find(w=>w.name===$('#lv_ws').value).rows()); window._lv=r;
+        const P=r.filter(o=>o.typ==='P'), mitZeit=P.filter(o=>o.zeit>0), h=P.reduce((a,o)=>a+(o.zeit||0)*(o.menge||0),0)/60;
+        $('#lv_msg').innerHTML=`<p>${P.length} Positionen erkannt, davon ${P.filter(o=>o.in_liste).length} sichtbar (Aufmaß-Liste), ${r.filter(o=>o.typ==='T').length} Titel.</p>
+          <p class="hint" style="margin-top:4px">${mitZeit.length?`Zeiten übernommen: ${mitZeit.length} Positionen, zusammen ${h.toLocaleString('de-DE',{maximumFractionDigits:1})} h. Sie sind nur im Aufmaß für das Team sichtbar, nicht im PDF und nicht bei der Unterschrift.`:'Keine Zeit-Spalte gefunden, das LV wird ohne Zeiten übernommen.'} Preise werden nicht übernommen.</p>
+          <button class="btn cta block" id="lv_ok" style="margin-top:10px">LV übernehmen</button>`;
         $('#lv_ok').onclick=async()=>{ $('#lv_ok').disabled=true; try{ await api('projekte/'+pid+'/lv',{method:'PUT',body:JSON.stringify(window._lv)}); route(); }catch(e){ alert(e.message); $('#lv_ok').disabled=false; } };
       }catch(e){ $('#lv_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; } };
     $('#lv_ws').onchange=upd;
-    const pref=names.findIndex(n=>/aufma/i.test(n)); if(pref>=0) $('#lv_ws').selectedIndex=pref;
+    let pref=names.findIndex(n=>/aufma/i.test(n)); if(pref<0) pref=0; $('#lv_ws').selectedIndex=pref;
     upd();
   }catch(e){ $('#lv_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; }
 }
-function parseLV(ws){
-  // Kopfzeile suchen
-  let hr=0, col={};
-  for(let r=1;r<=Math.min(20,ws.rowCount);r++){
-    const vals=Array.from(ws.getRow(r).values||[],v=>String(cellVal(v)).trim().toLowerCase());
+/* Spalten über die Kopfzeile finden: Typ (Spalte A), Pos.-Nr., Bezeichnung, Menge, ME,
+   dazu die Zeit je Einheit: „Zeit in min pro Stück“ (pds/Kalkulation), „Zeit“ (Addison, Minuten)
+   oder „Zeit in h pro Stück“ (wird in Minuten umgerechnet). Preise werden ignoriert. */
+function parseLV(rows){
+  let hr=-1, col={};
+  for(let r=0;r<Math.min(20,rows.length);r++){
+    const vals=rows[r].t.map(v=>String(v).trim().toLowerCase());
     const pi=vals.findIndex(v=>v.startsWith('pos')), bi=vals.findIndex(v=>v.startsWith('bezeichnung'));
-    if(pi>0&&bi>0){ hr=r; col={pos:pi,bez:bi,menge:vals.findIndex(v=>v==='menge'),me:vals.findIndex(v=>v==='me'),typ:1}; break; }
+    if(pi>0&&bi>0){
+      const jeEinheit=v=>/^zeit/.test(v) && /\b(pro|je)\b/.test(v) && !/gesamt/.test(v);
+      let zi=vals.findIndex(v=>jeEinheit(v) && /\bmin\b/.test(v)), zf=1;
+      if(zi<0) zi=vals.findIndex(v=>v==='zeit');
+      if(zi<0){ zi=vals.findIndex(v=>jeEinheit(v) && /\bh\b/.test(v)); zf=60; }
+      hr=r; col={pos:pi,bez:bi,menge:vals.findIndex(v=>v==='menge'),me:vals.findIndex(v=>v==='me'),typ:1,zeit:zi,zf}; break; }
   }
-  if(!hr) throw new Error('Kopfzeile mit „Pos.-Nr.“ und „Bezeichnung“ nicht gefunden');
+  if(hr<0) throw new Error('Kopfzeile mit „Pos.-Nr.“ und „Bezeichnung“ nicht gefunden');
+  const num=x=>{ if(typeof x==='number') return x; const n=Number(String(x).replace(/\./g,'').replace(',','.')); return isFinite(n)?n:0; };
   const out=[]; let started=false;
-  for(let r=hr+1;r<=ws.rowCount;r++){
-    const row=ws.getRow(r); const g=c=>c>0?cellVal(row.getCell(c).value):'';
-    const typ=String(g(col.typ)).trim(), pos=String(g(col.pos)).trim().replace(/\.$/,''), bez=String(g(col.bez)).trim();
+  for(let r=hr+1;r<rows.length;r++){
+    const row=rows[r]; const t=c=>c>0?String(row.t[c]??'').trim():'', v=c=>c>0?row.v[c]:'';
+    const typ=t(col.typ), pos=t(col.pos).replace(/\.$/,''), bez=t(col.bez);
     const vis=!row.hidden;
     if(typ==='Los'){ started=true; out.push({typ:'L',pos,bez}); }
-    else if(typ==='Titel'){ out.push({typ:'T',pos,bez}); }
-    else if(typ==='Position'){ let me=String(g(col.me)).trim(); if(/^st/i.test(me)) me='Stck'; if(me==='M') me='m';
-      out.push({typ:'P',pos,bez:bez.split('\n')[0],menge:Number(g(col.menge))||0,me,in_liste:vis?1:0}); }
+    else if(typ==='Titel'){ out.push({typ:'T',pos,bez:bez.split('\n')[0]}); }
+    else if(typ==='Position'){ let me=t(col.me); if(/^st/i.test(me)) me='Stck'; if(me==='M') me='m';
+      const z=col.zeit>0? Math.round(num(v(col.zeit))*col.zf*100)/100 : 0;
+      out.push({typ:'P',pos,bez:bez.split('\n')[0],menge:num(v(col.menge))||0,me,in_liste:vis?1:0,zeit:z>0?z:null}); }
     else if(/^text/i.test(typ) && started){ const first=bez.split('\n')[0].trim(); if(first && first.length<=70) out.push({typ:'X',bez:first}); }
   }
   if(!out.some(o=>o.typ==='P')) throw new Error('Keine Positionen gefunden (Spalte A muss „Position“ enthalten)');

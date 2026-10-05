@@ -41,6 +41,14 @@ main{max-width:900px;margin:0 auto;padding:4px 16px calc(110px + var(--safe-b))}
 .pos .bz{font-weight:650;overflow-wrap:anywhere;margin-top:1px}
 .pos .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;display:grid;justify-items:end;gap:4px}
 .pos .lv{font-size:12px;color:var(--ink-3)}
+.soll{font-size:12px;color:var(--blue);font-weight:650}
+.zeitbox{display:flex;align-items:center;gap:12px;background:var(--blue-bg);color:var(--ink);border-radius:16px;padding:10px 14px;margin:8px 0 4px;font-size:13.5px}
+.zeitbox b{font-variant-numeric:tabular-nums}
+.zeitbox .zt{flex:1;min-width:0}
+.zeitbox small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.zeitbox button{color:var(--blue);font-weight:700;font-size:13px;white-space:nowrap}
+.zeitaus{text-align:right;margin:4px 2px 0}
+.zeitaus button{color:var(--ink-3);font-size:12.5px;font-weight:650}
 .badge{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;background:var(--ok-bg);color:var(--ok);font-weight:750;font-size:13px}
 .badge.over{background:var(--amber-bg);color:var(--amber)}
 .pos.free{box-shadow:inset 0 0 0 1.5px var(--line);border:1.5px dashed var(--ink-3)}
@@ -136,6 +144,7 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
       </div>
       <div class="tbar2"><span id="grpTools"></span><button class="btn-free" id="btnFree"></button></div>
     </div>
+    <div id="zeitBox"></div>
     <div id="preBanner"></div>
     <div id="posList"></div>
   </section>
@@ -256,6 +265,24 @@ function initLV(){
   LV.forEach((o,i)=>{ if(o.k==='P'){ o.i=i; POS[o.p]=o; }});
   let cur=null; LV.forEach((o,i)=>{ if(o.k==='T'){ if(cur) TITEND[cur]=i; cur=o.p; TIT[o.p]=o.b; TITIDX[o.p]=i; } else if(o.k==='L'){ if(cur) TITEND[cur]=i; } else if(o.k==='P') o.t=cur; }); if(cur) TITEND[cur]=LV.length;
 }
+/* ---------- Soll-Zeiten (nur intern) ----------
+   Kommen aus der Kalkulation (Minuten je Einheit). Sie erscheinen nur in der Positionsliste
+   und im Erfassen-Fenster, nie unter „Erfasst“, „Abschluss“, im PDF oder in der Excel-Datei. */
+let ZEIT_ON=true; try{ ZEIT_ON=localStorage.getItem('pj_zeiten')!=='0'; }catch(e){}
+const hatZeiten=()=>LV.some(o=>o.k==='P'&&o.z>0);
+const fmtMin=m=>m>=60? (Math.round(m/6)/10).toLocaleString('de-DE')+' h' : (Math.round(m*10)/10).toLocaleString('de-DE')+' min';
+const fmtH=h=>(Math.round(h*10)/10).toLocaleString('de-DE',{maximumFractionDigits:1})+' h';
+const zeitAktiv=()=>ZEIT_ON && document.getElementById('v-pos').classList.contains('on');
+function sollText(p){ return p&&p.z>0? `Soll ${fmtMin(p.z)}/${esc(p.me)} · ${fmtH(p.z*(p.m||0)/60)}` : ''; }
+function setZeit(on){ ZEIT_ON=on; try{ localStorage.setItem('pj_zeiten',on?'1':'0'); }catch(e){} renderPos(); }
+function renderZeitBox(){
+  const el=$('#zeitBox'); if(!el) return;
+  if(!hatZeiten()){ el.innerHTML=''; return; }
+  if(!ZEIT_ON){ el.innerHTML=`<div class="zeitaus"><button onclick="setZeit(true)">Soll-Zeiten einblenden</button></div>`; return; }
+  const P=LV.filter(o=>o.k==='P'&&o.z>0);
+  const soll=P.reduce((a,o)=>a+o.z*(o.m||0),0)/60, ist=P.reduce((a,o)=>a+o.z*sumOf(o.p),0)/60;
+  el.innerHTML=`<div class="zeitbox"><div class="zt">Zeitbudget laut Kalkulation <b>${fmtH(soll)}</b><small>Erfasste Mengen entsprechen ${fmtH(ist)} · nur für das Team, nicht im PDF</small></div><button onclick="setZeit(false)">Ausblenden</button></div>`;
+}
 function titelOf(key){ const p=posOf(key); return p&&p.t&&TIT[p.t]? p.t+' '+TIT[p.t] : ''; }
 function posOf(key){ return POS[key] || S.free.find(f=>f.p===key); }
 
@@ -320,7 +347,7 @@ function posRow(p,free){
   return `<div class="pos${free?' free':''}" data-k="${esc(p.p)}">
     <div class="l"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.ref?' · '+esc(p.ref):''):''}${!free&&!p.v&&S.filter==='list'?' · <span style="color:var(--warn)">nicht in Aufmaß-Liste</span>':''}</div><div class="bz">${esc(p.b)}</div>${npre?`<div class="src pre">Vorschlag aus Rechnung · bitte prüfen</div>`:''}</div>
     <div class="r">${has?`<span class="badge${over?' over':''}">${nf(s)} ${esc(p.me)}</span>`:''}
-    ${!free?`<div class="lv">LV: ${nf(p.m)} ${esc(p.me)}</div>`:''}</div></div>`;
+    ${!free?`<div class="lv">LV: ${nf(p.m)} ${esc(p.me)}</div>`:''}${!free&&ZEIT_ON&&p.z>0?`<div class="soll">${sollText(p)}</div>`:''}</div></div>`;
 }
 function renderPreBanner(){
   const np=S.entries.filter(e=>e.pre).length;
@@ -328,7 +355,7 @@ function renderPreBanner(){
 }
 function showPre(){ S.filter='pre'; $('#q').value=''; save(); renderPos(); window.scrollTo(0,0); }
 function renderPos(){
-  renderPreBanner();
+  renderPreBanner(); renderZeitBox();
   document.querySelectorAll('.chip[data-f]').forEach(c=>c.classList.toggle('on',c.dataset.f===S.filter));
   const q=$('#q').value.trim().toLowerCase();
   const terms=q.split(/\s+/).filter(Boolean);
@@ -401,7 +428,7 @@ function openPos(key, eid){
   const ed=editId? S.entries.find(e=>e.id===editId):null;
   const s=sumOf(key);
   $('#sheet').innerHTML=`
-    <div class="hd"><div class="t"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.t?' · Zuordnung '+esc(titelOf(p.p)):' · ohne Zuordnung'):` · LV-Menge ${nf(p.m)} ${esc(p.me)}`}</div><h3>${esc(p.b)}</h3></div>
+    <div class="hd"><div class="t"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.t?' · Zuordnung '+esc(titelOf(p.p)):' · ohne Zuordnung'):` · LV-Menge ${nf(p.m)} ${esc(p.me)}`}</div><h3>${esc(p.b)}</h3>${!free&&p.z>0&&zeitAktiv()?`<div class="soll" style="margin-top:4px">${sollText(p)}</div>`:''}</div>
       <button class="icon" onclick="closeSheet()" aria-label="Schließen">${IC('x')}</button></div>
     ${free?`<div style="text-align:right"><button class="btn ghost" onclick="openFree(null,'${esc(p.p)}')">Position bearbeiten</button></div>`:''}
     <div class="card" style="margin-top:8px">
@@ -756,7 +783,7 @@ const api=(path,opt={})=>PJ.api(path,opt);
 function applyServer(srv, keepLocal){
   // Projekt, LV, Bereiche
   PROJ=srv.projekt;
-  LV=srv.lv.map(o=>({k:o.typ,p:o.pos,b:o.bez,m:o.menge,me:o.me,v:o.in_liste?1:0})); initLV();
+  LV=srv.lv.map(o=>({k:o.typ,p:o.pos,b:o.bez,m:o.menge,me:o.me,v:o.in_liste?1:0,z:o.zeit||null})); initLV();
   const srvE=srv.eintraege.map(fromE), srvF=srv.freipos.map(fromF);
   const k=srv.kopf;
   const srvHead={bez:k.bez||'',dat:k.datum||'',mon:k.monteur||'',ag:k.ag||'',bem:k.bemerkung||''}, srvSig={sig1:k.sig1||null,sig2:k.sig2||null,ts:k.sig_ts||null,aend:parseAend(k.sig_aenderung)};
