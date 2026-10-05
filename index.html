@@ -186,6 +186,15 @@ textarea.inp{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
 
 .app-n{position:absolute;z-index:2;top:12px;right:12px;min-width:26px;height:26px;padding:0 8px;border-radius:13px;background:#e5342b;color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center;box-shadow:0 0 0 3px rgba(255,255,255,.55)}
 .app-n[hidden]{display:none}
+
+/* Bereiche auf der Startseite */
+.app .b-cnt{position:absolute;left:16px;bottom:14px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.2)}
+.app.bereich .app-t span{-webkit-line-clamp:3;margin-bottom:30px}
+.ugrp{border-bottom:1px solid var(--line);padding-bottom:4px}
+.ugrp:last-child{border-bottom:0}
+.ubereich{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 2px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.ubereich .lnk{font-size:13px;letter-spacing:0;text-transform:none;font-weight:700;color:var(--blue,#2c60a7)}
+.ugrp .umod:last-child{border-bottom:0}
 /* ===== Nachrichten ===== */
 .top-r{display:flex;align-items:center;gap:10px}
 .bell{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow);color:var(--ink);flex:none}
@@ -347,6 +356,25 @@ const MODULES = [
       { k: 'leser', l: 'Leser', d: 'Alles ansehen (z. B. Buchhaltung), Kostenübersicht und PDFs, nichts ändern.' }] },
 ];
 
+/* ---------- Bereiche --------------------------------------------------
+   Die Startseite zeigt Bereiche statt einzelner Apps. Eine App kann in mehreren
+   Bereichen stehen (z. B. Gefährdungsbeurteilung). Der rote Zähler einer App zählt
+   nur in den Bereichen, die sie unter „zaehlt“ führen, damit nichts doppelt erscheint.
+   Ein Bereich erscheint nur, wenn mindestens eine seiner Apps freigeschaltet ist.
+   NEUE APP: id unter apps (und ggf. zaehlt) beim passenden Bereich ergänzen. */
+const BEREICHE = [
+  { id: 'baustelle', name: 'Baustelle', desc: 'Projekte, Objektaufnahme, Gefährdungsbeurteilung', icon: 'hardhat', g: ['#e8742f', '#c94a03'],
+    apps: ['projekte', 'objekt', 'gefaehrdung'], zaehlt: ['projekte', 'objekt', 'gefaehrdung'] },
+  { id: 'lager', name: 'Lager & Material', desc: 'Kommission, eigenes Lager, Reste', icon: 'box', g: ['#4a5a7a', '#2f3b53'],
+    apps: ['lager'], zaehlt: ['lager'] },
+  { id: 'betriebsmittel', name: 'Fahrzeuge & Betriebsmittel', desc: 'Fuhrpark, Leiterprüfung, Geräte', icon: 'car', g: ['#4a7fc4', '#2c60a7'],
+    apps: ['fuhrpark', 'leitern', 'geraete'], zaehlt: ['fuhrpark', 'leitern', 'geraete'] },
+  { id: 'arbeitsschutz', name: 'Arbeitsschutz & Personal', desc: 'Unterweisungen, Gefährdungsbeurteilungen', icon: 'shield', g: ['#d8474b', '#c32328'],
+    apps: ['unterweisung', 'gefaehrdung'], zaehlt: ['unterweisung'] },
+];
+const bereichApps = b => b.apps.map(id => MODULES.find(m => m.id === id)).filter(m => m && APPS[m.id]);
+const meineBereiche = () => BEREICHE.filter(b => bereichApps(b).length);
+
 /* ---------- Grundlagen ---------- */
 const SB = 'https://bbjzfoirefcsqqgztjpt.supabase.co', KEY = 'sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H';
 const SESS_KEY = 'heiseSession'; // gemeinsame Anmeldung für alle Module
@@ -447,6 +475,7 @@ function route() {
   if (!ME || !ready) return;
   const h = location.hash;
   if (h === '#/zugriff' && ME.rolle === 'admin') showZugriff();
+  else if (/^#\/bereich\/[\w-]+$/.test(h) && BEREICHE.some(b => b.id === h.split('/')[2])) showBereich(h.split('/')[2]);
   else if (/^#\/nachrichten(\/(inbox|gesendet|meldungen))?$/.test(h)) showNachrichten(h.split('/')[2]);
   else showHome();
   window.scrollTo(0, 0);
@@ -564,19 +593,43 @@ function appTile(m) {
   return `<a class="app" href="${esc(m.url)}" style="--g1:${m.g[0]};--g2:${m.g[1]}"><span class="app-n" data-app-n="${esc(m.id)}" hidden></span><div class="app-ico">${ic(m.icon)}</div><div class="app-t"><b>${esc(m.name)}</b><span>${esc(m.desc)}</span></div>${ic('chev', 'chev')}</a>`;
 }
 function showHome() {
-  const mods = MODULES.filter(m => APPS[m.id]), first = (ME.name || '').split(' ')[0], adm = ME.rolle === 'admin';
+  const mods = MODULES.filter(m => APPS[m.id]), bers = meineBereiche(), first = (ME.name || '').split(' ')[0], adm = ME.rolle === 'admin';
   root.innerHTML = `<div class="shell">
     <header class="topbar"><div class="brand"><img src="icon.png?v=5" alt="" onerror="this.remove()"><div>${APP_NAME}<small>${esc(FIRMA)}</small></div></div><div class="top-r"><a class="bell" href="#/nachrichten" data-bell aria-label="Nachrichten">${ic('bell')}<span class="bell-n" hidden></span></a><button class="avatar" data-act="konto" aria-label="Konto">${esc((ME.name || '?').charAt(0).toUpperCase())}</button></div></header>
     <section class="hero"><div class="hero-t"><div class="ey">${esc(heute())}</div><h1>${esc(greet())}, ${esc(first)}</h1></div><div class="logo-tile" id="heroLogo"></div><p class="hero-p">Willkommen bei Heise Haustechnik. Was möchtest du heute erledigen?</p></section>
     <a class="msgcard" id="msgcard" href="#/nachrichten">${'<div class="mi">' + ic('mail', 'lg') + '</div>'}<div class="mt"><b>Nachrichten</b><span class="s">${esc(zaehlerText())}</span></div><span class="cnt" hidden></span>${ic('chev', 'chev')}</a>
-    <div class="sec-title">Deine Apps</div>
-    ${mods.length ? `<div class="apps">${mods.map(appTile).join('')}</div>` : `<div class="empty">${ic('lock')}<h3>Noch keine App freigeschaltet</h3><p class="muted" style="margin-top:4px">Bitte melde dich beim Administrator.</p></div>`}
+    ${!mods.length ? `<div class="sec-title">Deine Apps</div><div class="empty">${ic('lock')}<h3>Noch keine App freigeschaltet</h3><p class="muted" style="margin-top:4px">Bitte melde dich beim Administrator.</p></div>`
+      : bers.length === 1 ? `<div class="sec-title">${esc(bers[0].name)}</div><div class="apps">${bereichApps(bers[0]).map(appTile).join('')}</div>`
+      : `<div class="sec-title">Deine Bereiche</div><div class="apps">${bers.map(bereichTile).join('')}</div>`}
     ${adm ? `<div class="sec-title">Verwaltung</div><div class="apps"><a class="app plain" href="#/zugriff" style="--g1:#14b8a6;--g2:#0f766e"><div class="app-ico">${ic('users')}</div><div class="app-t"><b>Benutzer &amp; Zugriff</b><span>Benutzer anlegen, Apps und Rollen</span></div>${ic('chev', 'chev')}</a></div>` : ''}
     <div class="foot">${APP_NAME} · ${esc(FIRMA)}</div></div>`;
   loadLogo($('#heroLogo'), LOGO_WILLKOMMEN);
   paintZaehler(); refreshZaehler();
 }
 
+function bereichTile(b) {
+  const apps = bereichApps(b);
+  // Bereich mit nur einer freigeschalteten App: direkt in die App
+  const href = apps.length === 1 ? apps[0].url : '#/bereich/' + b.id;
+  const desc = apps.length === 1 ? apps[0].desc : apps.map(m => m.name).join(', ');
+  return `<a class="app bereich" href="${esc(href)}" style="--g1:${b.g[0]};--g2:${b.g[1]}"><span class="app-n" data-bereich-n="${esc(b.id)}" hidden></span><div class="app-ico">${ic(b.icon)}</div><div class="app-t"><b>${esc(b.name)}</b><span>${esc(desc)}</span></div>${apps.length > 1 ? `<span class="b-cnt">${apps.length} Apps</span>` : ''}${ic('chev', 'chev')}</a>`;
+}
+function paintBereiche() {
+  $$('[data-bereich-n]').forEach(el => {
+    const b = BEREICHE.find(x => x.id === el.dataset.bereichN); if (!b) return;
+    const k = bereichApps(b).filter(m => b.zaehlt.includes(m.id)).reduce((a, m) => a + (NX.Z[m.id] || 0), 0);
+    el.textContent = k > 99 ? '99+' : k; el.hidden = !k; el.title = k + (k === 1 ? ' offener Punkt' : ' offene Punkte');
+  });
+}
+function showBereich(id) {
+  const b = BEREICHE.find(x => x.id === id), apps = bereichApps(b);
+  if (!apps.length) { location.hash = '#/'; return }
+  root.innerHTML = `<div class="shell">
+    <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><div style="min-width:0"><h1>${esc(b.name)}</h1></div></div>
+    <div class="apps">${apps.map(appTile).join('')}</div>
+    <div class="foot">${APP_NAME} · ${esc(FIRMA)}</div></div>`;
+  paintZaehler(); refreshZaehler();
+}
 /* ---------- Zugriff & Rollen (Admin) ---------- */
 function roleSelect(uid, m, cur, uname) {
   return `<select class="inp" data-zr data-u="${uid}" data-m="${m.id}" aria-label="Rolle ${esc(m.name)} für ${esc(uname)}">${m.rollen.map(x => `<option value="${x.k}" ${cur === x.k ? 'selected' : ''}>${esc(x.l)}</option>`).join('')}</select>`;
@@ -596,12 +649,12 @@ async function showZugriff() {
       ${users.map(u => {
         const isAdm = u.rolle === 'admin';
         return `<div class="urow"><div class="uhead"><div class="avatar" style="width:40px;height:40px;font-size:15px">${esc((u.name || '?').charAt(0).toUpperCase())}</div><div><b>${esc(u.name)}</b><small>${esc(u.benutzername || '')}${isAdm ? ' · Admin' : ''}${u.email ? '' : ' · <span style="color:var(--red)">keine E-Mail</span>'}</small></div><button class="iconbtn flat" data-act="uMenu" data-u="${u.id}" aria-label="${esc(u.name)} verwalten" style="margin-left:auto;font-size:22px;line-height:1">⋯</button></div>
-          ${isAdm ? `<p class="faint" style="margin-top:10px;font-size:14px">Admins haben überall Zugriff.</p>` : `<div class="umods">${MODULES.map(m => {
+          ${isAdm ? `<p class="faint" style="margin-top:10px;font-size:14px">Admins haben überall Zugriff.</p>` : `<div class="umods">${zugriffGruppen().map(g => `<div class="ugrp" data-b="${g.id}"><div class="ubereich"><b>${esc(g.name)}</b><button class="lnk" data-act="zgAll" data-u="${u.id}" data-b="${g.id}">Alle freischalten</button></div>${g.mods.map(m => {
             const r = (map[u.id] || {})[m.id], on = r !== undefined;
             return `<div class="umod" style="--g1:${m.g[0]};--g2:${m.g[1]}"><div class="umod-l"><span class="mi">${ic(m.icon)}</span><span>${esc(m.name)}</span></div>
               <div class="umod-r">${m.rollen && on ? roleSelect(u.id, m, r, u.name) : ''}
               <button class="switch ${on ? 'on' : ''}" data-act="zg" data-u="${u.id}" data-m="${m.id}" data-n="${esc(u.name)}" role="switch" aria-checked="${on}" aria-label="${esc(m.name)} für ${esc(u.name)}"></button></div>${m.id === 'lager' && on ? lagerRechteHTML(u.id, u.name) : ''}</div>`;
-          }).join('')}</div>`}</div>`;
+          }).join('')}</div>`).join('')}</div>`}</div>`;
       }).join('')}</div>`;
   } catch (e) {
     root.innerHTML = `<div class="shell"><div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1></div><div class="empty">${ic('info')}<h3>Konnte nicht geladen werden</h3><p class="muted">${esc(niceErr(e))}</p></div></div>`;
@@ -619,6 +672,13 @@ async function setLagerRecht(uid, lager, on) {
   if (on) await api('POST', 'lager_rechte', { benutzer_id: uid, lager }, '?on_conflict=benutzer_id,lager', { Prefer: 'resolution=ignore-duplicates,return=minimal' });
   else await api('DELETE', 'lager_rechte', null, `?benutzer_id=eq.${uid}&lager=eq.${lager}`);
   (LR[uid] = LR[uid] || {})[lager] = on;
+}
+/* Benutzer & Zugriff nach Bereichen gruppiert. Jede App steht nur einmal, im ersten Bereich, der sie führt
+   (Gefährdungsbeurteilung also unter Baustelle). Apps ohne Bereich landen unter „Weitere Apps“. */
+function zugriffGruppen() {
+  const seen = new Set(), out = BEREICHE.map(b => ({ id: b.id, name: b.name, mods: b.apps.filter(id => !seen.has(id) && seen.add(id)).map(id => MODULES.find(m => m.id === id)).filter(Boolean) }));
+  const rest = MODULES.filter(m => !seen.has(m.id)); if (rest.length) out.push({ id: 'weitere', name: 'Weitere Apps', mods: rest });
+  return out.filter(g => g.mods.length);
 }
 async function setZugriff(uid, mid, on, rolle) {
   const m = MODULES.find(x => x.id === mid);
@@ -751,6 +811,13 @@ const ACT = {
   pwGen(el) { const t = $('#' + el.dataset.t); if (t) t.value = pwVorschlag() },
   nvR(el) { $$('#nvRolle button').forEach(b => b.classList.toggle('on', b === el)) },
   logout, konto: kontoSheet, pw: () => { closeSheet(); pwSheet() }, closeSheet: () => closeSheet(),
+  async zgAll(el) {
+    const sw = $$(`.ugrp[data-b="${el.dataset.b}"] .switch[data-u="${el.dataset.u}"]:not(.on)`, el.closest('.urow'));
+    if (!sw.length) { toast('In diesem Bereich ist schon alles freigeschaltet', 'ok'); return }
+    el.disabled = true;
+    for (const s of sw) await ACT.zg(s);
+    el.disabled = false;
+  },
   async zg(el) {
     const on = !el.classList.contains('on');
     el.disabled = true;
@@ -872,6 +939,7 @@ function paintZaehler() {
   if (c) { c.classList.toggle('new', n > 0); $('.s', c).textContent = zaehlerText(); const k = $('.cnt', c); k.textContent = n > 99 ? '99+' : n; k.hidden = !n }
   $$('[data-app-n]').forEach(b => { const k = NX.Z[b.dataset.appN] || 0; b.textContent = k > 99 ? '99+' : k; b.hidden = !k; b.title = b.dataset.appN === 'unterweisung' ? k + (k === 1 ? ' offene Unterweisung' : ' offene Unterweisungen') : (b.dataset.appN === 'gefaehrdung' || b.dataset.appN === 'objekt') ? k + (k === 1 ? ' offener Entwurf' : ' offene Entwürfe') : b.dataset.appN === 'geraete' ? k + (k === 1 ? ' Frist in den nächsten 30 Tagen' : ' Fristen in den nächsten 30 Tagen') : k + (k === 1 ? ' offene Meldung' : ' offene Meldungen') });
   paintTabBadges();
+  if (typeof paintBereiche === 'function') paintBereiche();
 }
 setInterval(() => { if (ME && ready && !document.hidden) refreshZaehler() }, 60000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden && ME && ready) { refreshZaehler(); if (/^#\/nachrichten/.test(location.hash) && !$('#layer').firstChild) nxReload(true) } });
