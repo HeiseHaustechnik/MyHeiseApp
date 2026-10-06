@@ -767,6 +767,52 @@ button.ph{padding:0;display:block}
 .ee-tag{position:absolute;transform:translate(-50%,calc(-100% - 4px));padding:2px 7px;border-radius:9px;background:rgba(47,59,83,.88);color:#fff;font-size:10.5px;font-weight:700;white-space:nowrap;pointer-events:none;transition:opacity .25s;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .ee-cam.aktiv .ee-tag{opacity:0}
 @media (prefers-reduced-motion:reduce){.ee-cam,.ee-leaf,.ee-fade{transition:none}.ee-glow{animation:none}}
+/* ---------- Viessmann Kommission ---------- */
+.knav{display:flex;gap:8px;overflow-x:auto;margin:12px 0 4px;padding-bottom:4px;scrollbar-width:none}
+.knav::-webkit-scrollbar{display:none}
+.knav .chipbtn{flex:none;display:inline-flex;align-items:center;gap:6px}
+.knav .chipbtn.on{background:var(--brand);color:#fff;box-shadow:none}
+.cnt-dot{font-style:normal;background:var(--red);color:#fff;border-radius:9px;padding:0 6px;font-size:11.5px;font-weight:760;min-width:18px;text-align:center}
+.kgo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.kgo .hero-go{margin:0}
+@media (max-width:620px){.kgo{grid-template-columns:1fr}}
+.wobox.blue{background:linear-gradient(135deg,#eff6ff,#dbeafe);color:#1e3a8a}.wobox.blue>div:first-child{color:#1d4ed8}
+@media (prefers-color-scheme:dark){.wobox.blue{background:#13233f;color:#cfe0ff}}
+.kstep{background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:14px 16px;margin-top:12px}
+.kstep-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.kstep-h>span:first-child{width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:760;flex:none}
+.kstep-h b{font-size:16px}
+.kzeit{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--tb);color:var(--t)}
+.kzeit b{display:block;font-size:16px}.kzeit small{display:block;font-weight:650}
+.kfoto{display:flex;align-items:center;gap:10px}.kfoto img{width:72px;height:72px;object-fit:cover;border-radius:12px;box-shadow:inset 0 0 0 1px var(--line)}
+.kpos{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 12px;border-radius:16px;background:var(--surface-2)}
+.kpos-t{flex:1;min-width:160px}.kpos-t b{display:block}.kpos-t small{color:var(--ink-3);font-size:12.5px}
+.kpos-m{display:flex;align-items:center;gap:4px}.kpos-m .inp{width:64px;height:40px;text-align:center;padding:0 4px;font-weight:700}
+.ktreffer{margin-top:8px}.ktreffer .lcard{width:100%;text-align:left}
+.ktab-wrap{overflow-x:auto;padding:4px 8px}
+.ktab{width:100%;border-collapse:collapse;font-size:13.5px}
+.ktab th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ktab td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.ktab .r{text-align:right;font-variant-numeric:tabular-nums}
+.ktab tr.bereit td{background:#fff3d6}
+@media (prefers-color-scheme:dark){.ktab tr.bereit td{background:#3a2c0e}}
+.ktab tr.sum td{font-weight:760;font-size:15px;border-bottom:none;border-top:2px solid var(--ink-2)}
+.bz{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;background:#e0962b;color:#fff;font-size:11px}
+.monatwahl{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+.monatwahl b{font-size:18px}
+.khin{margin:6px 0 0 18px;padding:0}.khin li{margin:2px 0}
+.kbar{display:flex;align-items:center;gap:10px;padding:8px 2px;color:inherit;border-bottom:1px solid var(--line)}
+.kbar:last-child{border-bottom:none}
+.kbar-m{width:84px;flex:none;font-weight:650}
+.kbar-b{flex:1;height:12px;border-radius:6px;background:var(--surface-2);overflow:hidden}.kbar-b i{display:block;height:100%;background:linear-gradient(90deg,var(--brand-2),var(--brand));border-radius:6px}
+.kbar b{width:110px;text-align:right;font-variant-numeric:tabular-nums}
+.scanvid{width:100%;max-height:260px;object-fit:cover;border-radius:16px;background:#000;display:block}
+.scaninfo{margin-top:10px;text-align:center;color:var(--ink-2);font-size:14px;min-height:22px}
+.sheet.wide{max-width:640px}
+.act[disabled]{opacity:.45;pointer-events:none}
+.srow{display:flex;gap:8px;align-items:center}.srow .searchbar{flex:1;min-width:0}
+.kls{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media (max-width:620px){.kls{grid-template-columns:1fr}}
+.kls .btn{white-space:normal}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -828,6 +874,10 @@ button.ph{padding:0;display:block}
 <symbol id="i-minuscircle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></symbol>
 <symbol id="i-pluscircle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></symbol>
 <symbol id="i-clip" viewBox="0 0 24 24"><rect x="5.5" y="4" width="13" height="17" rx="2.2"/><path d="M9 4V3h6v1M9 13.2l2.2 2.2 3.8-4"/></symbol>
+<symbol id="i-carton" viewBox="0 0 24 24"><path d="M3 8.5 6 4h12l3 4.5"/><rect x="3" y="8.5" width="18" height="11.5" rx="1.6"/><path d="M10 8.5V4M14 8.5V4M10 12.5h4"/></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24"><path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.5v3h-7"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
+<symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 9v6M10 9v6M13 9v6M17 9v6"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
 </defs>
 </svg>
@@ -910,8 +960,11 @@ const jwtSub=t=>{try{return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').re
 
 
 /* ---------- Zustand ---------- */
-const S={me:null,lager:[],el:[],reste:[],rAll:false,kom:[],loadedAt:0,st:'Ramsenweg',q:'',rq:'',rst:'Ramsenweg'};
+const S={me:null,lager:[],rolle:{},el:[],reste:[],rAll:false,kom:[],loadedAt:0,st:'Ramsenweg',q:'',rq:'',rst:'Ramsenweg'};
 const isAdmin=()=>!!(S.me&&S.me.rolle==='admin');
+/* Kommission: Lagerist (buchen, bearbeiten, Transaktionen) und Lager-Abrechnung (Preise) – Admin hat beides */
+const isLagerist=()=>isAdmin()||!!S.rolle.lagerist;
+const isAbr=()=>isAdmin()||!!S.rolle.abrechnung;
 
 /* ---------- Datum, Zahlen ---------- */
 const berlinToday=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Berlin'}).format(new Date());
@@ -988,20 +1041,20 @@ function confirmSheet({title,text,ok='OK',danger=false,onOk}){
 /* ---------- Fotos & Dateien (privater Speicher „lager-dateien“ (Fotos Restelager)) ---------- */
 const BUCKET='lager-dateien';
 const PH=new Map();
-async function fileUrl(path){
-  const c=PH.get(path);if(c&&c.exp>Date.now())return c.url;
+async function fileUrl(path,bucket=BUCKET){
+  const c=PH.get(bucket+'/'+path);if(c&&c.exp>Date.now())return c.url;
   const tok=await ensureToken();
   const enc=path.split('/').map(encodeURIComponent).join('/');
-  const r=await fetch(`${SB}/storage/v1/object/sign/${BUCKET}/${enc}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+tok},body:JSON.stringify({expiresIn:3600})});
+  const r=await fetch(`${SB}/storage/v1/object/sign/${bucket}/${enc}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+tok},body:JSON.stringify({expiresIn:3600})});
   const j=await r.json().catch(()=>({}));
   if(!r.ok||!j.signedURL)throw new Error('Datei nicht ladbar');
   const url=j.signedURL.startsWith('http')?j.signedURL:`${SB}/storage/v1${j.signedURL}`;
-  PH.set(path,{url,exp:Date.now()+3300e3});return url;
+  PH.set(bucket+'/'+path,{url,exp:Date.now()+3300e3});return url;
 }
 function hydratePhotos(root){
   $$('img[data-photo]',root).forEach(async img=>{
     if(img.dataset.done)return;img.dataset.done='1';
-    try{img.src=await fileUrl(img.dataset.photo)}catch(e){img.replaceWith(Object.assign(document.createElement('div'),{className:'hero-photo',innerHTML:ic('image')}))}
+    try{img.src=await fileUrl(img.dataset.photo,img.dataset.bucket||BUCKET)}catch(e){img.replaceWith(Object.assign(document.createElement('div'),{className:'hero-photo',innerHTML:ic('image')}))}
   });
 }
 async function compressImage(file,max=1600,q=.82){
@@ -1026,18 +1079,18 @@ function pickFile(accept){
   });
 }
 const EXT={'image/jpeg':'jpg','image/png':'png','application/pdf':'pdf'};
-async function uploadFile(blob,prefix,mime){
+async function uploadFile(blob,prefix,mime,bucket=BUCKET){
   mime=mime||blob.type||'application/octet-stream';
   const path=`${prefix}/${crypto.randomUUID()}.${EXT[mime]||'bin'}`;
   const tok=await ensureToken();
-  const r=await fetch(`${SB}/storage/v1/object/${BUCKET}/${path}`,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+tok,'Content-Type':mime,'x-upsert':'false','cache-control':'3600'},body:blob});
+  const r=await fetch(`${SB}/storage/v1/object/${bucket}/${path}`,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+tok,'Content-Type':mime,'x-upsert':'false','cache-control':'3600'},body:blob});
   if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'Upload fehlgeschlagen')}
   return path;
 }
 async function delFile(path){
   try{const tok=await ensureToken();await fetch(`${SB}/storage/v1/object/${BUCKET}/${path.split('/').map(encodeURIComponent).join('/')}`,{method:'DELETE',headers:{apikey:KEY,Authorization:'Bearer '+tok}})}catch(e){}
 }
-async function openFile(path){try{const u=await fileUrl(path);window.open(u,'_blank','noopener')}catch(e){toast(niceErr(e),'err')}}
+async function openFile(path,bucket=BUCKET){try{const u=await fileUrl(path,bucket);window.open(u,'_blank','noopener')}catch(e){toast(niceErr(e),'err')}}
 const _libs={};
 const loadLib=u=>_libs[u]||(_libs[u]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;s.onload=res;s.onerror=()=>{delete _libs[u];rej(new Error('Bibliothek konnte nicht geladen werden'))};document.head.appendChild(s)}));
 function saveBlob(blob,name){
@@ -1046,14 +1099,14 @@ function saveBlob(blob,name){
 }
 /* =====================================================================
    Lagerverwaltung – Stammlisten und Laden
-   Drei getrennte Lager: kommission (Tabelle artikel, Seite lager.html), eigen (el_artikel), rest (el_reste)
+   Drei getrennte Lager: kommission (Tabelle artikel, #/k …), eigen (el_artikel), rest (el_reste)
    ===================================================================== */
 const STANDORTE=['Ramsenweg','Tannerstraße','Lauterberger Straße'];
 const ST_LANG={'Ramsenweg':'Hauptlager Ramsenweg 2c','Tannerstraße':'Lager Tannerstraße','Lauterberger Straße':'Lager Lauterberger Straße'};
 const LAGER={
-  kommission:{name:'Viessmann Kommission',sub:'Tannerstraße · Kommissionsware',ic:'box',tone:'blue',url:'lager.html'},
+  kommission:{name:'Viessmann Kommission',sub:'Tannerstraße · Kommissionsware',ic:'box',tone:'blue',href:'#/k'},
   eigen:{name:'Eigenes Lager',sub:'Ramsenweg, Tannerstraße, Lauterberger Str.',ic:'warehouse',tone:'amber',href:'#/eigen'},
-  rest:{name:'Restelager',sub:'Reste & Sonderartikel',ic:'scissors',tone:'teal',href:'#/reste'},
+  rest:{name:'Restelager',sub:'Reste & Sonderartikel',ic:'carton',tone:'teal',href:'#/reste'},
 };
 const EINHEITEN=['Stück','Meter','Pack','Rolle','Box','Paar','Satz','Karton','Liter','kg'];
 /* Produktbilder liegen auf 8 Ordner verteilt (lager-bilder1 … lager-bilder8, je unter 100 Dateien – GitHub-Upload-Grenze).
@@ -1073,11 +1126,12 @@ async function apiAll(table,query){
 }
 const EL_COLS='id,interne_nr,bezeichnung,zusatz,typ,hersteller_nr,lieferant,lieferant_nr,ean,standort,raum,bereich,platz,gruppe,untergruppe,min,max,bestand,einheit,vpe,bild,notiz,aktiv,langtext,updated_at';
 async function loadAll(){
-  S.lager=(await rpc('lager_meine'))||[];
+  try{const me=await rpc('lager_ich');S.lager=(me&&me.lager)||[];S.rolle={lagerist:!!(me&&me.lagerist),abrechnung:!!(me&&me.abrechnung)}}
+  catch(e){S.lager=(await rpc('lager_meine'))||[];S.rolle={}}
   const jobs=[];
   jobs.push(darfL('eigen')?apiAll('el_artikel',`?select=${EL_COLS}&aktiv=eq.true&order=bezeichnung.asc`):Promise.resolve([]));
   jobs.push(darfL('rest')?apiAll('el_reste',`?select=*${S.rAll?'':'&aktiv=eq.true'}&order=created_at.desc`):Promise.resolve([]));
-  jobs.push(darfL('kommission')?apiAll('artikel','?select=id,artikelnummer,beschreibung,lagerplatz,bestand&order=artikelnummer.asc'):Promise.resolve([]));
+  jobs.push(darfL('kommission')?apiAll('artikel','?select=id,artikelnummer,beschreibung,lagerplatz,bestand,bemerkung,barcode&geloescht_am=is.null&order=artikelnummer.asc'):Promise.resolve([]));
   const [el,re,kom]=await Promise.all(jobs);
   S.el=el;S.reste=re;S.kom=kom;S.loadedAt=Date.now();
 }
@@ -1125,9 +1179,10 @@ let TOKEN=0;
 function renderShell(){
   const ini=(S.me.name||'?').trim().charAt(0).toUpperCase();
   const tabs=[['start','home','Lager','#/']];
+  if(darfL('kommission'))tabs.push(['kom','box','Kommission','#/k']);
   if(darfL('eigen'))tabs.push(['eigen','warehouse','Eigenes','#/eigen']);
-  if(darfL('rest'))tabs.push(['reste','scissors','Reste','#/reste']);
-  if(darfL('eigen')||darfL('rest'))tabs.push(['inventur','clip','Inventur','#/inventur']);
+  if(darfL('rest'))tabs.push(['reste','carton','Reste','#/reste']);
+  if(!darfL('kommission')&&(darfL('eigen')||darfL('rest')))tabs.push(['inventur','clip','Inventur','#/inventur']);
   tabs.push(['mehr','more','Mehr','#/mehr']);
   const tb=$('#tabbar');tb.style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
   tb.innerHTML=tabs.map(([k,i,l,h])=>`<a class="tab" data-nav="${k}" href="${h}">${ic(i)}<span>${l}</span></a>`).join('');
@@ -1135,19 +1190,19 @@ function renderShell(){
     `<div class="rail-brand"><div class="rail-logo">${ic('warehouse','lg')}<img src="icon.png?v=4" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Lagerverwaltung</b><small>Heise Haustechnik</small></div></div>`+
     `<nav class="rail-nav">`+
       `<a class="rail-item" data-nav="start" href="#/">${ic('home')} Alle Lager</a>`+
-      (darfL('kommission')?`<a class="rail-item" href="lager.html">${ic('box')} Viessmann Kommission</a>`:'')+
+      (darfL('kommission')?`<a class="rail-item" data-nav="kom" href="#/k">${ic('box')} Viessmann Kommission</a>`:'')+
       (darfL('eigen')?`<a class="rail-item" data-nav="eigen" href="#/eigen">${ic('warehouse')} Eigenes Lager</a>`:'')+
-      (darfL('rest')?`<a class="rail-item" data-nav="reste" href="#/reste">${ic('scissors')} Restelager</a>`:'')+
-      (darfL('eigen')||darfL('rest')?`<a class="rail-item" data-nav="inventur" href="#/inventur">${ic('clip')} Inventur</a>`:'')+
+      (darfL('rest')?`<a class="rail-item" data-nav="reste" href="#/reste">${ic('carton')} Restelager</a>`:'')+
+      (darfL('eigen')||darfL('rest')?`<a class="rail-item" data-nav="inventur" href="#/inventur">${ic('clip')} Inventur ${darfL('kommission')?'<small style="font-weight:500;color:var(--ink-3)">(eigen/Reste)</small>':''}</a>`:'')+
       `<a class="rail-item" data-nav="mehr" href="#/mehr">${ic('more')} Mehr</a>`+
     `</nav>`+
     `<div class="rail-foot">`+
       `<a class="rail-item" href="${PORTAL}">${ic('apps')} My Heise Startseite</a>`+
-      `<div class="userbox"><div class="avatar">${esc(ini)}</div><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(S.me.name)}</b><small>${isAdmin()?'Admin':'Lager'}</small></div><button class="iconbtn flat" data-act="logout" aria-label="Abmelden" title="Abmelden">${ic('logout')}</button></div>`+
+      `<div class="userbox"><div class="avatar">${esc(ini)}</div><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(S.me.name)}</b><small>${isAdmin()?'Admin':isLagerist()?'Lagerist':'Lager'}</small></div><button class="iconbtn flat" data-act="logout" aria-label="Abmelden" title="Abmelden">${ic('logout')}</button></div>`+
     `</div>`;
 }
 function setNav(seg){
-  const key={a:'eigen',r:'eigen',z:'eigen',flur:'eigen',rest:'reste',inv:'inventur'}[seg]||seg||'start';
+  const key={a:'eigen',r:'eigen',z:'eigen',flur:'eigen',rest:'reste',inv:'inventur',k:'kom'}[seg]||seg||'start';
   $$('[data-nav]').forEach(a=>{a.classList.toggle('on',a.dataset.nav===key);a.setAttribute('aria-current',a.dataset.nav===key?'page':'false')});
 }
 function paint(html){
@@ -1166,8 +1221,8 @@ function route(){
   TOKEN++;const token=TOKEN;
   window.scrollTo(0,0);setNav(seg);
   const V={start:viewStart,eigen:viewEigen,r:()=>viewRaum(parts[1],parts[2]),z:()=>viewZone(parts[1],parts[2]),flur:viewFlur,a:()=>viewArtikel(parts[1],token),reste:viewReste,rest:()=>viewRest(parts[1],token),
-    inventur:viewInventuren,inv:()=>viewInventur(parts[1],parts[2],token),mehr:viewMehr};
-  const need={eigen:'eigen',r:'eigen',z:'eigen',flur:'eigen',a:'eigen',reste:'rest',rest:'rest'}[seg];
+    inventur:viewInventuren,inv:()=>viewInventur(parts[1],parts[2],token),mehr:viewMehr,k:()=>routeKom(parts.slice(1),token)};
+  const need={eigen:'eigen',r:'eigen',z:'eigen',flur:'eigen',a:'eigen',reste:'rest',rest:'rest',k:'kommission'}[seg];
   if(need&&!darfL(need)){paint(`<div class="noaccess">${ic('lock')}<h1>Kein Zugriff</h1><p class="muted">Dieses Lager ist für dich nicht freigeschaltet.</p><div class="btnrow" style="margin-top:20px"><a class="btn btn-primary" href="#/">Zur Lagerauswahl</a></div></div>`);return}
   (V[seg]||viewStart)();
 }
@@ -1201,7 +1256,7 @@ function viewStart(){
 function globalResults(q){
   if(!q.trim()||q.trim().length<2)return '';
   const groups=[];
-  if(darfL('kommission')){const r=komSuche(q);if(r.length)groups.push(['kommission',r.slice(0,20).map(k=>`<a class="lcard" href="lager.html"><div class="tnum tone-blue">${ic('box')}</div><div class="lcard-main"><b class="tt">${esc(k.artikelnummer)} · ${esc(k.beschreibung||'')}</b><div class="lcard-tags"><span class="chip tone-blue">${ic('pin','sm')}Platz ${esc(k.lagerplatz||'–')}</span><span class="chip tone-gray">Bestand ${nf2(k.bestand)}</span></div></div>${ic('chev','chev')}</a>`),r.length])}
+  if(darfL('kommission')){const r=komSuche(q);if(r.length)groups.push(['kommission',r.slice(0,20).map(k=>`<a class="lcard" href="#/k/a/${k.id}"><div class="tnum tone-blue">${ic('box')}</div><div class="lcard-main"><b class="tt">${esc(k.artikelnummer)} · ${esc(k.beschreibung||'')}</b><div class="lcard-tags"><span class="chip tone-blue">${ic('pin','sm')}Platz ${esc(k.lagerplatz||'–')}</span><span class="chip tone-gray">Bestand ${nf2(k.bestand)}</span></div></div>${ic('chev','chev')}</a>`),r.length])}
   if(darfL('eigen')){const r=elSuche(q);if(r.length)groups.push(['eigen',r.slice(0,20).map(elCard),r.length])}
   if(darfL('rest')){const r=restSuche(q,S.reste.filter(x=>x.aktiv));if(q.trim()&&r.length)groups.push(['rest',r.slice(0,20).map(restCard),r.length])}
   if(!groups.length)return`<div class="card">${emptyState('search','Nichts gefunden','In keinem Lager gibt es einen passenden Artikel.')}</div>`;
@@ -1216,6 +1271,7 @@ function viewMehr(){
   <div class="card" style="display:flex;gap:14px;align-items:center;margin-bottom:14px"><div class="avatar" style="width:52px;height:52px;font-size:20px">${esc((S.me.name||'?').charAt(0).toUpperCase())}</div><div><b style="font-size:17px">${esc(S.me.name)}</b><div class="muted" style="margin-top:3px">${S.lager.map(l=>`<span class="grpchip" style="margin-right:6px">${esc(LAGER[l].name)}</span>`).join('')}</div></div></div>
   <div class="menu-list">
     ${darfL('kommission')?item('box','Viessmann Kommission','Kommissionslager Tannerstraße öffnen','goKom'):''}
+    ${darfL('kommission')&&(darfL('eigen')||darfL('rest'))?item('clip','Inventur Eigenes Lager / Restelager','','goInv'):''}
     ${darfL('eigen')?item('download','Eigenes Lager als Excel (CSV)','Alle Artikel mit Standort, Raum, Regal, Bestand','csvEigen'):''}
     ${darfL('rest')?item('download','Restelager als Excel (CSV)','','csvReste'):''}
     ${item('apps','My Heise Startseite','Zu allen Apps','goApps')}
@@ -1223,7 +1279,8 @@ function viewMehr(){
     ${item('logout','Abmelden','','logout')}
   </div>`);
 }
-ACT.goKom=()=>{location.href='lager.html'};
+ACT.goKom=()=>{location.hash='#/k'};
+ACT.goInv=()=>{location.hash='#/inventur'};
 ACT.goApps=()=>{location.href=PORTAL};
 ACT.reload=el=>busy(el,async()=>{await reloadAndRoute();toast('Aktualisiert','ok')});
 ACT.logout=async()=>{
@@ -1240,6 +1297,9 @@ ACT.csvReste=()=>csvSave(`Restelager_${berlinToday()}.csv`,['Bezeichnung','Besch
 /* =====================================================================
    Eigenes Lager: Standort → Raum → Regal → Artikel, Suche, Detail, Buchen, Bearbeiten
    ===================================================================== */
+/* Entnehmen/Zugang im eigenen Lager und Restelager vorerst ausgeblendet (Jan, 05.10.2026:
+   dort wird noch nicht gebucht). Zum Einschalten hier auf true setzen. */
+const BUCHEN={eigen:false,rest:false};
 const thumb=a=>a.bild?`<img class="athumb" src="${esc(bildSrc(a.bild))}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'athumb none'}))">`:`<span class="athumb none">${ic('box')}</span>`;
 function elCard(a){
   const unter=a.min!=null&&+a.bestand<+a.min;
@@ -1313,9 +1373,9 @@ async function viewArtikel(id,tk){
   <div class="wobox"><div>${ic('pin')}</div><div><small>Hier liegt der Artikel</small><b>${esc(ST_LANG[a.standort])}</b><span>${esc([raumOf(a),a.bereich,a.platz].filter(Boolean).join(' › '))}</span></div></div>
   ${zoneOfRaum(a.standort,raumOf(a))?`<div class="card plancard" id="aPlan" style="margin-top:12px">${planSVG(a.standort,{hl:zoneOfRaum(a.standort,raumOf(a)).id,counts:false,klein:true})}</div>`:''}
   <div class="sumtiles s3" style="margin-top:12px"><div class="sumtile"><small>Bestand</small><b style="color:${unter?'var(--red)':'inherit'}">${nf2(a.bestand)}</b><div class="muted" style="font-size:12px">${esc(a.einheit)}</div></div><div class="sumtile"><small>Min</small><b>${nf2(a.min)}</b></div><div class="sumtile"><small>Max</small><b>${nf2(a.max)}</b></div></div>
-  <div class="actgrid" style="grid-template-columns:repeat(3,1fr)">
-    <button class="act" data-act="elBuch" data-a="entnahme">${ic('minuscircle')}<span>Entnehmen</span></button>
-    <button class="act" data-act="elBuch" data-a="zugang">${ic('pluscircle')}<span>Zugang</span></button>
+  <div class="actgrid" style="grid-template-columns:repeat(${BUCHEN.eigen?3:1},1fr)">
+    ${BUCHEN.eigen?`<button class="act" data-act="elBuch" data-a="entnahme">${ic('minuscircle')}<span>Entnehmen</span></button>
+    <button class="act" data-act="elBuch" data-a="zugang">${ic('pluscircle')}<span>Zugang</span></button>`:''}
     <button class="act" data-act="elEdit">${ic('edit')}<span>Bearbeiten</span></button>
   </div>
   ${kom.length?callout('blue','info','Gibt es auch im Viessmann-Kommissionslager',kom.map(k=>`${esc(k.artikelnummer)} · Platz ${esc(k.lagerplatz||'–')} · Bestand ${nf2(k.bestand)}`).join('<br>')+'<br><b>Das ist ein anderes Lager – dort nur Kommissionsware buchen.</b>',true):''}
@@ -1549,24 +1609,24 @@ function restCard(r){
   const tags=[`<span class="chip tone-teal">${ic('pin','sm')}${esc([r.standort!=='Ramsenweg'?r.standort:'',raumOf(r),r.platz].filter(Boolean).join(' · '))}</span>`,
     `<span class="chip tone-${r.aktiv?'gray':'red'}">${r.aktiv?esc(mengeTxt(r.menge,r.einheit)):'verbraucht'}</span>`];
   if(r.herkunft)tags.push(`<span class="chip tone-gray">${esc(r.herkunft)}</span>`);
-  return`<a class="lcard acard2" href="#/rest/${r.id}">${f?`<img class="athumb" data-photo="${esc(f)}" alt="">`:`<span class="athumb none">${ic('scissors')}</span>`}<div class="lcard-main"><b class="tt">${esc(r.bezeichnung)}</b><div class="lcard-sub">${esc(r.beschreibung||'')}</div><div class="lcard-tags">${tags.join('')}</div></div>${ic('chev','chev')}</a>`;
+  return`<a class="lcard acard2" href="#/rest/${r.id}">${f?`<img class="athumb" data-photo="${esc(f)}" alt="">`:`<span class="athumb none">${ic('carton')}</span>`}<div class="lcard-main"><b class="tt">${esc(r.bezeichnung)}</b><div class="lcard-sub">${esc(r.beschreibung||'')}</div><div class="lcard-tags">${tags.join('')}</div></div>${ic('chev','chev')}</a>`;
 }
 function viewReste(){
   const all=S.reste.filter(r=>r.standort===S.rst&&(S.rAll||r.aktiv));
   const list=restSuche(S.rq||'',all),rs=raeume(list);
   paint(`
-  ${backHead('#/','Lagerverwaltung','Restelager',`<button class="btn btn-primary btn-sm" data-act="rNew">${ic('plus','sm')} Rest</button>`)}
+  ${backHead('#/','Lagerverwaltung','Restelager',`<button class="btn btn-primary btn-sm" data-act="rNew">${ic('plus','sm')} Artikel</button>`)}
   ${lagerBadge('rest')}
-  <button class="hero-go teal" data-act="rNew" style="margin-top:12px"><span class="ico">${ic('camera','lg')}</span><span><small>Rest von der Baustelle, Sonderartikel</small><b>Rest erfassen (mit Foto)</b></span>${ic('chev','chev')}</button>
+  <button class="hero-go teal" data-act="rNew" style="margin-top:12px"><span class="ico">${ic('camera','lg')}</span><span><small>Rest von der Baustelle, Sonderartikel</small><b>Artikel erfassen (mit Foto)</b></span>${ic('chev','chev')}</button>
   ${stSeg(S.rst,'rSt')}
-  <div class="searchbar" style="margin-top:12px">${ic('search')}<input id="rrq" type="search" placeholder="Rest suchen …" value="${esc(S.rq||'')}" aria-label="Reste suchen"></div>
+  <div class="searchbar" style="margin-top:12px">${ic('search')}<input id="rrq" type="search" placeholder="Artikel suchen …" value="${esc(S.rq||'')}" aria-label="Artikel im Restelager suchen"></div>
   <label class="switchrow" style="margin:12px 2px 0"><input type="checkbox" id="rAll" ${S.rAll?'checked':''}> Verbrauchte auch anzeigen</label>
   <div id="rRes">${restListHTML(list,rs)}</div>`);
   const i=$('#rrq');i.addEventListener('input',()=>{S.rq=i.value;const l=restSuche(i.value,all);$('#rRes').innerHTML=restListHTML(l,raeume(l));hydratePhotos($('#rRes'))});
   $('#rAll').addEventListener('change',async e=>{S.rAll=e.target.checked;await loadAll();viewReste()});
 }
 function restListHTML(list,rs){
-  if(!list.length)return`<div class="card" style="margin-top:12px">${emptyState('scissors','Keine Reste hier','Erfasse Reste mit Foto, damit alle sehen, was noch da ist.')}</div>`;
+  if(!list.length)return`<div class="card" style="margin-top:12px">${emptyState('carton','Hier liegt noch nichts','Erfasse Artikel mit Foto, damit alle sehen, was noch da ist.')}</div>`;
   return rs.map(([r,n])=>`<div class="sec"><h2>${esc(r)}</h2><span class="muted">${n}</span></div><div class="list">${list.filter(x=>raumOf(x)===r).map(restCard).join('')}</div>`).join('');
 }
 ACT.rSt=el=>{S.rst=el.dataset.s;viewReste()};
@@ -1577,7 +1637,7 @@ async function viewRest(id,tk){
   let r=restById(id);
   if(!r){try{[r]=await api('GET','el_reste',null,`?id=eq.${id}&select=*`)}catch(e){}}
   if(tk!==TOKEN)return;
-  if(!r){paint(`<div class="noaccess">${ic('scissors')}<h1>Rest nicht gefunden</h1><div class="btnrow" style="margin-top:20px"><a class="btn btn-primary" href="#/reste">Zum Restelager</a></div></div>`);return}
+  if(!r){paint(`<div class="noaccess">${ic('carton')}<h1>Rest nicht gefunden</h1><div class="btnrow" style="margin-top:20px"><a class="btn btn-primary" href="#/reste">Zum Restelager</a></div></div>`);return}
   RD=r;let verl=[];
   try{verl=await api('GET','el_verlauf',null,`?rest_id=eq.${id}&select=*&order=created_at.desc&limit=30`)}catch(e){}
   if(tk!==TOKEN)return;
@@ -1587,9 +1647,9 @@ async function viewRest(id,tk){
   ${(r.fotos||[]).length?`<div class="phgrid" style="margin:12px 0">${r.fotos.map((p,i)=>`<button class="ph" data-act="openF" data-p="${esc(p)}"><img data-photo="${esc(p)}" alt="Foto ${i+1}"></button>`).join('')}</div>`:''}
   <div class="wobox teal"><div>${ic('pin')}</div><div><small>Hier liegt der Rest</small><b>${esc(ST_LANG[r.standort])}</b><span>${esc([raumOf(r),r.platz].filter(Boolean).join(' › '))}</span></div></div>
   <div class="sumtiles" style="margin-top:12px"><div class="sumtile"><small>Menge</small><b>${r.aktiv?esc(nf2(r.menge)):'0'}</b><div class="muted" style="font-size:12px">${esc(r.einheit)}</div></div><div class="sumtile"><small>Erfasst</small><b style="font-size:15px">${esc(fmtD(String(r.created_at).slice(0,10)))}</b><div class="muted" style="font-size:12px">${esc(r.erfasst_von||'')}</div></div></div>
-  <div class="actgrid" style="grid-template-columns:repeat(${r.aktiv?3:2},1fr)">
-    ${r.aktiv?`<button class="act" data-act="rBuch" data-a="entnahme">${ic('minuscircle')}<span>Entnehmen</span></button>`:''}
-    <button class="act" data-act="rBuch" data-a="zugang">${ic('pluscircle')}<span>${r.aktiv?'Dazu':'Wieder da'}</span></button>
+  <div class="actgrid" style="grid-template-columns:repeat(${BUCHEN.rest?(r.aktiv?3:2):1},1fr)">
+    ${BUCHEN.rest&&r.aktiv?`<button class="act" data-act="rBuch" data-a="entnahme">${ic('minuscircle')}<span>Entnehmen</span></button>`:''}
+    ${BUCHEN.rest?`<button class="act" data-act="rBuch" data-a="zugang">${ic('pluscircle')}<span>${r.aktiv?'Dazu':'Wieder da'}</span></button>`:''}
     <button class="act" data-act="rEdit">${ic('edit')}<span>Bearbeiten</span></button>
   </div>
   ${!r.aktiv?callout('gray','info','Verbraucht','Dieser Rest ist aufgebraucht und erscheint nicht mehr in der Liste.',true):''}
@@ -1609,7 +1669,7 @@ ACT.rDelete=()=>confirmSheet({title:'Rest löschen?',text:'Der Eintrag wird mit 
 function restForm(r){
   const n=!r;r=r||{standort:S.rst,einheit:'Stück',menge:1,fotos:[]};
   const raumOpts=[...new Set([...S.el.filter(a=>a.standort===r.standort).map(a=>a.raum),...S.reste.map(x=>x.raum)].filter(Boolean))].sort(raumSort).map(x=>`<option value="${esc(x)}">`).join('');
-  const bd=sheet({title:n?'Rest erfassen':'Rest bearbeiten',body:`
+  const bd=sheet({title:n?'Artikel erfassen':'Artikel bearbeiten',body:`
     ${lagerBadge('rest')}
     ${field('Fotos',`<div id="fFotos"></div>`,'Bis zu 4 Fotos – am besten so, dass man Größe/Länge erkennt.')}
     ${field('Was ist es? *',inp('rB',r.bezeichnung,'placeholder="z. B. Kupferrohr 22 mm, Heizkörper 600x1000"'))}
@@ -1640,13 +1700,13 @@ function restForm(r){
     let saved;
     if(n)[saved]=await api('POST','el_reste',row);else[saved]=await api('PATCH','el_reste',row,`?id=eq.${r.id}`);
     weg.forEach(delFile);
-    closeSheet();await loadAll();toast(n?'Rest erfasst':'Gespeichert','ok');
+    closeSheet();await loadAll();toast(n?'Artikel erfasst':'Gespeichert','ok');
     if(saved)location.hash='#/rest/'+saved.id;route();
   });
 }
 /* =====================================================================
    Inventur: eigenes Lager und Restelager, je Standort, raumweise zählen
-   (Die Inventur des Kommissionslagers bleibt in lager.html.)
+   (Die Inventur des Kommissionslagers steht in l84-kom-inventur.js.)
    ===================================================================== */
 let INV=null;
 async function viewInventuren(){
@@ -1660,7 +1720,7 @@ async function viewInventuren(){
   <div class="card" style="margin-bottom:12px"><b>Neue Inventur starten</b>
     <div class="row2" style="margin-top:12px">${field('Lager',sel('iL',ls.map(l=>[l,LAGER[l].name]),ls[0]))}${field('Standort',sel('iS',STANDORTE,'Ramsenweg'))}</div>
     <button class="btn btn-primary btn-block" data-act="invStart">${ic('clip','sm')} Inventur starten</button>
-    <p class="hint" style="margin-top:10px">Pro Lager und Standort läuft immer nur eine Inventur. Gezählt wird raumweise; mehrere Kollegen können gleichzeitig verschiedene Räume zählen. Die Inventur des Viessmann-Kommissionslagers findest du in der Kommission.</p>
+    <p class="hint" style="margin-top:10px">Pro Lager und Standort läuft immer nur eine Inventur. Gezählt wird raumweise; mehrere Kollegen können gleichzeitig verschiedene Räume zählen. Die Inventur des Viessmann-Kommissionslagers findest du unter Viessmann Kommission → Inventur.</p>
   </div>
   ${offen.length?`<div class="sec"><h2>Laufend</h2></div><div class="list">${offen.map(card).join('')}</div>`:''}
   ${fertig.length?`<div class="sec"><h2>Abgeschlossen</h2></div><div class="list">${fertig.map(card).join('')}</div>`:''}`);
@@ -1810,6 +1870,909 @@ async function pdfDeliver(P,name,who){
     footer:`<button class="btn btn-ghost" data-act="closeSheet">Schließen</button>${canShare?`<button class="btn btn-soft" id="pdShare">${ic('share')} Teilen</button>`:''}<button class="btn btn-primary" id="pdSave">${ic('download')} Speichern</button>`});
   $('#pdSave',bd).onclick=()=>saveBlob(blob,name);
   const sh=$('#pdShare',bd);if(sh)sh.onclick=async()=>{try{await navigator.share({files:[file],title:name})}catch(e){}};
+  return bd;
+}
+/* ---------- Unterschrift ---------- */
+function sigPad(host,initial){
+  host.innerHTML=`<canvas></canvas><div class="base"></div><div class="ph">Hier mit dem Finger unterschreiben</div><button class="clear" type="button">Löschen</button>`;
+  const cv=$('canvas',host),ctx=cv.getContext('2d'),ph=$('.ph',host);
+  let drawing=false,dirty=false,last=null,mid=null;
+  const INK='#0b1220';
+  const fit=()=>{const r=host.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);cv.width=Math.max(10,Math.round(r.width*dpr));cv.height=Math.max(10,Math.round(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=INK;ctx.fillStyle=INK};
+  fit();
+  if(initial){const im=new Image();im.onload=()=>{const r=host.getBoundingClientRect();ctx.drawImage(im,0,0,r.width,r.height);dirty=true;ph.hidden=true};im.src=initial}
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  cv.addEventListener('pointerdown',e=>{try{cv.setPointerCapture(e.pointerId)}catch(_){}drawing=true;last=pos(e);mid=last;ctx.beginPath();ctx.arc(last.x,last.y,1.4,0,7);ctx.fill();dirty=true;ph.hidden=true;e.preventDefault()});
+  cv.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e),m={x:(last.x+p.x)/2,y:(last.y+p.y)/2};ctx.beginPath();ctx.moveTo(mid.x,mid.y);ctx.quadraticCurveTo(last.x,last.y,m.x,m.y);ctx.stroke();last=p;mid=m;e.preventDefault()});
+  ['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>{drawing=false}));
+  $('.clear',host).onclick=()=>{ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.restore();dirty=false;ph.hidden=false};
+  return{empty:()=>!dirty,data(){const o=document.createElement('canvas');o.width=600;o.height=Math.max(60,Math.round(600*cv.height/cv.width));const c=o.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,o.width,o.height);c.drawImage(cv,0,0,o.width,o.height);return o.toDataURL('image/png')}};
+}
+/* =====================================================================
+   Viessmann-Kommissionslager (früher lager.html), jetzt im Design der Lagerverwaltung
+   Rechte: alle mit Kommissions-Recht sehen Artikel/Bestand/Lagerplatz und stellen Löschanfragen.
+           Lagerist + Admin buchen, bearbeiten, sehen Transaktionen, prüfen Löschanfragen.
+           Lager-Abrechnung + Admin sehen Preise, Abrechnung, Verdienst.
+   ===================================================================== */
+const KBUCKET='kommission-dateien';
+const KOM={q:'',lz:0};
+const berlinZeit=ts=>new Date(ts).toLocaleString('de-DE',{timeZone:'Europe/Berlin',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const berlinDatum=ts=>new Date(ts).toLocaleDateString('de-DE',{timeZone:'Europe/Berlin',day:'2-digit',month:'2-digit',year:'numeric'});
+const berlinUhr=ts=>new Date(ts).toLocaleTimeString('de-DE',{timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit'});
+const monatHeute=()=>berlinToday().slice(0,7);
+const monatName=m=>{const [y,mo]=m.split('-');return['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][+mo-1]+' '+y};
+const monatPlus=(m,n)=>{let [y,mo]=m.split('-').map(Number);mo+=n;while(mo<1){mo+=12;y--}while(mo>12){mo-=12;y++}return y+'-'+String(mo).padStart(2,'0')};
+const komById=id=>S.kom.find(a=>a.id===id);
+const ZONE={regulaer:['Öffnungszeit','ok'],bereitschaft:['Bereitschaft','amber'],gesperrt:['außerhalb (gesperrt)','red']};
+const zoneChip=z=>chip(ZONE[z]?ZONE[z][1]:'gray',ZONE[z]?ZONE[z][0]:z);
+const spin=()=>`<div style="display:grid;place-items:center;padding:80px 0"><div class="spinner"></div></div>`;
+const noKom=(t='Kein Zugriff',x='Dafür fehlt dir die Berechtigung. Buchen und Transaktionen sind dem Lageristen und dem Admin vorbehalten.')=>paint(`<div class="noaccess">${ic('lock')}<h1>${esc(t)}</h1><p class="muted">${esc(x)}</p><div class="btnrow" style="margin-top:20px"><a class="btn btn-primary" href="#/k">Zur Kommission</a></div></div>`);
+
+/* ---------- Router #/k/… ---------- */
+function routeKom(p,tk){
+  const [a,b,c]=p;
+  if(!a)return viewKom();
+  if(a==='a')return viewKomArtikel(b,tk);
+  if(a==='aus'||a==='ein'){if(!isLagerist())return noKom();return viewKomBuchen(a==='aus'?'ausgabe':'einlagerung')}
+  if(a==='buch'){if(!isLagerist()&&!isAbr())return noKom();return viewKomBuchungen(b||monatHeute(),tk)}
+  if(a==='v'){if(!isLagerist()&&!isAbr())return noKom();return viewKomVorgang(b,tk)}
+  if(a==='monat'){if(!isLagerist()&&!isAbr())return noKom();return viewKomMonat(b||monatHeute(),tk)}
+  if(a==='inv'){if(!isLagerist())return noKom();return viewKomInventur(b,c,tk)}
+  if(a==='loesch')return viewKomLoesch(tk);
+  if(a==='abr'){if(!isAbr())return noKom('Kein Zugriff','Die Abrechnung sehen nur der Admin und freigeschaltete Personen.');return viewKomAbr(b||monatPlus(monatHeute(),-1),tk)}
+  if(a==='jahr'){if(!isAbr())return noKom();return viewKomJahr(+(b||monatHeute().slice(0,4)),tk)}
+  if(a==='preise'){if(!isAdmin())return noKom('Nur für den Admin','Preise und Sondertage pflegt nur der Admin.');return viewKomPreise(tk)}
+  if(a==='kunden'){if(!isLagerist())return noKom();return viewKomKunden(tk)}
+  viewKom();
+}
+/* Unter-Navigation der Kommission (Chips) */
+function komNav(akt){
+  const it=[['k','#/k','box','Artikel']];
+  if(isLagerist()||isAbr())it.push(['buch','#/k/buch','list','Buchungen'],['monat','#/k/monat','doc','Monatsliste']);
+  if(isLagerist())it.push(['inv','#/k/inv','clip','Inventur']);
+  it.push(['loesch','#/k/loesch','trash','Löschanfragen'+(isLagerist()&&KOM.lz?` <em class="cnt-dot">${KOM.lz}</em>`:'')]);
+  if(isAbr())it.push(['abr','#/k/abr','euro','Abrechnung']);
+  return`<div class="chips knav" role="navigation" aria-label="Kommission">${it.map(([k,h,i,l])=>`<a class="chipbtn ${k===akt?'on':''}" href="${h}">${ic(i,'sm')} ${l}</a>`).join('')}</div>`;
+}
+async function komZaehler(){try{const z=await rpc('lager_zaehler');KOM.lz=+(z&&z.loesch)||0}catch(e){KOM.lz=0}}
+const komHead=(title,akt,right='')=>`${backHead(akt==='k'?'#/':'#/k','Viessmann Kommission',title,right)}${lagerBadge('kommission')}${komNav(akt)}`;
+
+/* ---------- Übersicht / Artikel ---------- */
+function komCard(a){
+  return`<a class="lcard acard2" href="#/k/a/${a.id}"><div class="tnum tone-blue">${ic('box')}</div><div class="lcard-main"><b class="tt">${esc(a.artikelnummer)}</b><div class="lcard-sub">${esc(a.beschreibung||'–')}</div><div class="lcard-tags"><span class="chip tone-blue">${ic('pin','sm')}Platz ${esc(a.lagerplatz||'–')}</span><span class="chip tone-${(+a.bestand||0)>0?'gray':'red'}">Bestand ${nf(a.bestand||0)}</span></div></div>${ic('chev','chev')}</a>`;
+}
+async function viewKom(){
+  await komZaehler();
+  const sum=S.kom.reduce((s,a)=>s+(+a.bestand||0),0),leer=S.kom.filter(a=>!(+a.bestand>0)).length;
+  paint(`
+  ${komHead('Kommissionslager Tannerstraße','k',isLagerist()?`<button class="btn btn-primary btn-sm" data-act="kNeu">${ic('plus','sm')} Artikel</button>`:'')}
+  ${isLagerist()?`<div class="kgo">
+    <a class="hero-go orange" href="#/k/aus"><span class="ico">${ic('out','lg')}</span><span><small>Abholung oder Versand</small><b>Ausgabe buchen</b></span>${ic('chev','chev')}</a>
+    <a class="hero-go teal" href="#/k/ein"><span class="ico">${ic('in','lg')}</span><span><small>Ware von Viessmann</small><b>Einlagerung buchen</b></span>${ic('chev','chev')}</a></div>`
+    :callout('blue','info','Nur ansehen','Hier siehst du Artikel, Bestand und Lagerplatz. Gebucht wird nur vom Lageristen. Wenn etwas falsch ist: Artikel öffnen → „Löschung beantragen“ oder „Problem melden“ in My Heise.',true)}
+  <div class="sumtiles s3" style="margin-top:12px"><div class="sumtile"><small>Artikel</small><b>${nf(S.kom.length)}</b></div><div class="sumtile"><small>Gesamtbestand</small><b>${nf(sum)}</b></div><div class="sumtile"><small>Ohne Bestand</small><b>${nf(leer)}</b></div></div>
+  <div class="srow" style="margin-top:12px"><div class="searchbar">${ic('search')}<input id="kq" type="search" placeholder="Artikelnummer, Beschreibung, Lagerplatz …" value="${esc(KOM.q)}" aria-label="Im Kommissionslager suchen"></div><button class="iconbtn" data-act="kScanSuche" aria-label="Karton scannen" title="Karton scannen">${ic('scan')}</button></div>
+  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-soft btn-sm" data-act="kPlan">${ic('map','sm')} Lagerplan</button>${isLagerist()?`<a class="btn btn-soft btn-sm" href="#/k/kunden">${ic('users','sm')} Kunden / Firmen</a>`:''}</div>
+  <div id="kRes"></div>`);
+  const i=$('#kq');const draw=()=>{KOM.q=i.value;const q=i.value.trim();const r=q?komSuche(q):S.kom;
+    $('#kRes').innerHTML=r.length?`<div class="sec"><h2>${q?r.length+' Treffer':'Alle Artikel'}</h2><span class="muted">${r.length>200?'die ersten 200':''}</span></div><div class="list">${r.slice(0,200).map(komCard).join('')}</div>`:`<div class="card" style="margin-top:12px">${emptyState('search','Nichts gefunden','Kein Kommissionsartikel passt zur Suche.')}</div>`};
+  i.addEventListener('input',draw);draw();
+}
+ACT.kScanSuche=()=>scanSheet({title:'Karton scannen',onCode:code=>{const a=komFinde(code);if(a){closeSheet();location.hash='#/k/a/'+a.id}else toast('Kein Artikel zu „'+code+'“','err')}});
+ACT.kNeu=()=>komForm(null);
+
+/* Artikel anhand Nummer oder gemerktem Barcode finden (wie bisher in der Inventur) */
+const codeNorm=s=>String(s||'').trim().toUpperCase().replace(/[\s\-_.\/]/g,'');
+const codeNoZeros=s=>codeNorm(s).replace(/^0+/,'');
+function komFinde(raw,list=S.kom){
+  const c=String(raw||'').trim();if(!c)return null;
+  const cn=codeNorm(c),cz=codeNoZeros(c);
+  let a=list.find(x=>String(x.artikelnummer).toLowerCase()===c.toLowerCase())||list.find(x=>codeNorm(x.artikelnummer)===cn)||(cz&&list.find(x=>codeNoZeros(x.artikelnummer)===cz))||null;
+  if(!a)a=list.find(x=>x.barcode&&(x.barcode===c||codeNorm(x.barcode)===cn))||null;
+  if(!a){const hits=list.filter(x=>{const n=codeNorm(x.artikelnummer);return n.length>=5&&cn.includes(n)});if(hits.length===1)a=hits[0]}
+  return a;
+}
+
+async function viewKomArtikel(id,tk){
+  let a=komById(id);
+  if(!a){try{[a]=await api('GET','artikel',null,`?id=eq.${id}&select=*`)}catch(e){}}
+  if(tk!==TOKEN)return;
+  if(!a){paint(`<div class="noaccess">${ic('box')}<h1>Artikel nicht gefunden</h1><div class="btnrow" style="margin-top:20px"><a class="btn btn-primary" href="#/k">Zur Kommission</a></div></div>`);return}
+  let hist=[],offen=null;
+  if(isLagerist()){try{hist=await api('GET','bewegungen',null,`?artikel_id=eq.${id}&select=*&order=created_at.desc&limit=40`)}catch(e){}}
+  try{[offen]=await api('GET','kom_loeschanfragen',null,`?objekt=eq.artikel&objekt_id=eq.${id}&status=eq.offen&select=id,beantragt_von,beantragt_am`)}catch(e){}
+  if(tk!==TOKEN)return;
+  KOM.a=a;
+  const nr=parseInt(String(a.lagerplatz||'').split('-')[0]);
+  paint(`
+  ${backHead('#/k','Viessmann Kommission',a.artikelnummer)}
+  ${lagerBadge('kommission')}
+  ${a.geloescht_am?callout('red','trash','Gelöscht',`Dieser Artikel wurde am ${esc(berlinDatum(a.geloescht_am))} gelöscht.`,true):''}
+  ${offen?callout('amber','alert','Löschung beantragt',`von ${esc(offen.beantragt_von||'')} am ${esc(berlinDatum(offen.beantragt_am))} – wartet auf Prüfung.`,true):''}
+  <div class="card" style="margin-top:12px"><b style="font-size:17px">${esc(a.beschreibung||'Ohne Beschreibung')}</b><div class="muted" style="margin-top:3px">Viessmann-Nr. ${esc(a.artikelnummer)}</div></div>
+  <div class="wobox blue"><div>${ic('pin')}</div><div><small>Hier liegt der Artikel</small><b>Kommissionslager Tannerstraße</b><span>Lagerplatz ${esc(a.lagerplatz||'–')}${nr?` · Abteil ${nr}`:''}</span></div></div>
+  <div class="sumtiles" style="margin-top:12px"><div class="sumtile"><small>Bestand</small><b style="color:${(+a.bestand||0)>0?'inherit':'var(--red)'}">${nf(a.bestand||0)}</b><div class="muted" style="font-size:12px">Stück</div></div><div class="sumtile"><small>Lagerplatz</small><b style="font-size:18px">${esc(a.lagerplatz||'–')}</b></div></div>
+  <div class="actgrid" style="grid-template-columns:repeat(${isLagerist()?3:2},1fr)">
+    ${isLagerist()?`<button class="act" data-act="kAusMit">${ic('out')}<span>Ausgabe</span></button><button class="act" data-act="kEinMit">${ic('in')}<span>Einlagerung</span></button><button class="act" data-act="kEdit">${ic('edit')}<span>Bearbeiten</span></button>`
+      :`<button class="act" data-act="kPlan" data-nr="${nr||''}">${ic('map')}<span>Im Lagerplan</span></button><button class="act" data-act="kLoeschArt" ${offen||a.geloescht_am?'disabled':''}>${ic('trash')}<span>Löschung beantragen</span></button>`}
+  </div>
+  ${isLagerist()?`<div class="btnrow" style="margin-top:10px"><button class="btn btn-soft btn-sm" data-act="kPlan" data-nr="${nr||''}">${ic('map','sm')} Im Lagerplan zeigen</button><button class="btn btn-ghost btn-sm" data-act="kLoeschArt" style="color:var(--red)" ${offen||a.geloescht_am?'disabled':''}>${ic('trash','sm')} Löschung beantragen</button></div>`:''}
+  ${a.bemerkung?`<div class="sec"><h2>Bemerkung</h2></div><div class="card"><p style="white-space:pre-wrap">${esc(a.bemerkung)}</p></div>`:''}
+  ${isLagerist()?`<div class="sec"><h2>Bewegungen</h2><span class="muted">nur Lagerist/Admin</span></div><div class="card">${hist.length?`<div class="tl">${hist.map(b=>`<div class="tl-i"><b>${b.typ==='einlagerung'?'↑ Eingelagert':'↓ Ausgelagert'} ${nf(b.menge)} Stück${b.lieferscheinnummer?' · LS '+esc(b.lieferscheinnummer):''}</b><small>${esc(berlinZeit(b.created_at))}${b.benutzer?' · '+esc(b.benutzer):''}${b.vorgang_id?` · <a href="#/k/v/${b.vorgang_id}">Buchung öffnen</a>`:''}</small></div>`).join('')}</div>`:'<p class="muted">Noch keine Bewegungen.</p>'}</div>`:''}
+  <div style="height:8px"></div>`);
+}
+ACT.kEdit=()=>komForm(KOM.a);
+ACT.kAusMit=()=>{KB=null;KB_START={art:'ausgabe',artikel:KOM.a};location.hash='#/k/aus'};
+ACT.kEinMit=()=>{KB=null;KB_START={art:'einlagerung',artikel:KOM.a};location.hash='#/k/ein'};
+ACT.kLoeschArt=()=>loeschAntrag('artikel',KOM.a.id,`${KOM.a.artikelnummer} · ${KOM.a.beschreibung||''}`);
+
+function komForm(a){
+  const n=!a;a=a||{};
+  const bd=sheet({title:n?'Neuer Kommissionsartikel':'Artikel bearbeiten',body:`
+    ${lagerBadge('kommission')}
+    ${field('Viessmann-Artikelnummer *',inp('kN',a.artikelnummer,'autofocus inputmode="numeric"'))}
+    ${field('Beschreibung',inp('kB',a.beschreibung))}
+    ${field('Lagerplatz',inp('kL',a.lagerplatz,'placeholder="z. B. 22-A"'),'Zahl = Abteil im Lagerplan, danach das Fach.')}
+    ${field('Bemerkung',`<textarea class="inp" id="kR" rows="2">${esc(a.bemerkung||'')}</textarea>`)}
+    ${n?callout('blue','info','Bestand','Neue Artikel starten mit Bestand 0. Der Bestand kommt über „Einlagerung buchen“ (mit Lieferschein).',true):`<p class="hint">Der Bestand ändert sich nur über Einlagerung, Ausgabe oder Inventur.</p>`}
+    <div class="err" id="kErr" role="alert"></div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="kGo">${n?'Anlegen':'Speichern'}</button>`});
+  $('#kGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const nr=val(bd,'kN');if(!nr)return $('#kErr',bd).textContent='Bitte die Artikelnummer eingeben.';
+    if(S.kom.some(x=>x.id!==a.id&&String(x.artikelnummer).trim().toLowerCase()===nr.toLowerCase()))return $('#kErr',bd).textContent='Diese Artikelnummer gibt es schon.';
+    const row={artikelnummer:nr,beschreibung:val(bd,'kB')||null,lagerplatz:val(bd,'kL')||null,bemerkung:val(bd,'kR')||null};
+    let saved;if(n)[saved]=await api('POST','artikel',{...row,bestand:0});else[saved]=await api('PATCH','artikel',row,`?id=eq.${a.id}`);
+    closeSheet();await loadAll();toast(n?'Angelegt':'Gespeichert','ok');
+    if(saved)location.hash='#/k/a/'+saved.id;route();
+  });
+}
+
+/* ---------- Löschanfrage stellen ---------- */
+function loeschAntrag(objekt,id,text){
+  const bd=sheet({title:'Löschung beantragen',body:`
+    ${callout('amber','alert','Es wird noch nichts gelöscht',`Der Lagerist oder der Admin prüft deine Anfrage und gibt sie mit Unterschrift frei. Du bekommst eine Nachricht.`,true)}
+    <div class="kv" style="margin:12px 0"><b>${esc(text)}</b></div>
+    ${field('Warum soll das gelöscht werden? *',`<textarea class="inp" id="lG" rows="3" placeholder="${objekt==='artikel'?'z. B. doppelt angelegt, Artikel gibt es nicht mehr':'z. B. falsche Menge gebucht, falscher Kunde'}"></textarea>`)}
+    <label class="switchrow"><input type="checkbox" id="lOk"> Ja, ich möchte die Löschung beantragen.</label>
+    <div class="err" id="lErr" role="alert"></div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-danger" id="lGo">${ic('trash','sm')} Beantragen</button>`});
+  $('#lGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const g=val(bd,'lG');if(!g)return $('#lErr',bd).textContent='Bitte einen Grund angeben.';
+    if(!$('#lOk',bd).checked)return $('#lErr',bd).textContent='Bitte bestätigen.';
+    await rpc('kom_loesch_beantragen',{p_objekt:objekt,p_id:id,p_grund:g});
+    closeSheet();toast('Löschanfrage gestellt – der Admin wird benachrichtigt','ok');route();
+  });
+}
+
+/* ---------- Lagerplan Tannerstraße (aus lager.html übernommen) ---------- */
+function komPlanSVG(hl=null,clickable=false){
+  const hlNr=hl?parseInt(String(hl)):null;
+  const left=[13,12,11,10,9,8,7,6,5,4,3,2,1],right=[16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33];
+  const on=nr=>hlNr&&nr===hlNr;
+  const col=(nr,top)=>on(nr)?{f:'#fee2e2',s:'#dc2626',t:'#dc2626',b:true}:top?{f:'#ede9fe',s:'#a78bfa',t:'#6d28d9',b:false}:{f:'#dbeafe',s:'#93c5fd',t:'#1d4ed8',b:false};
+  const cl=nr=>clickable?`data-act="kPlanAbteil" data-nr="${nr}" role="button" tabindex="0" style="cursor:pointer"`:'';
+  const W=520,H=420,wallW=60,topH=55,leftX=40,topY=20,rightX=W-40-wallW,leftStart=topY+topH+2,leftSlot=Math.floor((H-40-topH-2)/13),rightSlot=Math.floor((H-40)/18);
+  const dot=(x,y)=>`<circle cx="${x}" cy="${y}" r="5" fill="#dc2626"><animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/></circle>`;
+  let s=`<svg class="plan" viewBox="0 0 ${W} ${H}" role="img" aria-label="Lagerplan Kommissionslager"><rect x="${leftX}" y="${topY}" width="${W-80}" height="${H-40}" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="${leftX+wallW}" y="${topY+topH}" width="${W-80-wallW*2}" height="${H-40-topH}" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="4 3"/>
+  <rect x="${leftX}" y="${topY}" width="${W-80}" height="${topH}" fill="#ede9fe" stroke="#cbd5e1" stroke-width="0.5"/>
+  <text x="${W/2}" y="${topY+topH/2+4}" text-anchor="middle" font-size="10" fill="#64748b">Stirnseite</text>`;
+  [{nr:14,x:leftX+wallW+10,w:100},{nr:15,x:leftX+wallW+160,w:100}].forEach(({nr,x,w})=>{const c=col(nr,true);
+    s+=`<g ${cl(nr)}><rect x="${x}" y="${topY+4}" width="${w}" height="${topH-8}" rx="3" fill="${c.f}" stroke="${c.s}" stroke-width="${c.b?1.5:.5}"/><text x="${x+w/2}" y="${topY+topH/2+5}" text-anchor="middle" font-size="13" font-weight="${c.b?700:400}" fill="${c.t}">${nr}</text></g>`;if(c.b)s+=dot(x+w+8,topY+topH/2)});
+  s+=`<rect x="${leftX}" y="${topY}" width="${wallW}" height="${H-40}" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.8"/>`;
+  left.forEach((nr,i)=>{const y=leftStart+i*leftSlot+2,c=col(nr);s+=`<g ${cl(nr)}><rect x="${leftX+4}" y="${y}" width="${wallW-8}" height="${leftSlot-4}" rx="3" fill="${c.f}" stroke="${c.s}" stroke-width="${c.b?1.5:.5}"/><text x="${leftX+wallW/2}" y="${y+(leftSlot-4)/2+4}" text-anchor="middle" font-size="11" font-weight="${c.b?700:400}" fill="${c.t}">${nr}</text></g>`;if(c.b)s+=dot(leftX+wallW+6,y+(leftSlot-4)/2)});
+  s+=`<rect x="${rightX}" y="${topY}" width="${wallW}" height="${H-40}" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.8"/>`;
+  right.forEach((nr,i)=>{const y=topY+4+i*rightSlot,c=col(nr);s+=`<g ${cl(nr)}><rect x="${rightX+4}" y="${y}" width="${wallW-8}" height="${rightSlot-3}" rx="2" fill="${c.f}" stroke="${c.s}" stroke-width="${c.b?1.5:.5}"/><text x="${rightX+wallW/2}" y="${y+(rightSlot-3)/2+4}" text-anchor="middle" font-size="10" font-weight="${c.b?700:400}" fill="${c.t}">${nr}</text></g>`;if(c.b)s+=dot(rightX-6,y+(rightSlot-3)/2)});
+  const cx=W/2;
+  s+=`<rect x="${cx-45}" y="${topY+H-52}" width="90" height="15" rx="3" fill="#dcfce7"/><text x="${cx}" y="${topY+H-42}" text-anchor="middle" font-size="10" fill="#16a34a">Eingang</text></svg>`;
+  return s;
+}
+ACT.kPlan=el=>{
+  const nr=el&&el.dataset.nr?+el.dataset.nr:null;
+  sheet({title:nr?'Lagerplan – Abteil '+nr:'Lagerplan Kommissionslager',body:`<div class="card plancard">${komPlanSVG(nr,!nr)}</div><p class="hint" style="text-align:center;margin-top:8px">${nr?'Das Abteil ist rot markiert.':'Abteil antippen, um zu sehen, was dort liegt.'}</p><div id="kPlanRes"></div>`});
+};
+ACT.kPlanAbteil=el=>{
+  const nr=+el.dataset.nr,l=S.kom.filter(a=>parseInt(String(a.lagerplatz||'').split('-')[0])===nr);
+  const box=$('#kPlanRes');if(!box)return;
+  box.innerHTML=`<div class="sec"><h2>Abteil ${nr}</h2><span class="muted">${l.length} Artikel</span></div>${l.length?`<div class="list">${l.map(komCard).join('')}</div>`:'<p class="muted">Keine Artikel in diesem Abteil.</p>'}`;
+  box.querySelectorAll('a').forEach(x=>x.addEventListener('click',()=>closeSheet()));
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+/* ---------- Buchungen (Transaktionen) – nur Lagerist/Admin/Abrechnung ---------- */
+const vorgTitel=v=>v.art==='einlagerung'?'Einlagerung':v.versand?'Ausgabe per Versand':'Ausgabe / Abholung';
+function vorgCard(v){
+  return`<a class="lcard" href="#/k/v/${v.id}"><div class="tnum tone-${v.storniert?'gray':v.art==='einlagerung'?'teal':'amber'}">${ic(v.art==='einlagerung'?'in':v.versand?'truck':'out')}</div><div class="lcard-main"><b class="tt">${esc(vorgTitel(v))} · LS ${esc(v.lieferschein_nr)}</b><div class="lcard-sub">${esc(berlinZeit(v.zeitpunkt))}${v.firma?' · '+esc(v.firma):''}${v.abholer?' · '+esc(v.abholer):''}</div><div class="lcard-tags"><span class="chip tone-gray">${v.positionen} Artikel · ${v.stueck} Stück</span>${v.art==='ausgabe'&&!v.versand?zoneChip(v.zeitzone):''}${v.nachgetragen?chip('violet','nachgetragen'):''}${v.storniert?chip('red','storniert'):''}</div></div>${ic('chev','chev')}</a>`;
+}
+async function viewKomBuchungen(m,tk){
+  paint(komHead('Buchungen','buch')+spin());
+  let l=[];try{l=await api('GET','kom_vorgaenge',null,`?monat=eq.${m}&select=id,art,zeitpunkt,zeitzone,firma,abholer,versand,lieferschein_nr,positionen,stueck,nachgetragen,storniert&order=zeitpunkt.desc`)}catch(e){toast(niceErr(e),'err')}
+  if(tk!==TOKEN)return;
+  const aus=l.filter(v=>v.art==='ausgabe'&&!v.storniert),ein=l.filter(v=>v.art==='einlagerung'&&!v.storniert);
+  paint(`${komHead('Buchungen','buch')}
+  ${monatWahl(m,'#/k/buch/')}
+  <div class="sumtiles s3"><div class="sumtile"><small>Ausgaben</small><b>${aus.length}</b></div><div class="sumtile"><small>davon Bereitschaft</small><b>${aus.filter(v=>v.zeitzone==='bereitschaft').length}</b></div><div class="sumtile"><small>Einlagerungen</small><b>${ein.length}</b></div></div>
+  ${l.length?`<div class="list" style="margin-top:12px">${l.map(vorgCard).join('')}</div>`:`<div class="card" style="margin-top:12px">${emptyState('list','Keine Buchungen',`Im ${esc(monatName(m))} wurde nichts gebucht.`)}</div>`}
+  <p class="hint" style="margin-top:12px">Ältere Bewegungen (vor der Umstellung) stehen weiterhin beim jeweiligen Artikel unter „Bewegungen“.</p>`);
+}
+const monatWahl=(m,base)=>`<div class="monatwahl"><a class="iconbtn" href="${base}${monatPlus(m,-1)}" aria-label="Vormonat">${ic('back')}</a><b>${esc(monatName(m))}</b>${m<monatHeute()?`<a class="iconbtn" href="${base}${monatPlus(m,1)}" aria-label="Nächster Monat">${ic('chev')}</a>`:'<span style="width:44px"></span>'}</div>`;
+
+async function viewKomVorgang(id,tk){
+  paint(spin());
+  let v,pos=[],offen=null;
+  try{[v]=await api('GET','kom_vorgaenge',null,`?id=eq.${id}&select=*`);pos=await api('GET','bewegungen',null,`?vorgang_id=eq.${id}&select=*`)}catch(e){toast(niceErr(e),'err')}
+  try{[offen]=await api('GET','kom_loeschanfragen',null,`?objekt=eq.vorgang&objekt_id=eq.${id}&status=eq.offen&select=id,beantragt_von`)}catch(e){}
+  if(tk!==TOKEN)return;
+  if(!v){paint(`<div class="noaccess">${ic('list')}<h1>Buchung nicht gefunden</h1></div>`);return}
+  KOM.v=v;
+  const art=await komArtikelMap(pos.map(p=>p.artikel_id));
+  paint(`
+  ${backHead('#/k/buch/'+v.monat,'Viessmann Kommission',vorgTitel(v))}
+  ${lagerBadge('kommission')}
+  ${v.storniert?callout('red','trash','Storniert',`${esc(v.storno_von||'')} am ${esc(berlinDatum(v.storno_am))}${v.storno_grund?' – '+esc(v.storno_grund):''}. Wird nicht abgerechnet, der Bestand wurde zurückgebucht.`,true):''}
+  ${offen?callout('amber','alert','Storno beantragt',`von ${esc(offen.beantragt_von||'')} – wartet auf Prüfung.`,true):''}
+  <div class="card" style="padding:6px 16px;margin-top:12px"><div class="dl">${[
+    ['Zeitpunkt',berlinZeit(v.zeitpunkt)+(v.nachgetragen?' (nachgetragen)':'')],['Zeitzone',v.art==='ausgabe'?(ZONE[v.zeitzone]||[v.zeitzone])[0]:''],
+    ['Nachtrag – Grund',v.nachtrag_grund],['Lieferschein',v.lieferschein_nr],['Kunde',[v.kundennummer,v.firma].filter(Boolean).join(' · ')],
+    ['Abholer',v.abholer],['Versand',v.versand?'Ja':''],['Versandkosten',v.versand&&v.versandkosten!=null?eur(v.versandkosten):''],['Sendungsnummer',v.sendungsnummer],
+    ['Bemerkung',v.bemerkung],['Gebucht von',v.benutzer_name+' · '+berlinZeit(v.erfasst_am)]].filter(r=>r[1]).map(([l,x])=>`<div><dt>${esc(l)}</dt><dd>${esc(x)}</dd></div>`).join('')}</div></div>
+  <div class="sec"><h2>Artikel</h2><span class="muted">${v.positionen} Positionen · ${v.stueck} Stück</span></div>
+  <div class="list">${pos.map(p=>{const a=art[p.artikel_id]||{};return`<div class="lcard"><div class="tnum tone-blue"><b style="font-size:15px">${nf(p.menge)}</b></div><div class="lcard-main"><b class="tt">${esc(a.artikelnummer||'?')}</b><div class="lcard-sub">${esc(a.beschreibung||'')}</div></div></div>`}).join('')}</div>
+  <div class="sec"><h2>Nachweise</h2></div>
+  <div class="phgrid">${v.lieferschein_foto?`<button class="ph" data-act="kFile" data-p="${esc(v.lieferschein_foto)}"><img data-photo="${esc(v.lieferschein_foto)}" data-bucket="${KBUCKET}" alt="Lieferschein"></button>`:''}${v.versand_beleg?`<button class="ph" data-act="kFile" data-p="${esc(v.versand_beleg)}"><img data-photo="${esc(v.versand_beleg)}" data-bucket="${KBUCKET}" alt="Versandbeleg"></button>`:''}</div>
+  ${v.unterschrift?`<div class="card" style="margin-top:12px"><small class="muted">Unterschrift ${esc(v.abholer||'')}</small><img src="${esc(v.unterschrift)}" alt="Unterschrift" style="display:block;max-width:320px;width:100%;margin-top:6px"></div>`:''}
+  ${isLagerist()&&!v.storniert&&!offen?`<div style="margin-top:22px"><button class="btn btn-ghost btn-block" data-act="kStornoAntrag" style="color:var(--red)">${ic('trash')} Buchung stornieren (Löschanfrage)</button></div>`:''}
+  <div style="height:8px"></div>`);
+}
+ACT.kFile=el=>openFile(el.dataset.p,KBUCKET);
+ACT.kStornoAntrag=()=>loeschAntrag('vorgang',KOM.v.id,`${vorgTitel(KOM.v)} · LS ${KOM.v.lieferschein_nr} · ${berlinZeit(KOM.v.zeitpunkt)}`);
+/* Artikelnummern auch für gelöschte Artikel */
+async function komArtikelMap(ids){
+  const m={};ids.forEach(id=>{const a=komById(id);if(a)m[id]=a});
+  const fehlt=[...new Set(ids.filter(id=>id&&!m[id]))];
+  for(let i=0;i<fehlt.length;i+=80){try{(await api('GET','artikel',null,`?id=in.(${fehlt.slice(i,i+80).join(',')})&select=id,artikelnummer,beschreibung`)).forEach(a=>m[a.id]=a)}catch(e){}}
+  return m;
+}
+/* =====================================================================
+   Kommission: Ausgabe (Abholung mit Unterschrift oder Versand) und Einlagerung
+   Pflicht: Viessmann-Lieferscheinnummer + Foto. Kein eigener interner Lieferschein nötig.
+   Zeiten (Berliner Zeit): regulär Mo–Do 07–16, Fr 07–13 · Bereitschaft Mo–Do 16–22, Fr 13–22, Sa/So/Feiertag 08–22
+   22–07 Uhr (Wochenende/Feiertag vor 08 Uhr) keine Ausgabe. Die Datenbank prüft das noch einmal (kom_zeitzone).
+   ===================================================================== */
+let KB=null,KB_START=null;
+let KUNDEN=null;
+/* ---------- Zeitzone (gleiche Regeln wie in der Datenbank) ---------- */
+function osterSonntag(j){const a=j%19,b=Math.floor(j/100),c=j%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),t=((h+l-7*m+114)%31)+1;return Date.UTC(j,mo-1,t)}
+let SONDERTAGE={};
+function feiertag(iso){
+  if(SONDERTAGE[iso])return SONDERTAGE[iso];
+  const [y]=iso.split('-').map(Number),md=iso.slice(5),o=osterSonntag(y),d=Date.parse(iso+'T00:00:00Z'),off=Math.round((d-o)/864e5);
+  return{'01-01':'Neujahr','05-01':'Tag der Arbeit','10-03':'Tag der Deutschen Einheit','10-31':'Reformationstag','12-25':'1. Weihnachtstag','12-26':'2. Weihnachtstag'}[md]
+    ||{'-2':'Karfreitag','1':'Ostermontag','39':'Christi Himmelfahrt','50':'Pfingstmontag'}[String(off)]||null;
+}
+function berlinTeile(dt){
+  const p=Object.fromEntries(new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',weekday:'short',hour12:false}).formatToParts(dt).map(x=>[x.type,x.value]));
+  const wd={Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6,Sun:7}[new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Berlin',weekday:'short'}).format(dt)];
+  return{iso:`${p.year}-${p.month}-${p.day}`,min:(+p.hour%24)*60+ +p.minute,wd};
+}
+function kZone(dt){
+  const t=berlinTeile(dt),h=x=>x*60;
+  if(feiertag(t.iso)||t.wd>=6)return t.min>=h(8)&&t.min<h(22)?'bereitschaft':'gesperrt';
+  if(t.wd===5)return t.min>=h(7)&&t.min<h(13)?'regulaer':t.min>=h(13)&&t.min<h(22)?'bereitschaft':'gesperrt';
+  return t.min>=h(7)&&t.min<h(16)?'regulaer':t.min>=h(16)&&t.min<h(22)?'bereitschaft':'gesperrt';
+}
+/* datetime-local (Berliner Zeit) → Date */
+function berlinLokalZuDate(s){
+  if(!s)return null;const guess=new Date(s+':00Z');
+  for(let i=0;i<2;i++){const t=berlinTeile(guess),[d,hm]=s.split('T'),[hh,mm]=hm.split(':').map(Number),soll=Date.parse(d+'T00:00:00Z')+(hh*60+mm)*6e4,ist=Date.parse(t.iso+'T00:00:00Z')+t.min*6e4;guess.setTime(guess.getTime()+(soll-ist))}
+  return guess;
+}
+const dateZuBerlinLokal=dt=>{const t=berlinTeile(dt);return`${t.iso}T${String(Math.floor(t.min/60)).padStart(2,'0')}:${String(t.min%60).padStart(2,'0')}`};
+async function ladeSondertage(){try{(await api('GET','kom_sondertage',null,'?select=datum,name')).forEach(s=>SONDERTAGE[s.datum]=s.name)}catch(e){}}
+async function ladeKunden(force){if(KUNDEN&&!force)return KUNDEN;try{KUNDEN=await api('GET','kom_kunden',null,'?select=*&aktiv=eq.true&order=firma.asc')}catch(e){KUNDEN=[]}return KUNDEN}
+
+/* ---------- Seite ---------- */
+async function viewKomBuchen(art){
+  if(!KB||KB.art!==art){
+    KB={art,kunde_id:'',ls:'',foto:null,pos:[],versand:false,abholer:'',vk:'',beleg:null,sendung:'',bem:'',nach:false,zeit:'',grund:''};
+    if(KB_START&&KB_START.art===art&&KB_START.artikel)KB.pos.push({a:KB_START.artikel,m:1});
+  }
+  KB_START=null;
+  paint(spin());
+  await Promise.all([ladeSondertage(),art==='ausgabe'?ladeKunden():null]);
+  drawKB();
+}
+function kbZeit(){return KB.nach&&KB.zeit?berlinLokalZuDate(KB.zeit):new Date()}
+function drawKB(){
+  const aus=KB.art==='ausgabe',z=kZone(kbZeit()),jetzt=kbZeit();
+  const titel=aus?'Ausgabe buchen':'Einlagerung buchen';
+  const kOpts=[['','– Kunde wählen –'],...(KUNDEN||[]).map(k=>[k.id,(k.kundennummer?k.kundennummer+' · ':'')+k.firma])];
+  paint(`
+  ${backHead('#/k','Viessmann Kommission',titel)}
+  ${lagerBadge('kommission')}
+  <div class="kstep"><div class="kstep-h"><span>1</span><b>Zeitpunkt</b></div>
+    <div class="kzeit tone-${aus?(ZONE[z]||['','gray'])[1]:'gray'}">${ic('clock')}<div><b>${esc(berlinZeit(jetzt))}</b><small>${aus?esc(ZONE[z][0])+(feiertag(berlinTeile(jetzt).iso)?' · '+esc(feiertag(berlinTeile(jetzt).iso)):''):'Einlagerung'}</small></div></div>
+    ${aus&&z==='gesperrt'?callout('red','lock','Keine Ausgabe möglich','Zwischen 22 und 7 Uhr (am Wochenende und an Feiertagen vor 8 Uhr) kann nichts ausgegeben werden.',true):''}
+    <label class="switchrow" style="margin-top:10px"><input type="checkbox" id="bNach" ${KB.nach?'checked':''}> Später nachtragen (Buchung ist schon passiert)</label>
+    ${KB.nach?`<div class="row2" style="margin-top:8px">${field('Wann war es? *',`<input class="inp" type="datetime-local" id="bZeit" value="${esc(KB.zeit||dateZuBerlinLokal(new Date()))}" max="${esc(dateZuBerlinLokal(new Date()))}">`)}${field('Grund für den Nachtrag *',inp('bGrund',KB.grund,'placeholder="z. B. Abholung gestern Abend, Handy nicht dabei"'))}</div>`:''}
+  </div>
+  ${aus?`<div class="kstep"><div class="kstep-h"><span>2</span><b>Für wen?</b></div>
+    <div style="display:flex;gap:8px">${sel('bKunde',kOpts,KB.kunde_id,'style="flex:1"')}<button class="btn btn-soft" data-act="kbKundeNeu" title="Neue Firma">${ic('plus','sm')}</button></div></div>`:''}
+  <div class="kstep"><div class="kstep-h"><span>${aus?3:2}</span><b>Viessmann-Lieferschein</b></div>
+    <div class="kls">${field('Lieferscheinnummer *',inp('bLS',KB.ls,'inputmode="numeric" autocomplete="off"'))}
+    <div class="field"><label>Foto vom Lieferschein *</label>${KB.foto?`<div class="kfoto"><img src="${KB.foto.url}" alt="Lieferschein"><button class="btn btn-ghost btn-sm" data-act="kbFoto">Neu aufnehmen</button></div>`:`<button class="btn btn-soft btn-block" data-act="kbFoto">${ic('camera','sm')} Lieferschein fotografieren</button>`}</div></div>
+  </div>
+  <div class="kstep"><div class="kstep-h"><span>${aus?4:3}</span><b>Artikel</b><span class="muted" style="margin-left:auto">${KB.pos.length} Positionen · ${KB.pos.reduce((s,p)=>s+(+p.m||0),0)} Stück</span></div>
+    <div class="srow"><div class="searchbar">${ic('search')}<input id="bQ" type="search" placeholder="Artikelnummer oder Beschreibung …" autocomplete="off"></div><button class="btn btn-soft" data-act="kbScan" title="Karton scannen">${ic('scan','sm')} Scannen</button></div>
+    <div id="bTreffer"></div>
+    <div class="list" style="margin-top:10px">${KB.pos.map((p,i)=>`<div class="kpos"><div class="kpos-t"><b>${esc(p.a.artikelnummer)}</b><small>${esc(p.a.beschreibung||'')} · Platz ${esc(p.a.lagerplatz||'–')} · Bestand ${nf(p.a.bestand||0)}</small></div>
+      <div class="kpos-m"><button class="iconbtn flat" data-act="kbM" data-i="${i}" data-d="-1" aria-label="weniger">${ic('minus')}</button><input class="inp" inputmode="numeric" data-mi="${i}" value="${esc(p.m)}" aria-label="Menge"><button class="iconbtn flat" data-act="kbM" data-i="${i}" data-d="1" aria-label="mehr">${ic('plus')}</button><button class="iconbtn flat" data-act="kbDel" data-i="${i}" aria-label="Entfernen">${ic('x')}</button></div>
+      ${aus&&+p.m>(+p.a.bestand||0)?`<div class="err" style="width:100%">Nur ${nf(p.a.bestand||0)} Stück da.</div>`:''}</div>`).join('')||'<p class="muted" style="margin:4px 2px">Noch kein Artikel – suchen oder Karton scannen.</p>'}</div>
+  </div>
+  ${aus?`<div class="kstep"><div class="kstep-h"><span>5</span><b>Abholung oder Versand</b></div>
+    <div class="seg"><button class="${!KB.versand?'on':''}" data-act="kbArt" data-v="0">${ic('user','sm')} Abholung</button><button class="${KB.versand?'on':''}" data-act="kbArt" data-v="1">${ic('truck','sm')} Versand per Post</button></div>
+    ${KB.versand?`<div class="row2" style="margin-top:10px">${field('Tatsächliche Versandkosten (€) *',inp('bVK',KB.vk,'inputmode="decimal" placeholder="z. B. 7,90"'),'Die Versandpauschale kommt in der Abrechnung automatisch dazu.')}${field('Sendungsnummer',inp('bSend',KB.sendung))}</div>
+      <div class="field"><label>Versandbeleg</label>${KB.beleg?`<div class="kfoto"><img src="${KB.beleg.url}" alt="Beleg"><button class="btn btn-ghost btn-sm" data-act="kbBeleg">Neu aufnehmen</button></div>`:`<button class="btn btn-soft btn-block" data-act="kbBeleg">${ic('camera','sm')} Versandbeleg fotografieren</button>`}</div>`
+      :`<div style="margin-top:10px">${field('Name des Abholers *',inp('bAbh',KB.abholer,'autocomplete="off" placeholder="Vor- und Nachname"'))}</div><p class="hint">Der Abholer unterschreibt im nächsten Schritt auf diesem Gerät.</p>`}
+  </div>`:''}
+  ${field('Bemerkung (optional)',inp('bBem',KB.bem))}
+  <div class="err" id="bErr" role="alert"></div>
+  <div class="btnrow" style="margin-top:14px"><a class="btn btn-ghost" href="#/k" data-act="kbAbbruch">Abbrechen</a><button class="btn btn-primary" data-act="kbWeiter" style="flex:1">${aus&&!KB.versand?ic('sig','sm')+' Weiter zur Unterschrift':ic('check','sm')+' Buchen'}</button></div>
+  <div style="height:12px"></div>`);
+  /* Eingaben merken, ohne neu zu zeichnen */
+  const keep=(id,k)=>{const e=$('#'+id);if(e)e.addEventListener('input',()=>{KB[k]=e.value.trim()})};
+  keep('bLS','ls');keep('bAbh','abholer');keep('bVK','vk');keep('bSend','sendung');keep('bBem','bem');keep('bGrund','grund');
+  const ks=$('#bKunde');if(ks)ks.addEventListener('change',()=>{KB.kunde_id=ks.value});
+  const nz=$('#bNach');nz.addEventListener('change',()=>{KB.nach=nz.checked;if(KB.nach&&!KB.zeit)KB.zeit=dateZuBerlinLokal(new Date());drawKB()});
+  const zt=$('#bZeit');if(zt)zt.addEventListener('change',()=>{KB.zeit=zt.value;drawKB()});
+  $$('[data-mi]').forEach(e=>e.addEventListener('change',()=>{const p=KB.pos[+e.dataset.mi];p.m=Math.max(1,parseInt(e.value,10)||1);drawKB()}));
+  const q=$('#bQ');q.addEventListener('input',()=>kbTreffer(q.value));
+  q.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const a=komFinde(q.value);if(a){kbAdd(a)}else kbTreffer(q.value)}});
+}
+function kbTreffer(v){
+  const box=$('#bTreffer');if(!box)return;
+  const r=v.trim().length>=2?komSuche(v).slice(0,8):[];
+  box.innerHTML=r.length?`<div class="list ktreffer">${r.map(a=>`<button class="lcard" data-act="kbPick" data-id="${a.id}"><div class="lcard-main"><b class="tt">${esc(a.artikelnummer)}</b><div class="lcard-sub">${esc(a.beschreibung||'')} · Platz ${esc(a.lagerplatz||'–')} · Bestand ${nf(a.bestand||0)}</div></div>${ic('plus')}</button>`).join('')}</div>`:(v.trim().length>=2?'<p class="hint">Nichts gefunden.</p>':'');
+}
+function kbAdd(a,m=1){
+  const p=KB.pos.find(x=>x.a.id===a.id);if(p)p.m=(+p.m||0)+m;else KB.pos.push({a,m});
+  toast(`${a.artikelnummer} hinzugefügt`,'ok');drawKB();setTimeout(()=>{const q=$('#bQ');if(q&&!('ontouchstart' in window))q.focus()},30);
+}
+ACT.kbPick=el=>kbAdd(komById(el.dataset.id));
+ACT.kbM=el=>{const p=KB.pos[+el.dataset.i];p.m=Math.max(1,(+p.m||0)+ +el.dataset.d);drawKB()};
+ACT.kbDel=el=>{KB.pos.splice(+el.dataset.i,1);drawKB()};
+ACT.kbArt=el=>{KB.versand=el.dataset.v==='1';drawKB()};
+ACT.kbAbbruch=()=>{KB=null;location.hash='#/k'};
+ACT.kbScan=()=>scanSheet({title:'Karton scannen',fortlaufend:true,onCode:async code=>{
+  let a=komFinde(code);
+  if(!a){a=await codeZuordnen(code);if(!a)return}
+  kbAdd(a);return`✓ ${esc(a.artikelnummer)} hinzugefügt – nächsten Karton scannen`;
+}});
+/* Unbekannten Code einem Artikel zuordnen (wird gemerkt, wie bisher in der Inventur) */
+function codeZuordnen(code){
+  return new Promise(res=>{
+    const bd=sheet({title:'Code unbekannt',body:`<p class="muted">Der Code <b>${esc(code)}</b> ist noch keinem Artikel zugeordnet. Artikelnummer eingeben – der Code wird für die Zukunft gemerkt.</p>${field('Artikelnummer',inp('cNr','','autofocus inputmode="numeric"'))}<div class="err" id="cErr"></div>`,
+      footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="cGo">Zuordnen</button>`,onClose:()=>res(null)});
+    $('#cGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+      const a=komFinde(val(bd,'cNr'));if(!a)return $('#cErr',bd).textContent='Artikelnummer nicht gefunden.';
+      try{await api('PATCH','artikel',{barcode:code},`?id=eq.${a.id}`);a.barcode=code}catch(e){toast('Code konnte nicht gemerkt werden: '+niceErr(e),'err')}
+      const rec=SHEETS.pop();rec.el.remove();res(a);
+    });
+  });
+}
+async function kbFotoNehmen(k){const f=await pickFile('image/*');if(!f)return;if(KB[k]&&KB[k].url)URL.revokeObjectURL(KB[k].url);KB[k]={blob:f.blob,url:URL.createObjectURL(f.blob)};drawKB()}
+ACT.kbFoto=()=>kbFotoNehmen('foto');
+ACT.kbBeleg=()=>kbFotoNehmen('beleg');
+ACT.kbKundeNeu=()=>{
+  const bd=sheet({title:'Neue Firma',body:`${field('Firmenname *',inp('nF','','autofocus'))}${field('Kundennummer',inp('nK',''))}<div class="err" id="nErr"></div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="nGo">Anlegen</button>`});
+  $('#nGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const f=val(bd,'nF');if(!f)return $('#nErr',bd).textContent='Bitte den Firmennamen eingeben.';
+    const [k]=await api('POST','kom_kunden',{firma:f,kundennummer:val(bd,'nK')||null});
+    await ladeKunden(true);KB.kunde_id=k.id;closeSheet();drawKB();toast('Firma angelegt','ok');
+  });
+};
+function kbPruefen(){
+  const aus=KB.art==='ausgabe',t=kbZeit();
+  if(KB.nach){if(!KB.zeit||!t)return'Bitte den Zeitpunkt eingeben.';if(t>new Date())return'Der Zeitpunkt liegt in der Zukunft.';if(!KB.grund)return'Bitte einen Grund für den Nachtrag angeben.'}
+  if(aus&&kZone(t)==='gesperrt')return'Zu dieser Uhrzeit ist keine Ausgabe möglich (22–7 Uhr, Wochenende/Feiertag vor 8 Uhr).';
+  if(aus&&!KB.kunde_id)return'Bitte den Kunden wählen.';
+  if(!KB.ls)return'Bitte die Lieferscheinnummer eingeben.';
+  if(!KB.foto)return'Bitte den Lieferschein fotografieren.';
+  if(!KB.pos.length)return'Bitte mindestens einen Artikel hinzufügen.';
+  if(aus){const zu=KB.pos.find(p=>+p.m>(+p.a.bestand||0));if(zu)return`Von ${zu.a.artikelnummer} sind nur ${zu.a.bestand||0} Stück da.`}
+  if(aus&&KB.versand&&(KB.vk===''||pnum(KB.vk)==null||pnum(KB.vk)<0))return'Bitte die Versandkosten eingeben (0, wenn keine).';
+  if(aus&&!KB.versand&&!KB.abholer)return'Bitte den Namen des Abholers eingeben.';
+  return'';
+}
+ACT.kbWeiter=el=>{
+  const f=kbPruefen();$('#bErr').textContent=f;if(f)return;
+  if(KB.art==='ausgabe'&&!KB.versand)return kbUnterschrift();
+  busy(el,()=>kbSpeichern(null));
+};
+function kbUnterschrift(){
+  const k=(KUNDEN||[]).find(x=>x.id===KB.kunde_id)||{};
+  const bd=sheet({title:'Abholung bestätigen',cls:'wide',body:`
+    <p class="muted">Bitte dem Abholer geben: Er bestätigt mit seiner Unterschrift, dass er diese Artikel erhalten hat.</p>
+    <div class="card" style="margin:10px 0;padding:6px 14px"><div class="dl">
+      <div><dt>Datum, Uhrzeit</dt><dd>${esc(berlinZeit(kbZeit()))}</dd></div><div><dt>Kunde</dt><dd>${esc([k.kundennummer,k.firma].filter(Boolean).join(' · '))}</dd></div><div><dt>Lieferschein</dt><dd>${esc(KB.ls)}</dd></div></div></div>
+    <table class="ktab"><thead><tr><th>Stück</th><th>Materialnummer</th><th>Bezeichnung</th></tr></thead><tbody>${KB.pos.map(p=>`<tr><td><b>${nf(p.m)}</b></td><td>${esc(p.a.artikelnummer)}</td><td>${esc(p.a.beschreibung||'')}</td></tr>`).join('')}</tbody></table>
+    ${field('Name des Abholers',inp('sAbh',KB.abholer))}
+    <div class="field"><label>Unterschrift Abholer</label><div class="sig" id="sPad"></div></div>
+    <div class="err" id="sErr" role="alert"></div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Zurück</button><button class="btn btn-primary" id="sGo">${ic('check','sm')} Bestätigen & buchen</button>`});
+  const pad=sigPad($('#sPad',bd));
+  $('#sGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const n=val(bd,'sAbh');if(!n)return $('#sErr',bd).textContent='Bitte den Namen eingeben.';
+    if(pad.empty())return $('#sErr',bd).textContent='Bitte unterschreiben lassen.';
+    KB.abholer=n;await kbSpeichern(pad.data());
+  });
+}
+async function kbSpeichern(unterschrift){
+  const t=kbZeit(),mon=berlinTeile(t).iso.slice(0,7);
+  const foto=await uploadFile(KB.foto.blob,`lieferscheine/${mon}`,'image/jpeg',KBUCKET);
+  const beleg=KB.versand&&KB.beleg?await uploadFile(KB.beleg.blob,`versand/${mon}`,'image/jpeg',KBUCKET):null;
+  const id=await rpc('kom_buchen',{p:{art:KB.art,lieferschein_nr:KB.ls,lieferschein_foto:foto,kunde_id:KB.kunde_id||null,versand:KB.versand,
+    abholer:KB.abholer||null,unterschrift,versandkosten:KB.versand?pnum(KB.vk):null,versand_beleg:beleg,sendungsnummer:KB.sendung||null,bemerkung:KB.bem||null,
+    zeitpunkt:KB.nach?t.toISOString():null,nachtrag_grund:KB.nach?KB.grund:null,positionen:KB.pos.map(p=>({artikel_id:p.a.id,menge:+p.m}))}});
+  while(SHEETS.length)closeSheet();
+  const art=KB.art;KB=null;await loadAll();
+  toast(art==='ausgabe'?'Ausgabe gebucht':'Einlagerung gebucht','ok');
+  location.hash='#/k/v/'+id;
+}
+/* =====================================================================
+   Kommission: Inventur Regal für Regal (übernommen aus lager.html, neues Design)
+   Start/Abschluss laufen jetzt in der Datenbank (kom_inventur_starten / kom_inventur_abschliessen).
+   Scannen: Regal-QR („REGAL:12“) oder Karton-Code; unbekannte Codes werden einem Artikel zugeordnet und gemerkt.
+   ===================================================================== */
+const KI={list:[],open:null,pos:[],rep:null,repPos:[]};
+const XLSX_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+const QR_URL='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+const regalOf=lp=>{lp=(lp||'').trim();if(!lp)return'Ohne Lagerplatz';const m=lp.match(/^(\d+)/);return m?String(parseInt(m[1],10)):lp.toUpperCase()};
+const regalLabel=r=>/^\d+$/.test(r)?'Regal '+r:r;
+const regalCmp=(a,b)=>{const na=/^\d+$/.test(a),nb=/^\d+$/.test(b);if(na&&nb)return a-b;if(na)return-1;if(nb)return 1;if(a==='Ohne Lagerplatz')return 1;if(b==='Ohne Lagerplatz')return-1;return a.localeCompare(b,'de')};
+const posCmp=(a,b)=>(a.lagerplatz||'').localeCompare(b.lagerplatz||'','de',{numeric:true,sensitivity:'base'})||(a.artikelnummer||'').localeCompare(b.artikelnummer||'','de',{numeric:true});
+const kiRegale=pos=>[...new Set(pos.map(p=>p.regal))].sort(regalCmp);
+function kiStats(pos){const g=pos.filter(p=>p.geprueft),abw=g.filter(p=>p.ist!==p.soll);return{total:pos.length,geprueft:g.length,offen:pos.length-g.length,abw,sumSoll:pos.reduce((s,p)=>s+p.soll,0),sumIst:pos.reduce((s,p)=>s+(p.geprueft?p.ist:p.soll),0)}}
+async function kiLaden(){
+  KI.list=await api('GET','inventuren',null,'?select=*&order=gestartet_am.desc');
+  KI.open=KI.list.find(i=>i.status==='offen')||null;
+  KI.pos=KI.open?await apiAll('inventur_positionen',`?inventur_id=eq.${KI.open.id}&select=*&order=artikelnummer.asc`):[];
+}
+async function viewKomInventur(a,b,tk){
+  if(a==='p')return viewKomInvReport(b,tk);
+  paint(komHead('Inventur','inv')+spin());
+  try{if(!a||!KI.open)await kiLaden()}catch(e){paint(komHead('Inventur','inv')+`<div class="card">${emptyState('alert','Konnte nicht laden',esc(niceErr(e)))}</div>`);return}
+  if(tk!==TOKEN)return;
+  if(a==='r'&&KI.open)return drawKiRegal(b);
+  const o=KI.open,fertig=KI.list.filter(i=>i.status==='abgeschlossen');
+  let h=komHead('Inventur','inv');
+  if(o){
+    const st=kiStats(KI.pos),pct=st.total?Math.round(st.geprueft/st.total*100):0,by={};KI.pos.forEach(p=>(by[p.regal]=by[p.regal]||[]).push(p));
+    h+=`<div class="card" style="margin-top:4px"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b>Inventur läuft</b><div class="muted" style="font-size:13px">Gestartet ${esc(berlinZeit(o.gestartet_am))} von ${esc(o.gestartet_von||'')}</div></div><span class="muted">${st.geprueft} / ${st.total} geprüft · ${st.abw.length} Abweichungen</span></div><div class="pbar ok" style="margin-top:10px"><i style="width:${pct}%"></i></div></div>
+    <div class="actgrid" style="grid-template-columns:repeat(3,1fr)"><button class="act" data-act="kiScan">${ic('scan')}<span>Scannen</span></button><button class="act" data-act="kiFertig">${ic('check')}<span>Abschließen</span></button><button class="act" data-act="kiEtiketten">${ic('printer')}<span>Regal-Etiketten</span></button></div>
+    <div class="sec"><h2>Regal wählen</h2></div>
+    <div class="raumgrid">${kiRegale(KI.pos).map(r=>{const s=kiStats(by[r]);return`<a class="raumtile ${s.offen===0?'done':s.geprueft?'part':''}" href="#/k/inv/r/${encodeURIComponent(r)}"><b>${esc(regalLabel(r))}</b><small>${s.geprueft} / ${s.total} geprüft</small><span>${s.abw.length?s.abw.length+' Abweichung'+(s.abw.length===1?'':'en'):s.offen===0?'fertig ✓':s.geprueft?'angefangen':'offen'}</span></a>`}).join('')}</div>
+    <div style="margin-top:18px"><button class="btn btn-ghost btn-block" data-act="kiAbbruch" style="color:var(--red)">${ic('trash')} Inventur abbrechen</button></div>`;
+  }else{
+    h+=`<div class="card" style="margin-top:4px"><b>Neue Inventur</b><p class="muted" style="margin:6px 0 12px">Der aktuelle Bestand aller Artikel wird als Soll übernommen. Danach Regal für Regal zählen (gern mit Scanner). Beim Abschluss werden die Bestände angepasst und das Protokoll erstellt.</p>
+      <div class="btnrow"><button class="btn btn-primary" data-act="kiStart">${ic('clip','sm')} Inventur starten</button><button class="btn btn-soft" data-act="kiEtiketten">${ic('printer','sm')} Regal-Etiketten</button></div></div>`;
+  }
+  h+=`<div class="sec"><h2>Abgeschlossene Inventuren</h2></div>${fertig.length?`<div class="list">${fertig.map(i=>`<a class="lcard" href="#/k/inv/p/${i.id}"><div class="tnum tone-ok">${ic('check')}</div><div class="lcard-main"><b class="tt">Inventur ${esc(berlinDatum(i.abgeschlossen_am||i.gestartet_am))}</b><div class="lcard-sub">abgeschlossen von ${esc(i.abgeschlossen_von||'–')}${i.bemerkung?' · '+esc(i.bemerkung):''}</div></div>${ic('chev','chev')}</a>`).join('')}</div>`:'<p class="muted">Noch keine.</p>'}`;
+  paint(h);
+}
+ACT.kiStart=el=>confirmSheet({title:'Inventur starten?',text:'Der aktuelle Bestand aller Artikel wird als Soll übernommen.',ok:'Starten',onOk:async()=>{await rpc('kom_inventur_starten');await kiLaden();toast('Inventur gestartet','ok');route()}});
+ACT.kiAbbruch=()=>confirmSheet({title:'Inventur abbrechen?',text:'Alle bisher erfassten Zählungen gehen verloren. Bestände werden nicht verändert.',ok:'Abbrechen',danger:true,onOk:async()=>{await api('DELETE','inventuren',null,`?id=eq.${KI.open.id}`);KI.open=null;await kiLaden();toast('Inventur abgebrochen','ok');location.hash='#/k/inv';route()}});
+function kiRow(p){
+  const v=p.geprueft?p.ist:p.soll;
+  return`<div class="invrow ${p.geprueft?(p.ist!==p.soll?'diff':'ok'):''}" data-id="${p.id}" data-s="${esc(norm([p.artikelnummer,p.beschreibung,p.lagerplatz].join(' ')))}">
+    <div class="ir-t"><b>${esc(p.artikelnummer)}</b><small>${esc(p.beschreibung||'')} · Fach ${esc(p.lagerplatz||'–')} · Soll ${p.soll}${p.geprueft&&p.ist!==p.soll?` · <b style="color:var(--red)">Diff ${p.ist-p.soll>0?'+':''}${p.ist-p.soll}</b>`:''}</small></div>
+    <div class="ir-c"><button class="iconbtn flat" data-act="kiPm" data-d="-1" aria-label="weniger">${ic('minus')}</button><input class="inp" inputmode="numeric" value="${v}" aria-label="Gezählt"><button class="iconbtn flat" data-act="kiPm" data-d="1" aria-label="mehr">${ic('plus')}</button><button class="btn btn-soft btn-sm" data-act="kiOk" title="Menge stimmt / speichern">✓</button></div></div>`;
+}
+function drawKiRegal(r){
+  const rows=KI.pos.filter(p=>p.regal===r).sort(posCmp),rs=kiRegale(KI.pos),i=rs.indexOf(r),s=kiStats(rows);
+  paint(`${backHead('#/k/inv','Inventur Kommission',regalLabel(r))}${lagerBadge('kommission')}
+  <div class="btnrow" style="margin-top:12px">${i>0?`<a class="btn btn-soft btn-sm" href="#/k/inv/r/${encodeURIComponent(rs[i-1])}">${ic('back','sm')} ${esc(regalLabel(rs[i-1]))}</a>`:''}${i<rs.length-1?`<a class="btn btn-soft btn-sm" href="#/k/inv/r/${encodeURIComponent(rs[i+1])}">${esc(regalLabel(rs[i+1]))} ${ic('chev','sm')}</a>`:''}<button class="btn btn-soft btn-sm" data-act="kiScan">${ic('scan','sm')} Scannen</button><button class="btn btn-primary btn-sm" data-act="kiAlle" data-r="${esc(r)}">Alle offenen bestätigen</button></div>
+  <p class="muted" id="kiProg" style="margin:10px 2px 0">${s.geprueft} / ${s.total} geprüft${s.abw.length?' · '+s.abw.length+' Abweichungen':''}</p>
+  <div class="searchbar" style="margin-top:10px">${ic('search')}<input id="kiq" type="search" placeholder="Nummer oder Code eintippen / scannen, Enter …" aria-label="Suchen"></div>
+  <div class="list" id="kiList" style="margin-top:10px">${rows.map(kiRow).join('')}</div>
+  <p class="hint" style="margin:12px 4px 0">Menge zählen, bei Abweichung ändern, mit „✓“ speichern. Bei passender Menge genügt „✓“.</p>`);
+  const q=$('#kiq');
+  q.addEventListener('input',()=>{const n=norm(q.value);$$('#kiList .invrow').forEach(x=>{x.hidden=n&&!x.dataset.s.includes(n)})});
+  q.addEventListener('keydown',e=>{if(e.key!=='Enter')return;e.preventDefault();const p=kiFinde(q.value);q.value='';$$('#kiList .invrow').forEach(x=>x.hidden=false);
+    if(!p)return toast('Nicht gefunden','err');if(p.regal!==r){location.hash='#/k/inv/r/'+encodeURIComponent(p.regal);return}
+    const row=$(`.invrow[data-id="${p.id}"]`);row.scrollIntoView({block:'center',behavior:'smooth'});const i2=$('input.inp',row);i2.focus();i2.select()});
+  $('#kiList').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('input.inp')){e.preventDefault();kiSave(e.target.closest('.invrow'),true)}});
+}
+function kiFinde(code){
+  const a=komFinde(code,KI.pos.map(p=>({...p,barcode:(komById(p.artikel_id)||{}).barcode})));
+  return a?KI.pos.find(p=>p.id===a.id):null;
+}
+async function kiSave(row,weiter){
+  const p=KI.pos.find(x=>x.id===row.dataset.id),i=$('input.inp',row),v=parseInt(i.value,10);
+  if(isNaN(v)||v<0)return toast('Bitte eine gültige Menge (0 oder mehr) eingeben','err');
+  const upd={ist:v,geprueft:true,geprueft_von:S.me.name,geprueft_am:new Date().toISOString()};
+  try{await api('PATCH','inventur_positionen',upd,`?id=eq.${p.id}`);Object.assign(p,upd)}catch(e){return toast(niceErr(e),'err')}
+  row.outerHTML=kiRow(p);
+  const rows=KI.pos.filter(x=>x.regal===p.regal),s=kiStats(rows);const pr=$('#kiProg');if(pr)pr.textContent=`${s.geprueft} / ${s.total} geprüft${s.abw.length?' · '+s.abw.length+' Abweichungen':''}`;
+  if(s.offen===0)toast(regalLabel(p.regal)+' vollständig geprüft','ok');
+  else if(weiter){const nx=rows.sort(posCmp).find(x=>!x.geprueft);const el=nx&&$(`.invrow[data-id="${nx.id}"] input.inp`);if(el){el.focus();el.select()}}
+}
+ACT.kiOk=el=>kiSave(el.closest('.invrow'),true);
+ACT.kiPm=el=>{const i=$('input.inp',el.closest('.invrow'));i.value=Math.max(0,(parseInt(i.value,10)||0)+ +el.dataset.d)};
+ACT.kiAlle=el=>{
+  const offen=KI.pos.filter(p=>p.regal===el.dataset.r&&!p.geprueft);
+  if(!offen.length)return toast('Alle Positionen sind schon geprüft');
+  confirmSheet({title:'Alle offenen bestätigen?',text:`${offen.length} offene Positionen in ${esc(regalLabel(el.dataset.r))} mit der angezeigten Menge bestätigen?`,ok:'Bestätigen',onOk:async()=>{
+    for(const p of offen){const row=$(`.invrow[data-id="${p.id}"]`);const v=parseInt($('input.inp',row).value,10);if(isNaN(v)||v<0)throw new Error('Ungültige Menge bei '+p.artikelnummer)}
+    for(const p of offen){const row=$(`.invrow[data-id="${p.id}"]`);await kiSave(row,false)}
+  }});
+};
+ACT.kiScan=()=>{
+  if(!KI.open)return toast('Es läuft keine Inventur','err');
+  scanSheet({title:'Regal oder Karton scannen',fortlaufend:true,onCode:async code=>{
+    const m=code.match(/^REGAL:(.+)$/i);
+    if(m){const r=m[1].trim();if(!KI.pos.some(p=>p.regal===r)){toast(regalLabel(r)+' ist in dieser Inventur nicht enthalten','err');return}location.hash='#/k/inv/r/'+encodeURIComponent(r);return`${esc(regalLabel(r))} geöffnet – Artikel scannen`}
+    let p=kiFinde(code);
+    if(!p){const a=await codeZuordnen(code);if(!a)return;p=KI.pos.find(x=>x.artikel_id===a.id);if(!p){toast('Artikel ist nicht in dieser Inventur','err');return}}
+    return await kiZaehlDialog(p);
+  }});
+};
+function kiZaehlDialog(p){
+  return new Promise(res=>{
+    const bd=sheet({title:p.artikelnummer,body:`<p class="muted">${esc(p.beschreibung||'')} · ${esc(regalLabel(p.regal))} · Fach ${esc(p.lagerplatz||'–')}</p><p style="margin:8px 0">Soll: <b>${p.soll}</b>${p.geprueft?` · bereits gezählt: <b>${p.ist}</b>`:''}</p>
+      <div class="qtybox"><button type="button" class="iconbtn" data-q="-1" aria-label="weniger">${ic('minus')}</button><input class="inp" id="zM" inputmode="numeric" value="${p.geprueft?p.ist:p.soll}" aria-label="Gezählt"><button type="button" class="iconbtn" data-q="1" aria-label="mehr">${ic('plus')}</button></div>`,
+      footer:`<button class="btn btn-ghost" data-act="closeSheet">Verwerfen</button><button class="btn btn-primary" id="zGo">${ic('check','sm')} Speichern</button>`,onClose:()=>res('')});
+    const m=$('#zM',bd);m.focus();m.select();
+    bd.addEventListener('click',ev=>{const b=ev.target.closest('[data-q]');if(b)m.value=Math.max(0,(parseInt(m.value,10)||0)+ +b.dataset.q)});
+    m.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#zGo',bd).click()}});
+    $('#zGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+      const v=parseInt(m.value,10);if(isNaN(v)||v<0)return toast('Bitte eine gültige Menge eingeben','err');
+      const upd={ist:v,geprueft:true,geprueft_von:S.me.name,geprueft_am:new Date().toISOString()};
+      await api('PATCH','inventur_positionen',upd,`?id=eq.${p.id}`);Object.assign(p,upd);
+      const rec=SHEETS.pop();rec.el.remove();
+      const row=$(`.invrow[data-id="${p.id}"]`);if(row)row.outerHTML=kiRow(p);
+      res(`✓ ${esc(p.artikelnummer)} gespeichert (Ist ${v}${v!==p.soll?', Soll '+p.soll:''})`);
+    });
+  });
+}
+ACT.kiFertig=()=>{
+  const st=kiStats(KI.pos);
+  const bd=sheet({title:'Inventur abschließen',body:`<div class="sumtiles"><div class="sumtile"><small>Geprüft</small><b>${st.geprueft} / ${st.total}</b></div><div class="sumtile"><small>Abweichungen</small><b style="color:${st.abw.length?'var(--red)':'inherit'}">${st.abw.length}</b></div></div>
+    ${st.offen?callout('amber','alert',`${st.offen} Artikel nicht geprüft`,'Ihr Bestand bleibt unverändert und steht im Protokoll als „nicht geprüft“.',true):''}
+    ${st.abw.length?`<p class="muted" style="margin-top:8px">Bei ${st.abw.length} Artikeln wird der Bestand auf die gezählte Menge korrigiert (Bewegung „Inventur“).</p>`:''}
+    ${field('Bemerkung zum Protokoll (optional)','<textarea class="inp" id="kiB" rows="2"></textarea>')}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Zurück</button><button class="btn btn-primary" id="kiGo">Abschließen & Bestände anpassen</button>`});
+  $('#kiGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const id=KI.open.id,n=await rpc('kom_inventur_abschliessen',{p_id:id,p_bemerkung:val(bd,'kiB')||null});
+    closeSheet();KI.open=null;await loadAll();toast('Inventur abgeschlossen'+(n?' – '+n+' Bestände angepasst':''),'ok');location.hash='#/k/inv/p/'+id;
+  });
+};
+/* ---------- Protokoll ---------- */
+async function viewKomInvReport(id,tk){
+  paint(spin());
+  try{[KI.rep]=await api('GET','inventuren',null,`?id=eq.${id}&select=*`);KI.repPos=await apiAll('inventur_positionen',`?inventur_id=eq.${id}&select=*&order=artikelnummer.asc`)}catch(e){toast(niceErr(e),'err')}
+  if(tk!==TOKEN)return;
+  const inv=KI.rep;if(!inv){paint(`<div class="noaccess">${ic('clip')}<h1>Inventur nicht gefunden</h1></div>`);return}
+  const pos=KI.repPos,st=kiStats(pos),abw=pos.filter(p=>p.geprueft&&p.ist!==p.soll).sort((a,b)=>regalCmp(a.regal,b.regal)||posCmp(a,b));
+  paint(`${backHead('#/k/inv','Inventur Kommission','Protokoll '+berlinDatum(inv.abgeschlossen_am||inv.gestartet_am))}${lagerBadge('kommission')}
+  <div class="card" style="margin-top:12px;padding:6px 16px"><div class="dl"><div><dt>Gestartet</dt><dd>${esc(berlinZeit(inv.gestartet_am))} · ${esc(inv.gestartet_von||'')}</dd></div><div><dt>Abgeschlossen</dt><dd>${inv.abgeschlossen_am?esc(berlinZeit(inv.abgeschlossen_am))+' · '+esc(inv.abgeschlossen_von||''):'läuft noch'}</dd></div>${inv.bemerkung?`<div><dt>Bemerkung</dt><dd>${esc(inv.bemerkung)}</dd></div>`:''}</div></div>
+  <div class="sumtiles s3" style="margin-top:12px"><div class="sumtile"><small>Geprüft</small><b>${st.geprueft}<span class="of"> / ${st.total}</span></b></div><div class="sumtile"><small>Abweichungen</small><b style="color:${abw.length?'var(--red)':'inherit'}">${abw.length}</b></div><div class="sumtile"><small>Soll → Ist</small><b style="font-size:17px">${st.sumSoll} → ${st.sumIst}</b></div></div>
+  <div class="actgrid" style="grid-template-columns:repeat(2,1fr)"><button class="act" data-act="kiPdf">${ic('doc')}<span>PDF-Protokoll</span></button><button class="act" data-act="kiXlsx">${ic('download')}<span>Excel</span></button></div>
+  <div class="sec"><h2>Abweichungen</h2></div>
+  ${abw.length?`<div class="list">${abw.map(p=>`<div class="invrow diff"><div class="ir-t"><b>${esc(p.artikelnummer)}</b><small>${esc(p.beschreibung||'')} · ${esc(regalLabel(p.regal))} / ${esc(p.lagerplatz||'–')} · geprüft von ${esc(p.geprueft_von||'–')}</small></div><div class="ir-c"><b>${p.soll} → ${p.ist}</b></div></div>`).join('')}</div>`:`<div class="card">${emptyState('check','Keine Abweichungen','Alle gezählten Mengen stimmen.')}</div>`}`);
+}
+ACT.kiXlsx=el=>busy(el,async()=>{
+  await loadLib(XLSX_URL);const inv=KI.rep,pos=KI.repPos.slice().sort((a,b)=>regalCmp(a.regal,b.regal)||posCmp(a,b)),st=kiStats(pos);
+  const wb=XLSX.utils.book_new(),stat=p=>!p.geprueft?'nicht geprüft':p.ist===p.soll?'stimmt':'Abweichung';
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Inventurprotokoll'],['Lager','Viessmann Kommissionslager'],['Gestartet',berlinZeit(inv.gestartet_am)+' '+(inv.gestartet_von||'')],['Abgeschlossen',inv.abgeschlossen_am?berlinZeit(inv.abgeschlossen_am)+' '+(inv.abgeschlossen_von||''):''],['Bemerkung',inv.bemerkung||''],[],['Artikel',st.total],['Geprüft',st.geprueft],['Abweichungen',st.abw.length],['Soll',st.sumSoll],['Ist',st.sumIst]]),'Protokoll');
+  const head=['Regal','Lagerplatz','Artikelnummer','Beschreibung','Soll','Ist','Differenz','Status','Geprüft von','Geprüft am'];
+  const line=p=>[regalLabel(p.regal),p.lagerplatz||'',p.artikelnummer,p.beschreibung||'',p.soll,p.geprueft?p.ist:'',p.geprueft?p.ist-p.soll:'',stat(p),p.geprueft_von||'',p.geprueft_am?berlinZeit(p.geprueft_am):''];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([head,...pos.map(line)]),'Alle Positionen');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([head,...pos.filter(p=>p.geprueft&&p.ist!==p.soll).map(line)]),'Abweichungen');
+  XLSX.writeFile(wb,'Inventur_Kommission_'+String(inv.abgeschlossen_am||inv.gestartet_am).slice(0,10)+'.xlsx');
+});
+ACT.kiPdf=el=>busy(el,async()=>{
+  const inv=KI.rep,pos=KI.repPos.slice().sort((a,b)=>regalCmp(a.regal,b.regal)||posCmp(a,b)),st=kiStats(pos),abw=pos.filter(p=>p.geprueft&&p.ist!==p.soll);
+  const P=await pdfNew('Inventurprotokoll','Viessmann Kommissionslager Tannerstraße · '+berlinDatum(inv.abgeschlossen_am||inv.gestartet_am));
+  let y=pdfKV(P,[['Gestartet',berlinZeit(inv.gestartet_am)+' von '+(inv.gestartet_von||'–')],['Abgeschlossen',inv.abgeschlossen_am?berlinZeit(inv.abgeschlossen_am)+' von '+(inv.abgeschlossen_von||'–'):'läuft noch'],['Geprüft',`${st.geprueft} von ${st.total}`],['Abweichungen',String(abw.length)],['Bestand Soll → Ist',`${st.sumSoll} → ${st.sumIst}`],['Bemerkung',inv.bemerkung]],P.y);
+  y=pdfH(P,'Abweichungen',y);
+  y=abw.length?pdfTable(P,['Regal','Platz','Artikelnummer','Beschreibung','Soll','Ist','Diff.'],abw.map(p=>[regalLabel(p.regal),p.lagerplatz||'',p.artikelnummer,p.beschreibung||'',p.soll,p.ist,(p.ist-p.soll>0?'+':'')+(p.ist-p.soll)]),y,{styles:{fontSize:8.5,cellPadding:1.8}}):pdfText(P,'Keine Abweichungen festgestellt.',y+1);
+  y=pdfH(P,'Alle Positionen',y);
+  pdfTable(P,['Regal','Platz','Artikelnummer','Beschreibung','Soll','Ist','Status'],pos.map(p=>[regalLabel(p.regal),p.lagerplatz||'',p.artikelnummer,p.beschreibung||'',p.soll,p.geprueft?p.ist:'–',!p.geprueft?'nicht geprüft':p.ist===p.soll?'stimmt':'Abweichung']),y,{styles:{fontSize:8,cellPadding:1.5}});
+  await pdfDeliver(P,'Inventurprotokoll_Kommission_'+String(inv.abgeschlossen_am||inv.gestartet_am).slice(0,10)+'.pdf');
+});
+/* ---------- Regal-Etiketten mit QR-Code ---------- */
+ACT.kiEtiketten=el=>busy(el,async()=>{
+  const map={};S.kom.forEach(a=>{const r=regalOf(a.lagerplatz);if(r==='Ohne Lagerplatz')return;const f=(a.lagerplatz||'').trim().toUpperCase().replace(/^\d+[-\s]*/,'');(map[r]=map[r]||new Set());if(f)map[r].add(f)});
+  const regale=Object.keys(map).sort(regalCmp);if(!regale.length)return toast('Keine Lagerplätze vorhanden','err');
+  await loadLib(JSPDF_URL);await loadLib(QR_URL);
+  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'}),W=95,H=55,mx=10,my=11;
+  regale.forEach((r,i)=>{
+    if(i>0&&i%10===0)doc.addPage();
+    const k=i%10,x=mx+(k%2)*W,y=my+Math.floor(k/2)*H;
+    doc.setDrawColor(170).setLineWidth(.2).setLineDashPattern([1.5,1.5],0).rect(x,y,W,H).setLineDashPattern([],0);
+    const qr=qrcode(0,'M');qr.addData('REGAL:'+r);qr.make();
+    const n=qr.getModuleCount(),size=41,cell=size/n,qx=x+6,qy=y+(H-size)/2;doc.setFillColor(0,0,0);
+    for(let a=0;a<n;a++)for(let b=0;b<n;b++)if(qr.isDark(a,b))doc.rect(qx+b*cell,qy+a*cell,cell+.04,cell+.04,'F');
+    doc.setFont('helvetica','bold').setTextColor(100).setFontSize(12).text('REGAL',x+54,y+15);
+    doc.setTextColor(0).setFontSize(r.length>3?40:54).text(r,x+54,y+34);
+    const f=[...map[r]].sort().join('  ');doc.setFont('helvetica','normal').setTextColor(80).setFontSize(10).text(f?'Fächer: '+f:'',x+54,y+43);
+    doc.setFontSize(7).setTextColor(150).text('Heise Haustechnik - Viessmann Kommission',x+54,y+H-4);
+  });
+  pdfAusgeben(doc,'Regal-Etiketten.pdf');
+});
+/* =====================================================================
+   Kommission: Löschanfragen, Monatsliste (PDF wie „Abhollager Braunlage monatliche Ausgabe“),
+   Abrechnung & Verdienst (nur Admin + Lager-Abrechnung), Preise & Sondertage (Admin), Kunden (Lagerist)
+   ===================================================================== */
+/* ---------- Löschanfragen ---------- */
+async function viewKomLoesch(tk){
+  await komZaehler();
+  paint(komHead('Löschanfragen','loesch')+spin());
+  let l=[];try{l=await api('GET','kom_loeschanfragen',null,'?select=id,objekt,objekt_id,objekt_text,grund,status,beantragt_von,beantragt_von_id,beantragt_am,geprueft_von,geprueft_am,antwort&order=beantragt_am.desc&limit=200')}catch(e){toast(niceErr(e),'err')}
+  if(tk!==TOKEN)return;
+  KOM.loesch=l;
+  const offen=l.filter(x=>x.status==='offen'),erl=l.filter(x=>x.status!=='offen');
+  const card=x=>`<div class="lcard"><div class="tnum tone-${x.status==='offen'?'amber':x.status==='freigegeben'?'red':'gray'}">${ic(x.status==='offen'?'alert':x.status==='freigegeben'?'trash':'x')}</div><div class="lcard-main"><b class="tt">${esc(x.objekt_text||'')}</b><div class="lcard-sub">${x.objekt==='vorgang'?'Buchung stornieren':'Artikel löschen'} · beantragt von ${esc(x.beantragt_von||'')} am ${esc(berlinZeit(x.beantragt_am))}</div><div class="lcard-sub" style="margin-top:4px"><b>Grund:</b> ${esc(x.grund)}</div>${x.status!=='offen'?`<div class="lcard-tags">${chip(x.status==='freigegeben'?'red':'gray',x.status==='freigegeben'?'freigegeben & gelöscht':'abgelehnt')}<span class="chip tone-gray">${esc(x.geprueft_von||'')} · ${esc(berlinDatum(x.geprueft_am))}</span></div>${x.antwort?`<div class="lcard-sub">Antwort: ${esc(x.antwort)}</div>`:''}`:''}</div>${x.status==='offen'&&isLagerist()?`<button class="btn btn-primary btn-sm" data-act="kLPruef" data-id="${x.id}">Prüfen</button>`:''}</div>`;
+  paint(`${komHead('Löschanfragen','loesch')}
+  ${isLagerist()?callout('blue','info','So funktioniert es','Niemand löscht direkt. Jede Löschung wird beantragt und vom Lageristen oder Admin mit Unterschrift freigegeben. Artikel werden ausgeblendet (bleiben im Verlauf), Buchungen werden storniert und der Bestand zurückgebucht.',true)
+    :callout('blue','info','Deine Löschanfragen','Hier siehst du, was du beantragt hast und ob es freigegeben wurde. Beantragen kannst du beim jeweiligen Artikel.',true)}
+  <div class="sec"><h2>Offen</h2><span class="muted">${offen.length}</span></div>
+  ${offen.length?`<div class="list">${offen.map(card).join('')}</div>`:`<div class="card">${emptyState('check','Keine offenen Löschanfragen','')}</div>`}
+  ${erl.length?`<div class="sec"><h2>Entschieden</h2></div><div class="list">${erl.map(card).join('')}</div>`:''}`);
+}
+ACT.kLPruef=el=>{
+  const x=KOM.loesch.find(y=>y.id===el.dataset.id);if(!x)return;
+  const selbst=x.beantragt_von_id===S.me.id;
+  const bd=sheet({title:'Löschanfrage prüfen',cls:'wide',body:`
+    <div class="card" style="padding:6px 16px"><div class="dl"><div><dt>${x.objekt==='vorgang'?'Buchung':'Artikel'}</dt><dd>${esc(x.objekt_text||'')}</dd></div><div><dt>Beantragt</dt><dd>${esc(x.beantragt_von||'')} · ${esc(berlinZeit(x.beantragt_am))}</dd></div><div><dt>Grund</dt><dd>${esc(x.grund)}</dd></div></div></div>
+    <div class="btnrow" style="margin:10px 0"><a class="btn btn-soft btn-sm" href="${x.objekt==='vorgang'?'#/k/v/':'#/k/a/'}${x.objekt_id}" data-act="closeSheet">Ansehen</a></div>
+    ${x.objekt==='vorgang'?callout('amber','alert','Storno','Die Buchung wird storniert (nicht abgerechnet) und der Bestand zurückgebucht.',true):callout('amber','alert','Artikel löschen','Der Artikel wird ausgeblendet. Buchungen und Verlauf bleiben erhalten.',true)}
+    ${selbst?`<div class="callout tone-red" style="margin-top:10px">${ic('alert')}<div><b>Du hast diese Löschung selbst beantragt</b><span><label class="switchrow" style="margin-top:6px"><input type="checkbox" id="pSelbst"> Ich habe es noch einmal geprüft und gebe die eigene Löschanfrage trotzdem frei.</label></span></div></div>`:''}
+    <div class="field" style="margin-top:12px"><label>Unterschrift (für die Freigabe)</label><div class="sig" id="pPad"></div></div>
+    ${field('Antwort an den Antragsteller (bei Ablehnung Pflicht)',`<textarea class="inp" id="pA" rows="2"></textarea>`)}
+    <div class="err" id="pErr" role="alert"></div>`,
+    footer:`<button class="btn btn-ghost" id="pNein">Ablehnen</button><button class="btn btn-danger" id="pJa">${ic('trash','sm')} Freigeben & löschen</button>`});
+  const pad=sigPad($('#pPad',bd)),err=m=>$('#pErr',bd).textContent=m;
+  $('#pJa',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    if(selbst&&!$('#pSelbst',bd).checked)return err('Bitte bestätigen, dass du deine eigene Anfrage freigibst.');
+    if(pad.empty())return err('Bitte unterschreiben.');
+    await rpc('kom_loesch_entscheiden',{p_id:x.id,p_freigeben:true,p_unterschrift:pad.data(),p_antwort:val(bd,'pA')||null});
+    closeSheet();await loadAll();toast('Freigegeben','ok');route();
+  });
+  $('#pNein',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    if(!val(bd,'pA'))return err('Bitte kurz begründen, warum abgelehnt wird.');
+    await rpc('kom_loesch_entscheiden',{p_id:x.id,p_freigeben:false,p_unterschrift:null,p_antwort:val(bd,'pA')});
+    closeSheet();toast('Abgelehnt','ok');route();
+  });
+};
+
+/* ---------- Monatsliste ---------- */
+async function komMonatDaten(m){
+  const v=await api('GET','kom_vorgaenge',null,`?monat=eq.${m}&select=*&order=zeitpunkt.asc`);
+  const ids=v.map(x=>x.id),bew=[];
+  for(let i=0;i<ids.length;i+=60)bew.push(...await api('GET','bewegungen',null,`?vorgang_id=in.(${ids.slice(i,i+60).join(',')})&select=*`));
+  const art=await komArtikelMap(bew.map(b=>b.artikel_id));
+  const zeilen=x=>bew.filter(b=>b.vorgang_id===x.id).map(b=>({v:x,b,a:art[b.artikel_id]||{}}));
+  const aus=v.filter(x=>x.art==='ausgabe'&&!x.storniert).flatMap(zeilen),ein=v.filter(x=>x.art==='einlagerung'&&!x.storniert).flatMap(zeilen);
+  return{v,aus,ein,storno:v.filter(x=>x.storniert)};
+}
+async function viewKomMonat(m,tk){
+  paint(komHead('Monatsliste','monat')+spin());
+  let d;try{d=await komMonatDaten(m)}catch(e){paint(komHead('Monatsliste','monat')+`<div class="card">${emptyState('alert','Konnte nicht laden',esc(niceErr(e)))}</div>`);return}
+  if(tk!==TOKEN)return;
+  KOM.monat={m,d};
+  const istB=v=>v.zeitzone==='bereitschaft'&&!v.versand;
+  const tr=z=>`<tr class="${istB(z.v)?'bereit':''}"><td>${esc(berlinDatum(z.v.zeitpunkt))}</td><td>${esc(berlinUhr(z.v.zeitpunkt))}${istB(z.v)?' <b class="bz">B</b>':''}</td><td>${esc(z.v.kundennummer||'')}</td><td>${esc(z.v.firma||'')}</td><td class="r">${nf(z.b.menge)}</td><td>${esc(z.a.artikelnummer||'')}</td><td>${esc(z.v.lieferschein_nr)}</td><td>${esc(z.v.versand?'Versand per Post':z.v.abholer||'')}</td></tr>`;
+  paint(`${komHead('Monatsliste','monat')}
+  ${monatWahl(m,'#/k/monat/')}
+  <div class="actgrid" style="grid-template-columns:repeat(${isAbr()?2:1},1fr)"><button class="act" data-act="kMonatPdf">${ic('doc')}<span>Monatsliste als PDF</span></button>${isAbr()?`<a class="act" href="#/k/abr/${m}">${ic('euro')}<span>Abrechnung</span></a>`:''}</div>
+  <div class="sec"><h2>Ausgaben</h2><span class="muted">${d.aus.length} Positionen · <b class="bz">B</b> = Bereitschaft</span></div>
+  ${d.aus.length?`<div class="card ktab-wrap"><table class="ktab"><thead><tr><th>Datum</th><th>Uhrzeit</th><th>Kd.-Nr.</th><th>Firma</th><th class="r">Stück</th><th>Material-Nr.</th><th>Lieferschein</th><th>Abholer</th></tr></thead><tbody>${d.aus.map(tr).join('')}</tbody></table></div>`:`<div class="card">${emptyState('out','Keine Ausgaben','')}</div>`}
+  <div class="sec"><h2>Einlagerungen</h2><span class="muted">${d.ein.length} Positionen</span></div>
+  ${d.ein.length?`<div class="card ktab-wrap"><table class="ktab"><thead><tr><th>Datum</th><th>Uhrzeit</th><th class="r">Stück</th><th>Material-Nr.</th><th>Bezeichnung</th><th>Lieferschein</th><th>Gebucht von</th></tr></thead><tbody>${d.ein.map(z=>`<tr><td>${esc(berlinDatum(z.v.zeitpunkt))}</td><td>${esc(berlinUhr(z.v.zeitpunkt))}</td><td class="r">${nf(z.b.menge)}</td><td>${esc(z.a.artikelnummer||'')}</td><td>${esc(z.a.beschreibung||'')}</td><td>${esc(z.v.lieferschein_nr)}</td><td>${esc(z.v.benutzer_name||'')}</td></tr>`).join('')}</tbody></table></div>`:`<div class="card">${emptyState('in','Keine Einlagerungen','')}</div>`}
+  ${d.storno.length?`<p class="hint" style="margin-top:10px">${d.storno.length} stornierte Buchung(en) sind nicht enthalten.</p>`:''}`);
+}
+/* PDF im Aufbau der Papierliste „Abhollager Braunlage monatliche Ausgabe“ (A4 quer) */
+function monatslisteSeiten(doc,m,d,neu){
+  const W=297;
+  const kopf=(t)=>{doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(0);
+    doc.text('Lager',12,14);doc.text('Heise Haustechnik GmbH & Co. KG',40,14);doc.text('Lager',150,14);doc.text('0574',172,14);
+    doc.setFont('helvetica','bold');doc.text(t,W-12,14,{align:'right'});doc.setFont('helvetica','normal')};
+  if(neu)doc.addPage('a4','l');
+  kopf('Ausgabe '+monatName(m));
+  const sigs=[];
+  doc.autoTable({startY:18,margin:{left:12,right:12,bottom:16},theme:'grid',
+    head:[['Datum','Uhrzeit','Kundennummer','Kunde Firmenname','Stück/\nAnzahl','Material\nNummer','Lieferscheinnummer','Name des\nAbholer','Unterschrift']],
+    body:d.aus.map(z=>[berlinDatum(z.v.zeitpunkt),berlinUhr(z.v.zeitpunkt)+(z.v.zeitzone==='bereitschaft'&&!z.v.versand?'  B':''),z.v.kundennummer||'',z.v.firma||'',String(z.b.menge),z.a.artikelnummer||'',z.v.lieferschein_nr,z.v.versand?'Versand per Post':(z.v.abholer||''),'']),
+    styles:{fontSize:8.5,cellPadding:1.6,textColor:0,lineColor:[0,0,0],lineWidth:.2,minCellHeight:10,valign:'middle'},
+    headStyles:{fillColor:[255,255,255],textColor:0,fontStyle:'normal',valign:'bottom'},
+    columnStyles:{0:{cellWidth:22},1:{cellWidth:18},2:{cellWidth:28},3:{cellWidth:46},4:{cellWidth:14,halign:'center'},5:{cellWidth:22},6:{cellWidth:36},7:{cellWidth:30},8:{cellWidth:57}},
+    didParseCell:h=>{if(h.section==='body'&&d.aus[h.row.index]&&d.aus[h.row.index].v.zeitzone==='bereitschaft'&&!d.aus[h.row.index].v.versand)h.cell.styles.fillColor=[255,243,214]},
+    didDrawCell:h=>{if(h.section==='body'&&h.column.index===8){const z=d.aus[h.row.index];if(z&&z.v.unterschrift){try{doc.addImage(z.v.unterschrift,'PNG',h.cell.x+1,h.cell.y+.6,Math.min(h.cell.width-2,(h.cell.height-1.2)*3.3),h.cell.height-1.2,'sig'+z.v.id,'FAST')}catch(e){}}}},
+    didDrawPage:()=>kopf('Ausgabe '+monatName(m))});
+  let y=doc.lastAutoTable.finalY+5;
+  doc.setFontSize(8);doc.setTextColor(90);
+  doc.text(`B = Bereitschaft (außerhalb der Öffnungszeiten Mo–Do 07–16 Uhr, Fr 07–13 Uhr). Ausgaben: ${new Set(d.aus.map(z=>z.v.id)).size}, Positionen: ${d.aus.length}.`,12,Math.min(y,200));
+  doc.addPage('a4','l');kopf('Einlagerung '+monatName(m));
+  doc.autoTable({startY:18,margin:{left:12,right:12,bottom:16},theme:'grid',
+    head:[['Datum','Uhrzeit','Stück/\nAnzahl','Material\nNummer','Bezeichnung','Lieferscheinnummer','Gebucht von']],
+    body:d.ein.map(z=>[berlinDatum(z.v.zeitpunkt),berlinUhr(z.v.zeitpunkt),String(z.b.menge),z.a.artikelnummer||'',z.a.beschreibung||'',z.v.lieferschein_nr,z.v.benutzer_name||'']),
+    styles:{fontSize:8.5,cellPadding:1.6,textColor:0,lineColor:[0,0,0],lineWidth:.2,minCellHeight:8},headStyles:{fillColor:[255,255,255],textColor:0,fontStyle:'normal',valign:'bottom'},
+    columnStyles:{2:{halign:'center',cellWidth:16}},didDrawPage:()=>kopf('Einlagerung '+monatName(m))});
+}
+/* PDF anbieten (Speichern / Teilen) ohne den Hochformat-Fuß von pdfFinish */
+function pdfAusgeben(doc,name){
+  const blob=doc.output('blob'),file=new File([blob],name,{type:'application/pdf'});
+  let canShare=false;try{canShare=!!(navigator.canShare&&navigator.canShare({files:[file]}))}catch(e){}
+  const bd=sheet({title:'PDF fertig',body:`<div class="doc-row" style="border:0;padding:0 0 6px"><span class="ico">${ic('doc')}</span><div><b>${esc(name)}</b><small>${Math.round(blob.size/1024)} KB</small></div></div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Schließen</button>${canShare?`<button class="btn btn-soft" id="pdShare">${ic('share')} Teilen</button>`:''}<button class="btn btn-primary" id="pdSave">${ic('download')} Speichern</button>`});
+  $('#pdSave',bd).onclick=()=>saveBlob(blob,name);
+  const sh=$('#pdShare',bd);if(sh)sh.onclick=async()=>{try{await navigator.share({files:[file],title:name})}catch(e){}};
+}
+function seitenzahlen(doc,txt){const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);const w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(140);doc.text(txt+' · erstellt '+berlinZeit(new Date()),12,h-6);doc.text('Seite '+i+' von '+n,w-12,h-6,{align:'right'})}}
+ACT.kMonatPdf=el=>busy(el,async()=>{
+  const {m,d}=KOM.monat;await loadLib(JSPDF_URL);await loadLib(AUTOTABLE_URL);
+  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4',orientation:'l',compress:true});
+  monatslisteSeiten(doc,m,d,false);seitenzahlen(doc,'Abhollager Braunlage – monatliche Ausgabe '+monatName(m));
+  pdfAusgeben(doc,`Abhollager_Braunlage_${m}.pdf`);
+});
+
+/* ---------- Abrechnung (nur Admin + Lager-Abrechnung) ---------- */
+async function viewKomAbr(m,tk){
+  paint(komHead('Abrechnung','abr')+spin());
+  let r;try{r=await rpc('kom_abrechnung',{p_monat:m})}catch(e){paint(komHead('Abrechnung','abr')+`<div class="card">${emptyState('alert','Konnte nicht laden',esc(niceErr(e)))}</div>`);return}
+  if(tk!==TOKEN)return;
+  KOM.abr=r;
+  const vorbei=m<monatHeute();
+  paint(`${komHead('Abrechnung','abr')}
+  ${monatWahl(m,'#/k/abr/')}
+  ${r.abgeschlossen?callout('ok','lock','Monat abgeschlossen',`von ${esc(r.abgeschlossen_von||'')} am ${esc(berlinDatum(r.abgeschlossen_am))}. Die Zahlen sind eingefroren.`,true):!vorbei?callout('blue','info','Laufender Monat','Die Zahlen ändern sich noch. Abschließen kannst du ab dem 1. des Folgemonats.',true):''}
+  ${r.hinweise&&r.hinweise.length?`<div class="callout tone-amber" style="margin-top:12px">${ic('alert')}<div><b>Vor dem Abrechnen prüfen (${r.hinweise.length})</b><span><ul class="khin">${r.hinweise.map(h=>`<li>${esc(h)}</li>`).join('')}</ul></span></div></div>`:`<div style="margin-top:12px">${callout('ok','check','Keine Auffälligkeiten','Alle Buchungen haben Lieferschein-Foto, Unterschrift bzw. Versandkosten.',true)}</div>`}
+  ${r.feiertage&&r.feiertage.length?`<p class="hint" style="margin:8px 2px">Feiertage in diesem Monat (zählen als Bereitschaft): ${esc(r.feiertage.join(', '))}</p>`:''}
+  <div class="card ktab-wrap" style="margin-top:12px"><table class="ktab"><thead><tr><th>Posten</th><th>Bestell-Nr.</th><th class="r">Menge</th><th class="r">Einzel</th><th class="r">Summe</th></tr></thead><tbody>
+    ${r.posten.map(p=>`<tr><td>${esc(p.text)}${p.k==='ber'&&p.tage&&p.tage.length?`<div class="muted" style="font-size:12px">${esc(p.tage.join(', '))}</div>`:''}</td><td>${esc(p.bestellnr||'–')}</td><td class="r">${nf(p.menge)}</td><td class="r">${p.einzel==null?'':eur(p.einzel)}</td><td class="r"><b>${eur(p.summe)}</b></td></tr>`).join('')}
+    <tr class="sum"><td colspan="4">Summe netto</td><td class="r">${eur(r.summe)}</td></tr></tbody></table>
+    <p class="hint" style="margin-top:8px">Gezählt wird je ${r.zaehlweise==='stueck'?'Stück':'Artikel (Position auf dem Lieferschein)'}. Bereitschaft: eine Tagespauschale je Tag, egal wie viele Abholungen – dann ohne Betrag je Artikel.</p></div>
+  <div class="actgrid" style="grid-template-columns:repeat(3,1fr)"><button class="act" data-act="kAbrPdf">${ic('doc')}<span>Abrechnung + Liste (PDF)</span></button><a class="act" href="#/k/monat/${m}">${ic('list')}<span>Monatsliste</span></a><a class="act" href="#/k/jahr/${m.slice(0,4)}">${ic('chart')}<span>Verdienst ${m.slice(0,4)}</span></a></div>
+  ${isAdmin()?`<div class="btnrow" style="margin-top:14px">${!r.abgeschlossen&&vorbei?`<button class="btn btn-primary" data-act="kMonatZu">${ic('lock','sm')} Monat abschließen</button>`:''}${r.abgeschlossen?`<button class="btn btn-ghost" data-act="kMonatAuf">Abschluss aufheben</button>`:''}<a class="btn btn-soft" href="#/k/preise">${ic('euro','sm')} Preise & Sondertage</a></div>`:''}
+  <div style="height:8px"></div>`);
+}
+ACT.kMonatZu=()=>confirmSheet({title:'Monat abschließen?',text:`${esc(monatName(KOM.abr.monat))} wird abgeschlossen. Danach kann in diesem Monat nichts mehr gebucht oder storniert werden. Bitte vorher die Hinweise prüfen.`,ok:'Abschließen',onOk:async()=>{await rpc('kom_monat_abschliessen',{p_monat:KOM.abr.monat});toast('Monat abgeschlossen','ok');route()}});
+ACT.kMonatAuf=()=>confirmSheet({title:'Abschluss aufheben?',text:'Die eingefrorenen Zahlen werden verworfen und neu berechnet. Nur machen, wenn noch nicht abgerechnet wurde.',ok:'Aufheben',danger:true,onOk:async()=>{await rpc('kom_monat_oeffnen',{p_monat:KOM.abr.monat});toast('Wieder geöffnet','ok');route()}});
+ACT.kAbrPdf=el=>busy(el,async()=>{
+  const r=KOM.abr,m=r.monat,d=await komMonatDaten(m);
+  const P=await pdfNew('Abrechnung Kommissionslager','Abhollager Braunlage (Lager 0574) · '+monatName(m),'Viessmann Kommission');
+  let y=pdfKV(P,[['Rechnungsempfänger','Viessmann Deutschland GmbH'],['Zeitraum',monatName(m)],['Stand',r.abgeschlossen?'abgeschlossen am '+berlinDatum(r.abgeschlossen_am):'vorläufig ('+berlinZeit(new Date())+')'],['Zählweise',r.zaehlweise==='stueck'?'je Stück':'je Artikel (Position)']],P.y);
+  y=pdfH(P,'Posten',y);
+  y=pdfTable(P,['Posten','Bestell-Nr.','Menge','Einzel','Summe'],[...r.posten.map(p=>[p.text+(p.k==='ber'&&p.tage&&p.tage.length?'\n'+p.tage.join(', '):''),p.bestellnr||'',String(p.menge),p.einzel==null?'':eur(p.einzel),eur(p.summe)]),[{content:'Summe netto',colSpan:4,styles:{fontStyle:'bold'}},{content:eur(r.summe),styles:{fontStyle:'bold'}}]],y,{columnStyles:{2:{halign:'right'},3:{halign:'right'},4:{halign:'right'}}});
+  if(r.hinweise&&r.hinweise.length){y=pdfH(P,'Prüfhinweise',y);r.hinweise.forEach(h=>{y=pdfText(P,'• '+h,y,9)})}
+  y=pdfText(P,'Nachweis: Viessmann-Lieferscheine und unterschriebene Ausgabeliste (Anhang).',y+2,9);
+  monatslisteSeiten(P.doc,m,d,true);
+  seitenzahlen(P.doc,'Abrechnung Kommissionslager '+monatName(m));
+  pdfAusgeben(P.doc,`Abrechnung_Kommission_${m}.pdf`);
+});
+/* ---------- Verdienst-Übersicht ---------- */
+async function viewKomJahr(j,tk){
+  paint(komHead('Verdienst '+j,'abr')+spin());
+  let l=[];try{l=await rpc('kom_jahr',{p_jahr:j})||[]}catch(e){toast(niceErr(e),'err')}
+  if(tk!==TOKEN)return;
+  const max=Math.max(1,...l.map(x=>+x.summe||0)),ges=l.reduce((s,x)=>s+(+x.summe||0),0);
+  const teil=(x,k)=>((x.posten||[]).filter(p=>k.includes(p.k)).reduce((s,p)=>s+(+p.summe||0),0));
+  paint(`${komHead('Verdienst durch das Lager','abr')}
+  <div class="monatwahl"><a class="iconbtn" href="#/k/jahr/${j-1}" aria-label="Vorjahr">${ic('back')}</a><b>${j}</b>${j<+monatHeute().slice(0,4)?`<a class="iconbtn" href="#/k/jahr/${j+1}" aria-label="Nächstes Jahr">${ic('chev')}</a>`:'<span style="width:44px"></span>'}</div>
+  <div class="sumtiles s3"><div class="sumtile"><small>Gesamt ${j}</small><b>${eur(ges)}</b></div><div class="sumtile"><small>davon Miete</small><b>${eur(l.reduce((s,x)=>s+teil(x,['miete']),0))}</b></div><div class="sumtile"><small>Ein-/Auslagerung, Bereitschaft, Versand</small><b>${eur(l.reduce((s,x)=>s+teil(x,['ein','aus','ber','vaus','vpau','vkost']),0))}</b></div></div>
+  <div class="card" style="margin-top:12px">${l.length?l.map(x=>`<a class="kbar" href="#/k/abr/${x.monat}"><span class="kbar-m">${esc(monatName(x.monat).split(' ')[0])}</span><span class="kbar-b"><i style="width:${Math.round((+x.summe||0)/max*100)}%"></i></span><b>${eur(x.summe)}</b>${x.abgeschlossen?ic('lock','sm'):'<span style="width:16px"></span>'}</a>`).join(''):'<p class="muted">Noch keine Daten.</p>'}</div>
+  <p class="hint" style="margin-top:8px">${ic('lock','sm')} = Monat abgeschlossen. Laufende Monate sind vorläufig. Versandkosten sind durchlaufende Kosten (von Viessmann erstattet).</p>`);
+}
+/* ---------- Preise & Sondertage (Admin) ---------- */
+async function viewKomPreise(tk){
+  paint(komHead('Preise & Sondertage','abr')+spin());
+  let pr=[],st=[];try{[pr,st]=await Promise.all([api('GET','kom_preise',null,'?select=*&order=gueltig_ab.desc'),api('GET','kom_sondertage',null,'?select=*&order=datum.desc')])}catch(e){toast(niceErr(e),'err')}
+  if(tk!==TOKEN)return;
+  KOM.preise=pr;
+  paint(`${komHead('Preise & Sondertage','abr')}
+  ${callout('red','lock','Vertraulich','Preise sehen nur der Admin und Personen mit dem Häkchen „Lager-Abrechnung“. Der Lagerist sieht sie nicht.',true)}
+  <div class="sec"><h2>Preisvereinbarung</h2><button class="btn btn-primary btn-sm" data-act="kPreisNeu">${ic('plus','sm')} Neue Preise ab …</button></div>
+  ${pr.length?`<div class="list">${pr.map((p,i)=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>gültig ab ${esc(fmtD(p.gueltig_ab))}</b>${i===0?chip('ok','aktuell'):''}<button class="btn btn-ghost btn-sm" data-act="kPreisEdit" data-i="${i}" style="margin-left:auto">${ic('edit','sm')} Ändern</button></div>
+    <div class="dl" style="margin-top:6px"><div><dt>Miete / Monat</dt><dd>${eur(p.miete)} · Best.-Nr. ${esc(p.bestellnr_miete||'–')}</dd></div><div><dt>je Einlagerung</dt><dd>${eur(p.je_einlagerung)}</dd></div><div><dt>je Auslagerung (Öffnungszeit)</dt><dd>${eur(p.je_auslagerung)}</dd></div><div><dt>Bereitschaft je Tag</dt><dd>${eur(p.bereitschaft_tag)}</dd></div><div><dt>Versandpauschale</dt><dd>${eur(p.versand_pauschale)} + tatsächliche Kosten${p.versand_mit_auslagerung?' + Betrag je Auslagerung':''}</dd></div><div><dt>Zählweise</dt><dd>${p.zaehlweise==='stueck'?'je Stück':'je Artikel (Position)'}</dd></div><div><dt>Best.-Nr. Rest</dt><dd>${esc(p.bestellnr_rest||'–')}</dd></div></div></div>`).join('')}</div>`
+    :`<div class="card">${emptyState('euro','Noch keine Preise','Bitte die Preise aus der Vereinbarung mit Viessmann eintragen.')}</div>`}
+  <div class="sec"><h2>Sondertage</h2><button class="btn btn-soft btn-sm" data-act="kSonderNeu">${ic('plus','sm')} Tag</button></div>
+  <p class="hint">Gesetzliche Feiertage in Niedersachsen werden automatisch erkannt. Hier zusätzliche Tage eintragen, die wie ein Feiertag zählen (Bereitschaft 8–22 Uhr).</p>
+  ${st.length?`<div class="list">${st.map(s=>`<div class="lcard"><div class="tnum tone-violet">${ic('cal')}</div><div class="lcard-main"><b class="tt">${esc(fmtD(s.datum))}</b><div class="lcard-sub">${esc(s.name)}</div></div><button class="iconbtn flat" data-act="kSonderDel" data-d="${esc(s.datum)}" aria-label="Löschen">${ic('trash')}</button></div>`).join('')}</div>`:''}`);
+}
+function preisForm(p){
+  const n=!p;p=p||{gueltig_ab:berlinToday().slice(0,8)+'01',zaehlweise:'position',versand_mit_auslagerung:true};
+  const bd=sheet({title:n?'Neue Preise':'Preise ändern',body:`
+    ${field('Gültig ab *',`<input class="inp" type="date" id="pG" value="${esc(p.gueltig_ab||'')}" ${n?'':'disabled'}>`,'Gilt für alle Monate ab diesem Datum, bis neue Preise eingetragen werden.')}
+    <div class="row2">${field('Miete je Monat (€)',inp('pM',numIn(p.miete),'inputmode="decimal"'))}${field('Bestell-Nr. Miete',inp('pBM',p.bestellnr_miete))}</div>
+    <div class="row2">${field('je Einlagerung (€)',inp('pE',numIn(p.je_einlagerung),'inputmode="decimal"'))}${field('je Auslagerung in Öffnungszeit (€)',inp('pA',numIn(p.je_auslagerung),'inputmode="decimal"'))}</div>
+    <div class="row2">${field('Bereitschaft je Tag (€)',inp('pT',numIn(p.bereitschaft_tag),'inputmode="decimal"'))}${field('Versandpauschale (€)',inp('pV',numIn(p.versand_pauschale),'inputmode="decimal"'))}</div>
+    ${field('Bestell-Nr. für Ein-/Auslagerung, Bereitschaft, Versand',inp('pBR',p.bestellnr_rest))}
+    ${field('Zählweise',sel('pZ',[['position','je Artikel (Position auf dem Lieferschein)'],['stueck','je Stück']],p.zaehlweise))}
+    <label class="switchrow"><input type="checkbox" id="pVA" ${p.versand_mit_auslagerung?'checked':''}> Beim Versand zusätzlich Betrag je Auslagerung berechnen</label>
+    <div class="err" id="pErr"></div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="pGo">Speichern</button>`});
+  $('#pGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const num=id=>{const v=val(bd,id);return v===''?0:pnum(v)};
+    const row={miete:num('pM'),je_einlagerung:num('pE'),je_auslagerung:num('pA'),bereitschaft_tag:num('pT'),versand_pauschale:num('pV'),bestellnr_miete:val(bd,'pBM')||null,bestellnr_rest:val(bd,'pBR')||null,zaehlweise:val(bd,'pZ'),versand_mit_auslagerung:$('#pVA',bd).checked,geaendert_von:S.me.name,updated_at:new Date().toISOString()};
+    if(Object.values(row).some(v=>v===null&&false)||['miete','je_einlagerung','je_auslagerung','bereitschaft_tag','versand_pauschale'].some(k=>row[k]==null||row[k]<0))return $('#pErr',bd).textContent='Bitte gültige Beträge eingeben.';
+    if(n){const g=val(bd,'pG');if(!g)return $('#pErr',bd).textContent='Bitte „gültig ab“ angeben.';await api('POST','kom_preise',{...row,gueltig_ab:g})}
+    else await api('PATCH','kom_preise',row,`?id=eq.${p.id}`);
+    closeSheet();toast('Gespeichert','ok');route();
+  });
+}
+ACT.kPreisNeu=()=>preisForm(null);
+ACT.kPreisEdit=el=>preisForm(KOM.preise[+el.dataset.i]);
+ACT.kSonderNeu=()=>{
+  const bd=sheet({title:'Sondertag',body:`${field('Datum',`<input class="inp" type="date" id="sD">`)}${field('Bezeichnung',inp('sN','','placeholder="z. B. Heiligabend"'))}`,footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="sGo">Speichern</button>`});
+  $('#sGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{const d=val(bd,'sD');if(!d)return toast('Bitte ein Datum wählen','err');await api('POST','kom_sondertage',{datum:d,name:val(bd,'sN')||'Sondertag'});closeSheet();SONDERTAGE={};toast('Gespeichert','ok');route()});
+};
+ACT.kSonderDel=el=>confirmSheet({title:'Sondertag löschen?',text:fmtD(el.dataset.d),ok:'Löschen',danger:true,onOk:async()=>{await api('DELETE','kom_sondertage',null,`?datum=eq.${el.dataset.d}`);SONDERTAGE={};route()}});
+/* ---------- Kunden (Lagerist) ---------- */
+async function viewKomKunden(tk){
+  const l=await ladeKunden(true);if(tk!==TOKEN)return;
+  paint(`${komHead('Kunden / Firmen','buch',`<button class="btn btn-primary btn-sm" data-act="kbKundeNeu2">${ic('plus','sm')} Firma</button>`)}
+  <div class="list" style="margin-top:12px">${l.map(k=>`<div class="lcard"><div class="tnum tone-blue">${ic('users')}</div><div class="lcard-main"><b class="tt">${esc(k.firma)}</b><div class="lcard-sub">Kundennummer ${esc(k.kundennummer||'–')}</div></div><button class="iconbtn flat" data-act="kKundeEdit" data-id="${k.id}" aria-label="Bearbeiten">${ic('edit')}</button></div>`).join('')}</div>`);
+}
+ACT.kbKundeNeu2=()=>kundeForm(null);
+ACT.kKundeEdit=el=>kundeForm(KUNDEN.find(k=>k.id===el.dataset.id));
+function kundeForm(k){
+  const n=!k;k=k||{};
+  const bd=sheet({title:n?'Neue Firma':'Firma bearbeiten',body:`${field('Firmenname *',inp('kF',k.firma,'autofocus'))}${field('Kundennummer',inp('kK',k.kundennummer))}${n?'':`<label class="switchrow"><input type="checkbox" id="kAus"> Nicht mehr anzeigen</label>`}`,footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="kGo2">Speichern</button>`});
+  $('#kGo2',bd).onclick=ev=>busy(ev.currentTarget,async()=>{const f=val(bd,'kF');if(!f)return toast('Bitte den Firmennamen eingeben','err');
+    const row={firma:f,kundennummer:val(bd,'kK')||null};if(!n&&$('#kAus',bd).checked)row.aktiv=false;
+    if(n)await api('POST','kom_kunden',row);else await api('PATCH','kom_kunden',row,`?id=eq.${k.id}`);closeSheet();toast('Gespeichert','ok');route()});
+}
+/* =====================================================================
+   Kamera-Scanner (Barcode, QR) – aus lager.html übernommen
+   BarcodeDetector (Android/Chrome) oder ZXing als Ersatz (iPhone).
+   scanSheet({title,onCode,fortlaufend}): onCode darf einen Hinweistext zurückgeben (fortlaufend scannen).
+   ===================================================================== */
+const ZXING_URL='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';
+const SCAN={stream:null,timer:null,zx:null,onCode:null,paused:false,last:'',lastAt:0};
+async function scanStart(video,onCode){
+  scanStop();SCAN.onCode=onCode;SCAN.paused=false;SCAN.last='';SCAN.lastAt=0;
+  const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
+  SCAN.stream=stream;video.srcObject=stream;video.muted=true;video.setAttribute('playsinline','');
+  try{await video.play()}catch(e){}
+  let formats=[];
+  if('BarcodeDetector' in window){try{formats=(await BarcodeDetector.getSupportedFormats()).filter(f=>['qr_code','code_128','code_39','ean_13','ean_8','upc_a','upc_e','data_matrix','itf'].includes(f))}catch(e){}}
+  if(formats.includes('qr_code')&&(formats.includes('code_128')||formats.includes('ean_13'))){
+    const det=new BarcodeDetector({formats});
+    SCAN.timer=setInterval(async()=>{if(SCAN.paused)return;try{const c=await det.detect(video);if(c.length)scanEmit(c[0].rawValue)}catch(e){}},250);
+  }else{
+    await loadLib(ZXING_URL);
+    const F=ZXing.BarcodeFormat,hints=new Map();hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[F.QR_CODE,F.CODE_128,F.CODE_39,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.ITF,F.DATA_MATRIX]);
+    const reader=new ZXing.BrowserMultiFormatReader(hints,250);SCAN.zx=reader;
+    reader.decodeFromStream(stream,video,res=>{if(res)scanEmit(res.getText())}).catch(()=>{});
+  }
+}
+function scanEmit(v){
+  if(SCAN.paused||!v)return;const now=Date.now();
+  if(v===SCAN.last&&now-SCAN.lastAt<2000){SCAN.lastAt=now;return}
+  SCAN.last=v;SCAN.lastAt=now;try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}
+  SCAN.onCode(String(v).trim());
+}
+function scanStop(){
+  if(SCAN.timer){clearInterval(SCAN.timer);SCAN.timer=null}
+  if(SCAN.zx){try{SCAN.zx.reset()}catch(e){}SCAN.zx=null}
+  if(SCAN.stream){SCAN.stream.getTracks().forEach(t=>t.stop());SCAN.stream=null}
+}
+function scanSheet({title,onCode,fortlaufend=false}){
+  const bd=sheet({title,body:`<video class="scanvid" autoplay playsinline muted></video><div class="scaninfo" id="scInfo">Kamera wird gestartet …</div>
+    <div class="searchbar" style="margin-top:10px">${ic('search')}<input id="scMan" placeholder="Oder Nummer eintippen / Hand-Scanner, Enter" autocomplete="off" aria-label="Nummer eingeben"></div>`,
+    footer:`<button class="btn btn-primary" data-act="closeSheet">Fertig</button>`,onClose:scanStop});
+  const info=$('#scInfo',bd);
+  const hand=async code=>{
+    SCAN.paused=true;
+    try{const msg=await onCode(code);if(!bd.isConnected)return;info.innerHTML=msg||(fortlaufend?'Nächsten Code scannen …':'');}
+    catch(e){toast(niceErr(e),'err')}
+    finally{SCAN.paused=false}
+  };
+  scanStart($('video',bd),hand).then(()=>{if(bd.isConnected)info.textContent='Code in den Rahmen halten …'}).catch(()=>{info.innerHTML='<span style="color:var(--red)">Kamera nicht verfügbar – bitte Nummer unten eintippen.</span>'});
+  const m=$('#scMan',bd);m.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const v=m.value.trim();m.value='';if(v){SCAN.last='';hand(v)}}});
   return bd;
 }
 /* =====================================================================
