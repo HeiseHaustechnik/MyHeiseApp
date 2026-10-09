@@ -585,6 +585,7 @@ const niceErr=e=>{
   const m=(e&&e.message)||String(e||'Fehler');
   if(/row-level security|42501|permission denied/i.test(m))return 'Dafür fehlt dir die Berechtigung';
   if(/duplicate key|unique/i.test(m))return 'Diese Kennung ist schon vergeben';
+  if(/standhoehe_m/i.test(m))return 'Die Datenbank kennt die Standhöhe noch nicht (SQL-Update „schema_leitern_v3_standhoehe.sql“ fehlt)';
   if(/leiter_fahrzeugliste|p_fahrzeug|ausgebucht_fahrzeug/i.test(m))return 'Die Datenbank ist noch nicht auf dem neuen Stand (SQL-Update „Leitern v2“ fehlt)';
   if(/Failed to fetch|NetworkError|Load failed/i.test(m))return 'Keine Verbindung – bitte Netz prüfen';
   return m;
@@ -640,7 +641,7 @@ const ST={
   ausgebucht:{l:'Gebucht',t:'blue',d:'Ist unterwegs bei einer Person oder auf einem Fahrzeug'},
   defekt:{l:'Gesperrt',t:'red',d:'Defekt – darf nicht benutzt werden'},
   zur_pruefung:{l:'Wartet auf Prüfung',t:'amber',d:'Der Prüfer (Lager) schaut sie sich an'},
-  nachpruefung:{l:'Erneut prüfen',t:'violet',d:'Nach Reparatur noch einmal prüfen'}
+  nachpruefung:{l:'Freigabe offen',t:'violet',d:'Repariert – freigeben oder noch einmal prüfen'}
 };
 const chip=(t,l,extra='')=>`<span class="chip tone-${t} ${extra}"><i></i>${esc(l)}</span>`;
 const statusChip=(s,extra='')=>ST[s]?chip(ST[s].t,ST[s].l,extra):'';
@@ -1047,7 +1048,7 @@ function attentionList(){
   S.leitern.filter(l=>l.aktiv).forEach(l=>{
     const d=due(l);let pr=9,t='',tone='',icon='alert';
     if(l.status==='defekt'){pr=1;t='Gesperrt – defekt';tone='red';icon='wrench'}
-    else if(l.status==='nachpruefung'){pr=2;t='Nach Reparatur erneut prüfen';tone='violet';icon='clip'}
+    else if(l.status==='nachpruefung'){pr=2;t='Repariert – freigeben oder prüfen';tone='violet';icon='clip'}
     else if(l.status==='zur_pruefung'){pr=3;t=d.k==='never'?'Neu – erste Prüfung fehlt':'Wartet auf Prüfung';tone='amber';icon='clip'}
     else if(d.k==='over'||d.k==='never'){pr=4;t=d.l;tone='red';icon='cal'}
     else if(d.k==='soon'){pr=5;t=d.l;tone='amber';icon='cal'}
@@ -1171,7 +1172,7 @@ let DET=null;
 const REST_STATUS_HINT={
   defekt:'Diese Leiter ist als defekt gemeldet und darf nicht benutzt oder gebucht werden.',
   zur_pruefung:'Die Leiter kann erst nach der Prüfung wieder gebucht werden.',
-  nachpruefung:'Nach der Reparatur muss die Leiter noch einmal geprüft werden, bevor sie wieder raus darf.'
+  nachpruefung:'Repariert – noch nicht wieder freigegeben. Ein Prüfer kann sie direkt freigeben oder noch einmal prüfen.'
 };
 function callout(tone,icon,title,text,plain=false){return`<div class="callout tone-${tone} ${plain?'plain':''}">${ic(icon)}<div><b>${esc(title)}</b><span>${text}</span></div></div>`}
 function whereBlock(l){
@@ -1190,7 +1191,9 @@ function actionBlock(l){
   }else if(!gesperrt(l)&&!dueBad(l)){
     h+=`<div class="actions"><button class="btn btn-primary btn-big" data-act="buchen" data-a="ausbuchen">${ic('out')} Leiter buchen</button><div class="hint" style="text-align:center">Auf dich, eine andere Person oder ein Fahrzeug</div></div>`;
   }else if(can.pruefer()){
-    h+=`<div class="actions"><button class="btn btn-primary btn-big" data-act="pruefen">${ic('clip')} Prüfung starten</button></div>`;
+    h+=kannFreigeben(l)
+      ?`<div class="actions two"><button class="btn btn-ok" data-act="freigeben">${ic('shield')} Freigeben</button><button class="btn btn-soft" data-act="pruefen">${ic('clip')} Prüfen</button></div><div class="hint" style="text-align:center;margin-top:6px">Mängel sind behoben – freigeben ohne erneute Prüfung oder noch einmal prüfen</div>`
+      :`<div class="actions"><button class="btn btn-primary btn-big" data-act="pruefen">${ic('clip')} Prüfung starten</button></div>`;
   }
   const showPruef=can.pruefer()&&!(gesperrt(l)&&!isOut(l))&&!(dueBad(l)&&!isOut(l));
   h+=`<div class="qa">
@@ -1198,12 +1201,14 @@ function actionBlock(l){
     <button data-act="status">${ic('sliders')}Status</button>
     ${can.ober()?`<button data-act="aufgabe">${ic('tasks')}Aufgabe</button>`:''}
     ${showPruef?`<button data-act="pruefen">${ic('clip')}Prüfen</button>`:''}
+    ${isOut(l)&&kannFreigeben(l)?`<button data-act="freigeben">${ic('shield')}Freigeben</button>`:''}
   </div>`;
   return h;
 }
 function stammRows(l){
   const r=(k,v)=>v||v===0?`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`:'';
   return r('Kennung / Barcode',l.nummer)+r('Art',l.typ)+r('Material',l.material)+r(l.typ==='Tritt'||l.typ==='Podestleiter'?'Stufen':'Sprossen',l.sprossen)+
+    r('Max. Standhöhe',l.standhoehe_m?String(l.standhoehe_m).replace('.',',')+' m (letzte '+(stufenWort(l.typ)==='Stufen'?'Stufe':'Sprosse')+')':'')+
     r('Länge / Höhe',l.laenge_m?String(l.laenge_m).replace('.',',')+' m':'')+r('Max. Belastung',l.max_last_kg?l.max_last_kg+' kg':'')+
     r('Hersteller',l.hersteller)+r('Modell',l.modell)+r('Seriennummer',l.seriennummer)+r('Baujahr',l.baujahr)+
     r('Lagerort',l.lagerort)+r('Notiz',l.notiz);
@@ -1449,7 +1454,7 @@ function openEinbuchen(l){
 function statusOptions(l){
   const all=[['defekt','wrench','Defekt – sperren','Die Leiter darf sofort nicht mehr benutzt werden.'],
     ['zur_pruefung','clip','Zur Prüfung geben','Der Prüfer im Lager schaut sie sich als Nächstes an.'],
-    ['nachpruefung','refresh','Erneut prüfen','Nach einer Reparatur noch einmal prüfen.'],
+    ['nachpruefung','refresh','Freigabe offen','Repariert, muss noch freigegeben oder geprüft werden.'],
     ['im_lager','box','Wieder freigeben','Nur wenn keine kritischen Mängel offen sind.'],
     ['plakette','shield','Prüfplakette ist dran','Setzt eine gültige Prüfung voraus.']];
   const allowed=S.role==='nutzer'?['defekt']:S.role==='obermonteur'?['defekt','zur_pruefung']:all.map(a=>a[0]);
@@ -1526,15 +1531,44 @@ function openMangelInfo(id){
   const f=$('#miFix',bd);if(f)f.onclick=()=>{closeSheet();fixMangelSheet(m)};
 }
 ACT.mangelInfo=el=>openMangelInfo(el.dataset.id);
-function fixMangelSheet(m,after){
-  const bd=sheet({title:'Mangel behoben',body:`<p class="muted" style="margin-bottom:14px">${esc(m.beschreibung)}</p>${field('Was wurde gemacht?',`<textarea class="inp" id="fxNote" placeholder="z. B. Holm getauscht, Fußkappe erneuert" autofocus></textarea>`,'Sind danach alle Mängel behoben, springt die Leiter auf „Prüfung wiederholen“.')}`,
-    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-ok" id="fxGo">${ic('check')} Als behoben markieren</button>`});
+/** Kann die Leiter nach Reparatur direkt (ohne erneute Prüfung) freigegeben werden? ignoreId = Mangel, der gerade behoben wird */
+function kannFreigeben(l,ignoreId){
+  if(!l||!can.pruefer()||!gesperrt(l)||dueBad(l))return false;
+  return !openMaengel(l.id).some(x=>x.id!==ignoreId&&(x.schwere==='kritisch'||x.schwere==='mittel'));
+}
+function fixMangelSheet(m,after,opt={}){
+  const l=byId(m.leiter_id);
+  const rel=!opt.noRelease&&kannFreigeben(l,m.id);
+  const rest=openMaengel(m.leiter_id).filter(x=>x.id!==m.id).length;
+  let frei=true;
+  const bd=sheet({title:'Mangel behoben',body:`<p class="muted" style="margin-bottom:14px">${esc(m.beschreibung)}</p>
+    ${field('Was wurde gemacht?',`<textarea class="inp" id="fxNote" placeholder="z. B. Holm getauscht, Fußkappe erneuert" autofocus></textarea>`)}
+    ${rel?`<div class="field"><label>Und danach?</label></div><div class="optcards" id="fxOpt">
+      <button class="opt tone-ok on" data-fr="1"><span class="ico">${ic('shield')}</span><span><b>Direkt wieder freigeben</b><small>Reparatur ist in Ordnung – die Leiter darf ohne erneute Prüfung wieder raus.</small></span></button>
+      <button class="opt tone-violet" data-fr="0"><span class="ico">${ic('clip')}</span><span><b>Noch einmal prüfen</b><small>Die Leiter bleibt gesperrt, bis jemand sie geprüft hat.</small></span></button></div>`
+    :`<p class="hint">${opt.noRelease?'Das Ergebnis legst du gleich in der Prüfung fest.':rest?`Es ${rest===1?'ist noch 1 weiterer Mangel':`sind noch ${rest} weitere Mängel`} offen – danach kannst du die Leiter freigeben.`:l&&dueBad(l)?'Die Prüfung ist fällig – die Leiter muss geprüft werden, bevor sie wieder raus darf.':''}</p>`}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-ok" id="fxGo">${ic('check')} ${rel?'Behoben &amp; freigeben':'Behoben'}</button>`});
+  const o=$('#fxOpt',bd);
+  if(o)o.onclick=e=>{const b=e.target.closest('[data-fr]');if(!b)return;frei=b.dataset.fr==='1';$$('#fxOpt .opt',bd).forEach(x=>x.classList.toggle('on',x===b));$('#fxGo',bd).innerHTML=`${ic('check')} ${frei?'Behoben &amp; freigeben':'Behoben'}`};
   $('#fxGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
-    await api('PATCH','leiter_maengel',{status:'behoben',behoben_notiz:$('#fxNote',bd).value.trim()||null},`?id=eq.${m.id}`);
-    const row=await refreshLeiter(m.leiter_id);closeSheet();
-    toast(row&&row.status==='nachpruefung'?'Behoben – Prüfung wiederholen':'Mangel als behoben markiert','ok');renderShell();if(after)after();else rerender();
+    const row=await rpc('leiter_mangel_beheben',{p_mangel:m.id,p_notiz:$('#fxNote',bd).value.trim()||null,p_freigeben:rel&&frei});
+    applyRow(row);await refreshLeiter(m.leiter_id);closeSheet();
+    const r=byId(m.leiter_id);
+    toast(r&&!gesperrt(r)&&rel&&frei?`Behoben – ${r.nummer} ist wieder freigegeben`:r&&r.status==='nachpruefung'?'Behoben – Leiter erneut prüfen':'Mangel als behoben markiert','ok');renderShell();if(after)after();else rerender();
   });
 }
+/* Leiter nach Reparatur ohne Prüfung freigeben */
+ACT.freigeben=()=>{
+  const l=curLeiter();if(!l)return;
+  const bd=sheet({title:'Ohne Prüfung freigeben',body:`<div class="bk-head"><span class="lcard-ico tone-${ST[l.status].t}">${miniLadder(l)}</span><div><b class="num">${esc(l.nummer)}</b><small>${esc(l.bezeichnung||l.typ)} · gültig geprüft bis ${fmtD(l.naechste_pruefung)}</small></div></div>
+    <p class="muted" style="margin-bottom:14px">Die Leiter ist repariert und in Ordnung? Dann ist sie danach sofort wieder buchbar.</p>
+    ${field('Grund <span class="faint" style="font-weight:500">(optional)</span>',`<input class="inp" id="frGrund" placeholder="z. B. Fußkappe getauscht, Sichtkontrolle ok" autocomplete="off">`)}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-ok" id="frGo">${ic('shield')} Freigeben</button>`});
+  $('#frGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const row=await rpc('leiter_freigeben',{p_leiter:l.id,p_grund:$('#frGrund',bd).value.trim()||null});
+    applyRow(row);closeSheet();toast(`${row.nummer} ist wieder freigegeben`,'ok');renderShell();rerender();
+  });
+};
 
 /* ---------- Aufgaben ---------- */
 const AFHINT={pruefen:'Die Leiter wird auf „Muss zur Prüfung“ gesetzt.',reparieren:'Die Leiter wird gesperrt, bis sie repariert und erneut geprüft ist.',aussondern:'Die Leiter wird gesperrt und sollte ausgesondert werden.',sonstiges:'Keine Statusänderung.'};
@@ -1564,11 +1598,21 @@ function openAufgabe(l,{mangel}={}){
 ACT.aufgStatus=el=>busy(el,async()=>{await api('PATCH','leiter_aufgaben',{status:el.dataset.s},`?id=eq.${el.dataset.id}`);await refreshAufgaben();renderShell();viewAufgaben()});
 ACT.aufgErledigt=el=>{
   const a=S.aufgaben.find(x=>x.id===el.dataset.id);if(!a)return;
-  const bd=sheet({title:'Aufgabe erledigt',body:`<p class="muted" style="margin-bottom:14px">${esc(a.titel)}</p>${field('Notiz',`<textarea class="inp" id="agNote" placeholder="Was wurde gemacht? (optional)" autofocus></textarea>`,a.art==='reparieren'?'Nach einer Reparatur muss die Leiter erneut geprüft werden.':'')}`,
+  const l=byId(a.leiter_id);
+  const rel=a.art==='reparieren'&&kannFreigeben(l,a.mangel_id);
+  let frei=true;
+  const bd=sheet({title:'Aufgabe erledigt',body:`<p class="muted" style="margin-bottom:14px">${esc(a.titel)}</p>${field('Notiz',`<textarea class="inp" id="agNote" placeholder="Was wurde gemacht? (optional)" autofocus></textarea>`)}
+    ${rel?`<div class="field"><label>Und danach?</label></div><div class="optcards" id="agOpt">
+      <button class="opt tone-ok on" data-fr="1"><span class="ico">${ic('shield')}</span><span><b>Direkt wieder freigeben</b><small>Ohne erneute Prüfung – sofort wieder buchbar.</small></span></button>
+      <button class="opt tone-violet" data-fr="0"><span class="ico">${ic('clip')}</span><span><b>Noch einmal prüfen</b><small>Bleibt gesperrt bis zur Prüfung.</small></span></button></div>`:''}`,
     footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-ok" id="agGo">${ic('check')} Erledigt</button>`});
+  const o=$('#agOpt',bd);
+  if(o)o.onclick=e=>{const b=e.target.closest('[data-fr]');if(!b)return;frei=b.dataset.fr==='1';$$('#agOpt .opt',bd).forEach(x=>x.classList.toggle('on',x===b))};
   $('#agGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
     await api('PATCH','leiter_aufgaben',{status:'erledigt',erledigt_notiz:$('#agNote',bd).value.trim()||null},`?id=eq.${a.id}`);
-    await Promise.all([refreshAufgaben(),refreshLeiter(a.leiter_id)]);closeSheet();toast('Aufgabe erledigt','ok');renderShell();rerender();
+    let msg='Aufgabe erledigt';
+    if(rel&&frei){try{const row=await rpc('leiter_freigeben',{p_leiter:a.leiter_id,p_grund:'Reparatur erledigt'});applyRow(row);msg=`Erledigt – ${row.nummer} ist wieder freigegeben`}catch(e){msg='Erledigt – Freigabe nicht möglich: '+niceErr(e)}}
+    await Promise.all([refreshAufgaben(),refreshLeiter(a.leiter_id)]);closeSheet();toast(msg,'ok');renderShell();rerender();
   });
 };
 ACT.aufgPruefen=el=>{const l=byId(el.dataset.lid);if(l)startPruefung(l)};
@@ -1628,7 +1672,7 @@ let A=null;
 const A_STEPS=['Art','Größe','Typenschild','Lager & Prüfung','Übersicht'];
 async function openAnlegen(keep){
   if(!can.pruefer())return toast('Nur Prüfer und Admins dürfen Leitern anlegen','err');
-  A={step:keep?2:1,typ:keep?keep.typ:null,material:keep?keep.material:'Aluminium',sprossen:keep?keep.sprossen:8,laenge:keep?keep.laenge:null,last:keep?keep.last:150,
+  A={step:keep?2:1,typ:keep?keep.typ:null,material:keep?keep.material:'Aluminium',sprossen:keep?keep.sprossen:8,laenge:keep?keep.laenge:null,stand:keep?keep.stand:null,last:keep?keep.last:150,
      bez:'',bezTouched:false,hersteller:keep?keep.hersteller:'',modell:keep?keep.modell:'',ser:'',baujahr:keep?keep.baujahr:'',photo:null,
      lagerort:keep?keep.lagerort:'Hauptlager',geprueft:keep?keep.geprueft:null,letzte:keep?keep.letzte:berlinToday(),plak:keep?keep.plak:true,intervall:keep?keep.intervall:12,
      anzahl:1,notiz:'',more:false,nr:nextLocalNr(),done:null};
@@ -1679,6 +1723,7 @@ function azStep2(){
         <div class="field"><label>Material</label><div class="az-chips" id="azMat">${MATERIALIEN.map(m=>`<button class="fchip ${A.material===m?'on':''}" data-m="${m}">${m}</button>`).join('')}</div></div>
         <div class="field"><label>Anzahl ${sw} <span class="faint" style="font-weight:500">(gesamt)</span></label>
           <div class="stepper"><button data-sp="-1" aria-label="Weniger">−</button><input class="inp num" id="azSpr" type="number" min="2" max="30" value="${A.sprossen}" inputmode="numeric"><button data-sp="1" aria-label="Mehr">+</button></div></div>
+        ${field(`Max. Standhöhe auf der letzten ${sw==='Stufen'?'Stufe':'Sprosse'} (m)`,`<input class="inp num" id="azStand" type="number" step="0.05" min="0" max="20" inputmode="decimal" value="${A.stand??''}" placeholder="z. B. 1,65">`,'Höchste Stelle, auf der man noch stehen darf – steht auf dem Typenschild.')}
         <button class="az-more" data-act="azMore">${ic(A.more?'minus':'plus','sm')}<span>Länge und Belastung ${A.more?'ausblenden':'angeben'} <span class="faint">(optional)</span></span></button>
         <div ${A.more?'':'hidden'}>
           <div class="row2">${field('Länge / Höhe (m)',`<input class="inp num" id="azLen" type="number" step="0.05" min="0" inputmode="decimal" value="${A.laenge??''}" placeholder="z. B. 2,40">`)}
@@ -1691,6 +1736,7 @@ function azStep2(){
   const spr=$('#azSpr');
   spr.oninput=()=>{const v=+spr.value;if(v>=2&&v<=30){A.sprossen=v;prev()}};
   $('#azBody').onclick=e=>{const sp=e.target.closest('[data-sp]');if(!sp)return;A.sprossen=Math.min(30,Math.max(2,(+spr.value||8)+ +sp.dataset.sp));spr.value=A.sprossen;prev()};
+  const stand=$('#azStand');stand.oninput=()=>{A.stand=stand.value===''?null:+String(stand.value).replace(',','.')};
   const len=$('#azLen'),last=$('#azLast');
   len.oninput=()=>{A.laenge=len.value===''?null:+String(len.value).replace(',','.')};
   last.oninput=()=>{A.last=last.value===''?null:+last.value};
@@ -1761,7 +1807,7 @@ function azStep5(){
       <div class="az-sum-h"><span class="az-mini">${ladderSVG(preview())}</span><div><small>Kennung &amp; Barcode</small><b class="num">${esc(A.anzahl>1?`${nums[0]} bis ${nums[nums.length-1]}`:nums[0])}</b><span>${esc(A.bez||autoBez(A))}</span></div></div>
       <dl class="dl">
         ${row('Art',A.typ)}${row('Material',A.material)}${row(stufenWort(A.typ),A.sprossen)}
-        ${row('Länge / Höhe',A.laenge?String(A.laenge).replace('.',',')+' m':'')}${row('Max. Belastung',A.last?A.last+' kg':'')}
+        ${row('Max. Standhöhe',A.stand?String(A.stand).replace('.',',')+' m':'')}${row('Länge / Höhe',A.laenge?String(A.laenge).replace('.',',')+' m':'')}${row('Max. Belastung',A.last?A.last+' kg':'')}
         ${row('Hersteller',[A.hersteller,A.modell].filter(Boolean).join(' · '))}${row('Baujahr',A.baujahr)}${A.anzahl===1?row('Seriennummer',A.ser):''}
         ${row('Lagerort',A.lagerort)}
         ${row('Prüfung',A.geprueft==='ja'?`geprüft am ${fmtD(A.letzte)}${A.plak?' · Plakette dran':''}`:'noch nicht geprüft (gesperrt)')}
@@ -1789,7 +1835,7 @@ ACT.azGo=el=>{const s=+el.dataset.s;if(s<=A.step||azStepOk(s-1)){A.step=s;drawAn
 ACT.azSave=el=>busy(el,async()=>{
   const letzte=A.geprueft==='ja'?(A.letzte||null):null;
   const plak=!!letzte&&A.plak;
-  const base={bezeichnung:(A.bez||autoBez(A)).trim()||null,typ:A.typ,material:A.material,sprossen:A.sprossen,laenge_m:A.laenge||null,max_last_kg:A.last||null,
+  const base={bezeichnung:(A.bez||autoBez(A)).trim()||null,typ:A.typ,material:A.material,sprossen:A.sprossen,laenge_m:A.laenge||null,standhoehe_m:A.stand||null,max_last_kg:A.last||null,
     hersteller:A.hersteller.trim()||null,modell:A.modell.trim()||null,baujahr:A.baujahr?+A.baujahr:null,lagerort:A.lagerort||'Hauptlager',
     pruefintervall_monate:A.intervall,notiz:A.notiz.trim()||null,letzte_pruefung:letzte,naechste_pruefung:letzte?addMonths(letzte,A.intervall):null,
     plakette_angebracht:plak,status:letzte?(plak?'plakette':'im_lager'):'zur_pruefung'};
@@ -1832,7 +1878,7 @@ function openLeiterEdit(l){
     ${field('Bezeichnung',`<input class="inp" id="fBez" value="${esc(l.bezeichnung||'')}" placeholder="z. B. Alu-Stehleiter 6 Stufen" autocomplete="off">`)}
     <div class="row2">${field('Art',`<select class="inp" id="fTyp">${opt(TYPEN,l.typ)}</select>`)}${field('Material',`<select class="inp" id="fMat">${opt(MATERIALIEN,l.material)}</select>`)}</div>
     <div class="row2">${field('Sprossen / Stufen',`<div class="stepper" style="grid-template-columns:44px 1fr 44px"><button data-sp="-1" aria-label="Weniger">−</button><input class="inp num" id="fSpr" type="number" min="2" max="30" value="${l.sprossen||8}" inputmode="numeric"><button data-sp="1" aria-label="Mehr">+</button></div>`)}${field('Länge / Höhe (m)',`<input class="inp num" id="fLen" type="number" step="0.05" min="0" inputmode="decimal" value="${l.laenge_m??''}">`)}</div>
-    ${field('Max. Belastung (kg)',`<input class="inp num" id="fLast" type="number" min="0" inputmode="numeric" value="${l.max_last_kg||''}">`)}
+    <div class="row2">${field('Max. Standhöhe (m)',`<input class="inp num" id="fStand" type="number" step="0.05" min="0" max="20" inputmode="decimal" value="${l.standhoehe_m??''}" placeholder="letzte Stufe">`)}${field('Max. Belastung (kg)',`<input class="inp num" id="fLast" type="number" min="0" inputmode="numeric" value="${l.max_last_kg||''}">`)}</div>
     ${sec('Typenschild')}
     <div class="row2">${field('Hersteller',`<input class="inp" id="fHer" value="${esc(l.hersteller||'')}" list="fHerL" autocomplete="off"><datalist id="fHerL">${HERSTELLER.map(h=>`<option value="${h}">`).join('')}</datalist>`)}${field('Modell',`<input class="inp" id="fMod" value="${esc(l.modell||'')}" autocomplete="off">`)}</div>
     <div class="row2">${field('Seriennummer',`<input class="inp" id="fSer" value="${esc(l.seriennummer||'')}" autocomplete="off">`)}${field('Baujahr',`<input class="inp num" id="fBj" type="number" min="1950" max="2100" inputmode="numeric" value="${l.baujahr||''}">`)}</div>
@@ -1857,7 +1903,7 @@ function openLeiterEdit(l){
   q('#fGo').onclick=ev=>busy(ev.currentTarget,async()=>{
     const g=id=>q(id).value.trim(),num=id=>{const x=g(id);return x===''?null:+String(x).replace(',','.')};
     const interval=+g('#fInt')||12,letzte=g('#fLetzte')||null;
-    const patch={bezeichnung:g('#fBez')||null,typ:g('#fTyp'),material:g('#fMat'),sprossen:+g('#fSpr')||8,laenge_m:num('#fLen'),max_last_kg:num('#fLast'),
+    const patch={bezeichnung:g('#fBez')||null,typ:g('#fTyp'),material:g('#fMat'),sprossen:+g('#fSpr')||8,laenge_m:num('#fLen'),standhoehe_m:num('#fStand'),max_last_kg:num('#fLast'),
       hersteller:g('#fHer')||null,modell:g('#fMod')||null,seriennummer:g('#fSer')||null,baujahr:num('#fBj'),lagerort:g('#fOrt')||null,
       pruefintervall_monate:interval,letzte_pruefung:letzte,plakette_angebracht:plak&&!!letzte,notiz:g('#fNote')||null};
     if(can.admin()){
@@ -1936,7 +1982,7 @@ $('#wizLayer').addEventListener('click',e=>{
   drawWizard(true);
 });
 ACT.wizAllOk=()=>{W.items.forEach(i=>{if(!i.e)i.e='ok'});drawWizard(true)};
-ACT.wizFix=el=>{const m=S.maengel.find(x=>x.id===el.dataset.id);if(m)fixMangelSheet(m,()=>drawWizard(true))};
+ACT.wizFix=el=>{const m=S.maengel.find(x=>x.id===el.dataset.id);if(m)fixMangelSheet(m,()=>drawWizard(true),{noRelease:true})};
 ACT.wizMangel=async el=>{
   const it=W.items[+el.dataset.i],l=wl();
   const row=await openMangel(l,{text:it.text,severity:'mittel'});
@@ -2160,6 +2206,7 @@ function printProtocol(l,p,maengel){
     <h1>Prüfprotokoll Leiter</h1><div class="sub">Heise Haustechnik GmbH &amp; Co. KG · Sicht- und Funktionsprüfung</div>
     <table class="kv"><tr><td>Leiter</td><td><b>${esc(l?l.nummer:'')}</b> · ${esc(l?(l.bezeichnung||l.typ):'')}</td></tr>
     <tr><td>Typ / Material</td><td>${esc(l?l.typ:'')}${l&&l.material?' · '+esc(l.material):''}</td></tr>
+    <tr><td>Max. Standhöhe</td><td>${l&&l.standhoehe_m?String(l.standhoehe_m).replace('.',',')+' m':'–'}</td></tr>
     <tr><td>Hersteller / Modell</td><td>${esc(l&&[l.hersteller,l.modell].filter(Boolean).join(' · ')||'–')}</td></tr>
     <tr><td>Seriennummer</td><td>${esc(l&&l.seriennummer||'–')}</td></tr>
     <tr><td>Prüfdatum</td><td>${fmtD(p.datum)}</td></tr><tr><td>Art der Prüfung</td><td>${esc(ARTL[p.art]||p.art)}</td></tr>
