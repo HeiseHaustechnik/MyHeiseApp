@@ -367,6 +367,114 @@ textarea.inp{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
 @media (min-width:960px){.hubpill{display:none}}
 
 .rail-logo{overflow:hidden}.rail-logo img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ===================== Leitern v2 (09.10.2026) ===================== */
+/* Detailkopf (eigene Klasse, damit das CI-.hero nicht dunkel überschreibt) */
+.ldet{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+.ldet .actions.two .btn{padding:0 10px;min-width:0}
+.ldet-top{display:flex;gap:14px;align-items:center}
+.ldet-photo{width:76px;height:76px;border-radius:20px;background:var(--tb);color:var(--t);overflow:hidden;flex:none;display:grid;place-items:center}
+.ldet-photo img{width:100%;height:100%;object-fit:cover}
+.ldet-photo .mini svg{width:32px;height:46px}
+.ldet h1{font-size:32px;font-weight:800;letter-spacing:-.02em}
+.ldet .sub{color:var(--ink-2);margin-top:2px}
+.ldet-chips{display:flex;gap:8px;flex-wrap:wrap}
+.where{display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;background:var(--tb)}
+.where .ico{width:46px;height:46px;border-radius:14px;background:var(--surface);color:var(--t);display:grid;place-items:center;flex:none}
+.where .w{min-width:0;display:grid;gap:2px}
+.where small{font-size:11.5px;font-weight:750;letter-spacing:.07em;text-transform:uppercase;color:var(--t)}
+.where b{font-size:18px;font-weight:760;color:var(--ink)}
+.where .ws{font-size:13px;color:var(--ink-2)}
+.btn-big{height:58px;font-size:17px;border-radius:18px}
+.actions .hint{margin-top:-2px}
+
+/* Kennzeichen-Schild */
+.plate{display:inline-flex;align-items:stretch;height:28px;border-radius:6px;background:#fff;color:#111;font-weight:800;font-size:14px;letter-spacing:.04em;box-shadow:inset 0 0 0 2px #111;overflow:hidden;white-space:nowrap;flex:none;font-family:"DIN Alternate","Arial Narrow",Arial,sans-serif}
+.plate i{display:grid;place-items:center;width:16px;background:#1d4fb8;color:#fff;font-style:normal;font-size:9px;font-weight:700}
+.plate{padding-right:9px}.plate i{margin-right:7px}
+.where .plate{height:32px;font-size:16px;justify-self:start}
+
+/* Start */
+.newbar{display:flex;align-items:center;gap:14px;width:100%;margin:12px 0 0;padding:14px 16px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);text-align:left}
+.newbar .ico{width:44px;height:44px;border-radius:14px;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);display:grid;place-items:center;flex:none}
+.newbar b{display:block;font-size:15.5px}.newbar small{color:var(--ink-2);font-size:13px}
+.newbar .chev{margin-left:auto}
+.hero-scan small{line-height:1.35}
+.tile{color:inherit}
+.lcard-ret{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px;border-radius:12px;background:var(--surface-2);font-weight:700;font-size:13px;color:var(--ink);flex:none;cursor:pointer}
+.selbar{position:fixed;left:12px;right:12px;bottom:calc(96px + var(--safe-b));z-index:35;max-width:740px;margin:0 auto;display:flex;gap:8px;padding:10px;border-radius:20px;background:var(--surface);box-shadow:0 18px 40px -12px rgba(0,0,0,.35)}
+@media(min-width:960px){.selbar{bottom:24px;left:300px}}
+
+/* Wer hat was */
+.sec h2{display:flex;align-items:center;gap:8px}
+.wcard{background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:14px}
+.wcard-h{display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.wcard-h b{display:block;font-size:15px}.wcard-h small{color:var(--ink-3);font-size:12.5px}
+.wrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.wcard-h+.wrow{border-top:0}
+.wico{width:36px;height:44px;border-radius:11px;background:var(--tb);color:var(--t);display:grid;place-items:center;flex:none}
+.wico svg{width:20px;height:30px}
+.wmain{min-width:0;flex:1}.wmain b{font-size:15px}.wmain small{display:block;color:var(--ink-3);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Buchen */
+.bk-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.bk-head .lcard-ico{width:44px;height:54px}.bk-head .lcard-ico svg{width:26px;height:38px}
+.bk-head b{display:block;font-size:19px;font-weight:780}.bk-head small{color:var(--ink-2);font-size:13px}
+.pick-list{display:grid;gap:8px;margin-bottom:16px;max-height:min(42dvh,360px);overflow:auto;padding:2px}
+.pick{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:8px 14px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);text-align:left;font-weight:650}
+.pick>span:not(.avatar):not(.plate){flex:1;min-width:0}
+.pick.on{box-shadow:inset 0 0 0 2.5px var(--brand-2);background:color-mix(in srgb,var(--brand) 7%,var(--surface))}
+.pick .ic{color:var(--brand-strong);margin-left:auto}
+.pick.car .pc{display:grid}.pick.car .pc b{font-size:14.5px}.pick.car .pc small{color:var(--ink-3);font-weight:500;font-size:12.5px}
+.avatar.sm{width:32px;height:32px;font-size:13px}
+.fchip.sm{height:34px;font-size:13px;padding:0 12px}
+
+/* Bearbeiten */
+.ed-sec{font-size:12px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:18px 2px 10px;padding-top:14px;border-top:1px solid var(--line)}
+.ed-sec:first-child{margin-top:0;padding-top:0;border-top:0}
+.ed-ro{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;background:var(--surface-2);margin-bottom:14px}
+.ed-ro .num{font-size:20px;font-weight:800}.ed-ro small{color:var(--ink-3)}
+
+/* Anlegen-Leitfaden */
+.az .wiz-top .az-nr{font-weight:800;font-size:15px;padding:6px 10px;border-radius:10px;background:var(--surface-2);color:var(--ink-2)}
+.az-steps{display:flex;gap:4px;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.az-steps::-webkit-scrollbar{display:none}
+.az-steps button{display:flex;align-items:center;gap:7px;padding:6px 10px 6px 6px;border-radius:12px;font-size:13px;font-weight:650;color:var(--ink-3);white-space:nowrap}
+.az-steps button i{width:24px;height:24px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
+.az-steps button.on{color:var(--ink);background:var(--surface-2)}
+.az-steps button.on i{background:var(--accent);color:#fff}
+.az-steps button.ok i{background:var(--ok);color:#fff}
+.az-steps button.ok{color:var(--ink-2)}
+.az-steps button[disabled]{opacity:.5}
+@media(max-width:560px){.az-steps button:not(.on) span{display:none}.az-steps button:not(.on){padding:6px}}
+.az-q{margin:6px 2px 18px}.az-q h2{font-size:24px;font-weight:780}.az-q p{color:var(--ink-2);margin-top:6px}
+.az-types{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:640px){.az-types{grid-template-columns:repeat(3,1fr)}}
+.az-type{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);text-align:left;min-height:150px;transition:transform .12s}
+.az-type:active{transform:scale(.98)}
+.az-type .pic{width:100%;height:118px;border-radius:14px;background:var(--surface-2);display:grid;place-items:center;margin-bottom:4px;padding:6px 0}
+.az-type .pic svg{height:100%;width:auto;pointer-events:none}
+.az-type b{font-size:15.5px}.az-type small{color:var(--ink-2);font-size:12.5px;line-height:1.35}
+.az-type.on{box-shadow:inset 0 0 0 2.5px var(--accent),var(--shadow)}
+.az-split{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:start}
+@media(min-width:640px){.az-split{grid-template-columns:200px 1fr;gap:24px}}
+.az-prev{position:sticky;top:0;border-radius:20px;background:radial-gradient(120% 80% at 50% 0%,var(--surface-2),transparent 70%),var(--surface);box-shadow:var(--shadow);padding:8px}
+.az-prev svg,.az-mini svg{display:block;width:100%;height:auto;pointer-events:none}
+.az-chips{display:flex;flex-wrap:wrap;gap:8px}
+.az-chips .fchip{box-shadow:inset 0 0 0 1.5px var(--line)}
+.az-chips .fchip.on{box-shadow:none}
+.az-more{display:flex;align-items:flex-start;gap:8px;text-align:left;font-weight:650;font-size:14px;color:var(--brand-strong);padding:6px 0 14px}
+.az-sub{margin-top:12px}
+.az-sum-h{display:flex;gap:14px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.az-mini{width:64px;flex:none;border-radius:14px;background:var(--surface-2);padding:4px}
+.az-sum-h small{display:block;font-size:11.5px;font-weight:750;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.az-sum-h b{display:block;font-size:26px;font-weight:800}
+.az-sum-h span{color:var(--ink-2)}
+.az-done-nr{display:inline-block;margin:10px 0 6px;padding:10px 18px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow);font-size:30px;font-weight:800;letter-spacing:-.01em}
+.az-next{display:grid;gap:10px;max-width:420px;margin:22px auto 0;text-align:left}
+.az-tip{display:flex;gap:10px;padding:12px 14px;border-radius:16px;background:var(--blue-bg);color:var(--ink);font-size:13.5px;line-height:1.4}
+.az-tip .ic{color:var(--blue);margin-top:1px}
+.az-tip b{font-weight:700}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -412,6 +520,8 @@ textarea.inp{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
 <symbol id="i-apps" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></symbol>
 <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
 <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17H3.5a1 1 0 0 1-1-1v-3.2a2 2 0 0 1 .6-1.4L5 9.5l1.6-3.4A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.8 1.1L19 9.5l1.9 1.9a2 2 0 0 1 .6 1.4V16a1 1 0 0 1-1 1H19"/><path d="M5 9.5h14M9 17h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
+<symbol id="i-pinmap" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/></symbol>
 </defs>
 </svg>
@@ -474,7 +584,8 @@ async function ensureToken(){
 const niceErr=e=>{
   const m=(e&&e.message)||String(e||'Fehler');
   if(/row-level security|42501|permission denied/i.test(m))return 'Dafür fehlt dir die Berechtigung';
-  if(/duplicate key|unique/i.test(m))return 'Diese Nummer bzw. dieser Barcode ist schon vergeben';
+  if(/duplicate key|unique/i.test(m))return 'Diese Kennung ist schon vergeben';
+  if(/leiter_fahrzeugliste|p_fahrzeug|ausgebucht_fahrzeug/i.test(m))return 'Die Datenbank ist noch nicht auf dem neuen Stand (SQL-Update „Leitern v2“ fehlt)';
   if(/Failed to fetch|NetworkError|Load failed/i.test(m))return 'Keine Verbindung – bitte Netz prüfen';
   return m;
 };
@@ -497,7 +608,7 @@ async function rpc(name,args={}){
 const jwtSub=t=>{try{return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub}catch(e){return null}};
 
 /* ---------- Zustand ---------- */
-const S={me:null,role:null,leitern:[],maengel:[],aufgaben:[],users:[],ziele:null,checkpunkte:null,q:'',filter:'alle',archiv:false,loadedAt:0};
+const S={me:null,role:null,leitern:[],maengel:[],aufgaben:[],users:[],fahrzeuge:[],ziele:null,checkpunkte:null,q:'',filter:'alle',archiv:false,loadedAt:0};
 const byId=id=>S.leitern.find(l=>l.id===id);
 const ROLLEN={nutzer:'Nutzer',obermonteur:'Obermonteur',pruefer:'Prüfer (Lager)',admin:'Admin'};
 const RANK={nutzer:1,obermonteur:2,pruefer:3,admin:4};
@@ -525,11 +636,11 @@ const greet=()=>'Hallo';
 /* ---------- Status-Logik ---------- */
 const ST={
   im_lager:{l:'Im Lager',t:'ok',d:'Einsatzbereit im Lager'},
-  plakette:{l:'Plakette angebracht',t:'teal',d:'Geprüft, Prüfplakette ist angebracht'},
-  ausgebucht:{l:'Ausgebucht',t:'blue',d:'Ist bei einer Person im Einsatz'},
-  defekt:{l:'Defekt',t:'red',d:'Gesperrt – darf nicht benutzt werden'},
-  zur_pruefung:{l:'Muss zur Prüfung',t:'amber',d:'Wartet auf Prüfung durch den Lageristen'},
-  nachpruefung:{l:'Prüfung wiederholen',t:'violet',d:'Nach Reparatur erneut prüfen'}
+  plakette:{l:'Im Lager',t:'ok',d:'Geprüft, Prüfplakette ist dran'},
+  ausgebucht:{l:'Gebucht',t:'blue',d:'Ist unterwegs bei einer Person oder auf einem Fahrzeug'},
+  defekt:{l:'Gesperrt',t:'red',d:'Defekt – darf nicht benutzt werden'},
+  zur_pruefung:{l:'Wartet auf Prüfung',t:'amber',d:'Der Prüfer (Lager) schaut sie sich an'},
+  nachpruefung:{l:'Erneut prüfen',t:'violet',d:'Nach Reparatur noch einmal prüfen'}
 };
 const chip=(t,l,extra='')=>`<span class="chip tone-${t} ${extra}"><i></i>${esc(l)}</span>`;
 const statusChip=(s,extra='')=>ST[s]?chip(ST[s].t,ST[s].l,extra):'';
@@ -542,6 +653,23 @@ function due(l){
 }
 const gesperrt=l=>['defekt','zur_pruefung','nachpruefung'].includes(l.status);
 const isOut=l=>!!l.ausgebucht_seit;
+const onCar=l=>isOut(l)&&!!(l.ausgebucht_fahrzeug_id||l.ausgebucht_fahrzeug);
+const carById=id=>S.fahrzeuge.find(f=>f.id===id);
+/** Gehört die Leiter gerade mir? (an mich gebucht oder auf „mein“ Fahrzeug als Hauptfahrer) */
+const isMine=l=>isOut(l)&&(l.ausgebucht_an_id===S.me.id||(onCar(l)&&(carById(l.ausgebucht_fahrzeug_id)||{}).hauptfahrer_id===S.me.id));
+/** Wo ist die Leiter? → {icon,text,sub} */
+function whereInfo(l){
+  if(onCar(l))return{icon:'car',text:l.ausgebucht_fahrzeug||'Fahrzeug',sub:l.ausgebucht_an?`Fahrer: ${l.ausgebucht_an}`:'Fahrzeug'};
+  if(isOut(l))return{icon:'user',text:l.ausgebucht_an||'?',sub:'Person'};
+  return{icon:'box',text:l.lagerort||'Lager',sub:'Lager'};
+}
+/** Eingabe/Scan → Kennung: "lh7", "7", "LH 7", altes "L-007" → "LH-007" (wie leiter_kennung() in der DB) */
+function kennung(raw){
+  const s=String(raw||'').trim().toUpperCase().replace(/\s+/g,'');
+  const m=/^(?:LH-?|L-)?(\d+)$/.exec(s);if(!m)return s;
+  return'LH-'+(m[1].length<3?m[1].padStart(3,'0'):m[1]);
+}
+const plate=kz=>`<span class="plate"><i>D</i>${esc(kz||'?')}</span>`;
 const dueBad=l=>['over','never'].includes(due(l).k);
 const bereit=l=>!isOut(l)&&!gesperrt(l)&&!dueBad(l);
 const openMaengel=id=>S.maengel.filter(m=>m.leiter_id===id&&m.status!=='behoben').sort((a,b)=>a.created_at<b.created_at?-1:1);
@@ -641,6 +769,7 @@ async function loadAll(){
   ]);
   S.leitern=l.sort((x,y)=>x.nummer.localeCompare(y.nummer,'de',{numeric:true}));
   S.maengel=m;S.aufgaben=a;S.users=u||[];S.loadedAt=Date.now();
+  try{S.fahrzeuge=await rpc('leiter_fahrzeugliste')||[]}catch(e){S.fahrzeuge=[]}
 }
 async function refreshLeiter(id){
   const [row]=await api('GET','leiter_leitern',null,`?id=eq.${id}`);
@@ -825,28 +954,34 @@ async function qrSVG(text){
   return`<svg viewBox="0 0 ${n+m*2} ${n+m*2}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
 }
 /* =====================================================================
-   Oberfläche: Rahmen (Tab-Leiste / Seitenleiste), Router, Start, Leitern, Aufgaben, Mehr
+   Oberfläche: Rahmen (Tab-Leiste / Seitenleiste), Router, Start, Leitern,
+   Wer hat was, Leiter-Detail, Aufgaben, Mehr
    ===================================================================== */
 const view=()=>$('#view');
 let TOKEN=0;
 const openTaskCount=()=>S.aufgaben.filter(a=>a.status!=='erledigt').length;
+const tasksInTab=()=>can.pruefer();   // Prüfer/Admin: Aufgaben als Tab, alle anderen: „Wer hat was“
 
 function renderShell(){
   const n=openTaskCount(),ini=(S.me.name||'?').trim().charAt(0).toUpperCase();
-  const dot=n?`<i class="dot">${n}</i>`:'';
+  const dot=n&&can.ober()?`<i class="dot">${n}</i>`:'';
   $('#tabbar').innerHTML=
     `<a class="tab" data-nav="start" href="#/">${ic('home')}<span>Start</span></a>`+
     `<a class="tab" data-nav="leitern" href="#/leitern">${ic('ladder')}<span>Leitern</span></a>`+
     `<button class="tab tab-scan" data-act="scan" aria-label="Leiter scannen"><span class="fab">${ic('scan')}</span><span>Scannen</span></button>`+
-    `<a class="tab" data-nav="aufgaben" href="#/aufgaben">${ic('tasks')}<span>Aufgaben</span>${dot}</a>`+
+    (tasksInTab()
+      ?`<a class="tab" data-nav="aufgaben" href="#/aufgaben">${ic('tasks')}<span>Aufgaben</span>${dot}</a>`
+      :`<a class="tab" data-nav="unterwegs" href="#/unterwegs">${ic('users')}<span>Wer hat was</span></a>`)+
     `<a class="tab" data-nav="mehr" href="#/mehr">${ic('more')}<span>Mehr</span></a>`;
   $('#rail').innerHTML=
-    `<div class="rail-brand"><div class="rail-logo">${ic('ladder','lg')}<img src="icon.png?v=5" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Leiterprüfung</b><small>Heise Haustechnik</small></div></div>`+
+    `<div class="rail-brand"><div class="rail-logo">${ic('ladder','lg')}<img src="icon.png?v=5" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()"></div><div><b>Leitern</b><small>Heise Haustechnik</small></div></div>`+
     `<button class="btn btn-primary" data-act="scan">${ic('scan')} Leiter scannen</button>`+
+    (can.pruefer()?`<button class="btn btn-soft" data-act="newLeiter" style="margin:-8px 0 18px">${ic('plus')} Neue Leiter</button>`:'')+
     `<nav class="rail-nav">`+
       `<a class="rail-item" data-nav="start" href="#/">${ic('home')} Start</a>`+
-      `<a class="rail-item" data-nav="leitern" href="#/leitern">${ic('ladder')} Leitern</a>`+
-      `<a class="rail-item" data-nav="aufgaben" href="#/aufgaben">${ic('tasks')} Aufgaben${dot}</a>`+
+      `<a class="rail-item" data-nav="leitern" href="#/leitern">${ic('ladder')} Alle Leitern</a>`+
+      `<a class="rail-item" data-nav="unterwegs" href="#/unterwegs">${ic('users')} Wer hat was</a>`+
+      (can.ober()?`<a class="rail-item" data-nav="aufgaben" href="#/aufgaben">${ic('tasks')} Aufgaben${dot}</a>`:'')+
       (can.admin()?`<a class="rail-item" data-nav="admin" href="#/admin">${ic('sliders')} Verwaltung</a>`:'')+
     `</nav>`+
     `<div class="rail-foot">`+
@@ -867,13 +1002,13 @@ function paint(html){
 /* ---------- Router ---------- */
 function route(){
   const h=location.hash||'#/';
-  if(!h.startsWith('#/')){ // Deep-Link aus QR-Code: #L-001
+  if(!h.startsWith('#/')){ // Deep-Link aus QR-Code: #LH-001
     const code=decodeURIComponent(h.slice(1));history.replaceState(null,'',location.pathname+'#/');openByCode(code);return;
   }
   const parts=h.slice(2).split('/');const seg=parts[0]||'start';
   TOKEN++;const token=TOKEN;DET=null;
   window.scrollTo(0,0);setNav(seg);
-  const V={start:viewStart,leitern:viewLeitern,leiter:()=>viewLeiter(parts[1],token),aufgaben:viewAufgaben,mehr:viewMehr,admin:()=>viewAdmin(parts[1])};
+  const V={start:viewStart,leitern:viewLeitern,leiter:()=>viewLeiter(parts[1],token),unterwegs:viewUnterwegs,aufgaben:viewAufgaben,mehr:viewMehr,admin:()=>viewAdmin(parts[1])};
   (V[seg]||viewStart)();
 }
 window.addEventListener('hashchange',route);
@@ -886,21 +1021,23 @@ document.addEventListener('visibilitychange',async()=>{
 
 /* ---------- Karten ---------- */
 function whereLine(l){
-  return isOut(l)
-    ?`${ic('user')}<span>bei ${esc(l.ausgebucht_an||'?')}${l.ausgebucht_ziel?` · ${esc(l.ausgebucht_ziel)}`:''}</span>`
-    :`${ic('box')}<span>${esc(l.lagerort||'Lager')}</span>`;
+  const w=whereInfo(l);
+  if(onCar(l))return`${ic('car')}<span>${esc(w.text)}${l.ausgebucht_an?` · ${esc(l.ausgebucht_an)}`:''}${l.ausgebucht_ziel?` · ${esc(l.ausgebucht_ziel)}`:''}</span>`;
+  if(isOut(l))return`${ic('user')}<span>${esc(w.text)}${l.ausgebucht_ziel?` · ${esc(l.ausgebucht_ziel)}`:''}</span>`;
+  return`${ic('box')}<span>${esc(w.text)}</span>`;
 }
-function leiterCard(l,sel){
+function leiterCard(l,sel,opt={}){
   const d=due(l),mc=openMaengel(l.id).length;
   const tag=sel===undefined?'a':'button';
   const attrs=sel===undefined?`href="#/leiter/${l.id}"`:`data-act="toggleSel" data-id="${l.id}"`;
+  const stat=gesperrt(l)?statusChip(l.status):'';
   return`<${tag} class="lcard ${sel?'sel':''}" ${attrs}>${sel===undefined?'':`<span class="selbox">${sel?ic('check','sm'):''}</span>`}
     <div class="lcard-ico tone-${ST[l.status].t}">${miniLadder(l)}</div>
     <div class="lcard-main">
       <div class="lcard-top"><b class="num">${esc(l.nummer)}</b><span class="lname">${esc(l.bezeichnung||l.typ)}</span></div>
       <div class="lcard-sub">${whereLine(l)}</div>
-      <div class="lcard-tags">${statusChip(l.status)}${d.k!=='ok'?chip(d.t,d.l):''}${mc?`<span class="chip tone-red">${ic('alert')} ${mc} ${mc===1?'Mangel':'Mängel'}</span>`:''}</div>
-    </div>${sel===undefined?ic('chev','chev'):''}</${tag}>`;
+      ${(stat||d.k!=='ok'||mc)?`<div class="lcard-tags">${stat}${d.k!=='ok'?chip(d.t,d.l):''}${mc?`<span class="chip tone-red">${ic('alert')} ${mc} ${mc===1?'Mangel':'Mängel'}</span>`:''}</div>`:''}
+    </div>${opt.ret?`<span class="lcard-ret" data-act="quickReturn" data-id="${l.id}" role="button" tabindex="0">${ic('in','sm')} Zurück</span>`:sel===undefined?ic('chev','chev'):''}</${tag}>`;
 }
 const emptyState=(icon,title,text,btn='')=>`<div class="empty">${ic(icon)}<b>${esc(title)}</b><p>${text}</p>${btn?`<div style="margin-top:16px">${btn}</div>`:''}</div>`;
 
@@ -909,9 +1046,9 @@ function attentionList(){
   const rows=[];
   S.leitern.filter(l=>l.aktiv).forEach(l=>{
     const d=due(l);let pr=9,t='',tone='',icon='alert';
-    if(l.status==='defekt'){pr=1;t='Defekt – gesperrt';tone='red';icon='wrench'}
-    else if(l.status==='nachpruefung'){pr=2;t='Prüfung wiederholen';tone='violet';icon='clip'}
-    else if(l.status==='zur_pruefung'){pr=3;t='Muss zur Prüfung';tone='amber';icon='clip'}
+    if(l.status==='defekt'){pr=1;t='Gesperrt – defekt';tone='red';icon='wrench'}
+    else if(l.status==='nachpruefung'){pr=2;t='Nach Reparatur erneut prüfen';tone='violet';icon='clip'}
+    else if(l.status==='zur_pruefung'){pr=3;t=d.k==='never'?'Neu – erste Prüfung fehlt':'Wartet auf Prüfung';tone='amber';icon='clip'}
     else if(d.k==='over'||d.k==='never'){pr=4;t=d.l;tone='red';icon='cal'}
     else if(d.k==='soon'){pr=5;t=d.l;tone='amber';icon='cal'}
     if(pr<9)rows.push({l,pr,t,tone,icon,d:d.d??-999});
@@ -921,46 +1058,47 @@ function attentionList(){
 function viewStart(){
   const L=S.leitern.filter(l=>l.aktiv);
   const c={bereit:L.filter(bereit).length,out:L.filter(isOut).length,sp:L.filter(gesperrt).length,faellig:L.filter(l=>['over','never','soon'].includes(due(l).k)).length};
-  const mine=L.filter(l=>l.ausgebucht_an_id===S.me.id);
+  const mine=L.filter(isMine);
   const att=attentionList().slice(0,6),tasks=openTaskCount();
   const first=(S.me.name||'').split(' ')[0];
-  const tile=(f,tone,icon,n,label)=>`<button class="tile tone-${tone}" data-act="filter" data-f="${f}">${ic(icon)}<b>${n}</b><span>${label}</span></button>`;
+  const tile=(f,tone,icon,n,label,href)=>`<${href?'a':'button'} class="tile tone-${tone}" ${href?`href="${href}"`:`data-act="filter" data-f="${f}"`}>${ic(icon)}<b>${n}</b><span>${label}</span></${href?'a':'button'}>`;
   paint(`
   <div class="pills"><a class="hubpill" href="${PORTAL}">${ic('apps','sm')} My Heise</a><a class="hubpill" href="${PORTAL}#/nachrichten">${ic('bell','sm')} Nachrichten<span class="nzb" data-nz hidden></span></a></div>
   <div class="head"><div><div class="eyebrow">${esc(greet())}</div><h1>${esc(first)}</h1></div><div class="avatar" style="width:46px;height:46px;font-size:18px">${esc((S.me.name||'?').charAt(0).toUpperCase())}</div></div>
-  ${L.length?`<div class="tiles">
-    ${tile('lager','ok','shield',c.bereit,'Einsatzbereit')}
-    ${tile('ausgebucht','blue','out',c.out,'Ausgebucht')}
+  <button class="hero-scan" data-act="scan"><span class="ic-wrap">${ic('scan','lg')}</span><span><b>Leiter scannen</b><small>Etikett scannen – buchen, zurückgeben, Mangel melden</small></span>${ic('chev','chev')}</button>
+  ${can.pruefer()?`<button class="newbar" data-act="newLeiter"><span class="ico">${ic('plus')}</span><span><b>Neue Leiter anlegen</b><small>Schritt für Schritt, Kennung LH-… kommt automatisch</small></span>${ic('chev','chev')}</button>`:''}
+  ${mine.length?`<div class="sec"><h2>Meine Leitern</h2><span class="faint">${mine.length}</span></div><div class="list">${mine.map(l=>leiterCard(l,undefined,{ret:true})).join('')}</div>`:''}
+  ${L.length?`<div class="sec"><h2>Überblick</h2><a href="#/leitern">Alle Leitern</a></div><div class="tiles">
+    ${tile('lager','ok','box',c.bereit,'Im Lager, einsatzbereit')}
+    ${tile('ausgebucht','blue','users',c.out,'Gebucht – wer hat was?','#/unterwegs')}
     ${tile('gesperrt','red','lock',c.sp,'Gesperrt')}
     ${tile('faellig','amber','cal',c.faellig,'Prüfung fällig')}
-  </div>`:''}
-  <button class="hero-scan" data-act="scan"><span class="ic-wrap">${ic('scan','lg')}</span><span><b>Leiter scannen</b><small>QR-Code oder Barcode am Etikett</small></span>${ic('chev','chev')}</button>
-  ${!L.length?`<div class="card" style="margin-top:14px">${emptyState('ladder','Noch keine Leitern',can.pruefer()?'Lege die erste Leiter an – die Nummer wird automatisch vergeben.':'Sobald Leitern erfasst sind, siehst du sie hier.',can.pruefer()?`<button class="btn btn-primary" data-act="newLeiter">${ic('plus')} Erste Leiter anlegen</button>`:'')}</div>`:''}
-  ${mine.length?`<div class="sec"><h2>Meine Leitern</h2><span class="faint">${mine.length}</span></div><div class="list">${mine.map(l=>leiterCard(l)).join('')}</div>`:''}
-  ${can.ober()&&(att.length||tasks)?`<div class="sec"><h2>Braucht Aufmerksamkeit</h2><a href="#/leitern">Alle</a></div><div class="list">
+  </div>`:`<div class="card" style="margin-top:14px">${emptyState('ladder','Noch keine Leitern',can.pruefer()?'Lege die erste Leiter an – du wirst Schritt für Schritt geführt.':'Sobald Leitern erfasst sind, siehst du sie hier.',can.pruefer()?`<button class="btn btn-primary" data-act="newLeiter">${ic('plus')} Erste Leiter anlegen</button>`:'')}</div>`}
+  ${can.ober()&&(att.length||tasks)?`<div class="sec"><h2>Braucht Aufmerksamkeit</h2>${tasks?`<a href="#/aufgaben">Aufgaben</a>`:''}</div><div class="list">
     ${tasks&&can.pruefer()?`<a class="alert-row tone-blue" href="#/aufgaben"><span class="ico">${ic('tasks')}</span><div><b>${tasks} offene ${tasks===1?'Aufgabe':'Aufgaben'}</b><small>Prüfen und Reparieren</small></div>${ic('chev','chev')}</a>`:''}
     ${att.map(r=>`<a class="alert-row tone-${r.tone}" href="#/leiter/${r.l.id}"><span class="ico">${ic(r.icon)}</span><div><b class="num">${esc(r.l.nummer)} · ${esc(r.l.bezeichnung||r.l.typ)}</b><small>${esc(r.t)}</small></div>${ic('chev','chev')}</a>`).join('')}
   </div>`:''}
   `);
 }
 ACT.filter=el=>{S.filter=el.dataset.f;S.q='';location.hash='#/leitern'};
+ACT.quickReturn=(el,e)=>{e.stopPropagation();const l=byId(el.dataset.id);if(l)openEinbuchen(l)};
 
 /* ---------- Leitern-Liste ---------- */
-const FILTERS=[['alle','Alle'],['lager','Im Lager'],['ausgebucht','Ausgebucht'],['gesperrt','Gesperrt'],['faellig','Prüfung fällig']];
+const FILTERS=[['alle','Alle'],['lager','Im Lager'],['ausgebucht','Gebucht'],['fahrzeug','Auf Fahrzeug'],['gesperrt','Gesperrt'],['faellig','Prüfung fällig']];
 const FMATCH={
-  alle:()=>true,lager:l=>!isOut(l)&&!gesperrt(l),ausgebucht:isOut,gesperrt,
+  alle:()=>true,lager:l=>!isOut(l)&&!gesperrt(l),ausgebucht:isOut,fahrzeug:onCar,gesperrt,
   faellig:l=>['over','never','soon'].includes(due(l).k)
 };
 let SEL={on:false,ids:new Set()};
 function filtered(){
-  const q=S.q.trim().toLowerCase();
-  return S.leitern.filter(l=>!!l.aktiv===!S.archiv).filter(FMATCH[S.filter]||FMATCH.alle).filter(l=>!q||[l.nummer,l.bezeichnung,l.typ,l.hersteller,l.modell,l.seriennummer,l.barcode,l.ausgebucht_an,l.ausgebucht_ziel,l.lagerort,ST[l.status].l].some(v=>v&&String(v).toLowerCase().includes(q)));
+  const q=S.q.trim().toLowerCase(),k=kennung(S.q).toLowerCase();
+  return S.leitern.filter(l=>!!l.aktiv===!S.archiv).filter(FMATCH[S.filter]||FMATCH.alle).filter(l=>!q||l.nummer.toLowerCase()===k||[l.nummer,l.bezeichnung,l.typ,l.hersteller,l.modell,l.seriennummer,l.ausgebucht_an,l.ausgebucht_fahrzeug,l.ausgebucht_ziel,l.lagerort,ST[l.status].l].some(v=>v&&String(v).toLowerCase().includes(q)));
 }
 function viewLeitern(){
   paint(`
   <div class="head"><div><div class="eyebrow">Bestand</div><h1>Leitern</h1></div>
     ${can.pruefer()?`<div style="display:flex;gap:8px"><button class="iconbtn" data-act="selMode" aria-label="Etiketten drucken" title="Etiketten drucken">${ic('tag')}</button><button class="btn btn-primary btn-sm" data-act="newLeiter">${ic('plus','sm')} Neu</button></div>`:''}</div>
-  <label class="searchbar">${ic('search')}<input id="q" type="search" enterkeyhint="search" placeholder="Nummer, Name, Person oder Barcode …" autocomplete="off" value="${esc(S.q)}"></label>
+  <label class="searchbar">${ic('search')}<input id="q" type="search" enterkeyhint="search" placeholder="LH-Nummer, Name, Person oder Fahrzeug …" autocomplete="off" value="${esc(S.q)}"></label>
   <div class="filters" id="chips"></div>
   <div class="list" id="llist" style="margin-top:8px"></div>
   <div id="selbar"></div>`);
@@ -969,17 +1107,17 @@ function viewLeitern(){
   q.addEventListener('keydown',async e=>{
     if(e.key==='Enter'&&q.value.trim()){
       e.preventDefault();
-      const rows=filtered();
-      const exact=S.leitern.filter(l=>[l.nummer,l.barcode,l.seriennummer].some(v=>v&&v.toLowerCase()===q.value.trim().toLowerCase()));
+      const k=kennung(q.value);
+      const exact=S.leitern.filter(l=>l.nummer===k||(l.seriennummer&&l.seriennummer.toLowerCase()===q.value.trim().toLowerCase()));
       if(exact.length===1){location.hash=`#/leiter/${exact[0].id}`}
-      else if(!rows.length)openByCode(q.value.trim());
+      else if(!filtered().length)openByCode(q.value.trim());
     }
   });
   drawList();
 }
 function drawList(){
   const act=S.leitern.filter(l=>!!l.aktiv===!S.archiv);
-  $('#chips').innerHTML=FILTERS.map(([k,l])=>`<button class="fchip ${S.filter===k?'on':''}" data-act="setFilter" data-f="${k}">${l}<em>${act.filter(FMATCH[k]).length}</em></button>`).join('')+
+  $('#chips').innerHTML=FILTERS.filter(([k])=>k!=='fahrzeug'||act.some(onCar)||S.filter==='fahrzeug').map(([k,l])=>`<button class="fchip ${S.filter===k?'on':''}" data-act="setFilter" data-f="${k}">${l}<em>${act.filter(FMATCH[k]).length}</em></button>`).join('')+
     (can.pruefer()?`<button class="fchip ${S.archiv?'on':''}" data-act="toggleArchiv">${ic('box','sm')} Archiv</button>`:'');
   const rows=filtered();
   $('#llist').innerHTML=rows.length?rows.map(l=>leiterCard(l,SEL.on?SEL.ids.has(l.id):undefined)).join(''):
@@ -994,47 +1132,81 @@ function drawSelbar(){
   const b=$('#selbar');if(!b)return;
   if(!SEL.on){b.innerHTML='';return}
   const n=SEL.ids.size;
-  b.innerHTML=`<div style="position:fixed;left:12px;right:12px;bottom:calc(96px + var(--safe-b));z-index:35;max-width:740px;margin:0 auto;display:flex;gap:8px;padding:10px;border-radius:20px;background:var(--surface);box-shadow:0 18px 40px -12px rgba(0,0,0,.35)">
+  b.innerHTML=`<div class="selbar">
     <button class="btn btn-soft btn-sm" data-act="selAll">Alle</button>
-    <button class="btn btn-primary" style="flex:1;height:44px" data-act="printSel" ${n?'':'disabled'}>${ic('print')} ${n?`${n} Etikett${n===1?'':'en'} drucken`:'Leitern auswählen'}</button>
+    <button class="btn btn-primary" style="flex:1;height:44px" data-act="printSel" ${n?'':'disabled'}>${ic('print')} ${n?`${n} Etikett${n===1?'':'en'} drucken`:'Leitern antippen'}</button>
     <button class="iconbtn flat" data-act="selMode" aria-label="Abbrechen">${ic('x')}</button></div>`;
 }
 ACT.selAll=()=>{filtered().forEach(l=>SEL.ids.add(l.id));drawList()};
 ACT.printSel=()=>{printLabels(S.leitern.filter(l=>SEL.ids.has(l.id)))};
 
+/* ---------- Wer hat was ---------- */
+function viewUnterwegs(){
+  const out=S.leitern.filter(l=>l.aktiv&&isOut(l));
+  const cars=new Map(),people=new Map();
+  out.forEach(l=>{
+    if(onCar(l)){const k=l.ausgebucht_fahrzeug_id||l.ausgebucht_fahrzeug;if(!cars.has(k))cars.set(k,{kz:l.ausgebucht_fahrzeug,fz:carById(l.ausgebucht_fahrzeug_id),fahrer:l.ausgebucht_an,list:[]});cars.get(k).list.push(l)}
+    else{const k=l.ausgebucht_an_id||l.ausgebucht_an;if(!people.has(k))people.set(k,{name:l.ausgebucht_an,me:l.ausgebucht_an_id===S.me.id,list:[]});people.get(k).list.push(l)}
+  });
+  const since=l=>l.ausgebucht_seit?ago(l.ausgebucht_seit):'';
+  const mini=l=>`<a class="wrow" href="#/leiter/${l.id}"><span class="wico tone-${ST[l.status].t}">${miniLadder(l)}</span><span class="wmain"><b class="num">${esc(l.nummer)}</b> <span class="faint">${esc(l.bezeichnung||l.typ)}</span><small>${l.ausgebucht_ziel?esc(l.ausgebucht_ziel)+' · ':''}seit ${esc(since(l))}${due(l).k!=='ok'?' · '+esc(due(l).l):''}</small></span>${ic('chev','chev')}</a>`;
+  cars.forEach(c=>{if(!c.fahrer&&c.fz)c.fahrer=c.fz.hauptfahrer});
+  const carList=[...cars.values()].sort((a,b)=>String(a.kz).localeCompare(String(b.kz)));
+  const pplList=[...people.values()].sort((a,b)=>(b.me-a.me)||String(a.name).localeCompare(String(b.name)));
+  const emptyCars=S.fahrzeuge.filter(f=>![...cars.values()].some(c=>c.fz&&c.fz.id===f.id));
+  paint(`
+  <div class="head"><div><div class="eyebrow">Unterwegs</div><h1>Wer hat was?</h1></div><span class="chip tone-blue lg">${out.length} gebucht</span></div>
+  ${!out.length?`<div class="card">${emptyState('box','Alle Leitern sind im Lager','Sobald jemand eine Leiter bucht, siehst du hier, wer sie hat – Person oder Fahrzeug.')}</div>`:''}
+  ${carList.length?`<div class="sec"><h2>${ic('car','sm')} Auf Fahrzeugen</h2><span class="faint">${carList.reduce((n,c)=>n+c.list.length,0)}</span></div>
+    <div class="list">${carList.map(c=>`<div class="wcard"><div class="wcard-h">${plate(c.kz)}<div style="min-width:0;flex:1"><b>${esc(c.fz&&c.fz.bezeichnung||c.fz&&c.fz.typ||'Fahrzeug')}</b><small>${c.fahrer?'Fahrer: '+esc(c.fahrer):'kein fester Fahrer'}</small></div><span class="chip tone-blue">${c.list.length}</span></div>${c.list.map(mini).join('')}</div>`).join('')}</div>`:''}
+  ${pplList.length?`<div class="sec"><h2>${ic('user','sm')} Bei Personen</h2><span class="faint">${pplList.reduce((n,c)=>n+c.list.length,0)}</span></div>
+    <div class="list">${pplList.map(p=>`<div class="wcard"><div class="wcard-h"><div class="avatar">${esc((p.name||'?').charAt(0).toUpperCase())}</div><div style="min-width:0;flex:1"><b>${esc(p.name||'?')}${p.me?' (ich)':''}</b><small>${p.list.length} ${p.list.length===1?'Leiter':'Leitern'}</small></div></div>${p.list.map(mini).join('')}</div>`).join('')}</div>`:''}
+  ${emptyCars.length&&out.length?`<p class="faint" style="margin:18px 4px 0;font-size:13px">Ohne Leiter: ${emptyCars.map(f=>esc(f.kennzeichen)).join(', ')}</p>`:''}
+  ${!S.fahrzeuge.length?`<div class="callout plain tone-blue" style="margin-top:18px">${ic('car')}<div><b>Fahrzeuge</b><span>Sobald im Fuhrpark Fahrzeuge angelegt sind, können Leitern auch direkt auf ein Fahrzeug gebucht werden.</span></div></div>`:''}
+  `);
+}
+
 /* ---------- Leiter-Detail ---------- */
 let DET=null;
 const REST_STATUS_HINT={
-  defekt:'Gesperrt: Diese Leiter ist als defekt markiert und darf nicht benutzt oder ausgegeben werden.',
-  zur_pruefung:'Muss zur Prüfung: Die Leiter kann erst nach der Prüfung wieder ausgegeben werden.',
-  nachpruefung:'Die Prüfung muss nach der Reparatur wiederholt werden, bevor die Leiter wieder raus darf.'
+  defekt:'Diese Leiter ist als defekt gemeldet und darf nicht benutzt oder gebucht werden.',
+  zur_pruefung:'Die Leiter kann erst nach der Prüfung wieder gebucht werden.',
+  nachpruefung:'Nach der Reparatur muss die Leiter noch einmal geprüft werden, bevor sie wieder raus darf.'
 };
 function callout(tone,icon,title,text,plain=false){return`<div class="callout tone-${tone} ${plain?'plain':''}">${ic(icon)}<div><b>${esc(title)}</b><span>${text}</span></div></div>`}
+function whereBlock(l){
+  const w=whereInfo(l);
+  const big=onCar(l)?plate(l.ausgebucht_fahrzeug):`<b>${esc(w.text)}</b>`;
+  const sub=onCar(l)?`${l.ausgebucht_an?'Fahrer: '+esc(l.ausgebucht_an):'Fahrzeug'}`:isOut(l)?'hat die Leiter':'Lagerort';
+  return`<div class="where tone-${isOut(l)?'blue':'ok'}"><span class="ico">${ic(w.icon)}</span><div class="w"><small>${isOut(l)?'Gebucht':'Im Lager'}</small>${big}<span class="ws">${sub}${isOut(l)&&l.ausgebucht_ziel?` · ${esc(l.ausgebucht_ziel)}`:''}${isOut(l)&&l.ausgebucht_seit?` · seit ${esc(ago(l.ausgebucht_seit))}`:''}</span></div></div>`;
+}
 function actionBlock(l){
   const d=due(l);let h='';
   if(gesperrt(l))h+=callout(ST[l.status].t,l.status==='defekt'?'lock':'clip',ST[l.status].l,esc(REST_STATUS_HINT[l.status]));
-  else if(dueBad(l))h+=callout('red','cal',d.k==='never'?'Noch nie geprüft':'Prüfung überfällig',d.k==='never'?'Diese Leiter muss zuerst geprüft werden, bevor sie ausgegeben werden darf.':`Die Prüfung ist seit ${fmtD(l.naechste_pruefung)} fällig – die Leiter darf nicht ausgegeben werden.`);
+  else if(dueBad(l))h+=callout('red','cal',d.k==='never'?'Noch nie geprüft':'Prüfung überfällig',d.k==='never'?'Die Leiter muss zuerst geprüft werden, bevor sie gebucht werden darf.':`Die Prüfung ist seit ${fmtD(l.naechste_pruefung)} fällig – die Leiter darf nicht raus.`);
   else if(d.k==='soon')h+=callout('amber','cal',d.l,`Nächste Prüfung am ${fmtD(l.naechste_pruefung)}.`,true);
   if(isOut(l)){
-    h+=`<div class="actions two"><button class="btn btn-primary" data-act="buchen" data-a="einbuchen">${ic('in')} Zurück ins Lager</button><button class="btn btn-soft" data-act="buchen" data-a="umbuchen">${ic('swap')} Umbuchen</button></div>`;
+    h+=`<div class="actions two"><button class="btn btn-primary" data-act="buchen" data-a="einbuchen">${ic('in')} Zurückgeben</button><button class="btn btn-soft" data-act="buchen" data-a="umbuchen">${ic('swap')} Weitergeben</button></div>`;
   }else if(!gesperrt(l)&&!dueBad(l)){
-    h+=`<div class="actions"><button class="btn btn-primary" data-act="buchen" data-a="ausbuchen">${ic('out')} Ausbuchen</button></div>`;
+    h+=`<div class="actions"><button class="btn btn-primary btn-big" data-act="buchen" data-a="ausbuchen">${ic('out')} Leiter buchen</button><div class="hint" style="text-align:center">Auf dich, eine andere Person oder ein Fahrzeug</div></div>`;
   }else if(can.pruefer()){
-    h+=`<div class="actions"><button class="btn btn-primary" data-act="pruefen">${ic('clip')} Prüfung starten</button></div>`;
+    h+=`<div class="actions"><button class="btn btn-primary btn-big" data-act="pruefen">${ic('clip')} Prüfung starten</button></div>`;
   }
+  const showPruef=can.pruefer()&&!(gesperrt(l)&&!isOut(l))&&!(dueBad(l)&&!isOut(l));
   h+=`<div class="qa">
     <button data-act="mangel" class="warn">${ic('alert')}Mangel melden</button>
     <button data-act="status">${ic('sliders')}Status</button>
-    ${can.ober()?`<button data-act="aufgabe">${ic('tasks')}Aufgabe stellen</button>`:''}
-    ${can.pruefer()&&!(gesperrt(l)||dueBad(l))||can.pruefer()&&isOut(l)?`<button data-act="pruefen">${ic('clip')}Prüfen</button>`:''}
+    ${can.ober()?`<button data-act="aufgabe">${ic('tasks')}Aufgabe</button>`:''}
+    ${showPruef?`<button data-act="pruefen">${ic('clip')}Prüfen</button>`:''}
   </div>`;
   return h;
 }
 function stammRows(l){
   const r=(k,v)=>v||v===0?`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`:'';
-  return r('Typ',l.typ)+r('Material',l.material)+r('Hersteller',l.hersteller)+r('Modell',l.modell)+r('Seriennummer',l.seriennummer)+r('Baujahr',l.baujahr)+
-    r(l.typ==='Tritt'||l.typ==='Podestleiter'?'Stufen':'Sprossen',l.sprossen)+r('Länge / Höhe',l.laenge_m?String(l.laenge_m).replace('.',',')+' m':'')+r('Max. Belastung',l.max_last_kg?l.max_last_kg+' kg':'')+
-    r('Lagerort',l.lagerort)+r('Barcode',l.barcode)+r('Notiz',l.notiz);
+  return r('Kennung / Barcode',l.nummer)+r('Art',l.typ)+r('Material',l.material)+r(l.typ==='Tritt'||l.typ==='Podestleiter'?'Stufen':'Sprossen',l.sprossen)+
+    r('Länge / Höhe',l.laenge_m?String(l.laenge_m).replace('.',',')+' m':'')+r('Max. Belastung',l.max_last_kg?l.max_last_kg+' kg':'')+
+    r('Hersteller',l.hersteller)+r('Modell',l.modell)+r('Seriennummer',l.seriennummer)+r('Baujahr',l.baujahr)+
+    r('Lagerort',l.lagerort)+r('Notiz',l.notiz);
 }
 function maengelBlock(list){
   if(!list.length)return`<div class="card"><h3>Mängel</h3><p class="muted" style="display:flex;gap:8px;align-items:center">${ic('shield')} Keine offenen Mängel.</p></div>`;
@@ -1053,40 +1225,37 @@ async function viewLeiter(id,token){
   const l=byId(id);
   if(!l){paint(`<div class="topbar"><a class="iconbtn" href="#/leitern" aria-label="Zurück">${ic('back')}</a></div>${emptyState('search','Leiter nicht gefunden','Sie wurde eventuell gelöscht oder du hast keinen Zugriff.')}`);return}
   const open=openMaengel(id),d=due(l);
+  const stat=gesperrt(l)?statusChip(l.status,'lg'):'';
   paint(`
   <div class="topbar"><a class="iconbtn" href="#/leitern" aria-label="Zurück">${ic('back')}</a><span class="eyebrow" style="margin:0">Leiter</span>${can.pruefer()?`<button class="iconbtn" data-act="leiterMenu" aria-label="Mehr">${ic('more')}</button>`:'<span style="width:44px"></span>'}</div>
   <div class="detail-grid">
     <div class="stack">
-      <div class="card hero">
-        <div class="hero-top">
-          <div class="hero-photo tone-${ST[l.status].t}" style="${l.foto_pfad?'':'background:var(--tb);color:var(--t)'}">${l.foto_pfad?`<img data-photo="${esc(l.foto_pfad)}" alt="Foto ${esc(l.nummer)}">`:`<span style="width:30px;height:44px">${miniLadder(l)}</span>`}</div>
+      <div class="card ldet">
+        <div class="ldet-top">
+          <div class="ldet-photo tone-${ST[l.status].t}">${l.foto_pfad?`<img data-photo="${esc(l.foto_pfad)}" alt="Foto ${esc(l.nummer)}">`:`<span class="mini">${miniLadder(l)}</span>`}</div>
           <div style="min-width:0"><h1 class="num">${esc(l.nummer)}</h1><div class="sub">${esc(l.bezeichnung||l.typ)}</div></div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">${statusChip(l.status,'lg')}${d.k!=='ok'?chip(d.t,d.l,'lg'):''}</div>
-        <div class="facts">
-          <div class="fact"><small>${isOut(l)?'Ausgebucht an':'Standort'}</small><b>${isOut(l)?`${ic('user','sm')}${esc(l.ausgebucht_an||'?')}`:`${ic('box','sm')}${esc(l.lagerort||'Lager')}`}</b></div>
-          <div class="fact"><small>${isOut(l)?'Wohin':'Nächste Prüfung'}</small><b>${isOut(l)?esc(l.ausgebucht_ziel||'–'):esc(fmtD(l.naechste_pruefung))}</b></div>
-        </div>
+        <div class="ldet-chips">${stat}${d.k!=='ok'?chip(d.t,d.l,'lg'):chip('ok','Geprüft bis '+fmtD(l.naechste_pruefung),'lg')}${l.plakette_angebracht&&d.k==='ok'?chip('teal','Plakette dran','lg'):''}</div>
+        ${whereBlock(l)}
         ${actionBlock(l)}
       </div>
       <div id="maengelBox">${maengelBlock(open)}</div>
     </div>
     <div class="stack">
-      <div class="card"><h3>Prüfstatus</h3>
+      <div class="card"><h3>Prüfung ${can.pruefer()?`<button class="btn btn-soft btn-sm" data-act="pruefen">${ic('clip','sm')} Jetzt prüfen</button>`:''}</h3>
         <dl class="dl">
           <div><dt>Letzte Prüfung</dt><dd>${esc(fmtD(l.letzte_pruefung))}</dd></div>
           <div><dt>Nächste Prüfung</dt><dd>${esc(fmtD(l.naechste_pruefung))}</dd></div>
-          <div><dt>Prüfplakette</dt><dd>${l.plakette_angebracht?'Angebracht':'Nicht angebracht'}</dd></div>
-          <div><dt>Intervall</dt><dd>${l.pruefintervall_monate} Monate</dd></div>
+          <div><dt>Prüfplakette</dt><dd>${l.plakette_angebracht?'Ist dran':'Nicht dran'}</dd></div>
+          <div><dt>Intervall</dt><dd>alle ${l.pruefintervall_monate} Monate</dd></div>
         </dl>
         <div id="pruefList" style="margin-top:8px"></div>
       </div>
-      <div class="card"><h3>Stammdaten ${can.pruefer()?`<button class="btn btn-soft btn-sm" data-act="editLeiter">${ic('edit','sm')} Bearbeiten</button>`:''}</h3><dl class="dl">${stammRows(l)}</dl></div>
+      <div class="card"><h3>Angaben ${can.pruefer()?`<button class="btn btn-soft btn-sm" data-act="editLeiter">${ic('edit','sm')} Bearbeiten</button>`:''}</h3><dl class="dl">${stammRows(l)}</dl></div>
       <div class="card"><h3>Verlauf</h3><div id="verlauf" class="tl"><div class="faint">Lädt …</div></div></div>
     </div>
   </div>`);
   DET={id,temp:null,ctl:null,open,pr:[]}; // Diagramm erst im Formular „Mangel melden“
-  // Nachladen: Prüfungen & Verlauf
   try{
     const [pr,vl]=await Promise.all([
       api('GET','leiter_pruefungen',null,`?leiter_id=eq.${id}&select=id,datum,art,ergebnis,pruefer_name,plakette_angebracht,naechste_pruefung,created_at&order=datum.desc,created_at.desc&limit=12`),
@@ -1108,7 +1277,7 @@ function viewAufgaben(){
     const l=byId(a.leiter_id),m=AUFG[a.art]||AUFG.sonstiges;
     return`<div class="task tone-${m[2]}">
       <div class="task-h"><span class="ico">${ic(m[1])}</span><div><b>${esc(a.titel)}</b><small>${a.leiter_id&&l?`<a href="#/leiter/${l.id}" style="font-weight:650;text-decoration:underline">${esc(l.nummer)}</a> · `:''}${esc(a.erstellt_von||'?')} · ${ago(a.created_at)}</small></div>
-        <div style="display:grid;gap:4px;justify-items:end">${a.prioritaet==='hoch'?chip('red','Hoch'):''}${a.status==='in_arbeit'?chip('blue','In Arbeit'):a.status==='erledigt'?chip('ok','Erledigt'):''}</div></div>
+        <div style="display:grid;gap:4px;justify-items:end">${a.prioritaet==='hoch'?chip('red','Dringend'):''}${a.status==='in_arbeit'?chip('blue','In Arbeit'):a.status==='erledigt'?chip('ok','Erledigt'):''}</div></div>
       ${a.beschreibung?`<p>${esc(a.beschreibung)}</p>`:''}
       ${a.status==='erledigt'?`<p class="faint">Erledigt von ${esc(a.erledigt_von||'?')} · ${fmtDT(a.erledigt_am)}${a.erledigt_notiz?` – ${esc(a.erledigt_notiz)}`:''}</p>`:''}
       ${can.pruefer()&&a.status!=='erledigt'?`<div class="btnrow">
@@ -1126,13 +1295,16 @@ ACT.afTab=el=>{AF=el.dataset.t;viewAufgaben()};
 /* ---------- Mehr ---------- */
 function viewMehr(){
   const item=(icon,t,sub,act,extra='')=>`<button class="menu-item" data-act="${act}" ${extra}><span class="ico">${ic(icon)}</span><span>${t}${sub?`<small>${sub}</small>`:''}</span>${ic('chev','chev')}</button>`;
+  const n=openTaskCount();
   paint(`
   <div class="head"><div><div class="eyebrow">Konto</div><h1>Mehr</h1></div></div>
   <div class="card" style="display:flex;gap:14px;align-items:center;margin-bottom:14px"><div class="avatar" style="width:52px;height:52px;font-size:20px">${esc((S.me.name||'?').charAt(0).toUpperCase())}</div><div><b style="font-size:17px">${esc(S.me.name)}</b><div class="muted">${esc(ROLLEN[S.role]||S.role)}</div></div></div>
   <div class="menu-list">
-    ${can.pruefer()?item('plus','Neue Leiter anlegen','Nummer wird automatisch vergeben','newLeiter'):''}
-    ${can.pruefer()?item('tag','Etiketten drucken','QR-Code und Barcode für Leitern','goLabels'):''}
-    ${can.admin()?item('sliders','Verwaltung','Benutzer &amp; Zugriff, Checkliste','goAdmin'):''}
+    ${can.pruefer()?item('plus','Neue Leiter anlegen','Schritt für Schritt – Kennung LH-… automatisch','newLeiter'):''}
+    ${tasksInTab()?item('users','Wer hat was?','Gebuchte Leitern nach Person und Fahrzeug','goUnterwegs'):''}
+    ${can.ober()&&!tasksInTab()?item('tasks','Aufgaben',n?`${n} offen`:'Prüfen &amp; Reparieren','goTasks'):''}
+    ${can.pruefer()?item('tag','Etiketten drucken','QR-Code und Barcode mit der LH-Nummer','goLabels'):''}
+    ${can.admin()?item('sliders','Verwaltung','Benutzer &amp; Zugriff, Prüf-Checkliste','goAdmin'):''}
     ${item('bell','Nachrichten','Mitteilungen &amp; Meldungen in My Heise','goMsg')}
     ${item('apps','My Heise Startseite','Zu allen Apps','goApps')}
     ${item('refresh','Daten aktualisieren','','reload')}
@@ -1140,6 +1312,8 @@ function viewMehr(){
   </div>`);
 }
 ACT.goLabels=()=>{SEL={on:true,ids:new Set()};location.hash='#/leitern'};
+ACT.goUnterwegs=()=>{location.hash='#/unterwegs'};
+ACT.goTasks=()=>{location.hash='#/aufgaben'};
 ACT.goAdmin=()=>{location.hash='#/admin'};
 ACT.goApps=()=>{location.href=PORTAL};
 ACT.goMsg=()=>{location.href=PORTAL+'#/nachrichten'};
@@ -1165,8 +1339,8 @@ function parseCode(raw){
 }
 async function findByCode(raw){
   const code=parseCode(raw);if(!code)return[];
-  const c=code.toLowerCase();
-  let hit=S.leitern.filter(l=>l.aktiv&&[l.nummer,l.barcode,l.seriennummer].some(v=>v&&v.toLowerCase()===c));
+  const k=kennung(code),c=code.toLowerCase();
+  let hit=S.leitern.filter(l=>l.aktiv&&(l.nummer===k||(l.seriennummer&&l.seriennummer.toLowerCase()===c)));
   if(hit.length)return hit;
   const rows=await rpc('leiter_finden',{p_code:code});
   (rows||[]).forEach(applyRow);
@@ -1181,22 +1355,23 @@ async function openByCode(raw){
   }catch(e){toast(niceErr(e),'err')}
 }
 function notFoundSheet(code){
-  sheet({title:'Nicht gefunden',body:`${callout('amber','search','Keine Leiter zu diesem Code',`<span class="num">${esc(code)}</span> ist keiner Leiter zugeordnet.`)}${can.pruefer()?`<p class="muted">Du kannst sie jetzt mit diesem Barcode neu anlegen.</p>`:''}`,
-    footer:`<button class="btn btn-ghost" data-act="closeSheet">Schließen</button>${can.pruefer()?`<button class="btn btn-primary" id="nfNew">${ic('plus')} Neu anlegen</button>`:''}`});
-  const b=$('#nfNew');if(b)b.onclick=()=>{closeSheet();openLeiterForm(null,{barcode:code})};
+  const k=kennung(code);
+  sheet({title:'Nicht gefunden',body:`${callout('amber','search','Keine Leiter mit dieser Kennung',`<span class="num">${esc(k)}</span> gibt es (noch) nicht oder sie ist archiviert.`)}${can.pruefer()?`<p class="muted">Neue Leitern bekommen ihre LH-Nummer automatisch – danach druckst du das passende Etikett.</p>`:''}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Schließen</button>${can.pruefer()?`<button class="btn btn-primary" id="nfNew">${ic('plus')} Neue Leiter</button>`:''}`});
+  const b=$('#nfNew');if(b)b.onclick=()=>{closeSheet();openAnlegen()};
 }
 function pickLeiterSheet(list,title='Leiter wählen',onPick){
-  const bd=sheet({title,body:`<label class="searchbar" style="margin-bottom:12px">${ic('search')}<input id="pkQ" type="search" placeholder="Suchen …" autocomplete="off"></label><div class="list" id="pkList"></div>`});
+  const bd=sheet({title,body:`<label class="searchbar" style="margin-bottom:12px">${ic('search')}<input id="pkQ" type="search" placeholder="LH-Nummer oder Name …" autocomplete="off"></label><div class="list" id="pkList"></div>`});
   const draw=()=>{
-    const q=$('#pkQ',bd).value.trim().toLowerCase();
-    const rows=list.filter(l=>!q||[l.nummer,l.bezeichnung,l.typ,l.barcode].some(v=>v&&String(v).toLowerCase().includes(q)));
-    $('#pkList',bd).innerHTML=rows.length?rows.map(l=>`<button class="lcard" data-pick="${l.id}" style="width:100%;text-align:left"><div class="lcard-ico tone-${ST[l.status].t}">${miniLadder(l)}</div><div class="lcard-main"><div class="lcard-top"><b class="num">${esc(l.nummer)}</b><span class="lname">${esc(l.bezeichnung||l.typ)}</span></div><div class="lcard-tags">${statusChip(l.status)}</div></div></button>`).join(''):`<p class="faint" style="text-align:center;padding:16px">Keine Treffer</p>`;
+    const q=$('#pkQ',bd).value.trim().toLowerCase(),k=kennung(q).toLowerCase();
+    const rows=list.filter(l=>!q||l.nummer.toLowerCase()===k||[l.nummer,l.bezeichnung,l.typ].some(v=>v&&String(v).toLowerCase().includes(q)));
+    $('#pkList',bd).innerHTML=rows.length?rows.map(l=>`<button class="lcard" data-pick="${l.id}" style="width:100%;text-align:left"><div class="lcard-ico tone-${ST[l.status].t}">${miniLadder(l)}</div><div class="lcard-main"><div class="lcard-top"><b class="num">${esc(l.nummer)}</b><span class="lname">${esc(l.bezeichnung||l.typ)}</span></div><div class="lcard-sub">${whereLine(l)}</div></div></button>`).join(''):`<p class="faint" style="text-align:center;padding:16px">Keine Treffer</p>`;
   };
   $('#pkQ',bd).addEventListener('input',draw);draw();
   bd.addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(!b)return;const l=byId(b.dataset.pick);closeSheet();if(onPick)onPick(l);else location.hash=`#/leiter/${l.id}`});
 }
 
-/* ---------- Buchen ---------- */
+/* ---------- Buchen (Person oder Fahrzeug) ---------- */
 async function loadZiele(){
   if(S.ziele!==null)return S.ziele;
   try{const r=await api('GET','leiter_buchungen',null,'?select=ziel&ziel=not.is.null&order=created_at.desc&limit=150');S.ziele=[...new Set(r.map(x=>x.ziel).filter(Boolean))].slice(0,10)}catch(e){S.ziele=[]}
@@ -1207,48 +1382,76 @@ async function openBuchen(l,aktion){
   if(aktion==='einbuchen')return openEinbuchen(l);
   const ziele=await loadZiele();
   const umb=aktion==='umbuchen';
-  const users=S.users.filter(u=>!umb||u.id!==l.ausgebucht_an_id);
-  const bd=sheet({title:umb?'Umbuchen':'Ausbuchen',body:`
-    ${callout('blue',umb?'swap':'out',`${l.nummer} · ${l.bezeichnung||l.typ}`,umb?`Aktuell bei <b style="display:inline">${esc(l.ausgebucht_an||'?')}</b>${l.ausgebucht_ziel?` · ${esc(l.ausgebucht_ziel)}`:''}.`:`Kommt aus: ${esc(l.lagerort||'Lager')}.`,true)}
-    ${field(umb?'Neue Person':'Wer bekommt die Leiter?',`<select class="inp" id="bUser">${umb?'<option value="">Person wählen …</option>':''}${users.map(u=>`<option value="${u.id}" ${!umb&&u.id===S.me.id?'selected':''}>${esc(u.name)}${u.id===S.me.id?' (ich)':''}</option>`).join('')}</select>`)}
-    ${field('Wohin? (Baustelle, Fahrzeug …)',`<input class="inp" id="bZiel" list="bZielList" placeholder="optional" autocomplete="off" ${umb&&l.ausgebucht_ziel?`value="${esc(l.ausgebucht_ziel)}"`:''}><datalist id="bZielList">${ziele.map(z=>`<option value="${esc(z)}">`).join('')}</datalist>`)}
-    ${ziele.length?`<div class="filters" style="margin:-6px -20px 10px;padding-left:20px;padding-right:20px">${ziele.slice(0,6).map(z=>`<button class="fchip" data-zl="${esc(z)}" style="height:34px;font-size:13px">${esc(z)}</button>`).join('')}</div>`:''}
-    ${field('Notiz',`<input class="inp" id="bNotiz" placeholder="optional" autocomplete="off">`)}`,
-    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="bGo">${ic('check')} ${umb?'Umbuchen':'Ausbuchen'}</button>`});
-  bd.addEventListener('click',e=>{const z=e.target.closest('[data-zl]');if(z){$('#bZiel',bd).value=z.dataset.zl}});
+  const cars=S.fahrzeuge||[];
+  // Vorauswahl: mein Fahrzeug (Hauptfahrer), sonst ich
+  let mode='person',pick=umb?'':S.me.id,car=null;
+  const myCar=cars.find(f=>f.hauptfahrer_id===S.me.id);
+  const users=S.users.filter(u=>!umb||onCar(l)||u.id!==l.ausgebucht_an_id);
+  const bd=sheet({title:umb?'Weitergeben':'Leiter buchen',body:`
+    <div class="bk-head"><span class="lcard-ico tone-${ST[l.status].t}">${miniLadder(l)}</span><div><b class="num">${esc(l.nummer)}</b><small>${esc(l.bezeichnung||l.typ)} · ${umb?`jetzt: ${esc(onCar(l)?'Fahrzeug '+(l.ausgebucht_fahrzeug||''):l.ausgebucht_an||'?')}`:`aus ${esc(l.lagerort||'Lager')}`}</small></div></div>
+    <div class="field"><label>${umb?'An wen geht die Leiter?':'Wer nimmt die Leiter?'}</label>
+      <div class="seg" id="bMode"><button data-m="person" class="on">${ic('user','sm')} Person</button><button data-m="fahrzeug">${ic('car','sm')} Fahrzeug</button></div></div>
+    <div id="bPick"></div>
+    ${field('Wofür? <span class="faint" style="font-weight:500">(optional)</span>',`<input class="inp" id="bZiel" list="bZielList" placeholder="z. B. Baustelle Wurmberg" autocomplete="off" ${umb&&l.ausgebucht_ziel?`value="${esc(l.ausgebucht_ziel)}"`:''}><datalist id="bZielList">${ziele.map(z=>`<option value="${esc(z)}">`).join('')}</datalist>`)}
+    ${ziele.length?`<div class="filters" style="margin:-8px -20px 6px;padding:0 20px 4px">${ziele.slice(0,6).map(z=>`<button class="fchip sm" data-zl="${esc(z)}">${esc(z)}</button>`).join('')}</div>`:''}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="bGo">${ic('check')} ${umb?'Weitergeben':'Buchen'}</button>`});
+  const drawPick=()=>{
+    $$('#bMode button',bd).forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+    const h=$('#bPick',bd);
+    if(mode==='person'){
+      h.innerHTML=`<div class="pick-list">${users.map(u=>`<button class="pick ${pick===u.id?'on':''}" data-u="${u.id}"><span class="avatar sm">${esc((u.name||'?').charAt(0).toUpperCase())}</span><span>${esc(u.name)}${u.id===S.me.id?' <span class="faint">(ich)</span>':''}</span>${pick===u.id?ic('check','sm'):''}</button>`).join('')}</div>`;
+    }else if(!cars.length){
+      h.innerHTML=callout('blue','car','Noch keine Fahrzeuge','Fahrzeuge werden im Fuhrpark angelegt. Sobald sie da sind, kannst du Leitern direkt auf ein Fahrzeug buchen.',true);
+    }else{
+      h.innerHTML=`<div class="pick-list">${cars.map(f=>`<button class="pick car ${car===f.id?'on':''}" data-f="${f.id}">${plate(f.kennzeichen)}<span class="pc"><b>${esc(f.bezeichnung||f.typ||'')}</b><small>${f.hauptfahrer?'Fahrer: '+esc(f.hauptfahrer):'kein fester Fahrer'}</small></span>${car===f.id?ic('check','sm'):''}</button>`).join('')}</div>
+        <div class="hint" style="margin:-4px 2px 14px">Verantwortlich ist der Fahrer des Fahrzeugs.</div>`;
+    }
+  };
+  drawPick();
+  bd.addEventListener('click',e=>{
+    const z=e.target.closest('[data-zl]');if(z){$('#bZiel',bd).value=z.dataset.zl;return}
+    const m=e.target.closest('#bMode [data-m]');if(m){mode=m.dataset.m;if(mode==='fahrzeug'&&!car&&myCar)car=myCar.id;drawPick();return}
+    const u=e.target.closest('[data-u]');if(u){pick=u.dataset.u;drawPick();return}
+    const f=e.target.closest('[data-f]');if(f){car=f.dataset.f;drawPick()}
+  });
   $('#bGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
-    const an=$('#bUser',bd).value||null;
-    if(umb&&!an)return toast('Bitte eine Person wählen','err');
-    const row=await rpc('leiter_buchen',{p_leiter:l.id,p_aktion:aktion,p_an:an,p_ziel:$('#bZiel',bd).value.trim()||null,p_notiz:$('#bNotiz',bd).value.trim()||null});
+    if(mode==='person'&&!pick)return toast('Bitte eine Person wählen','err');
+    if(mode==='fahrzeug'&&!car)return toast('Bitte ein Fahrzeug wählen','err');
+    const args={p_leiter:l.id,p_aktion:aktion,p_ziel:$('#bZiel',bd).value.trim()||null};
+    if(mode==='person')args.p_an=pick;else args.p_fahrzeug=car;
+    const row=await rpc('leiter_buchen',args);
     applyRow(row);S.ziele=null;closeSheet();
-    toast(umb?`Umgebucht an ${row.ausgebucht_an}`:`Ausgebucht an ${row.ausgebucht_an}`,'ok');rerender();renderShell();
+    const wer=onCar(row)?`Fahrzeug ${row.ausgebucht_fahrzeug}`:row.ausgebucht_an;
+    toast(umb?`Weitergegeben an ${wer}`:`${row.nummer} gebucht: ${wer}`,'ok');rerender();renderShell();
   });
 }
 function openEinbuchen(l){
   let zustand='ok';
-  const bd=sheet({title:'Zurück ins Lager',body:`
-    <p class="muted" style="margin-bottom:14px">${esc(l.nummer)} kommt von <b>${esc(l.ausgebucht_an||'?')}</b> zurück. Wie ist der Zustand?</p>
+  const von=onCar(l)?`Fahrzeug ${l.ausgebucht_fahrzeug||''}`:(l.ausgebucht_an||'?');
+  const bd=sheet({title:'Zurückgeben',body:`
+    <div class="bk-head"><span class="lcard-ico tone-${ST[l.status].t}">${miniLadder(l)}</span><div><b class="num">${esc(l.nummer)}</b><small>kommt von ${esc(von)} zurück nach ${esc(l.lagerort||'Lager')}</small></div></div>
+    <div class="field"><label>Wie ist der Zustand?</label></div>
     <div class="optcards" id="zOpts">
       <button class="opt on tone-ok" data-z="ok"><span class="ico">${ic('shield')}</span><span><b>Alles in Ordnung</b><small>Keine Auffälligkeiten – die Leiter ist wieder einsatzbereit.</small></span></button>
-      <button class="opt tone-red" data-z="mangel"><span class="ico">${ic('alert')}</span><span><b>Es gibt ein Problem</b><small>Du markierst danach die Stelle an der Leiter und machst ein Foto.</small></span></button>
+      <button class="opt tone-red" data-z="mangel"><span class="ico">${ic('alert')}</span><span><b>Es gibt ein Problem</b><small>Du zeigst danach die Stelle an der Leiter und machst ein Foto.</small></span></button>
     </div>
-    ${field('Notiz',`<input class="inp" id="eNotiz" placeholder="optional" autocomplete="off" style="margin-top:14px">`)}`,
-    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="eGo">${ic('in')} Einbuchen</button>`});
+    ${field('Notiz <span class="faint" style="font-weight:500">(optional)</span>',`<input class="inp" id="eNotiz" placeholder="z. B. dreckig, Fußkappe fehlt" autocomplete="off">`)}`.replace('<div class="field"><label>Notiz','<div class="field" style="margin-top:14px"><label>Notiz'),
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="eGo">${ic('in')} Zurückgeben</button>`});
   $('#zOpts',bd).addEventListener('click',e=>{const b=e.target.closest('[data-z]');if(!b)return;zustand=b.dataset.z;$$('#zOpts .opt',bd).forEach(o=>o.classList.toggle('on',o===b))});
   $('#eGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
     const row=await rpc('leiter_buchen',{p_leiter:l.id,p_aktion:'einbuchen',p_notiz:$('#eNotiz',bd).value.trim()||null});
-    applyRow(row);closeSheet();toast('Zurück im Lager gebucht','ok');rerender();renderShell();
+    applyRow(row);closeSheet();toast(`${row.nummer} ist zurück im Lager`,'ok');rerender();renderShell();
     if(zustand==='mangel')openMangel(row,{});
   });
 }
 
 /* ---------- Status ---------- */
 function statusOptions(l){
-  const all=[['defekt','wrench','Defekt melden','Sperrt die Leiter sofort.'],
-    ['zur_pruefung','clip','Muss zur Prüfung','Der Lagerist prüft sie als Nächstes.'],
-    ['nachpruefung','refresh','Prüfung wiederholen','Nach einer Reparatur erneut prüfen.'],
-    ['im_lager','box','Einsatzbereit freigeben','Nur wenn keine kritischen Mängel offen sind.'],
-    ['plakette','shield','Plakette angebracht','Setzt eine gültige Prüfung voraus.']];
+  const all=[['defekt','wrench','Defekt – sperren','Die Leiter darf sofort nicht mehr benutzt werden.'],
+    ['zur_pruefung','clip','Zur Prüfung geben','Der Prüfer im Lager schaut sie sich als Nächstes an.'],
+    ['nachpruefung','refresh','Erneut prüfen','Nach einer Reparatur noch einmal prüfen.'],
+    ['im_lager','box','Wieder freigeben','Nur wenn keine kritischen Mängel offen sind.'],
+    ['plakette','shield','Prüfplakette ist dran','Setzt eine gültige Prüfung voraus.']];
   const allowed=S.role==='nutzer'?['defekt']:S.role==='obermonteur'?['defekt','zur_pruefung']:all.map(a=>a[0]);
   return all.filter(a=>allowed.includes(a[0])&&a[0]!==l.status);
 }
@@ -1258,7 +1461,7 @@ ACT.status=()=>{
   const bd=sheet({title:'Status ändern',body:`
     <div class="callout plain tone-blue">${ic('info')}<div><b>Aktuell</b><span>${statusChip(l.status)}</span></div></div>
     <div class="optcards" id="sOpts">${opts.map(o=>`<button class="opt tone-${ST[o[0]].t}" data-s="${o[0]}"><span class="ico">${ic(o[1])}</span><span><b>${o[2]}</b><small>${o[3]}</small></span></button>`).join('')}</div>
-    ${field('Grund',`<textarea class="inp" id="sGrund" placeholder="optional, z. B. Holm verbogen" style="margin-top:14px"></textarea>`,'Tipp: Mit „Mangel melden“ markierst du die defekte Stelle direkt an der Leiter.')}`,
+    <div style="height:14px"></div>${field('Grund <span class="faint" style="font-weight:500">(optional)</span>',`<textarea class="inp" id="sGrund" placeholder="z. B. Holm verbogen"></textarea>`,'Tipp: Mit „Mangel melden“ zeigst du die kaputte Stelle direkt an der Leiter.')}`,
     footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="sGo" disabled>Übernehmen</button>`});
   $('#sOpts',bd).addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;pick=b.dataset.s;$$('#sOpts .opt',bd).forEach(o=>o.classList.toggle('on',o===b));$('#sGo',bd).disabled=false});
   $('#sGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
@@ -1370,101 +1573,23 @@ ACT.aufgErledigt=el=>{
 };
 ACT.aufgPruefen=el=>{const l=byId(el.dataset.lid);if(l)startPruefung(l)};
 
-/* ---------- Leiter anlegen / bearbeiten ---------- */
-ACT.newLeiter=()=>openLeiterForm(null);
-ACT.editLeiter=()=>{const l=curLeiter();if(l)openLeiterForm(l)};
-const nextNumbers=(start,n)=>{
-  const m=/^(.*?)(\d+)$/.exec(start);if(!m)return null;
-  return Array.from({length:n},(_,i)=>m[1]+String(+m[2]+i).padStart(m[2].length,'0'));
-};
-async function openLeiterForm(l,pre={}){
-  const isNew=!l;
-  let nr='';
-  if(isNew){try{nr=pre.nummer||await rpc('leiter_naechste_nummer')}catch(e){nr='L-001'}}
-  const v=l||{nummer:nr,barcode:pre.barcode||'',typ:'Anlegeleiter',material:'Aluminium',sprossen:8,max_last_kg:150,pruefintervall_monate:12,lagerort:'Hauptlager'};
-  let photo=null,plak=!!v.plakette_angebracht;
-  const opt=(arr,cur)=>arr.map(x=>`<option ${x===cur?'selected':''}>${x}</option>`).join('');
-  const bd=sheet({title:isNew?'Neue Leiter':`${l.nummer} bearbeiten`,body:`
-    <div class="row2">${field('Nummer',`<input class="inp num" id="fNr" value="${esc(v.nummer)}" autocomplete="off">`)}${isNew?field('Anzahl',`<div class="stepper" style="grid-template-columns:44px 1fr 44px"><button data-st="-1" aria-label="Weniger">−</button><input class="inp num" id="fAnz" type="number" min="1" max="30" value="1" inputmode="numeric"><button data-st="1" aria-label="Mehr">+</button></div>`):field('Prüfintervall',`<select class="inp" id="fInt">${[6,12,24,36].map(m=>`<option value="${m}" ${m===v.pruefintervall_monate?'selected':''}>${m} Monate</option>`).join('')}</select>`)}</div>
-    ${isNew?`<div class="hint" id="fAnzHint" style="margin:-8px 0 14px">Mehrere gleiche Leitern auf einmal: die Nummern zählen automatisch hoch.</div>`:''}
-    ${field('Bezeichnung',`<input class="inp" id="fBez" value="${esc(v.bezeichnung||'')}" placeholder="z. B. Alu-Stehleiter 2×6" autocomplete="off">`)}
-    <div class="row2">${field('Typ',`<select class="inp" id="fTyp">${opt(TYPEN,v.typ)}</select>`)}${field('Material',`<select class="inp" id="fMat">${opt(MATERIALIEN,v.material)}</select>`)}</div>
-    <div class="row2">${field('Sprossen / Stufen',`<div class="stepper" style="grid-template-columns:44px 1fr 44px"><button data-sp="-1" aria-label="Weniger">−</button><input class="inp num" id="fSpr" type="number" min="2" max="30" value="${v.sprossen||8}" inputmode="numeric"><button data-sp="1" aria-label="Mehr">+</button></div>`)}${field('Länge / Höhe (m)',`<input class="inp num" id="fLen" type="number" step="0.05" min="0" inputmode="decimal" value="${v.laenge_m??''}" placeholder="z. B. 2,40">`)}</div>
-    <div class="row2">${field('Hersteller',`<input class="inp" id="fHer" value="${esc(v.hersteller||'')}" placeholder="z. B. Hymer, Krause" autocomplete="off">`)}${field('Modell',`<input class="inp" id="fMod" value="${esc(v.modell||'')}" autocomplete="off">`)}</div>
-    <div class="row2">${field('Seriennummer',`<input class="inp" id="fSer" value="${esc(v.seriennummer||'')}" autocomplete="off">`)}${field('Baujahr',`<input class="inp num" id="fBj" type="number" min="1950" max="2100" inputmode="numeric" value="${v.baujahr||''}">`)}</div>
-    <div class="row2">${field('Max. Belastung (kg)',`<input class="inp num" id="fLast" type="number" min="0" inputmode="numeric" value="${v.max_last_kg||''}">`)}${field('Lagerort',`<input class="inp" id="fOrt" value="${esc(v.lagerort||'')}" autocomplete="off">`)}</div>
-    ${isNew?field('Prüfintervall',`<select class="inp" id="fInt">${[6,12,24,36].map(m=>`<option value="${m}" ${m===v.pruefintervall_monate?'selected':''}>${m} Monate</option>`).join('')}</select>`):''}
-    ${can.pruefer()?field('Letzte Prüfung',`<input class="inp" id="fLetzte" type="date" max="${berlinToday()}" value="${v.letzte_pruefung||''}">`,isNew?'Nur ausfüllen, wenn die Leiter bereits geprüft wurde. Sonst bleibt sie bis zur ersten Prüfung gesperrt.':'Die nächste Prüfung wird daraus berechnet.'):''}
-    <div class="field" id="fPlakRow" style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><label class="lbl">Prüfplakette angebracht</label><div class="hint">Sichtbar an der Leiter</div></div><button class="switch ${plak?'on':''}" id="fPlak" role="switch" aria-checked="${plak}" aria-label="Prüfplakette angebracht"></button></div>
-    ${field('Barcode',`<div style="display:flex;gap:8px"><input class="inp num" id="fBc" value="${esc(v.barcode&&v.barcode!==v.nummer?v.barcode:(pre.barcode||''))}" placeholder="leer = Leiternummer" autocomplete="off"><button class="iconbtn" id="fBcScan" aria-label="Barcode scannen" style="flex:none;height:50px;width:50px">${ic('scan')}</button></div>`,'Bereits vorhandenes Etikett? Scannen oder eintippen. Sonst wird die Nummer als Barcode genutzt.')}
-    ${field('Notiz',`<textarea class="inp" id="fNote" style="min-height:70px">${esc(v.notiz||'')}</textarea>`)}
-    <div id="fPhotoField">${field('Foto der Leiter',`<div id="fPhoto"></div>`)}</div>`,
-    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="fGo">${ic('check')} ${isNew?'Anlegen':'Speichern'}</button>`});
-  const $$q=s=>$(s,bd);
-  bd.addEventListener('click',e=>{
-    const st=e.target.closest('[data-st]'),sp=e.target.closest('[data-sp]');
-    if(st){const i=$$q('#fAnz');i.value=Math.min(30,Math.max(1,(+i.value||1)+ +st.dataset.st));upd()}
-    if(sp){const i=$$q('#fSpr');i.value=Math.min(30,Math.max(2,(+i.value||8)+ +sp.dataset.sp))}
-  });
-  const upd=()=>{
-    if(!isNew)return;const n=+$$q('#fAnz').value||1;
-    $$q('#fPhotoField').hidden=n>1;$$q('#fSer').disabled=n>1;$$q('#fBc').disabled=n>1;
-    const nums=nextNumbers($$q('#fNr').value.trim(),Math.min(n,30));
-    $$q('#fAnzHint').textContent=n>1?(nums?`Legt ${nums[0]} bis ${nums[nums.length-1]} an.`:'Für mehrere Leitern muss die Nummer auf eine Zahl enden, z. B. L-012.'):'Mehrere gleiche Leitern auf einmal: die Nummern zählen automatisch hoch.';
-  };
-  if(isNew){$$q('#fAnz').addEventListener('input',upd);$$q('#fNr').addEventListener('input',upd)}
-  const fl=$$q('#fLetzte'),plakRow=$$q('#fPlakRow');
-  const togglePlak=()=>{if(fl)plakRow.hidden=isNew&&!fl.value};
-  if(fl){fl.addEventListener('input',togglePlak);togglePlak()}
-  $$q('#fPlak').onclick=e=>{plak=!plak;e.currentTarget.classList.toggle('on',plak);e.currentTarget.setAttribute('aria-checked',plak)};
-  $$q('#fBcScan').onclick=()=>scanOpen({title:'Barcode übernehmen',hint:'Etikett der Leiter scannen',onCode:c=>{$$q('#fBc').value=parseCode(c);scanClose();toast('Barcode übernommen','ok')}});
-  const drawPhoto=()=>{
-    const h=$$q('#fPhoto');
-    const cur=!photo&&!isNew&&l.foto_pfad?`<img data-photo="${esc(l.foto_pfad)}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:14px">`:photo?`<img src="${URL.createObjectURL(photo)}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:14px">`:'';
-    h.innerHTML=`<div style="display:flex;gap:12px;align-items:center">${cur}<button class="btn btn-soft" id="fPh" style="flex:1">${ic('camera')} ${cur?'Foto ändern':'Foto aufnehmen'}</button></div>`;
-    hydratePhotos(h);$$q('#fPh').onclick=async()=>{const b=await pickPhoto();if(b){photo=b;drawPhoto()}};
-  };
-  drawPhoto();upd();
-  $$q('#fGo').onclick=ev=>busy(ev.currentTarget,async()=>{
-    const g=id=>$$q(id).value.trim(),num=id=>{const x=g(id);return x===''?null:+String(x).replace(',','.')};
-    const nummer=g('#fNr');if(!nummer)return toast('Bitte eine Nummer eintragen','err');
-    const interval=+g('#fInt')||12,letzte=fl?(fl.value||null):v.letzte_pruefung||null;
-    const base={bezeichnung:g('#fBez')||null,typ:g('#fTyp'),material:g('#fMat'),sprossen:+g('#fSpr')||8,laenge_m:num('#fLen'),hersteller:g('#fHer')||null,modell:g('#fMod')||null,baujahr:num('#fBj'),max_last_kg:num('#fLast'),lagerort:g('#fOrt')||null,pruefintervall_monate:interval,notiz:g('#fNote')||null,plakette_angebracht:plak&&(!!letzte||!isNew)};
-    if(isNew){
-      const anz=Math.min(30,Math.max(1,+g('#fAnz')||1));
-      const nums=anz>1?nextNumbers(nummer,anz):[nummer];
-      if(!nums)return toast('Für mehrere Leitern muss die Nummer auf eine Zahl enden, z. B. L-012','err');
-      const status=letzte?(base.plakette_angebracht?'plakette':'im_lager'):'zur_pruefung';
-      const rows=nums.map(n=>({...base,nummer:n,barcode:anz===1?(g('#fBc')||null):null,seriennummer:anz===1?(g('#fSer')||null):null,letzte_pruefung:letzte,naechste_pruefung:letzte?addMonths(letzte,interval):null,status}));
-      const created=await api('POST','leiter_leitern',rows);
-      if(photo&&created.length===1){const p=await uploadPhoto(photo,created[0].id);created[0]=(await api('PATCH','leiter_leitern',{foto_pfad:p},`?id=eq.${created[0].id}`))[0]||created[0]}
-      created.forEach(applyRow);S.leitern.sort((x,y)=>x.nummer.localeCompare(y.nummer,'de',{numeric:true}));
-      closeSheet();renderShell();
-      toast(created.length===1?`${created[0].nummer} angelegt`:`${created.length} Leitern angelegt`,'ok');
-      if(created.length===1)location.hash=`#/leiter/${created[0].id}`;else{S.filter='alle';S.q='';location.hash='#/leitern';if(/^#\/leitern/.test(location.hash))rerender()}
-    }else{
-      const patch={...base,nummer,barcode:g('#fBc')||nummer,seriennummer:g('#fSer')||null,letzte_pruefung:letzte};
-      if(letzte&&(letzte!==l.letzte_pruefung||interval!==l.pruefintervall_monate))patch.naechste_pruefung=addMonths(letzte,interval);
-      if(photo)patch.foto_pfad=await uploadPhoto(photo,l.id);
-      const [row]=await api('PATCH','leiter_leitern',patch,`?id=eq.${l.id}`);
-      applyRow(row);closeSheet();toast('Gespeichert','ok');renderShell();rerender();
-    }
-  });
-}
+/* ---------- Leiter anlegen / bearbeiten: siehe 45-anlegen.js ---------- */
+ACT.newLeiter=()=>openAnlegen();
+ACT.editLeiter=()=>{const l=curLeiter();if(l)openLeiterEdit(l)};
 
 /* ---------- Menü in der Detailansicht ---------- */
 ACT.leiterMenu=()=>{
   const l=curLeiter();if(!l)return;
   const item=(icon,t,sub,id,danger)=>`<button class="menu-item" id="${id}"><span class="ico" ${danger?'style="color:var(--red)"':''}>${ic(icon)}</span><span>${t}${sub?`<small>${sub}</small>`:''}</span>${ic('chev','chev')}</button>`;
   const bd=sheet({title:l.nummer,body:`<div class="menu-list">
-    ${item('edit','Bearbeiten','Stammdaten, Prüfintervall, Foto','mEdit')}
-    ${item('tag','Etikett drucken','QR-Code und Barcode','mLabel')}
+    ${item('edit','Bearbeiten','Angaben, Prüfintervall, Foto','mEdit')}
+    ${item('tag','Etikett drucken','QR-Code und Barcode mit '+esc(l.nummer),'mLabel')}
     ${item('box',l.aktiv?'Archivieren':'Wiederherstellen',l.aktiv?'Leiter wird nicht mehr in der Liste gezeigt':'Wieder in den aktiven Bestand','mArch')}
     ${can.admin()?item('trash','Endgültig löschen','Inklusive Prüf- und Buchungsverlauf','mDel',true):''}</div>`});
-  $('#mEdit',bd).onclick=()=>{closeSheet();openLeiterForm(l)};
+  $('#mEdit',bd).onclick=()=>{closeSheet();openLeiterEdit(l)};
   $('#mLabel',bd).onclick=()=>{closeSheet();printLabels([l])};
   $('#mArch',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
-    if(l.aktiv&&isOut(l))return toast('Die Leiter ist noch ausgebucht – bitte erst zurückbuchen','err');
+    if(l.aktiv&&isOut(l))return toast('Die Leiter ist noch gebucht – bitte erst zurückgeben','err');
     const [row]=await api('PATCH','leiter_leitern',{aktiv:!l.aktiv},`?id=eq.${l.id}`);applyRow(row);closeSheet();toast(row.aktiv?'Wiederhergestellt':'Archiviert','ok');location.hash='#/leitern';
   });
   const d=$('#mDel',bd);if(d)d.onclick=()=>{closeSheet();confirmSheet({title:`${l.nummer} löschen?`,text:'Die Leiter samt Prüfungen, Mängeln und Verlauf wird endgültig gelöscht. Das lässt sich nicht rückgängig machen.',ok:'Endgültig löschen',danger:true,onOk:async()=>{await api('DELETE','leiter_leitern',null,`?id=eq.${l.id}`);S.leitern=S.leitern.filter(x=>x.id!==l.id);toast('Gelöscht','ok');renderShell();location.hash='#/leitern'}})};
@@ -1472,6 +1597,283 @@ ACT.leiterMenu=()=>{
 function confirmSheet({title,text,ok='OK',danger=false,onOk}){
   const bd=sheet({title,body:`<p class="muted">${text}</p>`,footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn ${danger?'btn-danger':'btn-primary'}" id="cfGo">${ok}</button>`});
   $('#cfGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{await onOk();closeSheet()});
+}
+/* =====================================================================
+   Neue Leiter anlegen: Schritt-für-Schritt-Leitfaden · Leiter bearbeiten
+   Die Kennung LH-xxx vergibt die Datenbank beim Speichern (fortlaufend).
+   ===================================================================== */
+const TYPINFO={
+  Anlegeleiter:'Wird an Wand oder Kante angelehnt',
+  Stehleiter:'Steht frei, beidseitig begehbar',
+  Mehrzweckleiter:'Mehrteilig mit Gelenken',
+  Schiebeleiter:'Zum Ausziehen, oft mit Seil',
+  Steckleiter:'Teile zum Zusammenstecken',
+  Podestleiter:'Mit Plattform und Geländer',
+  Tritt:'Kleiner Tritt, 2–4 Stufen'
+};
+const TYP_SPROSSEN={Anlegeleiter:10,Stehleiter:6,Mehrzweckleiter:12,Schiebeleiter:12,Steckleiter:9,Podestleiter:5,Tritt:3};
+const MAT_KURZ={Aluminium:'Alu',Holz:'Holz',Glasfaser:'GFK',Stahl:'Stahl',Kunststoff:'Kunststoff'};
+const HERSTELLER=['Hymer','Krause','Zarges','Günzburger','Hailo','Layher'];
+const STANDORTE=['Hauptlager','Ramsenweg 2c','Tannerstraße','Lauterberger Straße'];
+const stufenWort=t=>ladderKind(t)==='p'?'Stufen':'Sprossen';
+const autoBez=a=>`${MAT_KURZ[a.material]||''}-${a.typ} ${a.sprossen} ${stufenWort(a.typ)}`.replace(/^-/,'');
+const lagerorte=()=>[...new Set([...STANDORTE,...S.leitern.map(l=>l.lagerort).filter(Boolean)])];
+function nextLocalNr(){
+  const m=Math.max(0,...S.leitern.map(l=>{const x=/^LH-(\d+)$/.exec(l.nummer||'');return x?+x[1]:0}));
+  return kennung(String(m+1));
+}
+const nrRange=(start,n)=>{const m=/^LH-(\d+)$/.exec(start||'');if(!m)return[start];return Array.from({length:n},(_,i)=>kennung(String(+m[1]+i)))};
+
+let A=null;
+const A_STEPS=['Art','Größe','Typenschild','Lager & Prüfung','Übersicht'];
+async function openAnlegen(keep){
+  if(!can.pruefer())return toast('Nur Prüfer und Admins dürfen Leitern anlegen','err');
+  A={step:keep?2:1,typ:keep?keep.typ:null,material:keep?keep.material:'Aluminium',sprossen:keep?keep.sprossen:8,laenge:keep?keep.laenge:null,last:keep?keep.last:150,
+     bez:'',bezTouched:false,hersteller:keep?keep.hersteller:'',modell:keep?keep.modell:'',ser:'',baujahr:keep?keep.baujahr:'',photo:null,
+     lagerort:keep?keep.lagerort:'Hauptlager',geprueft:keep?keep.geprueft:null,letzte:keep?keep.letzte:berlinToday(),plak:keep?keep.plak:true,intervall:keep?keep.intervall:12,
+     anzahl:1,notiz:'',more:false,nr:nextLocalNr(),done:null};
+  drawAnlegen();
+  try{const n=await rpc('leiter_naechste_nummer');if(A&&n&&/^LH-\d+$/.test(n)){A.nr=n;if(A.step===5)drawAnlegen(true)}}catch(e){}
+}
+function closeAnlegen(){$('#wizLayer').innerHTML='';A=null}
+ACT.azClose=()=>{
+  if(!A)return;
+  if(A.done||A.step===1)return closeAnlegen();
+  confirmSheet({title:'Anlegen abbrechen?',text:'Die bisherigen Eingaben gehen verloren.',ok:'Abbrechen',danger:true,onOk:async()=>closeAnlegen()});
+};
+function drawAnlegen(keepScroll){
+  if(!A)return;
+  const body0=$('.wiz-body'),sc=body0&&keepScroll?body0.scrollTop:0;
+  const pct=A.done?100:Math.round((A.step-1)/A_STEPS.length*100);
+  $('#wizLayer').innerHTML=`<div class="wiz az" role="dialog" aria-modal="true" aria-label="Neue Leiter anlegen">
+    <div class="wiz-top"><button class="iconbtn flat" data-act="azClose" aria-label="Schließen">${ic('x')}</button><div class="t"><b>Neue Leiter</b><small>${A.done?'Fertig':`Schritt ${A.step} von ${A_STEPS.length} · ${A_STEPS[A.step-1]}`}</small></div>
+      ${A.done?'':`<span class="az-nr num">${esc(A.anzahl>1?nrRange(A.nr,A.anzahl)[0]+' …':A.nr)}</span>`}</div>
+    <div class="wiz-bar"><i style="width:${pct}%"></i></div>
+    ${A.done?'':`<div class="az-steps">${A_STEPS.map((s,i)=>`<button class="${i+1===A.step?'on':i+1<A.step?'ok':''}" data-act="azGo" data-s="${i+1}" ${i+1>A.step&&!azStepOk(i)?'disabled':''}><i>${i+1<A.step?ic('check','sm'):i+1}</i><span>${s}</span></button>`).join('')}</div>`}
+    <div class="wiz-body"><div class="wiz-inner" id="azBody"></div></div>
+    <div class="wiz-foot"><div class="in" id="azFoot"></div></div></div>`;
+  if(A.done)azDone();else[azStep1,azStep2,azStep3,azStep4,azStep5][A.step-1]();
+  $('.wiz-body').scrollTop=sc;
+}
+/** darf Schritt n+1 schon angetippt werden? (alle davor erledigt) */
+function azStepOk(i){if(i>=1&&!A.typ)return false;if(i>=4&&!A.geprueft)return false;return true}
+const azFoot=(nextLabel='Weiter',nextOk=true,back=true)=>`${back?`<button class="btn btn-ghost" data-act="azBack" style="flex:0 0 auto">${ic('back','sm')} Zurück</button>`:`<button class="btn btn-ghost" data-act="azClose" style="flex:0 0 auto">Abbrechen</button>`}<button class="btn btn-primary" data-act="azNext" ${nextOk?'':'disabled'}>${nextLabel} ${ic('chev','sm')}</button>`;
+const azQ=(t,sub='')=>`<div class="az-q"><h2>${t}</h2>${sub?`<p>${sub}</p>`:''}</div>`;
+const preview=()=>({nummer:'Vorschau',typ:A.typ||'Anlegeleiter',material:A.material,sprossen:A.sprossen});
+
+/* Schritt 1: Art */
+function azStep1(){
+  $('#azBody').innerHTML=`${azQ('Was für eine Leiter ist es?','Tippe die passende Art an.')}
+    <div class="az-types">${TYPEN.map(t=>`<button class="az-type ${A.typ===t?'on':''}" data-act="azTyp" data-t="${t}"><span class="pic">${ladderSVG({nummer:t,typ:t,material:'Aluminium',sprossen:TYP_SPROSSEN[t]})}</span><b>${t}</b><small>${TYPINFO[t]}</small></button>`).join('')}</div>`;
+  $('#azFoot').innerHTML=azFoot('Weiter',!!A.typ,false);
+}
+ACT.azTyp=el=>{const t=el.dataset.t;if(A.typ!==t){A.typ=t;A.sprossen=TYP_SPROSSEN[t]||8}A.step=2;drawAnlegen()};
+
+/* Schritt 2: Größe & Material */
+function azStep2(){
+  const sw=stufenWort(A.typ);
+  $('#azBody').innerHTML=`${azQ('Größe und Material','Die Zeichnung passt sich an – so sieht später auch das Mängel-Bild aus.')}
+    <div class="az-split">
+      <div class="az-prev" id="azPrev">${ladderSVG(preview())}</div>
+      <div>
+        <div class="field"><label>Material</label><div class="az-chips" id="azMat">${MATERIALIEN.map(m=>`<button class="fchip ${A.material===m?'on':''}" data-m="${m}">${m}</button>`).join('')}</div></div>
+        <div class="field"><label>Anzahl ${sw} <span class="faint" style="font-weight:500">(gesamt)</span></label>
+          <div class="stepper"><button data-sp="-1" aria-label="Weniger">−</button><input class="inp num" id="azSpr" type="number" min="2" max="30" value="${A.sprossen}" inputmode="numeric"><button data-sp="1" aria-label="Mehr">+</button></div></div>
+        <button class="az-more" data-act="azMore">${ic(A.more?'minus':'plus','sm')}<span>Länge und Belastung ${A.more?'ausblenden':'angeben'} <span class="faint">(optional)</span></span></button>
+        <div ${A.more?'':'hidden'}>
+          <div class="row2">${field('Länge / Höhe (m)',`<input class="inp num" id="azLen" type="number" step="0.05" min="0" inputmode="decimal" value="${A.laenge??''}" placeholder="z. B. 2,40">`)}
+          ${field('Max. Belastung (kg)',`<input class="inp num" id="azLast" type="number" min="0" inputmode="numeric" value="${A.last??''}">`)}</div>
+        </div>
+      </div>
+    </div>`;
+  const prev=()=>{$('#azPrev').innerHTML=ladderSVG(preview())};
+  $('#azMat').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;A.material=b.dataset.m;$$('#azMat .fchip').forEach(x=>x.classList.toggle('on',x===b));prev()};
+  const spr=$('#azSpr');
+  spr.oninput=()=>{const v=+spr.value;if(v>=2&&v<=30){A.sprossen=v;prev()}};
+  $('#azBody').onclick=e=>{const sp=e.target.closest('[data-sp]');if(!sp)return;A.sprossen=Math.min(30,Math.max(2,(+spr.value||8)+ +sp.dataset.sp));spr.value=A.sprossen;prev()};
+  const len=$('#azLen'),last=$('#azLast');
+  len.oninput=()=>{A.laenge=len.value===''?null:+String(len.value).replace(',','.')};
+  last.oninput=()=>{A.last=last.value===''?null:+last.value};
+  $('#azFoot').innerHTML=azFoot();
+}
+ACT.azMore=()=>{A.more=!A.more;drawAnlegen(true)};
+
+/* Schritt 3: Typenschild (alles optional) */
+function azStep3(){
+  if(!A.bezTouched)A.bez=autoBez(A);
+  $('#azBody').innerHTML=`${azQ('Angaben vom Typenschild','Alles freiwillig – was du nicht weißt, lässt du einfach leer.')}
+    ${field('Bezeichnung',`<input class="inp" id="azBez" value="${esc(A.bez)}" autocomplete="off">`,'Vorschlag aus Art, Material und Größe – kannst du ändern.')}
+    <div class="field"><label>Hersteller</label><div class="az-chips" id="azHer">${HERSTELLER.map(h=>`<button class="fchip sm ${A.hersteller===h?'on':''}" data-h="${h}">${h}</button>`).join('')}</div>
+      <input class="inp" id="azHerI" value="${esc(A.hersteller)}" placeholder="oder eintippen" autocomplete="off" style="margin-top:8px"></div>
+    <div class="row2">${field('Modell',`<input class="inp" id="azMod" value="${esc(A.modell)}" autocomplete="off">`)}${field('Baujahr',`<input class="inp num" id="azBj" type="number" min="1950" max="2100" inputmode="numeric" value="${esc(A.baujahr)}">`)}</div>
+    ${field('Seriennummer',`<input class="inp" id="azSer" value="${esc(A.ser)}" autocomplete="off">`,'Steht meist auf dem Typenschild am Holm.')}
+    ${field('Foto der Leiter',`<div id="azPhoto"></div>`)}`;
+  const bind=(id,k,f=v=>v)=>{const i=$(id);i.oninput=()=>{A[k]=f(i.value)}};
+  bind('#azBez','bez');$('#azBez').addEventListener('input',()=>A.bezTouched=true);
+  bind('#azMod','modell');bind('#azBj','baujahr');bind('#azSer','ser');
+  const herI=$('#azHerI');herI.oninput=()=>{A.hersteller=herI.value;$$('#azHer .fchip').forEach(x=>x.classList.toggle('on',x.dataset.h===A.hersteller))};
+  $('#azHer').onclick=e=>{const b=e.target.closest('[data-h]');if(!b)return;A.hersteller=A.hersteller===b.dataset.h?'':b.dataset.h;herI.value=A.hersteller;$$('#azHer .fchip').forEach(x=>x.classList.toggle('on',x.dataset.h===A.hersteller))};
+  const drawPhoto=()=>{
+    const h=$('#azPhoto');
+    h.innerHTML=A.photo?`<div style="display:flex;gap:12px;align-items:center"><img src="${URL.createObjectURL(A.photo)}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:14px"><button class="btn btn-soft" id="azPh" style="flex:1">${ic('camera')} Anderes Foto</button><button class="iconbtn flat" id="azPhX" aria-label="Foto entfernen">${ic('trash')}</button></div>`
+      :`<button class="btn btn-soft btn-block" id="azPh">${ic('camera')} Foto aufnehmen</button>`;
+    $('#azPh').onclick=async()=>{const b=await pickPhoto();if(b){A.photo=b;drawPhoto()}};
+    const x=$('#azPhX');if(x)x.onclick=()=>{A.photo=null;drawPhoto()};
+  };
+  drawPhoto();
+  $('#azFoot').innerHTML=azFoot();
+}
+
+/* Schritt 4: Lagerort & Prüfung */
+function azStep4(){
+  const orte=lagerorte(),custom=A.lagerort&&!orte.includes(A.lagerort);
+  $('#azBody').innerHTML=`${azQ('Wo steht sie – und ist sie geprüft?')}
+    <div class="field"><label>Lagerort</label><div class="az-chips" id="azOrt">${orte.map(o=>`<button class="fchip sm ${A.lagerort===o?'on':''}" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div>
+      <input class="inp" id="azOrtI" value="${custom?esc(A.lagerort):''}" placeholder="anderer Ort" autocomplete="off" style="margin-top:8px"></div>
+    <div class="field" style="margin-top:6px"><label>Wurde die Leiter schon geprüft?</label></div>
+    <div class="optcards" id="azPr">
+      <button class="opt tone-ok ${A.geprueft==='ja'?'on':''}" data-g="ja"><span class="ico">${ic('shield')}</span><span><b>Ja, gültige Prüfung vorhanden</b><small>Sie kann sofort gebucht werden.</small></span></button>
+      <button class="opt tone-amber ${A.geprueft==='nein'?'on':''}" data-g="nein"><span class="ico">${ic('clip')}</span><span><b>Nein / weiß ich nicht</b><small>Sie bleibt gesperrt, bis sie geprüft ist. Du kannst gleich danach prüfen.</small></span></button>
+    </div>
+    <div class="card az-sub" ${A.geprueft==='ja'?'':'hidden'}>
+      ${field('Datum der letzten Prüfung',`<input class="inp" id="azLetzte" type="date" max="${berlinToday()}" value="${A.letzte||''}">`)}
+      <div class="field" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0"><div><label class="lbl">Prüfplakette ist dran</label><div class="hint">Gut sichtbar an der Leiter</div></div><button class="switch ${A.plak?'on':''}" id="azPlak" role="switch" aria-checked="${A.plak}" aria-label="Prüfplakette ist dran"></button></div>
+    </div>
+    <div class="field" style="margin-top:14px"><label>Wie oft prüfen?</label><div class="seg" id="azInt">${[6,12,24].map(m=>`<button data-i="${m}" class="${A.intervall===m?'on':''}">${m} Monate</button>`).join('')}</div>
+      <div class="hint">Üblich ist einmal im Jahr (12 Monate).</div></div>`;
+  const ortI=$('#azOrtI');
+  $('#azOrt').onclick=e=>{const b=e.target.closest('[data-o]');if(!b)return;A.lagerort=b.dataset.o;ortI.value='';$$('#azOrt .fchip').forEach(x=>x.classList.toggle('on',x===b))};
+  ortI.oninput=()=>{A.lagerort=ortI.value.trim()||'Hauptlager';$$('#azOrt .fchip').forEach(x=>x.classList.toggle('on',!ortI.value.trim()&&x.dataset.o==='Hauptlager'))};
+  $('#azPr').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;A.geprueft=b.dataset.g;drawAnlegen(true)};
+  const lz=$('#azLetzte');if(lz)lz.oninput=()=>{A.letzte=lz.value};
+  const pl=$('#azPlak');if(pl)pl.onclick=()=>{A.plak=!A.plak;pl.classList.toggle('on',A.plak);pl.setAttribute('aria-checked',A.plak)};
+  $('#azInt').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;A.intervall=+b.dataset.i;$$('#azInt button').forEach(x=>x.classList.toggle('on',x===b))};
+  $('#azFoot').innerHTML=azFoot('Weiter',!!A.geprueft);
+}
+
+/* Schritt 5: Übersicht & Anzahl */
+function azStep5(){
+  const nums=nrRange(A.nr,A.anzahl);
+  const naechste=A.geprueft==='ja'&&A.letzte?addMonths(A.letzte,A.intervall):null;
+  const row=(k,v)=>v||v===0?`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`:'';
+  $('#azBody').innerHTML=`${azQ('Alles richtig?','Tippe oben auf einen Schritt, um etwas zu ändern.')}
+    <div class="card az-sum">
+      <div class="az-sum-h"><span class="az-mini">${ladderSVG(preview())}</span><div><small>Kennung &amp; Barcode</small><b class="num">${esc(A.anzahl>1?`${nums[0]} bis ${nums[nums.length-1]}`:nums[0])}</b><span>${esc(A.bez||autoBez(A))}</span></div></div>
+      <dl class="dl">
+        ${row('Art',A.typ)}${row('Material',A.material)}${row(stufenWort(A.typ),A.sprossen)}
+        ${row('Länge / Höhe',A.laenge?String(A.laenge).replace('.',',')+' m':'')}${row('Max. Belastung',A.last?A.last+' kg':'')}
+        ${row('Hersteller',[A.hersteller,A.modell].filter(Boolean).join(' · '))}${row('Baujahr',A.baujahr)}${A.anzahl===1?row('Seriennummer',A.ser):''}
+        ${row('Lagerort',A.lagerort)}
+        ${row('Prüfung',A.geprueft==='ja'?`geprüft am ${fmtD(A.letzte)}${A.plak?' · Plakette dran':''}`:'noch nicht geprüft (gesperrt)')}
+        ${row('Nächste Prüfung',naechste?fmtD(naechste):'')}${row('Intervall',`alle ${A.intervall} Monate`)}
+      </dl>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="field" style="margin:0"><label>Wie viele genau gleiche Leitern?</label>
+        <div class="stepper" style="max-width:240px"><button data-an="-1" aria-label="Weniger">−</button><input class="inp num" id="azAnz" type="number" min="1" max="30" value="${A.anzahl}" inputmode="numeric"><button data-an="1" aria-label="Mehr">+</button></div>
+        <div class="hint">${A.anzahl>1?`Bekommen fortlaufend ${esc(nums[0])} bis ${esc(nums[nums.length-1])}. Foto und Seriennummer werden nur bei einer einzelnen Leiter gespeichert.`:'Mehrere gleiche Leitern? Dann hier hochzählen – die Nummern laufen automatisch weiter.'}</div></div>
+    </div>
+    ${field('Notiz <span class="faint" style="font-weight:500">(optional)</span>',`<textarea class="inp" id="azNote" style="min-height:70px" placeholder="z. B. gehört zum Sprinter-Ausbau">${esc(A.notiz)}</textarea>`).replace('class="field"','class="field" style="margin-top:14px"')}
+    <p class="hint" style="margin-top:4px">Die endgültige Nummer wird beim Speichern vergeben – falls gerade jemand anderes auch anlegt, kann sie eins höher sein.</p>`;
+  const anz=$('#azAnz');
+  const setA=v=>{A.anzahl=Math.min(30,Math.max(1,v||1));drawAnlegen(true)};
+  anz.onchange=()=>setA(+anz.value);
+  $('#azBody').onclick=e=>{const b=e.target.closest('[data-an]');if(b)setA(A.anzahl+ +b.dataset.an)};
+  $('#azNote').oninput=e=>{A.notiz=e.target.value};
+  $('#azFoot').innerHTML=`<button class="btn btn-ghost" data-act="azBack" style="flex:0 0 auto">${ic('back','sm')} Zurück</button><button class="btn btn-primary" data-act="azSave">${ic('check')} ${A.anzahl>1?`${A.anzahl} Leitern anlegen`:'Leiter anlegen'}</button>`;
+}
+
+ACT.azBack=()=>{if(A&&A.step>1){A.step--;drawAnlegen()}};
+ACT.azNext=()=>{if(!A)return;if(A.step===1&&!A.typ)return;if(A.step===4&&!A.geprueft)return toast('Bitte angeben, ob die Leiter geprüft ist','err');if(A.step===4&&A.geprueft==='ja'&&!A.letzte)return toast('Bitte das Prüfdatum eintragen','err');A.step++;drawAnlegen()};
+ACT.azGo=el=>{const s=+el.dataset.s;if(s<=A.step||azStepOk(s-1)){A.step=s;drawAnlegen()}};
+ACT.azSave=el=>busy(el,async()=>{
+  const letzte=A.geprueft==='ja'?(A.letzte||null):null;
+  const plak=!!letzte&&A.plak;
+  const base={bezeichnung:(A.bez||autoBez(A)).trim()||null,typ:A.typ,material:A.material,sprossen:A.sprossen,laenge_m:A.laenge||null,max_last_kg:A.last||null,
+    hersteller:A.hersteller.trim()||null,modell:A.modell.trim()||null,baujahr:A.baujahr?+A.baujahr:null,lagerort:A.lagerort||'Hauptlager',
+    pruefintervall_monate:A.intervall,notiz:A.notiz.trim()||null,letzte_pruefung:letzte,naechste_pruefung:letzte?addMonths(letzte,A.intervall):null,
+    plakette_angebracht:plak,status:letzte?(plak?'plakette':'im_lager'):'zur_pruefung'};
+  // Kennung (nummer) und Barcode setzt die Datenbank
+  const rows=Array.from({length:A.anzahl},()=>({...base,seriennummer:A.anzahl===1?(A.ser.trim()||null):null}));
+  let created=await api('POST','leiter_leitern',rows);
+  if(A.photo&&created.length===1){const p=await uploadPhoto(A.photo,created[0].id);created[0]=(await api('PATCH','leiter_leitern',{foto_pfad:p},`?id=eq.${created[0].id}`))[0]||created[0]}
+  created.forEach(applyRow);S.leitern.sort((x,y)=>x.nummer.localeCompare(y.nummer,'de',{numeric:true}));
+  A.done=created;renderShell();drawAnlegen();
+});
+function azDone(){
+  const c=A.done,one=c.length===1,l=c[0];
+  $('#azBody').innerHTML=`<div class="done tone-ok"><div class="big">${ic('check')}</div>
+    <h2>${one?'Leiter angelegt':`${c.length} Leitern angelegt`}</h2>
+    <div class="az-done-nr num">${esc(one?l.nummer:`${c[0].nummer} – ${c[c.length-1].nummer}`)}</div>
+    <p class="muted">${esc(l.bezeichnung||l.typ)}</p>
+    <div class="az-next">
+      <div class="az-tip">${ic('tag')}<span><b>Jetzt das Etikett drucken und an die Leiter kleben.</b> Der Barcode darauf ist die Kennung ${esc(one?l.nummer:'jeder Leiter')} – so findet jeder sie per Scan.</span></div>
+      <button class="btn btn-primary btn-block" data-act="azLabel">${ic('print')} ${one?'Etikett drucken':`${c.length} Etiketten drucken`}</button>
+      ${one&&l.status==='zur_pruefung'?`<button class="btn btn-soft btn-block" data-act="azPruefen">${ic('clip')} Jetzt prüfen</button>`:''}
+      <button class="btn btn-soft btn-block" data-act="azAgain">${ic('plus')} Noch eine ähnliche Leiter</button>
+    </div></div>`;
+  $('#azFoot').innerHTML=`<button class="btn btn-ghost" data-act="azFinish" style="flex:1">${one?'Zur Leiter':'Zur Liste'}</button>`;
+}
+ACT.azLabel=()=>{if(A&&A.done)printLabels(A.done)};
+ACT.azPruefen=()=>{const l=A&&A.done&&byId(A.done[0].id);closeAnlegen();if(l){location.hash=`#/leiter/${l.id}`;setTimeout(()=>startPruefung(l),350)}};
+ACT.azAgain=()=>{const k={...A};closeAnlegen();openAnlegen(k)};
+ACT.azFinish=()=>{const c=A&&A.done;closeAnlegen();if(c&&c.length===1)location.hash=`#/leiter/${c[0].id}`;else{S.filter='alle';S.q='';location.hash='#/leitern';rerender()}};
+
+/* ---------- Leiter bearbeiten (übersichtlich in Abschnitten) ---------- */
+function openLeiterEdit(l){
+  let photo=null,plak=!!l.plakette_angebracht;
+  const opt=(arr,cur)=>arr.map(x=>`<option ${x===cur?'selected':''}>${x}</option>`).join('');
+  const sec=t=>`<div class="ed-sec">${t}</div>`;
+  const bd=sheet({title:`${l.nummer} bearbeiten`,body:`
+    ${sec('Kennung')}
+    ${can.admin()?field('Kennung / Barcode',`<input class="inp num" id="fNr" value="${esc(l.nummer)}" autocomplete="off">`,'Nur Admins. Format LH-001. Nach einer Änderung bitte ein neues Etikett drucken.')
+      :`<div class="ed-ro"><span class="num">${esc(l.nummer)}</span><small>Kennung und Barcode – ändern kann sie nur ein Admin.</small></div>`}
+    ${sec('Leiter')}
+    ${field('Bezeichnung',`<input class="inp" id="fBez" value="${esc(l.bezeichnung||'')}" placeholder="z. B. Alu-Stehleiter 6 Stufen" autocomplete="off">`)}
+    <div class="row2">${field('Art',`<select class="inp" id="fTyp">${opt(TYPEN,l.typ)}</select>`)}${field('Material',`<select class="inp" id="fMat">${opt(MATERIALIEN,l.material)}</select>`)}</div>
+    <div class="row2">${field('Sprossen / Stufen',`<div class="stepper" style="grid-template-columns:44px 1fr 44px"><button data-sp="-1" aria-label="Weniger">−</button><input class="inp num" id="fSpr" type="number" min="2" max="30" value="${l.sprossen||8}" inputmode="numeric"><button data-sp="1" aria-label="Mehr">+</button></div>`)}${field('Länge / Höhe (m)',`<input class="inp num" id="fLen" type="number" step="0.05" min="0" inputmode="decimal" value="${l.laenge_m??''}">`)}</div>
+    ${field('Max. Belastung (kg)',`<input class="inp num" id="fLast" type="number" min="0" inputmode="numeric" value="${l.max_last_kg||''}">`)}
+    ${sec('Typenschild')}
+    <div class="row2">${field('Hersteller',`<input class="inp" id="fHer" value="${esc(l.hersteller||'')}" list="fHerL" autocomplete="off"><datalist id="fHerL">${HERSTELLER.map(h=>`<option value="${h}">`).join('')}</datalist>`)}${field('Modell',`<input class="inp" id="fMod" value="${esc(l.modell||'')}" autocomplete="off">`)}</div>
+    <div class="row2">${field('Seriennummer',`<input class="inp" id="fSer" value="${esc(l.seriennummer||'')}" autocomplete="off">`)}${field('Baujahr',`<input class="inp num" id="fBj" type="number" min="1950" max="2100" inputmode="numeric" value="${l.baujahr||''}">`)}</div>
+    ${sec('Lager &amp; Prüfung')}
+    ${field('Lagerort',`<input class="inp" id="fOrt" value="${esc(l.lagerort||'')}" list="fOrtL" autocomplete="off"><datalist id="fOrtL">${lagerorte().map(o=>`<option value="${esc(o)}">`).join('')}</datalist>`)}
+    <div class="row2">${field('Prüfintervall',`<select class="inp" id="fInt">${[6,12,24,36].map(m=>`<option value="${m}" ${m===l.pruefintervall_monate?'selected':''}>${m} Monate</option>`).join('')}</select>`)}${field('Letzte Prüfung',`<input class="inp" id="fLetzte" type="date" max="${berlinToday()}" value="${l.letzte_pruefung||''}">`)}</div>
+    <div class="field" style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><label class="lbl">Prüfplakette ist dran</label><div class="hint">Sichtbar an der Leiter</div></div><button class="switch ${plak?'on':''}" id="fPlak" role="switch" aria-checked="${plak}" aria-label="Prüfplakette ist dran"></button></div>
+    ${sec('Sonstiges')}
+    ${field('Notiz',`<textarea class="inp" id="fNote" style="min-height:70px">${esc(l.notiz||'')}</textarea>`)}
+    ${field('Foto der Leiter',`<div id="fPhoto"></div>`)}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="fGo">${ic('check')} Speichern</button>`});
+  const q=s=>$(s,bd);
+  bd.addEventListener('click',e=>{const sp=e.target.closest('[data-sp]');if(sp){const i=q('#fSpr');i.value=Math.min(30,Math.max(2,(+i.value||8)+ +sp.dataset.sp))}});
+  q('#fPlak').onclick=e=>{plak=!plak;e.currentTarget.classList.toggle('on',plak);e.currentTarget.setAttribute('aria-checked',plak)};
+  const drawPhoto=()=>{
+    const h=q('#fPhoto');
+    const cur=!photo&&l.foto_pfad?`<img data-photo="${esc(l.foto_pfad)}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:14px">`:photo?`<img src="${URL.createObjectURL(photo)}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:14px">`:'';
+    h.innerHTML=`<div style="display:flex;gap:12px;align-items:center">${cur}<button class="btn btn-soft" id="fPh" style="flex:1">${ic('camera')} ${cur?'Foto ändern':'Foto aufnehmen'}</button></div>`;
+    hydratePhotos(h);q('#fPh').onclick=async()=>{const b=await pickPhoto();if(b){photo=b;drawPhoto()}};
+  };
+  drawPhoto();
+  q('#fGo').onclick=ev=>busy(ev.currentTarget,async()=>{
+    const g=id=>q(id).value.trim(),num=id=>{const x=g(id);return x===''?null:+String(x).replace(',','.')};
+    const interval=+g('#fInt')||12,letzte=g('#fLetzte')||null;
+    const patch={bezeichnung:g('#fBez')||null,typ:g('#fTyp'),material:g('#fMat'),sprossen:+g('#fSpr')||8,laenge_m:num('#fLen'),max_last_kg:num('#fLast'),
+      hersteller:g('#fHer')||null,modell:g('#fMod')||null,seriennummer:g('#fSer')||null,baujahr:num('#fBj'),lagerort:g('#fOrt')||null,
+      pruefintervall_monate:interval,letzte_pruefung:letzte,plakette_angebracht:plak&&!!letzte,notiz:g('#fNote')||null};
+    if(can.admin()){
+      const nr=kennung(g('#fNr'));
+      if(!/^LH-\d{3,}$/.test(nr))return toast('Die Kennung muss so aussehen: LH-001','err');
+      if(nr!==l.nummer){
+        if(S.leitern.some(x=>x.id!==l.id&&x.nummer===nr))return toast(`${nr} ist schon vergeben`,'err');
+        patch.nummer=nr;
+      }
+    }
+    if(letzte&&(letzte!==l.letzte_pruefung||interval!==l.pruefintervall_monate))patch.naechste_pruefung=addMonths(letzte,interval);
+    if(photo)patch.foto_pfad=await uploadPhoto(photo,l.id);
+    const [row]=await api('PATCH','leiter_leitern',patch,`?id=eq.${l.id}`);
+    applyRow(row);S.leitern.sort((x,y)=>x.nummer.localeCompare(y.nummer,'de',{numeric:true}));closeSheet();
+    toast(patch.nummer?`Neue Kennung ${row.nummer} – bitte neues Etikett drucken`:'Gespeichert','ok');renderShell();rerender();
+  });
 }
 /* =====================================================================
    Prüf-Assistent: Checkliste → Ergebnis → Unterschrift · Prüfprotokoll
@@ -1683,13 +2085,13 @@ function scanClose(){scanStop();$('#scanLayer').innerHTML=''}
 ACT.scanClose=()=>scanClose();
 ACT.scan=()=>scanOpen();
 
-async function scanOpen({title='Leiter scannen',hint='QR-Code oder Barcode in den Rahmen halten',onCode}={}){
+async function scanOpen({title='Leiter scannen',hint='Etikett (QR-Code oder Barcode) in den Rahmen halten',onCode}={}){
   scanClose();
   $('#scanLayer').innerHTML=`<div class="scan" role="dialog" aria-modal="true" aria-label="${esc(title)}"><video id="scVideo" playsinline muted autoplay></video>
     <div class="scan-top"><button class="iconbtn" data-act="scanClose" aria-label="Schließen">${ic('x')}</button><b>${esc(title)}</b><button class="iconbtn" id="scTorch" hidden aria-label="Licht">${ic('flash')}</button></div>
     <div class="scan-mid"><div class="frame"><i></i><i></i><i></i><i></i></div></div>
     <div class="scan-bot"><div class="scan-msg" id="scMsg">${esc(hint)}</div>
-      <div class="scan-in"><input id="scManual" placeholder="Oder Nummer eintippen / Handscanner nutzen" autocomplete="off" enterkeyhint="go"><button class="btn" id="scGo">OK</button></div></div></div>`;
+      <div class="scan-in"><input id="scManual" placeholder="Oder Nummer eintippen, z. B. 7 oder LH-007" autocomplete="off" enterkeyhint="go"><button class="btn" id="scGo">OK</button></div></div></div>`;
   const msg=h=>{const m=$('#scMsg');if(m)m.innerHTML=h};
   const handler=onCode||(async raw=>{
     SCAN.paused=true;msg('Suche …');
@@ -1699,8 +2101,8 @@ async function scanOpen({title='Leiter scannen',hint='QR-Code oder Barcode in de
       else if(hits.length>1){scanClose();pickLeiterSheet(hits,'Mehrere Treffer')}
       else{
         try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(e){}
-        msg(`Keine Leiter zu „${esc(code)}“ gefunden${can.pruefer()?` <button class="btn btn-sm" id="scNew" style="margin-left:8px;background:#fff;color:#0d1524">Neu anlegen</button>`:''}`);
-        const nb=$('#scNew');if(nb)nb.onclick=()=>{scanClose();openLeiterForm(null,{barcode:code})};
+        msg(`Keine Leiter „${esc(kennung(code))}“ gefunden${can.pruefer()?` <button class="btn btn-sm" id="scNew" style="margin-left:8px;background:#fff;color:#0d1524">Neue Leiter</button>`:''}`);
+        const nb=$('#scNew');if(nb)nb.onclick=()=>{scanClose();openAnlegen()};
         setTimeout(()=>{SCAN.paused=false},2200);
       }
     }catch(e){msg(esc(niceErr(e)));setTimeout(()=>{SCAN.paused=false},2200)}
@@ -1729,7 +2131,7 @@ async function printLabels(list){
   if(!list.length)return;
   try{
     const base=location.origin+location.pathname;
-    const items=await Promise.all(list.map(async l=>{const code=l.barcode||l.nummer;return{l,code,qr:await qrSVG(`${base}#${encodeURIComponent(code)}`),bc:code128SVG(code,{h:30})}}));
+    const items=await Promise.all(list.map(async l=>{const code=l.nummer;return{l,code,qr:await qrSVG(`${base}#${encodeURIComponent(code)}`),bc:code128SVG(code,{h:30})}}));
     const cells=items.map(({l,code,qr,bc})=>`<div class="lb"><div class="top"><div class="qr">${qr}</div><div class="tx"><div class="brand">HEISE HAUSTECHNIK</div><div class="nr">${esc(l.nummer)}</div><div class="nm">${esc(l.bezeichnung||l.typ)}</div></div></div><div class="bc">${bc}</div><div class="cd">${esc(code)}</div></div>`).join('');
     printHTML(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Leiter-Etiketten</title><style>
       @page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}
