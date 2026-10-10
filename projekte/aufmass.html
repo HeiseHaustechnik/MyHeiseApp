@@ -244,6 +244,7 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
 
 <script src="lib/heise-icons.js"></script>
 <script src="lib/pj-api.js"></script>
+<script src="lib/pj-shell.js"></script>
 <script src="lib/exceljs.min.js"></script>
 <script src="lib/jspdf.umd.min.js"></script>
 <script src="lib/jspdf.plugin.autotable.min.js"></script>
@@ -794,7 +795,7 @@ function renderAreas(){
 $('#a_add').onclick=()=>{ const n=$('#a_n').value.trim(); if(!n){ toast('Bitte einen Namen eintragen'); return; } const g=$('#a_g').value.trim()||'Eigene Bereiche';
   const A2=areas().slice(); let idx=-1; A2.forEach((a,i)=>{ if(a.g===g) idx=i; }); const it={g,n}; if(idx<0) A2.push(it); else A2.splice(idx+1,0,it);
   S.areas=A2; save(); $('#a_n').value=''; renderAreas(); toast('Bereich hinzugefügt'); };
-function renderAll(){ renderAreas(); renderPos(); renderSum(); renderHdr(); sigText(); }
+function renderAll(){ PJS.set({seite:'aufmass',pid:PROJ?.id||null,pname:PROJ?.name||'',erfassen:true}); renderAreas(); renderPos(); renderSum(); renderHdr(); sigText(); }
 
 /* ---------- Datenbank-Abgleich ---------- */
 const eKey=e=>JSON.stringify([e.key,e.qty,e.ort||'',e.bem||'',e.rg||'',!!e.pre]);

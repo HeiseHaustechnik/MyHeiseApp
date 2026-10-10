@@ -33,20 +33,23 @@ input[type=file].inp{padding:12px 14px}
 </style>
 </head>
 <body>
-<header class="topbar">
+<header class="topbar pjs-desk-aus">
   <a href="../index.html" class="brand" title="Zur My Heise App"><div class="lt"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div><div style="min-width:0"><b>Heise Projekte</b><small>Aufmaß · Bautagebuch</small></div></a>
 </header>
 <main class="shell" id="app"><div class="empty">Lädt …</div></main>
 <div class="toast" id="toast"></div>
 <script src="lib/heise-icons.js"></script>
 <script src="lib/pj-api.js"></script>
+<script src="lib/pj-shell.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dDE=d=>d?new Date(d).toLocaleDateString('de-DE'):'';
 function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2200); }
 const api=(path,opt={})=>PJ.api(path,opt);
-function route(){ const m=location.hash.match(/^#p=(.+)$/); window.scrollTo(0,0); m? showProjekt(m[1]) : showListe(); }
+function route(){ const m=location.hash.match(/^#p=(.+)$/); window.scrollTo(0,0);
+  if(m){ PJS.set({seite:'projekt',pid:decodeURIComponent(m[1]),erfassen:false}); showProjekt(m[1]); }
+  else { PJS.set({seite:'liste',pid:null,pname:''}); showListe().then(()=>{ if(location.hash==='#neu'){ const d=$('#np_name')&&$('#np_name').closest('details'); if(d){ d.open=true; d.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>$('#np_name').focus(),300); } } }); } }
 window.addEventListener('hashchange',route);
 const plural=(n,a,b)=>n+' '+(n==1?a:b);
 
@@ -61,7 +64,7 @@ async function showListe(){
   const mein=p=>p.status!=='archiv' && (p.ansicht===true || (p.ansicht!==false && (PJ.leitung() || p.meins || !p.team_n)));
   let modus='meine'; try{ modus=localStorage.getItem('pj_modus')||'meine'; }catch(e){}
   const zeig=modus==='alle'? list : list.filter(mein);
-  app.innerHTML=`
+  app.innerHTML=`${PJS.pills()}
     <section class="hero">
       <div><div class="ey">${gruss}</div><h1>Projekte</h1></div>
       <div class="logo-tile"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div>
@@ -125,6 +128,7 @@ async function showProjekt(id){
   let bt=[], zl=null;
   try{ [d,am,bt,zl]=await Promise.all([api('projekte/'+id),api('projekte/'+id+'/aufmasse'),api('projekte/'+id+'/bautagebuch').catch(()=>[]),PJ.za?PJ.za('projekte/'+id+'/zusatz').catch(()=>null):null]); }catch(e){ app.innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="#">Zurück</a>`; return; }
   const p=d.projekt;
+  PJS.set({seite:'projekt',pid:id,pname:p.name,erfassen:false});
   const nP=d.lv.filter(o=>o.typ==='P').length, nL=d.lv.filter(o=>o.typ==='P'&&o.in_liste).length;
   const offen=am.reduce((a,x)=>a+(x.anz_ungeprueft||0),0);
   app.innerHTML=`

@@ -81,6 +81,7 @@
 
 <script src="lib/heise-icons.js"></script>
 <script src="lib/pj-api.js"></script>
+<script src="lib/pj-shell.js"></script>
 <script src="lib/jspdf.umd.min.js"></script>
 <script src="lib/jspdf.plugin.autotable.min.js"></script>
 <script>
@@ -153,6 +154,7 @@ const listRow=e=>({id:e.id,datum:e.datum,von:e.von,bis:e.bis,pause_min:e.pause_m
 function hours(von,bis,pause){ if(!von||!bis) return 0; const [a,b]=[von,bis].map(t=>{ const [h,m]=t.split(':').map(Number); return h*60+m; }); let d=b-a; if(d<0) d+=1440; return Math.max(0,(d-(Number(pause)||0))/60); }
 const hStr=h=>h.toLocaleString('de-DE',{maximumFractionDigits:2})+' h';
 function renderList(){
+  PJS.set({seite:'btb',pid:PID,pname:PROJ?.name||'',erfassen:false});
   $('#hTitle').textContent='Bautagebuch'; $('#hSub').textContent=PROJ?PROJ.name:'';
   $('#backBtn').href='index.html#p='+PID;
   const today=todayIso(), hasToday=LIST.find(x=>x.datum===today);
@@ -235,6 +237,7 @@ async function loadEntry(id){
 }
 
 function renderEntry(){
+  PJS.set({seite:'btb',pid:PID,pname:PROJ?.name||'',erfassen:true});
   const e=E;
   $('#hTitle').textContent='Bautagebuch '+dDE(e.datum); $('#hSub').textContent=PROJ?.name||'';
   $('#backBtn').href='?p='+PID;

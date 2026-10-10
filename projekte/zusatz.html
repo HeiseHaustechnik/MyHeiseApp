@@ -94,6 +94,7 @@ fieldset:disabled .inp{background:var(--surface-2);color:var(--ink-2)}
 
 <script src="lib/heise-icons.js"></script>
 <script src="lib/pj-api.js"></script>
+<script src="lib/pj-shell.js"></script>
 <script src="lib/jspdf.umd.min.js"></script>
 <script src="lib/jspdf.plugin.autotable.min.js"></script>
 <script>
@@ -176,6 +177,7 @@ function sumStd(p){ return (p||[]).reduce((a,x)=>a+num(x.stunden),0); }
 
 /* ================= Übersicht ================= */
 function renderList(){
+  PJS.set({seite:'za',pid:PID,pname:PROJ?.name||'',erfassen:false});
   D=null; KIND=null;
   const tab=ls.get(K.tab,'za');
   $('#hTitle').textContent='Zusätzliche Arbeiten'; $('#hSub').textContent=PROJ?.name||'';
@@ -263,6 +265,7 @@ function hdr(){
 
 /* ================= Auftrag für zusätzliche Arbeiten ================= */
 function renderZa(){
+  PJS.set({seite:'za',pid:PID,pname:PROJ?.name||'',erfassen:true});
   KIND='zusatz'; hdr(); $('#backBtn').innerHTML=IC('back'); $('#backBtn').href='?p='+PID;
   const d=D, lk=locked(), sn=SL.filter(s=>{ let zi=s.zusatz_ids; if(typeof zi==='string'){ try{ zi=JSON.parse(zi); }catch(e){ zi=[]; } } return (zi||[]).includes(d.id); });
   $('#app').innerHTML=`
@@ -326,6 +329,7 @@ function readyZa(){
 
 /* ================= Stundennachweis ================= */
 function renderSn(){
+  PJS.set({seite:'za',pid:PID,pname:PROJ?.name||'',erfassen:true});
   KIND='stunden'; hdr(); $('#backBtn').innerHTML=IC('back'); $('#backBtn').href='?p='+PID;
   const d=D, lk=locked();
   $('#app').innerHTML=`
