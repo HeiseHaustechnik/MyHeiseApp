@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f8">
+<title>Zusätzliche Arbeiten</title>
+<link rel="stylesheet" href="lib/heise-ui.css">
+<style>
+.sync{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:650;color:var(--ink-3);text-align:right;line-height:1.25;max-width:42%}
+.sync .ic{width:16px;height:16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.card .field:last-child{margin-bottom:0}
+.sig{border:1.5px dashed var(--ink-3);border-radius:16px;background:var(--surface);touch-action:none;width:100%;height:160px;display:block}
+.sig.lock{border-style:solid;border-color:var(--line);touch-action:auto}
+.sigbar{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px;color:var(--ink-3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.lnk{color:var(--brand-2);font-weight:650;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;padding:6px 0}
+.lnk .ic{width:16px;height:16px}
+.nrbox{display:grid;place-items:center;min-width:58px;height:52px;padding:0 8px;border-radius:15px;background:var(--surface-2);color:var(--brand);flex:0 0 auto;line-height:1.05;text-align:center}
+.nrbox b{font-size:15px;font-weight:800}
+.nrbox small{font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--ink-3)}
+.row-card .mt .desc{display:block;font-size:13px;color:var(--ink-2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ov{position:fixed;inset:0;background:rgba(8,13,21,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:50;display:none}
+.ov.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--bg);border-radius:28px 28px 0 0;padding:24px 20px calc(20px + var(--safe-b));transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.9,.3,1);max-width:560px;margin:0 auto;box-shadow:0 -24px 70px -20px rgba(0,0,0,.5);max-height:88vh;overflow:auto}
+.sheet::before{content:"";position:absolute;top:9px;left:50%;width:40px;height:5px;border-radius:3px;background:var(--line);transform:translateX(-50%)}
+.sheet.on{transform:none}
+.sheet h2{font-size:20px;font-weight:760;margin-bottom:14px}
+.bottombar{position:sticky;bottom:0;z-index:5;padding:12px 0 calc(8px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:10px}
+.bottombar .btn{flex:1}
+.chk{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--accent);flex:0 0 auto}
+.chk b{display:block;font-size:14.5px}.chk small{display:block;font-size:12.5px;color:var(--ink-3)}
+.opt{display:flex;gap:10px;flex-wrap:wrap}
+.opt label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:14px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:650;cursor:pointer}
+.opt input{width:20px;height:20px;accent-color:var(--accent)}
+.opt label:has(input:checked){box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+.lock-note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--ok-bg);color:var(--ink);margin-bottom:14px;font-size:14px}
+.lock-note .ic{color:var(--ok);flex:0 0 auto}
+.vob{font-size:12px;color:var(--ink-3);margin-top:8px;line-height:1.4}
+.trow{display:grid;grid-template-columns:78px 1fr 78px 40px;gap:8px;align-items:end;margin-bottom:8px}
+.trow.mat{grid-template-columns:1fr 72px 64px 104px 40px}
+.trow .field{margin:0}
+.trow .field label{font-size:11.5px}
+.trow .bem{grid-column:2/4}
+@media(max-width:520px){.trow{grid-template-columns:64px 1fr 64px 40px}.trow.mat{grid-template-columns:1fr 64px 56px 40px}.trow.mat .qu{grid-column:1/-2}}
+.delbtn{width:40px;height:50px;border-radius:12px;display:grid;place-items:center;color:var(--ink-3)}
+.delbtn:active{background:var(--red-bg);color:var(--red)}
+.sum{display:flex;justify-content:space-between;font-weight:760;padding:8px 2px 0;border-top:1px solid var(--line);margin-top:4px}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+fieldset:disabled .inp{background:var(--surface-2);color:var(--ink-2)}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="iconbtn" id="backBtn" aria-label="Zurück"></a>
+  <div class="brand"><div class="lt"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div><div style="min-width:0"><b id="hTitle">Zusätzliche Arbeiten</b><small id="hSub"></small></div></div>
+  <span class="sync" id="syncState"></span>
+</header>
+<main class="shell" id="app"><div class="empty">Lädt …</div></main>
+<div class="ov" id="ov"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<script src="lib/heise-icons.js"></script>
+<script src="lib/pj-api.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.plugin.autotable.min.js"></script>
+<script>
+/* =====================================================================
+   Zusätzliche Arbeiten: Auftrag (ZA-001 …) und Stundennachweis (SN-001 …)
+   Daten über die RPC pj_za (supabase/zusatz.sql). Offline wird lokal gespeichert
+   und später übertragen. Nach der Unterschrift des Auftraggebers bzw. Kunden ist
+   das Dokument gesperrt, nur die Bauleitung kann entsperren.
+   ===================================================================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+const nowIso=()=>new Date().toISOString();
+const todayIso=()=>{ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+const WT=['So','Mo','Di','Mi','Do','Fr','Sa'], WTL=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const dDE=d=>d?new Date(d+'T12:00').toLocaleDateString('de-DE'):'';
+const dLong=d=>d?WTL[new Date(d+'T12:00').getDay()]+', '+new Date(d+'T12:00').toLocaleDateString('de-DE',{day:'numeric',month:'long',year:'numeric'}):'';
+const tsDE=t=>t?new Date(t).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'}):'';
+const num=v=>{ if(typeof v==='number') return v; const n=parseFloat(String(v||'').replace(',','.')); return isFinite(n)?n:0; };
+const hStr=h=>(Math.round(h*100)/100).toLocaleString('de-DE',{maximumFractionDigits:2})+' h';
+const eur=v=>v?Number(v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €/h':'';
+const zaNr=n=>n?'ZA-'+String(n).padStart(3,'0'):'ZA neu', snNr=n=>n?'SN-'+String(n).padStart(3,'0'):'SN neu';
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2600); }
+const ls={ get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }, del(k){ try{ localStorage.removeItem(k); }catch(e){} } };
+const api=(path,opt={})=>PJ.api(path,opt);
+const za=(path,opt={})=>PJ.za(path,opt);
+const Q=new URLSearchParams(location.search);
+const PID=Q.get('p');
+let PROJ=null, PERS=[], ZL=[], SL=[], D=null, KIND=null;   // Projekt, Personen, Aufträge, Stundennachweise, aktuelles Dokument
+const K={proj:'za_proj_'+PID, pers:'za_pers_'+PID, zl:'za_list_'+PID, sl:'sn_list_'+PID, queue:'za_queue', doc:(k,id)=>'za_doc_'+k+'_'+id, tab:'za_tab'};
+const ZAEND={ausfuehrung:'regie',saetze:'vereinbart',material_nachweis:1};
+
+/* ================= Speichern / Offline-Warteschlange ================= */
+function setSync(kind,txt){ const el=$('#syncState'); el.innerHTML=IC(kind==='err'?'cloudoff':kind==='ok'?'cloud':'sync')+'<span>'+esc(txt)+'</span>'; el.style.color=kind==='err'?'var(--amber)':kind==='ok'?'var(--ok)':''; }
+const queue=()=>ls.get(K.queue,[]);
+function enqueue(item){ const q=queue().filter(x=>!(x.kind===item.kind&&x.id===item.id)); q.push(item); ls.set(K.queue,q); flushSoon(); }
+let flushT=null, flushing=false;
+function flushSoon(){ clearTimeout(flushT); updSync(); flushT=setTimeout(flush,900); }
+function updSync(){ const n=queue().length; if(!navigator.onLine) setSync('err',n?`offline · ${n} Änderung${n>1?'en':''} warten`:'offline'); else if(n) setSync('',`${n} Änderung${n>1?'en':''} werden gespeichert …`); else setSync('ok','gespeichert '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})); }
+async function flush(){
+  if(flushing||!navigator.onLine) { updSync(); return; } flushing=true;
+  try{
+    for(const it of queue()){
+      try{
+        const r=await za((it.kind==='zusatz'?'zusatz/':'stunden/')+it.id,{method:'PUT',body:JSON.stringify(it.data)});
+        ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id&&x.v===it.v)));
+        if(r){ const loc=ls.get(K.doc(it.kind,it.id),null); if(loc){ loc.nr=r.nr; ls.set(K.doc(it.kind,it.id),loc); }
+          if(D&&D.id===it.id){ D.nr=r.nr; D.erstellt_von=r.erstellt_von; hdr(); } }
+      }catch(e){
+        if(!navigator.onLine || /Verbindung|fetch|network|angemeldet|timeout|abort/i.test(e.message||'')) break;   // Netzproblem: später erneut
+        ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id)));   // vom Server abgelehnt: nicht endlos wiederholen
+        toast('Nicht gespeichert: '+e.message);
+        if(D&&D.id===it.id) setTimeout(()=>location.reload(),1800);
+      }
+    }
+  } finally { flushing=false; updSync(); }
+}
+window.addEventListener('online',flushSoon); window.addEventListener('offline',updSync);
+
+async function loadBase(){
+  PROJ=ls.get(K.proj,null); PERS=ls.get(K.pers,[]); ZL=ls.get(K.zl,[]); SL=ls.get(K.sl,[]);
+  try{
+    const [p,pers,zl,sl]=await Promise.all([api('projekte/'+PID),api('projekte/'+PID+'/personen').catch(()=>[]),za('projekte/'+PID+'/zusatz'),za('projekte/'+PID+'/stunden')]);
+    PROJ=p.projekt; PERS=pers||[]; ZL=zl; SL=sl;
+    ls.set(K.proj,PROJ); ls.set(K.pers,PERS); ls.set(K.zl,ZL); ls.set(K.sl,SL);
+  }catch(e){
+    if(/pj_za/.test(e.message)) throw new Error('Die Datenbank für „Zusätzliche Arbeiten“ ist noch nicht eingerichtet (zusatz.sql ausführen).');
+    if(!PROJ) throw e;
+  }
+  // lokal angelegte, noch nicht übertragene Dokumente in die Listen
+  queue().forEach(it=>{ const L=it.kind==='zusatz'?ZL:SL; if(!L.some(x=>x.id===it.id)){ const d=it.data; L.unshift(it.kind==='zusatz'?{id:it.id,nr:null,datum:d.datum,beschreibung:d.beschreibung,bereich:d.bereich,geschoss:d.geschoss,sig_heise:!!d.sig_heise,sig_ag:!!d.sig_ag,sn:[],stunden:0}:{id:it.id,nr:null,datum:d.datum,zusatz_ids:d.zusatz_ids,personen:d.personen,beschreibung:d.beschreibung,sig_kunde:!!d.sig_kunde,sig_monteur:!!d.sig_monteur}); } });
+}
+function sumStd(p){ return (p||[]).reduce((a,x)=>a+num(x.stunden),0); }
+
+/* ================= Übersicht ================= */
+function renderList(){
+  D=null; KIND=null;
+  const tab=ls.get(K.tab,'za');
+  $('#hTitle').textContent='Zusätzliche Arbeiten'; $('#hSub').textContent=PROJ?.name||'';
+  $('#backBtn').innerHTML=IC('back'); $('#backBtn').href='index.html#p='+PID;
+  const offen=ZL.filter(z=>!z.sig_ag).length;
+  $('#app').innerHTML=`
+    <section class="hero">
+      <div><div class="ey">${esc(PROJ?.name||'')}</div><h1>Zusätzliche Arbeiten</h1></div>
+      <div class="logo-tile"><img src="lib/heise-logo.svg" alt=""></div>
+      <p>${ZL.length} ${ZL.length==1?'Auftrag':'Aufträge'}${offen?` · ${offen} ohne Unterschrift Auftraggeber`:''} · ${SL.length} ${SL.length==1?'Stundennachweis':'Stundennachweise'}</p>
+    </section>
+    <div class="segc" style="margin:18px 0 12px"><button data-tab="za" class="${tab==='za'?'on':''}">Aufträge (${ZL.length})</button><button data-tab="sn" class="${tab==='sn'?'on':''}">Stundennachweise (${SL.length})</button></div>
+    ${tab==='za'?`
+      <button class="btn cta block" id="newZa">${IC('plus')}Zusätzliche Arbeiten anmelden</button>
+      <p class="hint" style="margin:8px 2px 4px">Arbeiten kurz beschreiben und begründen, der Auftraggeber oder sein Vertreter unterschreibt direkt auf dem Gerät. Danach als PDF senden.</p>
+      ${ZL.length?ZL.map(z=>`<a class="row-card" href="?p=${PID}&za=${z.id}">
+        <div class="nrbox"><small>ZA</small><b>${z.nr?String(z.nr).padStart(3,'0'):'neu'}</b></div>
+        <div class="mt"><b>${esc((z.beschreibung||'ohne Beschreibung').split('\n')[0])}</b>
+          <small>${dDE(z.datum)}${z.bereich||z.geschoss?' · '+esc([z.geschoss,z.bereich].filter(Boolean).join(', ')):''}${z.sn&&z.sn.length?' · '+z.sn.map(snNr).join(', ')+' · '+hStr(z.stunden||0):''}</small>
+          <div class="tags">${z.sig_ag?'<span class="pill tone-ok"><i></i>vom Auftraggeber unterschrieben</span>':'<span class="pill tone-amber"><i></i>Unterschrift Auftraggeber fehlt</span>'}${z.ausfuehrung==='nachtrag'?'<span class="pill tone-blue">Nachtrag</span>':''}</div></div>
+        <span class="chev">${IC('chev')}</span></a>`).join(''):`<div class="empty" style="margin-top:12px">${IC('file')}<div>Noch keine zusätzlichen Arbeiten angemeldet.</div></div>`}`
+    :`
+      <button class="btn cta block" id="newSn">${IC('plus')}Stundennachweis schreiben</button>
+      <p class="hint" style="margin:8px 2px 4px">Je Arbeitstag ein Nachweis mit Personen, Stunden und Material, zugeordnet zu einem oder mehreren Aufträgen (ZA-Nummern).</p>
+      ${SL.length?SL.map(s=>{ const d=s.datum?new Date(s.datum+'T12:00'):null; let p=s.personen; if(typeof p==='string'){ try{ p=JSON.parse(p); }catch(e){ p=[]; } } let zi=s.zusatz_ids; if(typeof zi==='string'){ try{ zi=JSON.parse(zi); }catch(e){ zi=[]; } }
+        const zn=(zi||[]).map(id=>ZL.find(z=>z.id===id)).filter(Boolean).map(z=>zaNr(z.nr));
+        return `<a class="row-card" href="?p=${PID}&sn=${s.id}">
+        <div class="nrbox"><small>${d?WT[d.getDay()]:'SN'}</small><b>${d?d.getDate()+'.'+(d.getMonth()+1)+'.':'neu'}</b></div>
+        <div class="mt"><b>${snNr(s.nr)} · ${hStr(sumStd(p))}</b>
+          <small>${(p||[]).length} ${(p||[]).length==1?'Person':'Personen'}${zn.length?' · '+zn.join(', '):' · ohne Auftrag'}</small>
+          ${s.beschreibung?`<span class="desc">${esc(s.beschreibung)}</span>`:''}
+          <div class="tags">${s.sig_kunde?'<span class="pill tone-ok"><i></i>Kunde</span>':'<span class="pill tone-amber"><i></i>Unterschrift Kunde fehlt</span>'}${s.sig_monteur?'<span class="pill tone-ok"><i></i>Monteur</span>':''}</div></div>
+        <span class="chev">${IC('chev')}</span></a>`; }).join(''):`<div class="empty" style="margin-top:12px">${IC('clock')}<div>Noch keine Stundennachweise.</div></div>`}`}`;
+  $$('[data-tab]').forEach(b=>b.onclick=()=>{ ls.set(K.tab,b.dataset.tab); renderList(); });
+  if($('#newZa')) $('#newZa').onclick=newZa;
+  if($('#newSn')) $('#newSn').onclick=()=>newSn([]);
+}
+
+/* ================= Neues Dokument ================= */
+function newZa(){
+  const last=ZL[0];
+  const d={id:uid(),projekt_id:PID,nr:null,datum:todayIso(),gewerk:last?.gewerk||'',geschoss:'',bereich:'',beschreibung:'',begruendung:'',...ZAEND,
+    satz_vorarbeiter:null,satz_facharbeiter:null,ort:'',name_heise:ls.get('za_name_heise',PJ.me?.name||''),name_ag:'',sig_heise:null,sig_ag:null,sig_ts:null};
+  ls.set(K.doc('zusatz',d.id),d); saveDoc('zusatz',d);
+  D=d; KIND='zusatz'; history.pushState(null,'',`?p=${PID}&za=${d.id}`); window.scrollTo(0,0); renderZa();
+}
+function newSn(zids){
+  const last=SL[0];
+  const d={id:uid(),projekt_id:PID,nr:null,datum:todayIso(),zusatz_ids:zids,kundennr:ls.get('sn_kdnr_'+PID,''),personen:[{persnr:'',name:PJ.me?.name||'',stunden:'',bem:''}],
+    beschreibung:'',material:[],name_kunde:'',name_monteur:PJ.me?.name||'',sig_kunde:null,sig_monteur:null,sig_ts:null};
+  if(zids.length===1){ const z=(D&&D.id===zids[0])?D:ZL.find(x=>x.id===zids[0]); if(z&&z.beschreibung) d.beschreibung=z.beschreibung; }
+  ls.set(K.doc('stunden',d.id),d); saveDoc('stunden',d);
+  D=d; KIND='stunden'; history.pushState(null,'',`?p=${PID}&sn=${d.id}`); window.scrollTo(0,0); renderSn();
+}
+function saveDoc(kind,d){
+  d.updated_at=nowIso(); ls.set(K.doc(kind,d.id),d);
+  const data={...d}; delete data.nr; delete data.erstellt_von; delete data.created_at; delete data.updated_at;
+  if(kind==='stunden'){ data.personen=JSON.stringify(d.personen||[]); data.material=JSON.stringify(d.material||[]); data.zusatz_ids=JSON.stringify(d.zusatz_ids||[]); }
+  enqueue({kind,id:d.id,v:d.updated_at,data});
+  // Listen im Speicher aktuell halten (für Zuordnungen und Anzeige in dieser Sitzung)
+  const L=kind==='zusatz'?ZL:SL, i=L.findIndex(x=>x.id===d.id);
+  const row=kind==='zusatz'?{...(L[i]||{sn:[],stunden:0}),id:d.id,nr:d.nr,datum:d.datum,beschreibung:d.beschreibung,bereich:d.bereich,geschoss:d.geschoss,ausfuehrung:d.ausfuehrung,sig_heise:!!d.sig_heise,sig_ag:!!d.sig_ag}
+    :{id:d.id,nr:d.nr,datum:d.datum,zusatz_ids:d.zusatz_ids,personen:d.personen,beschreibung:d.beschreibung,sig_kunde:!!d.sig_kunde,sig_monteur:!!d.sig_monteur};
+  if(i>=0) L[i]=row; else L.unshift(row);
+  ls.set(kind==='zusatz'?K.zl:K.sl,L);
+}
+async function loadDoc(kind,id){
+  const local=ls.get(K.doc(kind,id),null);
+  if(local&&queue().some(x=>x.kind===kind&&x.id===id)) return local;
+  try{ const s=await za((kind==='zusatz'?'zusatz/':'stunden/')+id); if(!s) throw new Error('nicht gefunden');
+    if(kind==='stunden'){ ['personen','material','zusatz_ids'].forEach(k=>{ try{ s[k]=JSON.parse(s[k]||'[]'); }catch(e){ s[k]=[]; } }); }
+    ls.set(K.doc(kind,id),s); return s; }
+  catch(e){ if(local) return local; throw e; }
+}
+let saveT=null;
+function changed(){ clearTimeout(saveT); setSync('','wird gespeichert …'); saveT=setTimeout(()=>saveDoc(KIND,D),500); }
+const locked=()=>KIND==='zusatz'?!!D.sig_ag:!!D.sig_kunde;
+const canEdit=()=>!locked();
+function hdr(){
+  $('#hTitle').textContent=KIND==='zusatz'?'Auftrag '+zaNr(D.nr):'Stundennachweis '+snNr(D.nr);
+  $('#hSub').textContent=PROJ?.name||'';
+  const t=$('#nrT'); if(t) t.textContent=KIND==='zusatz'?zaNr(D.nr):snNr(D.nr);
+  const b=$('#toSn'); if(b&&KIND==='zusatz') b.innerHTML=IC('clock')+'Stundennachweis zu '+zaNr(D.nr)+' schreiben';
+}
+
+/* ================= Auftrag für zusätzliche Arbeiten ================= */
+function renderZa(){
+  KIND='zusatz'; hdr(); $('#backBtn').innerHTML=IC('back'); $('#backBtn').href='?p='+PID;
+  const d=D, lk=locked(), sn=SL.filter(s=>{ let zi=s.zusatz_ids; if(typeof zi==='string'){ try{ zi=JSON.parse(zi); }catch(e){ zi=[]; } } return (zi||[]).includes(d.id); });
+  $('#app').innerHTML=`
+    ${lk?`<div class="lock-note">${IC('check')}<div><b>Vom Auftraggeber unterschrieben</b><br>${esc(d.name_ag||'')} am ${tsDE(d.sig_ts)}. Der Auftrag kann nicht mehr geändert werden.${PJ.leitung()?' <button class="lnk" id="unlock">Zum Bearbeiten entsperren</button>':''}</div></div>`:''}
+    <fieldset ${lk?'disabled':''}>
+    <div class="card"><h2><span id="nrT">${zaNr(d.nr)}</span> · Angaben</h2>
+      <div class="row2"><div class="field"><label for="f_dat">Datum</label><input class="inp" type="date" id="f_dat" value="${esc(d.datum||'')}"></div>
+        <div class="field"><label for="f_gw">Bauvorhaben / Gewerk</label><input class="inp" id="f_gw" value="${esc(d.gewerk||'')}" placeholder="${esc(PROJ?.name||'')}"></div></div>
+      <div class="row2"><div class="field"><label for="f_gs">Geschoss</label><input class="inp" id="f_gs" value="${esc(d.geschoss||'')}" placeholder="z. B. 2. OG"></div>
+        <div class="field"><label for="f_br">Bereich / Bauteil</label><input class="inp" id="f_br" value="${esc(d.bereich||'')}" placeholder="z. B. Raum 2.14, Strang B"></div></div>
+      <p class="hint" style="margin:0">Projekt-Nr. ${esc(PROJ?.nr||'–')} · ${esc(PROJ?.adresse||'')}</p></div>
+    <div class="card"><h2>Beauftragte Arbeiten</h2>
+      <div class="field"><label for="f_bs">Genaue Bezeichnung der Arbeiten *</label><textarea class="inp" id="f_bs" rows="4" placeholder="Was genau wird zusätzlich gemacht?">${esc(d.beschreibung||'')}</textarea></div>
+      <div class="field"><label for="f_bg">Warum sind die Arbeiten notwendig?</label><textarea class="inp" id="f_bg" rows="3" placeholder="z. B. Planänderung, bauseitige Behinderung, Wunsch des Bauherrn">${esc(d.begruendung||'')}</textarea></div>
+      <p class="vob" style="margin:0">Die Beauftragung beinhaltet alle zur Durchführung der Arbeiten notwendigen Aufwendungen wie Stundenlohn-, Material-, Geräte-, Frachtkosten usw. Es wird darauf hingewiesen, dass durch diesen Zusatzauftrag die Auftragssumme des Leistungsverzeichnisses und die Vertragstermine überschritten werden können.</p></div>
+    <div class="card"><h2>Ausführung</h2>
+      <div class="opt" style="margin-bottom:12px"><label><input type="radio" name="af" value="regie" ${d.ausfuehrung!=='nachtrag'?'checked':''}>in Regie</label><label><input type="radio" name="af" value="nachtrag" ${d.ausfuehrung==='nachtrag'?'checked':''}>als Nachtrag</label></div>
+      <div id="regie" ${d.ausfuehrung==='nachtrag'?'hidden':''}>
+        <div class="opt" style="margin-bottom:12px"><label><input type="radio" name="sz" value="vereinbart" ${d.saetze!=='neu'?'checked':''}>Stundenlohnsätze bereits vereinbart</label><label><input type="radio" name="sz" value="neu" ${d.saetze==='neu'?'checked':''}>Sätze werden hier vereinbart</label></div>
+        <div class="row2" id="saetze" ${d.saetze==='neu'?'':'hidden'}><div class="field"><label for="f_sv">Vorarbeiter netto (€/h)</label><input class="inp" id="f_sv" inputmode="decimal" value="${d.satz_vorarbeiter!=null?String(d.satz_vorarbeiter).replace('.',','):''}"></div>
+          <div class="field"><label for="f_sf">Facharbeiter netto (€/h)</label><input class="inp" id="f_sf" inputmode="decimal" value="${d.satz_facharbeiter!=null?String(d.satz_facharbeiter).replace('.',','):''}"></div></div>
+        <label class="chk" style="border:0"><input type="checkbox" id="f_mn" ${d.material_nachweis?'checked':''}><span><b>Materialkosten werden gegen Nachweis abgerechnet</b></span></label></div></div>
+    </fieldset>
+    <div class="card"><h2>Unterschriften</h2>
+      <fieldset ${lk?'disabled':''}><div class="row2"><div class="field"><label for="f_ort">Ort</label><input class="inp" id="f_ort" value="${esc(d.ort||'')}" placeholder="${esc((PROJ?.adresse||'').split(',').pop().trim())}"></div><div></div></div></fieldset>
+      <div class="grid2">
+        <div><fieldset ${lk?'disabled':''}><div class="field"><label for="f_nh">Heise Haustechnik (BL/OM/M), Name in Druckbuchstaben</label><input class="inp" id="f_nh" value="${esc(d.name_heise||'')}"></div></fieldset>
+          <canvas class="sig${lk?' lock':''}" id="sig_heise"></canvas><div class="sigbar"><span id="sig_heiset"></span>${lk?'':'<button class="lnk" data-clr="sig_heise">Löschen</button>'}</div></div>
+        <div><fieldset ${lk?'disabled':''}><div class="field"><label for="f_na">Auftraggeber oder Bauleitung, Name in Druckbuchstaben</label><input class="inp" id="f_na" value="${esc(d.name_ag||'')}"></div></fieldset>
+          <canvas class="sig${lk?' lock':''}" id="sig_ag"></canvas><div class="sigbar"><span id="sig_agt"></span>${lk?'':'<button class="lnk" data-clr="sig_ag">Löschen</button>'}</div>
+          <p class="vob">Der Unterzeichner versichert, dass er zur Anordnung von zusätzlichen Leistungen gemäß VOB/B § 2 Nr. 6 und zur Vereinbarung und Anordnung von Stundenlohnleistungen lt. § 2 Nr. 10 ermächtigt ist.</p></div>
+      </div></div>
+    <div class="card"><h2>Stundennachweise zu diesem Auftrag</h2>
+      ${sn.length?sn.map(s=>{ let p=s.personen; if(typeof p==='string'){ try{ p=JSON.parse(p); }catch(e){ p=[]; } } return `<a class="row-card" href="?p=${PID}&sn=${s.id}" style="margin:6px 0"><div class="mt"><b>${snNr(s.nr)} · ${dDE(s.datum)}</b><small>${hStr(sumStd(p))} · ${s.sig_kunde?'unterschrieben':'Unterschrift Kunde fehlt'}</small></div><span class="chev">${IC('chev')}</span></a>`; }).join(''):'<p class="hint" style="margin:0 0 10px">Noch keine Stunden erfasst.</p>'}
+      <button class="btn ghost block" id="toSn">${IC('clock')}Stundennachweis zu ${zaNr(d.nr)} schreiben</button></div>
+    <div class="bottombar"><button class="btn ghost" id="bPdf">${IC('file')}PDF</button><button class="btn cta" id="bMail">${IC('mail')}Senden</button></div>
+    ${PJ.leitung()?`<div style="text-align:center;margin-top:6px"><button class="lnk" id="bDel" style="color:var(--red)">${IC('trash')}Auftrag löschen</button></div>`:''}`;
+  const bind=(sel,key,fn)=>{ const el=$(sel); if(el) el.addEventListener('input',()=>{ d[key]=fn?fn(el.value):el.value; changed(); }); };
+  bind('#f_dat','datum'); bind('#f_gw','gewerk'); bind('#f_gs','geschoss'); bind('#f_br','bereich'); bind('#f_bs','beschreibung'); bind('#f_bg','begruendung');
+  bind('#f_sv','satz_vorarbeiter',v=>v.trim()?num(v):null); bind('#f_sf','satz_facharbeiter',v=>v.trim()?num(v):null);
+  bind('#f_ort','ort'); bind('#f_nh','name_heise'); bind('#f_na','name_ag');
+  $('#f_nh').addEventListener('change',()=>ls.set('za_name_heise',d.name_heise));
+  $$('[name=af]').forEach(r=>r.onchange=()=>{ d.ausfuehrung=r.value; $('#regie').hidden=r.value==='nachtrag'; changed(); });
+  $$('[name=sz]').forEach(r=>r.onchange=()=>{ d.saetze=r.value; $('#saetze').hidden=r.value!=='neu'; changed(); });
+  $('#f_mn').onchange=e=>{ d.material_nachweis=e.target.checked?1:0; changed(); };
+  setupSigs(['sig_heise','sig_ag'],'sig_ag');
+  $('#toSn').onclick=()=>newSn([d.id]);
+  $('#bPdf').onclick=async()=>{ if(!readyZa()) return; dl(await pdfZa(),fileZa()); };
+  $('#bMail').onclick=()=>{ if(!readyZa()) return;
+    sendDialog(()=>pdfZa(),fileZa(),`Auftrag für zusätzliche Arbeiten ${zaNr(d.nr)} – ${PROJ?.name||''}`,
+      `Guten Tag,\n\nanbei der Auftrag für zusätzliche Arbeiten ${zaNr(d.nr)} vom ${dDE(d.datum)} für das Bauvorhaben ${PROJ?.name||''}.\n\nMit freundlichen Grüßen\n${d.name_heise||''}\nHeise Haustechnik GmbH & Co. KG`); };
+  if($('#unlock')) $('#unlock').onclick=()=>{ if(!confirm('Entsperren löscht die Unterschrift des Auftraggebers. Danach muss er erneut unterschreiben. Fortfahren?')) return; d.sig_ag=null; if(!d.sig_heise) d.sig_ts=null; saveDoc('zusatz',d); renderZa(); };
+  if($('#bDel')) $('#bDel').onclick=()=>delDoc('zusatz',d);
+}
+function readyZa(){
+  if(!D.beschreibung.trim()){ toast('Bitte die beauftragten Arbeiten beschreiben'); $('#f_bs')&&$('#f_bs').focus(); return false; }
+  if(!D.nr){ toast('Wird noch gespeichert, bitte kurz warten'); flushSoon(); return false; }
+  if(!D.sig_ag && !confirm('Der Auftraggeber hat noch nicht unterschrieben. Trotzdem PDF erstellen?')) return false;
+  return true;
+}
+
+/* ================= Stundennachweis ================= */
+function renderSn(){
+  KIND='stunden'; hdr(); $('#backBtn').innerHTML=IC('back'); $('#backBtn').href='?p='+PID;
+  const d=D, lk=locked();
+  $('#app').innerHTML=`
+    ${lk?`<div class="lock-note">${IC('check')}<div><b>Vom Kunden unterschrieben</b><br>${esc(d.name_kunde||'')} am ${tsDE(d.sig_ts)}. Der Nachweis kann nicht mehr geändert werden.${PJ.leitung()?' <button class="lnk" id="unlock">Zum Bearbeiten entsperren</button>':''}</div></div>`:''}
+    <fieldset ${lk?'disabled':''}>
+    <div class="card"><h2><span id="nrT">${snNr(d.nr)}</span> · Angaben</h2>
+      <div class="row2"><div class="field"><label for="f_dat">Datum</label><input class="inp" type="date" id="f_dat" value="${esc(d.datum||'')}"></div>
+        <div class="field"><label for="f_kn">Kundennummer</label><input class="inp" id="f_kn" value="${esc(d.kundennr||'')}"></div></div>
+      <p class="hint" style="margin:0 0 10px">Projekt ${esc([PROJ?.nr,PROJ?.name].filter(Boolean).join(' · '))}${PROJ?.adresse?' · '+esc(PROJ.adresse):''}</p>
+      <label style="font-size:13px;font-weight:700;color:var(--ink-3)">Zu welchen Aufträgen gehören die Stunden?</label>
+      ${ZL.length?ZL.map(z=>`<label class="chk"><input type="checkbox" data-za="${z.id}" ${(d.zusatz_ids||[]).includes(z.id)?'checked':''}><span><b>${zaNr(z.nr)} · ${esc((z.beschreibung||'').split('\n')[0].slice(0,70))}</b><small>${dDE(z.datum)}${z.sig_ag?' · beauftragt':' · Unterschrift Auftraggeber fehlt'}</small></span></label>`).join('')
+        :'<p class="hint">Noch keine Aufträge angelegt. Stunden können trotzdem erfasst werden.</p>'}</div>
+    <div class="card"><h2>Personen und Stunden</h2>
+      <div id="pers"></div>
+      <button class="lnk" id="addP">${IC('userplus')}Person hinzufügen</button>
+      <div class="sum"><span>Gesamt</span><span id="pSum"></span></div></div>
+    <div class="card"><h2>Arbeitsbeschreibung</h2>
+      <div class="field"><textarea class="inp" id="f_bs" rows="4" placeholder="Was wurde gemacht?">${esc(d.beschreibung||'')}</textarea></div></div>
+    <div class="card"><h2>Material</h2>
+      <div id="mat"></div>
+      <button class="lnk" id="addM">${IC('plus')}Material hinzufügen</button></div>
+    </fieldset>
+    <div class="card"><h2>Unterschriften</h2>
+      <div class="grid2">
+        <div><fieldset ${lk?'disabled':''}><div class="field"><label for="f_nk">Kunde, Name</label><input class="inp" id="f_nk" value="${esc(d.name_kunde||'')}"></div></fieldset>
+          <canvas class="sig${lk?' lock':''}" id="sig_kunde"></canvas><div class="sigbar"><span id="sig_kundet"></span>${lk?'':'<button class="lnk" data-clr="sig_kunde">Löschen</button>'}</div></div>
+        <div><fieldset ${lk?'disabled':''}><div class="field"><label for="f_nm">Monteur, Name</label><input class="inp" id="f_nm" value="${esc(d.name_monteur||'')}"></div></fieldset>
+          <canvas class="sig${lk?' lock':''}" id="sig_monteur"></canvas><div class="sigbar"><span id="sig_monteurt"></span>${lk?'':'<button class="lnk" data-clr="sig_monteur">Löschen</button>'}</div></div>
+      </div></div>
+    <datalist id="persList">${PERS.map(p=>`<option value="${esc(p.name)}">`).join('')}</datalist>
+    <div class="bottombar"><button class="btn ghost" id="bPdf">${IC('file')}PDF</button><button class="btn cta" id="bMail">${IC('mail')}Senden</button></div>
+    ${PJ.leitung()?`<div style="text-align:center;margin-top:6px"><button class="lnk" id="bDel" style="color:var(--red)">${IC('trash')}Stundennachweis löschen</button></div>`:''}`;
+  const bind=(sel,key)=>{ const el=$(sel); if(el) el.addEventListener('input',()=>{ d[key]=el.value; changed(); }); };
+  bind('#f_dat','datum'); bind('#f_kn','kundennr'); bind('#f_bs','beschreibung'); bind('#f_nk','name_kunde'); bind('#f_nm','name_monteur');
+  $('#f_kn').addEventListener('change',()=>ls.set('sn_kdnr_'+PID,d.kundennr));
+  $$('[data-za]').forEach(c=>c.onchange=()=>{ d.zusatz_ids=$$('[data-za]').filter(x=>x.checked).map(x=>x.dataset.za);
+    if(c.checked&&!d.beschreibung.trim()){ const z=ZL.find(x=>x.id===c.dataset.za); if(z&&z.beschreibung){ d.beschreibung=z.beschreibung; $('#f_bs').value=z.beschreibung; } }
+    changed(); });
+  renderPers(); renderMat();
+  $('#addP').onclick=()=>{ d.personen.push({persnr:'',name:'',stunden:'',bem:''}); renderPers(); changed(); const ins=$$('#pers [data-k="name"]'); ins.length&&ins[ins.length-1].focus(); };
+  $('#addM').onclick=()=>{ d.material.push({bez:'',menge:'',me:'Stck',quelle:'lager'}); renderMat(); changed(); const ins=$$('#mat [data-k="bez"]'); ins.length&&ins[ins.length-1].focus(); };
+  setupSigs(['sig_kunde','sig_monteur'],'sig_kunde');
+  $('#bPdf').onclick=async()=>{ if(!readySn()) return; dl(await pdfSn(),fileSn()); };
+  $('#bMail').onclick=()=>{ if(!readySn()) return;
+    sendDialog(()=>pdfSn(),fileSn(),`Stundennachweis zusätzliche Arbeiten ${snNr(d.nr)} – ${PROJ?.name||''} – ${dDE(d.datum)}`,
+      `Guten Tag,\n\nanbei der Stunden- und Materialnachweis ${snNr(d.nr)} vom ${dDE(d.datum)} für zusätzliche Arbeiten${zaListe(d)?' ('+zaListe(d)+')':''} am Bauvorhaben ${PROJ?.name||''}.\n\nMit freundlichen Grüßen\n${d.name_monteur||''}\nHeise Haustechnik GmbH & Co. KG`); };
+  if($('#unlock')) $('#unlock').onclick=()=>{ if(!confirm('Entsperren löscht die Unterschrift des Kunden. Danach muss er erneut unterschreiben. Fortfahren?')) return; d.sig_kunde=null; if(!d.sig_monteur) d.sig_ts=null; saveDoc('stunden',d); renderSn(); };
+  if($('#bDel')) $('#bDel').onclick=()=>delDoc('stunden',d);
+}
+function renderPers(){
+  const d=D;
+  $('#pers').innerHTML=d.personen.map((p,i)=>`<div class="trow" data-i="${i}">
+      <div class="field"><label>Pers.-Nr.</label><input class="inp" data-k="persnr" value="${esc(p.persnr||'')}"></div>
+      <div class="field"><label>Name</label><input class="inp" data-k="name" list="persList" value="${esc(p.name||'')}"></div>
+      <div class="field"><label>Stunden</label><input class="inp" data-k="stunden" inputmode="decimal" value="${esc(String(p.stunden??'').replace('.',','))}"></div>
+      <button class="delbtn" data-del="${i}" aria-label="Person entfernen">${IC('trash','sm')}</button>
+      <div class="field bem"><input class="inp" data-k="bem" placeholder="Bemerkung (optional)" value="${esc(p.bem||'')}" style="min-height:40px"></div></div>`).join('')||'<p class="hint">Noch keine Person eingetragen.</p>';
+  $$('#pers input').forEach(el=>el.addEventListener('input',()=>{ d.personen[+el.closest('.trow').dataset.i][el.dataset.k]=el.value; updSum(); changed(); }));
+  $$('#pers [data-del]').forEach(b=>b.onclick=()=>{ d.personen.splice(+b.dataset.del,1); renderPers(); changed(); });
+  updSum();
+}
+function updSum(){ $('#pSum').textContent=hStr(sumStd(D.personen)); }
+function renderMat(){
+  const d=D;
+  $('#mat').innerHTML=d.material.map((m,i)=>`<div class="trow mat" data-i="${i}">
+      <div class="field"><label>Material</label><input class="inp" data-k="bez" value="${esc(m.bez||'')}"></div>
+      <div class="field"><label>Menge</label><input class="inp" data-k="menge" inputmode="decimal" value="${esc(String(m.menge??'').replace('.',','))}"></div>
+      <div class="field"><label>ME</label><input class="inp" data-k="me" value="${esc(m.me||'')}"></div>
+      <div class="field qu"><label>Herkunft</label><select class="inp" data-k="quelle"><option value="lager" ${m.quelle!=='bestellt'?'selected':''}>Lager</option><option value="bestellt" ${m.quelle==='bestellt'?'selected':''}>bestellt</option></select></div>
+      <button class="delbtn" data-del="${i}" aria-label="Material entfernen">${IC('trash','sm')}</button></div>`).join('')||'<p class="hint">Kein Material eingetragen.</p>';
+  $$('#mat .inp').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ d.material[+el.closest('.trow').dataset.i][el.dataset.k]=el.value; changed(); }));
+  $$('#mat [data-del]').forEach(b=>b.onclick=()=>{ d.material.splice(+b.dataset.del,1); renderMat(); changed(); });
+}
+const zaListe=d=>(d.zusatz_ids||[]).map(id=>ZL.find(z=>z.id===id)).filter(Boolean).map(z=>zaNr(z.nr)).join(', ');
+function readySn(){
+  if(!sumStd(D.personen)){ toast('Bitte Stunden eintragen'); return false; }
+  if(!D.nr){ toast('Wird noch gespeichert, bitte kurz warten'); flushSoon(); return false; }
+  if(!D.sig_kunde && !confirm('Der Kunde hat noch nicht unterschrieben. Trotzdem PDF erstellen?')) return false;
+  return true;
+}
+
+async function delDoc(kind,d){
+  const t=kind==='zusatz'?'Auftrag '+zaNr(d.nr):'Stundennachweis '+snNr(d.nr);
+  if(!confirm(t+' endgültig löschen?'+(kind==='zusatz'?' Zugeordnete Stundennachweise bleiben erhalten, verlieren aber die Zuordnung.':''))) return;
+  try{ if(d.nr) await za((kind==='zusatz'?'zusatz/':'stunden/')+d.id,{method:'DELETE'});
+    ls.set(K.queue,queue().filter(x=>!(x.kind===kind&&x.id===d.id))); ls.del(K.doc(kind,d.id));
+    location.href='?p='+PID; }catch(e){ toast(e.message); }
+}
+
+/* ================= Unterschriften ================= */
+function setupSigs(ids,lockId){
+  const lk=locked();
+  ids.forEach(id=>{
+    const c=$('#'+id), ctx=c.getContext('2d'); let draw=false,last=null,dirty=false;
+    const size=()=>{ const r=c.getBoundingClientRect(), dp=devicePixelRatio||1; c.width=r.width*dp; c.height=r.height*dp; ctx.setTransform(dp,0,0,dp,0,0); ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#0d1524'; ctx.fillStyle='#0d1524';
+      if(D[id]){ const im=new Image(); im.onload=()=>ctx.drawImage(im,0,0,r.width,r.height); im.src=D[id]; } };
+    c._size=size; size();
+    if(lk) return;
+    const pt=e=>{ const r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
+    c.addEventListener('pointerdown',e=>{ e.preventDefault(); c.setPointerCapture(e.pointerId); draw=true; dirty=true; last=pt(e); ctx.beginPath(); ctx.arc(last.x,last.y,1.1,0,7); ctx.fill(); });
+    c.addEventListener('pointermove',e=>{ if(!draw) return; const p=pt(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; });
+    const end=()=>{ if(!draw) return; draw=false; if(dirty){ D[id]=c.toDataURL('image/png'); D.sig_ts=nowIso(); sigText(ids);
+      if(id===lockId){ clearTimeout(saveT); saveDoc(KIND,D); toast('Unterschrift gespeichert – das Dokument ist jetzt gesperrt'); setTimeout(()=>KIND==='zusatz'?renderZa():renderSn(),900); } else changed(); } };
+    ['pointerup','pointercancel','pointerleave'].forEach(ev=>c.addEventListener(ev,end));
+  });
+  $$('[data-clr]').forEach(b=>b.onclick=()=>{ D[b.dataset.clr]=null; if(!ids.some(i=>D[i])) D.sig_ts=null; const c=$('#'+b.dataset.clr); c.getContext('2d').clearRect(0,0,c.width,c.height); c._size(); sigText(ids); changed(); });
+  sigText(ids);
+}
+function sigText(ids){ ids.forEach(id=>{ const el=$('#'+id+'t'); if(el) el.textContent=D[id]?'unterschrieben '+tsDE(D.sig_ts):'Mit Finger oder Stift unterschreiben'; }); }
+window.addEventListener('resize',()=>{ $$('canvas.sig').forEach(c=>c._size&&c._size()); });
+
+/* ================= PDF ================= */
+let LOGO=null;
+async function logoData(){ if(LOGO!==null) return LOGO; try{ const b=await (await fetch('lib/heise-logo.png')).blob(); LOGO=await new Promise(r=>{ const f=new FileReader(); f.onload=()=>r(f.result); f.readAsDataURL(b); }); }catch(e){ LOGO=''; } return LOGO; }
+const safe=s=>String(s).replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss').replace(/[^A-Za-z0-9-]+/g,'_');
+const fileZa=()=>safe('Zusatzauftrag_'+zaNr(D.nr)+'_'+(PROJ?.name||'')+'_'+D.datum)+'.pdf';
+const fileSn=()=>safe('Stundennachweis_'+snNr(D.nr)+'_'+(PROJ?.name||'')+'_'+D.datum)+'.pdf';
+const W=210,M=16;
+async function pdfKopf(doc,titel,nr){
+  const lg=await logoData(); if(lg) doc.addImage(lg,'PNG',W-M-38,8,38,38*91.014/200,undefined,'FAST');
+  doc.setTextColor(47,59,83); doc.setFont('helvetica','bold'); doc.setFontSize(17); const tl=doc.splitTextToSize(titel,W-2*M-46); doc.text(tl,M,17);
+  const o=(tl.length-1)*7;   // zweizeiliger Titel schiebt den Rest nach unten
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100); doc.text('Heise Haustechnik GmbH & Co. KG · Ramsenweg 2c · 38700 Braunlage',M,24+o);
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(226,83,4); doc.text(nr,M,31+o);
+  doc.setDrawColor(226,83,4); doc.setLineWidth(0.8); doc.line(M,34+o,W-M,34+o); doc.setLineWidth(0.2); doc.setTextColor(58,58,58); doc.setFont('helvetica','normal');
+  return 38+o;
+}
+function pdfFuss(doc,txt){ const n=doc.getNumberOfPages(); for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120); doc.text(txt,M,290); doc.text('Seite '+i+' von '+n,W-M,290,{align:'right'}); } }
+function pdfSig(doc,y,felder,ts){
+  const bw=(W-2*M-12)/2;
+  felder.forEach(([img,lab,name],i)=>{
+    const x=M+i*(bw+12);
+    if(img){ try{ const ip=doc.getImageProperties(img); let hh=22, ww=hh*ip.width/ip.height; if(ww>bw){ ww=bw; hh=ww*ip.height/ip.width; } doc.addImage(img,'PNG',x,y+24-hh,ww,hh,undefined,'FAST'); }catch(e){ console.warn('Unterschrift',e); } }
+    doc.setDrawColor(90); doc.line(x,y+25,x+bw,y+25); doc.setFontSize(8.5); doc.setFont('helvetica','normal'); doc.setTextColor(58,58,58);
+    doc.text(doc.splitTextToSize(lab+(name?': '+name:''),bw),x,y+29); doc.setTextColor(120); doc.text(img?'unterschrieben am '+tsDE(ts):'nicht unterschrieben',x,y+37); doc.setTextColor(58,58,58);
+  });
+  return y+40;
+}
+function para(doc,y,titel,text){
+  if(y>255){ doc.addPage(); y=20; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(47,59,83); doc.text(titel,M,y); doc.setTextColor(58,58,58);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); const lines=doc.splitTextToSize(text||'–',W-2*M);
+  lines.forEach(l=>{ y+=5; if(y>275){ doc.addPage(); y=20; } doc.text(l,M,y); }); return y+8;
+}
+async function pdfZa(){
+  const d=D, { jsPDF }=window.jspdf, doc=new jsPDF({unit:'mm',format:'a4'});
+  const y0=await pdfKopf(doc,'Auftrag für zusätzliche Arbeiten',zaNr(d.nr));
+  const sn=SL.filter(s=>{ let zi=s.zusatz_ids; if(typeof zi==='string'){ try{ zi=JSON.parse(zi); }catch(e){ zi=[]; } } return (zi||[]).includes(d.id); }).map(s=>snNr(s.nr));
+  doc.autoTable({startY:y0,theme:'plain',margin:{left:M,right:M},styles:{fontSize:10,cellPadding:1.4},columnStyles:{0:{fontStyle:'bold',cellWidth:48,textColor:[47,59,83]}},
+    body:[['Bauvorhaben / Gewerk',d.gewerk||PROJ?.name||''],['Projekt-Nr.',PROJ?.nr||'–'],['Baustelle',PROJ?.adresse||'–'],['Geschoss',d.geschoss||'–'],['Bereich / Bauteil',d.bereich||'–'],['Datum',dLong(d.datum)],
+      ['Lohnarbeitsbericht-Nr.',sn.length?sn.join(', '):'–']]});
+  let y=doc.lastAutoTable.finalY+7;
+  y=para(doc,y,'Beauftragte Arbeiten',d.beschreibung);
+  if((d.begruendung||'').trim()) y=para(doc,y,'Begründung',d.begruendung);
+  doc.setFontSize(8.5); doc.setTextColor(90);
+  const hin=doc.splitTextToSize('Die Beauftragung beinhaltet alle zur Durchführung der Arbeiten notwendigen Aufwendungen wie Stundenlohn-, Material-, Geräte-, Frachtkosten usw. Es wird darauf hingewiesen, dass durch diesen Zusatzauftrag die Auftragssumme des Leistungsverzeichnisses und die Vertragstermine überschritten werden können.',W-2*M);
+  if(y+hin.length*4>270){ doc.addPage(); y=20; } doc.text(hin,M,y); y+=hin.length*4+6; doc.setTextColor(58,58,58);
+  const box=(x,yy,on,txt)=>{ doc.setDrawColor(60); doc.rect(x,yy-3.2,3.6,3.6); if(on){ doc.setFont('helvetica','bold'); doc.text('X',x+0.7,yy-0.1); doc.setFont('helvetica','normal'); } doc.text(txt,x+6,yy); };
+  if(y>235){ doc.addPage(); y=20; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(47,59,83); doc.text('Ausführung',M,y); doc.setTextColor(58,58,58); doc.setFont('helvetica','normal'); doc.setFontSize(10); y+=7;
+  const regie=d.ausfuehrung!=='nachtrag';
+  box(M,y,regie,'in Regie'); box(M+40,y,!regie,'als Nachtrag'); y+=7;
+  if(regie){
+    box(M,y,d.saetze!=='neu','Stundenlohnsätze sind bereits vereinbart'); y+=6;
+    box(M,y,d.saetze==='neu','Stundenlohnsätze werden wie folgt vereinbart:'); y+=6;
+    if(d.saetze==='neu'){ doc.text('Vorarbeiter netto: '+(eur(d.satz_vorarbeiter)||'–'),M+6,y); doc.text('Facharbeiter netto: '+(eur(d.satz_facharbeiter)||'–'),M+80,y); y+=6; }
+    box(M,y,!!d.material_nachweis,'Materialkosten werden gegen Nachweis abgerechnet'); y+=6;
+  }
+  y+=4; if(y>222){ doc.addPage(); y=24; }
+  doc.text('Datum, Ort: '+dDE(d.datum)+(d.ort?', '+d.ort:''),M,y); y+=4;
+  y=pdfSig(doc,y,[[d.sig_heise,'Heise Haustechnik GmbH & Co. KG (BL/OM/M)',d.name_heise],[d.sig_ag,'Auftraggeber oder Bauleitung',d.name_ag]],d.sig_ts);
+  doc.setFontSize(7.5); doc.setTextColor(110);
+  doc.text(doc.splitTextToSize('Der Unterzeichner (Auftraggeber oder Bauleitung) versichert, dass er zur Anordnung von zusätzlichen Leistungen gemäß VOB/B § 2 Nr. 6 und zur Vereinbarung und Anordnung von Stundenlohnleistungen lt. § 2 Nr. 10 ermächtigt ist.',W-2*M),M,y+2);
+  pdfFuss(doc,'Auftrag für zusätzliche Arbeiten '+zaNr(d.nr)+' · '+(PROJ?.name||''));
+  return doc.output('blob');
+}
+async function pdfSn(){
+  const d=D, { jsPDF }=window.jspdf, doc=new jsPDF({unit:'mm',format:'a4'});
+  const y0=await pdfKopf(doc,'Stunden- und Materialnachweis für zusätzliche Arbeiten',snNr(d.nr));
+  doc.autoTable({startY:y0,theme:'plain',margin:{left:M,right:M},styles:{fontSize:10,cellPadding:1.4},columnStyles:{0:{fontStyle:'bold',cellWidth:44,textColor:[47,59,83]}},
+    body:[['Projekt',[PROJ?.name,PROJ?.adresse].filter(Boolean).join(' · ')],['Auftragsnummer',PROJ?.nr||'–'],['Kundennummer',d.kundennr||'–'],['Datum',dLong(d.datum)],['Zusatzauftrag',zaListe(d)||'–']]});
+  let y=doc.lastAutoTable.finalY+6;
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:[47,59,83],textColor:255,fontStyle:'bold',fontSize:9},styles:{fontSize:9.5,cellPadding:1.6},
+    columnStyles:{0:{cellWidth:24},2:{cellWidth:22,halign:'right'}},
+    head:[['Pers.-Nr.','Name','Stunden','Bemerkung']],
+    body:(d.personen||[]).filter(p=>p.name||num(p.stunden)).map(p=>[p.persnr||'',p.name||'',hStr(num(p.stunden)).replace(' h',''),p.bem||'']),
+    foot:[[{content:'Gesamt',colSpan:2,styles:{halign:'right'}},{content:hStr(sumStd(d.personen)).replace(' h',''),styles:{halign:'right'}},'']],footStyles:{fillColor:[232,236,243],textColor:[47,59,83],fontStyle:'bold'}});
+  y=doc.lastAutoTable.finalY+8;
+  y=para(doc,y,'Arbeitsbeschreibung',d.beschreibung);
+  const mat=(d.material||[]).filter(m=>m.bez);
+  if(mat.length){
+    if(y>250){ doc.addPage(); y=20; }
+    doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:[47,59,83],textColor:255,fontStyle:'bold',fontSize:9},styles:{fontSize:9.5,cellPadding:1.6},
+      columnStyles:{1:{cellWidth:22,halign:'right'},2:{cellWidth:16},3:{cellWidth:20,halign:'center'},4:{cellWidth:16,halign:'center'}},
+      head:[['Material','Menge','ME','bestellt','Lager']],body:mat.map(m=>[m.bez,String(m.menge??'').replace('.',','),m.me||'',m.quelle==='bestellt'?'X':'',m.quelle==='bestellt'?'':'X'])});
+    y=doc.lastAutoTable.finalY+8;
+  }
+  if(y>235){ doc.addPage(); y=24; }
+  pdfSig(doc,y+2,[[d.sig_kunde,'Unterschrift Kunde',d.name_kunde],[d.sig_monteur,'Unterschrift Monteur',d.name_monteur]],d.sig_ts);
+  pdfFuss(doc,'Stundennachweis '+snNr(d.nr)+' · '+(PROJ?.name||'')+' · '+dDE(d.datum));
+  return doc.output('blob');
+}
+function dl(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500); }
+
+/* ================= Senden (wie im Bautagebuch) ================= */
+function empfaenger(){ try{ const a=JSON.parse(PROJ?.empfaenger||'[]'); return Array.isArray(a)?a.filter(x=>x&&x.email):[]; }catch(e){ return []; } }
+const canShareFiles=()=>{ try{ return !!(navigator.canShare&&navigator.canShare({files:[new File(['x'],'x.pdf',{type:'application/pdf'})]})); }catch(e){ return false; } };
+function sendDialog(build,name,subject,text){
+  const em=empfaenger(), share=canShareFiles();
+  openSheet(`<h2>PDF senden</h2>
+    ${em.length?`<label style="font-size:13px;font-weight:700;color:var(--ink-3)">Empfänger</label>`+em.map((r,i)=>`<label class="chk"><input type="checkbox" data-em="${i}" checked><span><b>${esc(r.name||r.email)}</b><small>${esc([r.rolle,r.email].filter(Boolean).join(' · '))}</small></span></label>`).join('')
+      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Bauleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
+    <div class="field" style="margin-top:12px"><label for="em_x">Weitere Adresse (optional)</label><input class="inp" id="em_x" type="email" inputmode="email" placeholder="name@firma.de"></div>
+    <p class="hint" id="em_st">PDF wird erstellt …</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      ${share?`<button class="btn cta block" id="em_share" disabled>${IC('share')}Teilen mit PDF-Anhang</button>`:''}
+      <button class="btn ${share?'ghost':'cta'} block" id="em_mail" disabled>${IC('mail')}Im Mailprogramm öffnen</button></div>
+    <p class="hint" style="margin-top:10px">${share?'Beim Teilen werden die Empfänger in die Zwischenablage kopiert, im Mailprogramm ins Feld „An“ einfügen. ':''}„Im Mailprogramm öffnen“ trägt die Empfänger ein und speichert das PDF, das dann noch angehängt werden muss.</p>`,async()=>{
+    const to=()=>{ const a=$$('[data-em]').filter(c=>c.checked).map(c=>em[+c.dataset.em].email); const x=$('#em_x').value.trim(); if(x) a.push(x); return [...new Set(a)]; };
+    let blob=null;
+    try{ blob=await build(); }catch(e){ $('#em_st').textContent='PDF konnte nicht erstellt werden: '+e.message; return; }
+    $('#em_st').textContent='PDF ist fertig.';
+    const file=new File([blob],name,{type:'application/pdf'});
+    if($('#em_share')){ $('#em_share').disabled=false; $('#em_share').onclick=async()=>{
+      const a=to(); if(a.length&&navigator.clipboard) navigator.clipboard.writeText(a.join(', ')).catch(()=>{});
+      try{ await navigator.share({files:[file],title:subject,text}); closeSheet(); if(a.length) toast('Empfänger wurden kopiert'); }catch(e){ if(e.name!=='AbortError') toast('Teilen nicht möglich: '+e.message); } }; }
+    $('#em_mail').disabled=false; $('#em_mail').onclick=()=>{
+      const a=to(); dl(blob,name); closeSheet(); toast('PDF gespeichert – bitte an die E-Mail anhängen');
+      setTimeout(()=>location.href=`mailto:${a.map(encodeURIComponent).join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`,600); };
+  });
+}
+function openSheet(html,after){ $('#sheet').innerHTML=html; $('#ov').classList.add('on'); $('#sheet').classList.add('on'); after&&after(); }
+function closeSheet(){ $('#sheet').classList.remove('on'); $('#ov').classList.remove('on'); }
+$('#ov').onclick=closeSheet;
+
+/* ================= Start ================= */
+async function route(){
+  const q=new URLSearchParams(location.search), zid=q.get('za'), sid=q.get('sn');
+  try{
+    if(zid){ D=await loadDoc('zusatz',zid); KIND='zusatz'; renderZa(); }
+    else if(sid){ D=await loadDoc('stunden',sid); D.personen=D.personen||[]; D.material=D.material||[]; D.zusatz_ids=D.zusatz_ids||[]; KIND='stunden'; renderSn(); }
+    else renderList();
+  }catch(e){ $('#app').innerHTML=`<div class="err">Dokument nicht gefunden.</div><a class="btn ghost" href="?p=${PID}">Zurück</a>`; }
+}
+(async function(){
+  $('#backBtn').innerHTML=IC('back');
+  if(!PID){ $('#app').innerHTML='<div class="empty">Kein Projekt gewählt. <a href="index.html">Zur Projektübersicht</a></div>'; return; }
+  if(PJ.ready) await PJ.ready;
+  try{ await loadBase(); }catch(e){ $('#app').innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="index.html#p=${PID}">Zum Projekt</a>`; return; }
+  await route();
+  window.addEventListener('popstate',route);
+  document.title='Zusätzliche Arbeiten · '+(PROJ?.name||'');
+  updSync(); flush();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>

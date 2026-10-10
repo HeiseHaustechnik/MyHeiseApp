@@ -69,6 +69,14 @@
     return await rpc('pj_api', { p_method: method, p_path: String(path).replace(/^\/?(api\/)?/, ''), p_body: body });
   }
 
+  /* Zusätzliche Arbeiten (supabase/zusatz.sql): gleiche Aufrufart, eigene Funktion pj_za */
+  async function za(path, opt = {}) {
+    const method = (opt.method || 'GET').toUpperCase();
+    let body = null;
+    if (opt.body != null) body = typeof opt.body === 'string' ? JSON.parse(opt.body) : opt.body;
+    return await rpc('pj_za', { p_method: method, p_path: String(path), p_body: body });
+  }
+
   /* ---------- Zugriff prüfen ---------- */
   const ROLLE_KEY = 'pj_rolle';
   function setRolle(r) {
@@ -97,7 +105,7 @@
     } catch (e) { return PJ.rolle }                           // Netzfehler: mit gespeicherter Rolle weiter
   }
 
-  const PJ = window.PJ = { api, rpc, rolle: null, me: null, portal: PORTAL, logout() { authClear(); location.replace(PORTAL) } };
+  const PJ = window.PJ = { api, rpc, za, rolle: null, me: null, portal: PORTAL, logout() { authClear(); location.replace(PORTAL) } };
   PJ.leitung = () => PJ.rolle === 'bauleitung' || PJ.rolle === 'admin';
   PJ.ready = check();
   window.addEventListener('storage', e => { if (e.key === SESS_KEY && !e.newValue) location.replace(PORTAL) });

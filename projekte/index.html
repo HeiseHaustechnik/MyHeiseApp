@@ -122,8 +122,8 @@ async function migration(){
 async function showProjekt(id){
   const app=$('#app');
   let d, am;
-  let bt=[];
-  try{ [d,am,bt]=await Promise.all([api('projekte/'+id),api('projekte/'+id+'/aufmasse'),api('projekte/'+id+'/bautagebuch').catch(()=>[])]); }catch(e){ app.innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="#">Zurück</a>`; return; }
+  let bt=[], zl=null;
+  try{ [d,am,bt,zl]=await Promise.all([api('projekte/'+id),api('projekte/'+id+'/aufmasse'),api('projekte/'+id+'/bautagebuch').catch(()=>[]),PJ.za?PJ.za('projekte/'+id+'/zusatz').catch(()=>null):null]); }catch(e){ app.innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="#">Zurück</a>`; return; }
   const p=d.projekt;
   const nP=d.lv.filter(o=>o.typ==='P').length, nL=d.lv.filter(o=>o.typ==='P'&&o.in_liste).length;
   const offen=am.reduce((a,x)=>a+(x.anz_ungeprueft||0),0);
@@ -133,6 +133,7 @@ async function showProjekt(id){
       <button class="app" style="--g1:#4a5a7a;--g2:#2f3b53" onclick="document.getElementById('amList').scrollIntoView({behavior:'smooth'})">
         ${offen?`<span class="app-n">${offen}</span>`:''}<div class="app-ico">${IC('ruler')}</div><div><b>Aufmaß</b><span>${plural(am.length,'Aufmaß','Aufmaße')} · ${nP} LV-Positionen</span></div></button>
       <a class="app" href="bautagebuch.html?p=${id}" style="--g1:#e8742f;--g2:#c94a03">${bt.some(x=>x.datum===new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10))?'':'<span class="app-n">!</span>'}<div class="app-ico">${IC('book')}</div><div><b>Bautagebuch</b><span>${plural(bt.length,'Eintrag','Einträge')} · ${bt.length&&bt[0]?'zuletzt '+dDE(bt[0].datum):'noch leer'}</span></div></a>
+      ${zl?`<a class="app" href="zusatz.html?p=${id}" style="--g1:#5a86c8;--g2:#2c60a7">${zl.some(z=>!z.sig_ag)?`<span class="app-n">${zl.filter(z=>!z.sig_ag).length}</span>`:''}<div class="app-ico">${IC('clock')}</div><div><b>Zusätzliche Arbeiten</b><span>${zl.length?plural(zl.length,'Auftrag','Aufträge')+(zl.some(z=>!z.sig_ag)?' · '+zl.filter(z=>!z.sig_ag).length+' ohne Unterschrift':''):'Anmelden und Stunden erfassen'}</span></div></a>`:''}
     </div>
     <div class="sec-title" id="amList">Aufmaße</div>
     ${am.length? am.map(a=>`<div class="row-card" onclick="location.href='aufmass.html?id=${a.id}'">
