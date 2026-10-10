@@ -41,12 +41,39 @@
 .lock-note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--ok-bg);color:var(--ink);margin-bottom:14px;font-size:14px}
 .lock-note .ic{color:var(--ok);flex:0 0 auto}
 .vob{font-size:12px;color:var(--ink-3);margin-top:8px;line-height:1.4}
-.trow{display:grid;grid-template-columns:78px 1fr 78px 40px;gap:8px;align-items:end;margin-bottom:8px}
-.trow.mat{grid-template-columns:1fr 72px 64px 104px 40px}
+.trow{display:grid;grid-template-columns:1fr 84px 40px;gap:8px;align-items:end;margin-bottom:8px}
+.trow.mat{grid-template-columns:1fr 72px 70px 40px;margin-bottom:6px}
 .trow .field{margin:0}
 .trow .field label{font-size:11.5px}
-.trow .bem{grid-column:2/4}
-@media(max-width:520px){.trow{grid-template-columns:64px 1fr 64px 40px}.trow.mat{grid-template-columns:1fr 64px 56px 40px}.trow.mat .qu{grid-column:1/-2}}
+.trow .bem{grid-column:1/3}
+.pname{min-height:50px;display:flex;flex-direction:column;justify-content:center;font-weight:700;font-size:15px;line-height:1.2}
+.pname small{font-weight:600;font-size:12px;color:var(--ink-3)}
+.prow{padding:10px 0 4px;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+.pps{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
+.pp{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 14px 0 6px;border-radius:21px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:650;font-size:14px;text-align:left}
+.pp .av{width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:12px;font-weight:780;color:var(--ink-2);flex:0 0 auto}
+.pp small{display:block;font-size:11.5px;color:var(--ink-3);font-weight:600;line-height:1.1}
+.pp.on{background:color-mix(in srgb,var(--brand) 8%,var(--surface));box-shadow:inset 0 0 0 2px var(--brand)}
+.pp.on .av{background:var(--brand);color:#fff}
+.pp.add{padding:0 14px;color:var(--accent-2);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 45%,transparent);background:var(--amber-bg)}
+fieldset:disabled .pp{opacity:.6}
+.mrow{padding:10px 0;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:0}
+.mat2{display:grid;grid-template-columns:1fr 50px 112px;gap:8px;align-items:end}
+.mat2 .field{margin:0}.mat2 .field label{font-size:11.5px}
+.scanbtn{height:50px;border-radius:14px;display:grid;place-items:center;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--brand)}
+.lvline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:13px}
+.lvchip{display:inline-flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--ok-bg);font-weight:650;max-width:100%}
+.lvchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvchip button{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--ink-3)}
+.lvhint{color:var(--ink-3)}
+.lvhit{display:block;width:100%;text-align:left;padding:10px 4px;border-bottom:1px solid var(--line)}
+.lvhit b{font-size:12.5px;color:var(--ink-3)}.lvhit span{display:block;font-size:14.5px}
+.auf-note{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:14px;background:var(--surface-2);font-size:13.5px;margin-top:10px}
+.auf-note .ic{flex:0 0 auto;color:var(--brand)}
+.scanvid{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;background:#000}
+@media(max-width:560px){.trow.mat{grid-template-columns:1fr 1fr 40px}.trow.mat>.field:nth-child(1){grid-column:1/3;grid-row:1}.trow.mat>.delbtn{grid-column:3;grid-row:1}.trow.mat>.field:nth-child(2){grid-column:1;grid-row:2}.trow.mat>.field:nth-child(3){grid-column:2;grid-row:2}.mat2{grid-template-columns:1fr 50px 104px}}
 .delbtn{width:40px;height:50px;border-radius:12px;display:grid;place-items:center;color:var(--ink-3)}
 .delbtn:active{background:var(--red-bg);color:var(--red)}
 .sum{display:flex;justify-content:space-between;font-weight:760;padding:8px 2px 0;border-top:1px solid var(--line);margin-top:4px}
@@ -95,8 +122,8 @@ const api=(path,opt={})=>PJ.api(path,opt);
 const za=(path,opt={})=>PJ.za(path,opt);
 const Q=new URLSearchParams(location.search);
 const PID=Q.get('p');
-let PROJ=null, PERS=[], ZL=[], SL=[], D=null, KIND=null;   // Projekt, Personen, Aufträge, Stundennachweise, aktuelles Dokument
-const K={proj:'za_proj_'+PID, pers:'za_pers_'+PID, zl:'za_list_'+PID, sl:'sn_list_'+PID, queue:'za_queue', doc:(k,id)=>'za_doc_'+k+'_'+id, tab:'za_tab'};
+let PROJ=null, PERS=[], TEAM=[], LVP=[], ZL=[], SL=[], D=null, KIND=null;   // Projekt, Personen, Aufträge, Stundennachweise, aktuelles Dokument
+const K={proj:'za_proj_'+PID, pers:'za_pers_'+PID, team:'za_team_'+PID, lv:'za_lv_'+PID, zl:'za_list_'+PID, sl:'sn_list_'+PID, queue:'za_queue', doc:(k,id)=>'za_doc_'+k+'_'+id, tab:'za_tab'};
 const ZAEND={ausfuehrung:'regie',saetze:'vereinbart',material_nachweis:1};
 
 /* ================= Speichern / Offline-Warteschlange ================= */
@@ -114,7 +141,9 @@ async function flush(){
         const r=await za((it.kind==='zusatz'?'zusatz/':'stunden/')+it.id,{method:'PUT',body:JSON.stringify(it.data)});
         ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id&&x.v===it.v)));
         if(r){ const loc=ls.get(K.doc(it.kind,it.id),null); if(loc){ loc.nr=r.nr; ls.set(K.doc(it.kind,it.id),loc); }
-          if(D&&D.id===it.id){ D.nr=r.nr; D.erstellt_von=r.erstellt_von; hdr(); } }
+          if(D&&D.id===it.id){ D.nr=r.nr; D.erstellt_von=r.erstellt_von;
+            if(it.kind==='stunden'){ D.ae_map=r.ae_map; D.aufmass_id=r.aufmass_id; const l=ls.get(K.doc(it.kind,it.id),null); if(l){ l.ae_map=r.ae_map; l.aufmass_id=r.aufmass_id; ls.set(K.doc(it.kind,it.id),l); } aufNote(); }
+            hdr(); } }
       }catch(e){
         if(!navigator.onLine || /Verbindung|fetch|network|angemeldet|timeout|abort/i.test(e.message||'')) break;   // Netzproblem: später erneut
         ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id)));   // vom Server abgelehnt: nicht endlos wiederholen
@@ -127,11 +156,15 @@ async function flush(){
 window.addEventListener('online',flushSoon); window.addEventListener('offline',updSync);
 
 async function loadBase(){
-  PROJ=ls.get(K.proj,null); PERS=ls.get(K.pers,[]); ZL=ls.get(K.zl,[]); SL=ls.get(K.sl,[]);
+  PROJ=ls.get(K.proj,null); PERS=ls.get(K.pers,[]); TEAM=ls.get(K.team,[]); LVP=ls.get(K.lv,[]); ZL=ls.get(K.zl,[]); SL=ls.get(K.sl,[]);
   try{
-    const [p,pers,zl,sl]=await Promise.all([api('projekte/'+PID),api('projekte/'+PID+'/personen').catch(()=>[]),za('projekte/'+PID+'/zusatz'),za('projekte/'+PID+'/stunden')]);
+    const [p,pers,team,zl,sl]=await Promise.all([api('projekte/'+PID),api('projekte/'+PID+'/personen').catch(()=>[]),api('projekte/'+PID+'/team').catch(()=>null),za('projekte/'+PID+'/zusatz'),za('projekte/'+PID+'/stunden')]);
     PROJ=p.projekt; PERS=pers||[]; ZL=zl; SL=sl;
-    ls.set(K.proj,PROJ); ls.set(K.pers,PERS); ls.set(K.zl,ZL); ls.set(K.sl,SL);
+    if(team) TEAM=team.filter(b=>b.zugeordnet).map(b=>b.name).filter(Boolean);
+    // nur die Positionen des LV (für die Zuordnung von Material)
+    LVP=(p.lv||[]).filter(o=>o.typ==='P').map(o=>({p:o.pos,b:o.bez||'',me:o.me||''}));
+    ls.set(K.proj,PROJ); ls.set(K.pers,PERS); ls.set(K.team,TEAM); ls.set(K.zl,ZL); ls.set(K.sl,SL);
+    try{ ls.set(K.lv,LVP); }catch(e){}
   }catch(e){
     if(/pj_za/.test(e.message)) throw new Error('Die Datenbank für „Zusätzliche Arbeiten“ ist noch nicht eingerichtet (zusatz.sql ausführen).');
     if(!PROJ) throw e;
@@ -191,7 +224,7 @@ function newZa(){
 }
 function newSn(zids){
   const last=SL[0];
-  const d={id:uid(),projekt_id:PID,nr:null,datum:todayIso(),zusatz_ids:zids,kundennr:ls.get('sn_kdnr_'+PID,''),personen:[{persnr:'',name:PJ.me?.name||'',stunden:'',bem:''}],
+  const d={id:uid(),projekt_id:PID,nr:null,datum:todayIso(),zusatz_ids:zids,personen:PJ.me?.name?[{name:PJ.me.name,stunden:'',bem:''}]:[],
     beschreibung:'',material:[],name_kunde:'',name_monteur:PJ.me?.name||'',sig_kunde:null,sig_monteur:null,sig_ts:null};
   if(zids.length===1){ const z=(D&&D.id===zids[0])?D:ZL.find(x=>x.id===zids[0]); if(z&&z.beschreibung) d.beschreibung=z.beschreibung; }
   ls.set(K.doc('stunden',d.id),d); saveDoc('stunden',d);
@@ -299,21 +332,22 @@ function renderSn(){
     ${lk?`<div class="lock-note">${IC('check')}<div><b>Vom Kunden unterschrieben</b><br>${esc(d.name_kunde||'')} am ${tsDE(d.sig_ts)}. Der Nachweis kann nicht mehr geändert werden.${PJ.leitung()?' <button class="lnk" id="unlock">Zum Bearbeiten entsperren</button>':''}</div></div>`:''}
     <fieldset ${lk?'disabled':''}>
     <div class="card"><h2><span id="nrT">${snNr(d.nr)}</span> · Angaben</h2>
-      <div class="row2"><div class="field"><label for="f_dat">Datum</label><input class="inp" type="date" id="f_dat" value="${esc(d.datum||'')}"></div>
-        <div class="field"><label for="f_kn">Kundennummer</label><input class="inp" id="f_kn" value="${esc(d.kundennr||'')}"></div></div>
+      <div class="row2"><div class="field"><label for="f_dat">Datum</label><input class="inp" type="date" id="f_dat" value="${esc(d.datum||'')}"></div><div></div></div>
       <p class="hint" style="margin:0 0 10px">Projekt ${esc([PROJ?.nr,PROJ?.name].filter(Boolean).join(' · '))}${PROJ?.adresse?' · '+esc(PROJ.adresse):''}</p>
       <label style="font-size:13px;font-weight:700;color:var(--ink-3)">Zu welchen Aufträgen gehören die Stunden?</label>
       ${ZL.length?ZL.map(z=>`<label class="chk"><input type="checkbox" data-za="${z.id}" ${(d.zusatz_ids||[]).includes(z.id)?'checked':''}><span><b>${zaNr(z.nr)} · ${esc((z.beschreibung||'').split('\n')[0].slice(0,70))}</b><small>${dDE(z.datum)}${z.sig_ag?' · beauftragt':' · Unterschrift Auftraggeber fehlt'}</small></span></label>`).join('')
         :'<p class="hint">Noch keine Aufträge angelegt. Stunden können trotzdem erfasst werden.</p>'}</div>
     <div class="card"><h2>Personen und Stunden</h2>
+      <p class="hint" style="margin:0 0 8px">Wer hat gearbeitet? Antippen zum Auswählen, dann die Stunden eintragen.</p>
+      <div class="pps" id="pChips"></div>
       <div id="pers"></div>
-      <button class="lnk" id="addP">${IC('userplus')}Person hinzufügen</button>
       <div class="sum"><span>Gesamt</span><span id="pSum"></span></div></div>
     <div class="card"><h2>Arbeitsbeschreibung</h2>
       <div class="field"><textarea class="inp" id="f_bs" rows="4" placeholder="Was wurde gemacht?">${esc(d.beschreibung||'')}</textarea></div></div>
     <div class="card"><h2>Material</h2>
       <div id="mat"></div>
-      <button class="lnk" id="addM">${IC('plus')}Material hinzufügen</button></div>
+      <button class="lnk" id="addM">${IC('plus')}Material hinzufügen</button>
+      <div id="aufNote"></div></div>
     </fieldset>
     <div class="card"><h2>Unterschriften</h2>
       <div class="grid2">
@@ -322,18 +356,16 @@ function renderSn(){
         <div><fieldset ${lk?'disabled':''}><div class="field"><label for="f_nm">Monteur, Name</label><input class="inp" id="f_nm" value="${esc(d.name_monteur||'')}"></div></fieldset>
           <canvas class="sig${lk?' lock':''}" id="sig_monteur"></canvas><div class="sigbar"><span id="sig_monteurt"></span>${lk?'':'<button class="lnk" data-clr="sig_monteur">Löschen</button>'}</div></div>
       </div></div>
-    <datalist id="persList">${PERS.map(p=>`<option value="${esc(p.name)}">`).join('')}</datalist>
     <div class="bottombar"><button class="btn ghost" id="bPdf">${IC('file')}PDF</button><button class="btn cta" id="bMail">${IC('mail')}Senden</button></div>
     ${PJ.leitung()?`<div style="text-align:center;margin-top:6px"><button class="lnk" id="bDel" style="color:var(--red)">${IC('trash')}Stundennachweis löschen</button></div>`:''}`;
   const bind=(sel,key)=>{ const el=$(sel); if(el) el.addEventListener('input',()=>{ d[key]=el.value; changed(); }); };
-  bind('#f_dat','datum'); bind('#f_kn','kundennr'); bind('#f_bs','beschreibung'); bind('#f_nk','name_kunde'); bind('#f_nm','name_monteur');
-  $('#f_kn').addEventListener('change',()=>ls.set('sn_kdnr_'+PID,d.kundennr));
+  bind('#f_dat','datum'); bind('#f_bs','beschreibung'); bind('#f_nk','name_kunde'); bind('#f_nm','name_monteur');
   $$('[data-za]').forEach(c=>c.onchange=()=>{ d.zusatz_ids=$$('[data-za]').filter(x=>x.checked).map(x=>x.dataset.za);
     if(c.checked&&!d.beschreibung.trim()){ const z=ZL.find(x=>x.id===c.dataset.za); if(z&&z.beschreibung){ d.beschreibung=z.beschreibung; $('#f_bs').value=z.beschreibung; } }
     changed(); });
   renderPers(); renderMat();
-  $('#addP').onclick=()=>{ d.personen.push({persnr:'',name:'',stunden:'',bem:''}); renderPers(); changed(); const ins=$$('#pers [data-k="name"]'); ins.length&&ins[ins.length-1].focus(); };
-  $('#addM').onclick=()=>{ d.material.push({bez:'',menge:'',me:'Stck',quelle:'lager'}); renderMat(); changed(); const ins=$$('#mat [data-k="bez"]'); ins.length&&ins[ins.length-1].focus(); };
+  $('#addM').onclick=()=>{ d.material.push({id:uid(),bez:'',menge:'',me:'Stck',quelle:'lager',artnr:''}); renderMat(); changed(); const ins=$$('#mat [data-k="bez"]'); ins.length&&ins[ins.length-1].focus(); };
+  aufNote();
   setupSigs(['sig_kunde','sig_monteur'],'sig_kunde');
   $('#bPdf').onclick=async()=>{ if(!readySn()) return; dl(await pdfSn(),fileSn()); };
   $('#bMail').onclick=()=>{ if(!readySn()) return;
@@ -342,29 +374,145 @@ function renderSn(){
   if($('#unlock')) $('#unlock').onclick=()=>{ if(!confirm('Entsperren löscht die Unterschrift des Kunden. Danach muss er erneut unterschreiben. Fortfahren?')) return; d.sig_kunde=null; if(!d.sig_monteur) d.sig_ts=null; saveDoc('stunden',d); renderSn(); };
   if($('#bDel')) $('#bDel').onclick=()=>delDoc('stunden',d);
 }
+const initials=n=>String(n||'').trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+const sameName=(a,b)=>String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
+// Auswahl: Personenliste des Projekts (Bautagebuch) + zugeordnetes Team + bereits eingetragene Namen
+function persKandidaten(){
+  const out=[]; const add=(name,firma)=>{ name=String(name||'').trim(); if(name&&!out.some(x=>sameName(x.name,name))) out.push({name,firma:firma||''}); };
+  PERS.forEach(p=>add(p.name,p.firma)); TEAM.forEach(n=>add(n,'Heise Haustechnik')); (D.personen||[]).forEach(p=>add(p.name,''));
+  return out;
+}
 function renderPers(){
-  const d=D;
-  $('#pers').innerHTML=d.personen.map((p,i)=>`<div class="trow" data-i="${i}">
-      <div class="field"><label>Pers.-Nr.</label><input class="inp" data-k="persnr" value="${esc(p.persnr||'')}"></div>
-      <div class="field"><label>Name</label><input class="inp" data-k="name" list="persList" value="${esc(p.name||'')}"></div>
-      <div class="field"><label>Stunden</label><input class="inp" data-k="stunden" inputmode="decimal" value="${esc(String(p.stunden??'').replace('.',','))}"></div>
-      <button class="delbtn" data-del="${i}" aria-label="Person entfernen">${IC('trash','sm')}</button>
-      <div class="field bem"><input class="inp" data-k="bem" placeholder="Bemerkung (optional)" value="${esc(p.bem||'')}" style="min-height:40px"></div></div>`).join('')||'<p class="hint">Noch keine Person eingetragen.</p>';
-  $$('#pers input').forEach(el=>el.addEventListener('input',()=>{ d.personen[+el.closest('.trow').dataset.i][el.dataset.k]=el.value; updSum(); changed(); }));
+  const d=D, all=persKandidaten();
+  $('#pChips').innerHTML=all.map(p=>{ const on=d.personen.some(x=>sameName(x.name,p.name));
+      return `<button type="button" class="pp${on?' on':''}" data-n="${esc(p.name)}"><span class="av">${esc(initials(p.name))}</span><span>${esc(p.name)}${p.firma?`<small>${esc(p.firma)}</small>`:''}</span></button>`; }).join('')
+    +`<button type="button" class="pp add" id="pAdd">${IC('userplus','sm')}Andere Person</button>`;
+  $$('#pChips .pp[data-n]').forEach(b=>b.onclick=()=>{ const n=b.dataset.n, i=d.personen.findIndex(x=>sameName(x.name,n));
+    if(i>=0){ if(num(d.personen[i].stunden)&&!confirm(n+' mit '+hStr(num(d.personen[i].stunden))+' entfernen?')) return; d.personen.splice(i,1); }
+    else d.personen.push({name:n,stunden:'',bem:''});
+    renderPers(); changed(); if(i<0){ const ins=$$('#pers [data-k="stunden"]'); ins.length&&ins[ins.length-1].focus(); } });
+  $('#pAdd').onclick=addPerson;
+  $('#pers').innerHTML=d.personen.map((p,i)=>`<div class="prow" data-i="${i}"><div class="trow" style="margin:0">
+      <div class="pname">${esc(p.name||'–')}${(all.find(x=>sameName(x.name,p.name))||{}).firma?`<small>${esc(all.find(x=>sameName(x.name,p.name)).firma)}</small>`:''}</div>
+      <div class="field"><label>Stunden</label><input class="inp" data-k="stunden" inputmode="decimal" placeholder="0,0" value="${esc(String(p.stunden??'').replace('.',','))}"></div>
+      <button type="button" class="delbtn" data-del="${i}" aria-label="Person entfernen">${IC('trash','sm')}</button>
+      <div class="field bem"><input class="inp" data-k="bem" placeholder="Bemerkung (optional)" value="${esc(p.bem||'')}" style="min-height:40px"></div></div></div>`).join('')||'<p class="hint">Noch keine Person ausgewählt.</p>';
+  $$('#pers input').forEach(el=>el.addEventListener('input',()=>{ d.personen[+el.closest('.prow').dataset.i][el.dataset.k]=el.value; updSum(); changed(); }));
   $$('#pers [data-del]').forEach(b=>b.onclick=()=>{ d.personen.splice(+b.dataset.del,1); renderPers(); changed(); });
   updSum();
 }
+function addPerson(){
+  openSheet(`<h2>Andere Person</h2>
+    <div class="field"><label for="np_n">Name *</label><input class="inp" id="np_n" placeholder="Vor- und Nachname" autocomplete="off"></div>
+    <div class="field"><label for="np_f">Firma / Funktion</label><input class="inp" id="np_f" value="Heise Haustechnik"></div>
+    <label class="chk" style="border:0"><input type="checkbox" id="np_l" checked><span><b>In die Personenliste des Projekts aufnehmen</b><small>Dann steht sie auch im Bautagebuch zur Auswahl.</small></span></label>
+    <div class="row2" style="margin-top:10px"><button class="btn ghost" onclick="closeSheet()">Abbrechen</button><button class="btn cta" id="np_ok">Hinzufügen</button></div>`,()=>{
+    setTimeout(()=>$('#np_n').focus(),250);
+    $('#np_ok').onclick=async()=>{ const name=$('#np_n').value.trim(), firma=$('#np_f').value.trim(); if(!name){ toast('Bitte einen Namen eintragen'); return; }
+      if(!D.personen.some(x=>sameName(x.name,name))) D.personen.push({name,stunden:'',bem:''});
+      if($('#np_l').checked && !PERS.some(x=>sameName(x.name,name))){
+        const p={id:uid(),name,firma,rolle:'',updated_at:nowIso()}; PERS.push(p); PERS.sort((a,b)=>a.name.localeCompare(b.name,'de')); ls.set(K.pers,PERS);
+        api('projekte/'+PID+'/personen',{method:'POST',body:JSON.stringify(p)}).catch(()=>toast('Person nur in diesem Nachweis eingetragen (offline)'));
+      }
+      closeSheet(); renderPers(); changed(); const ins=$$('#pers [data-k="stunden"]'); ins.length&&ins[ins.length-1].focus(); };
+  });
+}
 function updSum(){ $('#pSum').textContent=hStr(sumStd(D.personen)); }
+const MES=['Stck','m','m²','kg','l','psch','VE'];
+const lvTerms=t=>String(t||'').toLowerCase().replace(/[^\p{L}\p{N}.,/ ]+/gu,' ').split(/\s+/).filter(w=>w.length>1);
+function lvTreffer(text,max){
+  const terms=lvTerms(text); if(!terms.length||!LVP.length) return [];
+  return LVP.map((o,i)=>{ const t=(o.p+' '+o.b).toLowerCase(); return {o,i,n:terms.reduce((a,w)=>a+(t.includes(w)?1:0),0)}; })
+    .filter(x=>x.n>0).sort((a,b)=>b.n-a.n||a.i-b.i).slice(0,max||40).map(x=>({...x.o,voll:x.n===terms.length}));
+}
+function lvLine(m,i){
+  if(m.lv){ return `<span class="lvchip">${IC('check','sm')}<span>LV ${esc(m.lv)} · ${esc(m.lv_bez||'')}</span><button type="button" data-lvx="${i}" aria-label="Zuordnung entfernen">${IC('x','sm')}</button></span>`; }
+  if(!LVP.length) return '';
+  const n=lvTreffer(m.bez,99).filter(x=>x.voll).length;
+  return `<button type="button" class="lnk" data-lv="${i}" style="padding:2px 0">${IC('list','sm')}LV-Position zuordnen</button>${n?`<span class="lvhint">· ${n} passende im LV</span>`:''}`;
+}
 function renderMat(){
   const d=D;
-  $('#mat').innerHTML=d.material.map((m,i)=>`<div class="trow mat" data-i="${i}">
-      <div class="field"><label>Material</label><input class="inp" data-k="bez" value="${esc(m.bez||'')}"></div>
+  $('#mat').innerHTML=d.material.map((m,i)=>`<div class="mrow" data-i="${i}">
+    <div class="trow mat">
+      <div class="field"><label>Material</label><input class="inp" data-k="bez" value="${esc(m.bez||'')}" placeholder="z. B. Kupferrohr 22 mm"></div>
       <div class="field"><label>Menge</label><input class="inp" data-k="menge" inputmode="decimal" value="${esc(String(m.menge??'').replace('.',','))}"></div>
-      <div class="field"><label>ME</label><input class="inp" data-k="me" value="${esc(m.me||'')}"></div>
-      <div class="field qu"><label>Herkunft</label><select class="inp" data-k="quelle"><option value="lager" ${m.quelle!=='bestellt'?'selected':''}>Lager</option><option value="bestellt" ${m.quelle==='bestellt'?'selected':''}>bestellt</option></select></div>
-      <button class="delbtn" data-del="${i}" aria-label="Material entfernen">${IC('trash','sm')}</button></div>`).join('')||'<p class="hint">Kein Material eingetragen.</p>';
-  $$('#mat .inp').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ d.material[+el.closest('.trow').dataset.i][el.dataset.k]=el.value; changed(); }));
+      <div class="field"><label>ME</label><input class="inp" data-k="me" list="meList" value="${esc(m.me||'')}"></div>
+      <button type="button" class="delbtn" data-del="${i}" aria-label="Material entfernen">${IC('trash','sm')}</button></div>
+    <div class="mat2">
+      <div class="field"><label>Art.-Nr. (optional)</label><input class="inp" data-k="artnr" autocomplete="off" value="${esc(m.artnr||'')}"></div>
+      <button type="button" class="scanbtn" data-scan="${i}" aria-label="Barcode scannen" title="Barcode scannen">${IC('camera')}</button>
+      <div class="field"><label>Herkunft</label><select class="inp" data-k="quelle"><option value="lager" ${m.quelle!=='bestellt'?'selected':''}>Lager</option><option value="bestellt" ${m.quelle==='bestellt'?'selected':''}>bestellt</option></select></div></div>
+    <div class="lvline" id="lvl${i}">${lvLine(m,i)}</div></div>`).join('')+`<datalist id="meList">${MES.map(x=>`<option value="${x}">`).join('')}</datalist>`
+    ||'<p class="hint">Kein Material eingetragen.</p>';
+  if(!d.material.length) $('#mat').innerHTML='<p class="hint">Kein Material eingetragen.</p>';
+  $$('#mat .inp').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const i=+el.closest('.mrow').dataset.i; d.material[i][el.dataset.k]=el.value; changed();
+    if(el.dataset.k==='bez'){ clearTimeout(el._t); el._t=setTimeout(()=>{ const l=$('#lvl'+i); if(l){ l.innerHTML=lvLine(d.material[i],i); bindLv(); } },350); } }));
   $$('#mat [data-del]').forEach(b=>b.onclick=()=>{ d.material.splice(+b.dataset.del,1); renderMat(); changed(); });
+  $$('#mat [data-scan]').forEach(b=>b.onclick=()=>scanArtnr(+b.dataset.scan));
+  bindLv();
+}
+function bindLv(){
+  $$('#mat [data-lv]').forEach(b=>b.onclick=()=>pickLv(+b.dataset.lv));
+  $$('#mat [data-lvx]').forEach(b=>b.onclick=()=>{ const m=D.material[+b.dataset.lvx]; delete m.lv; delete m.lv_bez; renderMat(); changed(); });
+}
+function pickLv(i){
+  const m=D.material[i];
+  openSheet(`<h2>LV-Position zuordnen</h2>
+    <p class="hint" style="margin:-6px 0 10px">Steht das Material schon im Leistungsverzeichnis? Dann hier auswählen, sonst wird es als freie Position übernommen.</p>
+    <div class="field"><input class="inp" id="lv_q" autocomplete="off" placeholder="LV durchsuchen, z. B. Rohr 22" value="${esc(m.bez||'')}"></div>
+    <div id="lv_r"></div>`,()=>{
+    const show=()=>{ const h=lvTreffer($('#lv_q').value,40);
+      $('#lv_r').innerHTML=h.length?h.map(o=>`<button type="button" class="lvhit" data-p="${esc(o.p)}"><b>${esc(o.p)} · ${esc(o.me)}</b><span>${esc(o.b)}</span></button>`).join('')
+        :'<p class="hint">Keine passende Position gefunden.</p>';
+      $$('#lv_r .lvhit').forEach(b=>b.onclick=()=>{ const o=LVP.find(x=>x.p===b.dataset.p); if(!o) return;
+        m.lv=o.p; m.lv_bez=o.b; if(o.me) m.me=o.me; if(!String(m.bez||'').trim()) m.bez=o.b;
+        closeSheet(); renderMat(); changed(); toast('Zugeordnet: '+o.p); }); };
+    $('#lv_q').addEventListener('input',show); show();
+  });
+}
+function aufNote(){
+  const el=$('#aufNote'); if(!el||!D||KIND!=='stunden') return;
+  let n=0; try{ n=Object.keys(JSON.parse(D.ae_map||'{}')).length; }catch(e){}
+  const hat=(D.material||[]).some(m=>String(m.bez||m.artnr||'').trim());
+  el.innerHTML=D.aufmass_id&&n?`<div class="auf-note">${IC('check','sm')}<div><b>${n} Material${n>1?'ien':''} im Aufmaß „Zusätzliche Arbeiten“</b><br>als Vorschlag zum Prüfen. <a class="lnk" style="padding:0" href="aufmass.html?id=${encodeURIComponent(D.aufmass_id)}">Zum Aufmaß</a></div></div>`
+    :hat?`<div class="auf-note">${IC('info','sm')}<div>Nach der Unterschrift des Kunden wird das Material als Vorschlag ins Aufmaß „Zusätzliche Arbeiten“ übernommen. Dort kann es geprüft, geändert oder gelöscht werden.</div></div>`:'';
+}
+
+/* ================= Barcode-Scanner (wie im Lager) ================= */
+const SCAN={stream:null,timer:null,zx:null};
+function loadScript(src){ return new Promise((ok,err)=>{ if(window.ZXing) return ok(); const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>err(new Error('Scanner konnte nicht geladen werden')); document.head.appendChild(s); }); }
+async function scanStart(video,onCode){
+  scanStop();
+  const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
+  SCAN.stream=stream; video.srcObject=stream; video.muted=true; video.setAttribute('playsinline',''); try{ await video.play(); }catch(e){}
+  let formats=[];
+  if('BarcodeDetector' in window){ try{ formats=(await BarcodeDetector.getSupportedFormats()).filter(f=>['code_128','code_39','ean_13','ean_8','upc_a','upc_e','itf','qr_code','data_matrix'].includes(f)); }catch(e){} }
+  if(formats.includes('ean_13')||formats.includes('code_128')){
+    const det=new BarcodeDetector({formats});
+    SCAN.timer=setInterval(async()=>{ try{ const c=await det.detect(video); if(c.length) onCode(c[0].rawValue); }catch(e){} },250);
+  } else {
+    await loadScript('lib/zxing.min.js');
+    const F=ZXing.BarcodeFormat, hints=new Map(); hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[F.EAN_13,F.EAN_8,F.CODE_128,F.CODE_39,F.UPC_A,F.UPC_E,F.ITF,F.QR_CODE,F.DATA_MATRIX]);
+    const reader=new ZXing.BrowserMultiFormatReader(hints,250); SCAN.zx=reader;
+    reader.decodeFromStream(stream,video,res=>{ if(res) onCode(res.getText()); }).catch(()=>{});
+  }
+}
+function scanStop(){ if(SCAN.timer){ clearInterval(SCAN.timer); SCAN.timer=null; } if(SCAN.zx){ try{ SCAN.zx.reset(); }catch(e){} SCAN.zx=null; } if(SCAN.stream){ SCAN.stream.getTracks().forEach(t=>t.stop()); SCAN.stream=null; } }
+function scanArtnr(i){
+  let done=false;
+  const fertig=code=>{ code=String(code||'').trim(); if(done||!code) return; done=true; try{ navigator.vibrate&&navigator.vibrate(60); }catch(e){}
+    scanStop(); D.material[i].artnr=code; closeSheet(); renderMat(); changed(); toast('Artikelnummer '+code); };
+  openSheet(`<h2>Barcode scannen</h2>
+    <video class="scanvid" autoplay playsinline muted></video>
+    <p class="hint" id="scInfo" style="margin:8px 0">Kamera wird gestartet …</p>
+    <div class="field"><input class="inp" id="scMan" placeholder="Oder Nummer eintippen, Enter" autocomplete="off"></div>
+    <button class="btn ghost" style="width:100%" id="scX">Abbrechen</button>`,()=>{
+    $('#scX').onclick=()=>{ scanStop(); closeSheet(); };
+    $('#scMan').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); fertig($('#scMan').value); } });
+    scanStart($('#sheet video'),fertig).then(()=>{ if($('#scInfo')) $('#scInfo').textContent='Barcode in den Rahmen halten …'; })
+      .catch(()=>{ if($('#scInfo')) $('#scInfo').innerHTML='<span style="color:var(--red)">Kamera nicht verfügbar. Bitte die Nummer eintippen.</span>'; });
+  });
 }
 const zaListe=d=>(d.zusatz_ids||[]).map(id=>ZL.find(z=>z.id===id)).filter(Boolean).map(z=>zaNr(z.nr)).join(', ');
 function readySn(){
@@ -473,21 +621,23 @@ async function pdfSn(){
   const d=D, { jsPDF }=window.jspdf, doc=new jsPDF({unit:'mm',format:'a4'});
   const y0=await pdfKopf(doc,'Stunden- und Materialnachweis für zusätzliche Arbeiten',snNr(d.nr));
   doc.autoTable({startY:y0,theme:'plain',margin:{left:M,right:M},styles:{fontSize:10,cellPadding:1.4},columnStyles:{0:{fontStyle:'bold',cellWidth:44,textColor:[47,59,83]}},
-    body:[['Projekt',[PROJ?.name,PROJ?.adresse].filter(Boolean).join(' · ')],['Auftragsnummer',PROJ?.nr||'–'],['Kundennummer',d.kundennr||'–'],['Datum',dLong(d.datum)],['Zusatzauftrag',zaListe(d)||'–']]});
+    body:[['Projekt',[PROJ?.name,PROJ?.adresse].filter(Boolean).join(' · ')],['Auftragsnummer',PROJ?.nr||'–'],['Datum',dLong(d.datum)],['Zusatzauftrag',zaListe(d)||'–']]});
   let y=doc.lastAutoTable.finalY+6;
   doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:[47,59,83],textColor:255,fontStyle:'bold',fontSize:9},styles:{fontSize:9.5,cellPadding:1.6},
-    columnStyles:{0:{cellWidth:24},2:{cellWidth:22,halign:'right'}},
-    head:[['Pers.-Nr.','Name','Stunden','Bemerkung']],
-    body:(d.personen||[]).filter(p=>p.name||num(p.stunden)).map(p=>[p.persnr||'',p.name||'',hStr(num(p.stunden)).replace(' h',''),p.bem||'']),
-    foot:[[{content:'Gesamt',colSpan:2,styles:{halign:'right'}},{content:hStr(sumStd(d.personen)).replace(' h',''),styles:{halign:'right'}},'']],footStyles:{fillColor:[232,236,243],textColor:[47,59,83],fontStyle:'bold'}});
+    columnStyles:{1:{cellWidth:24,halign:'right'}},
+    head:[['Name','Stunden','Bemerkung']],
+    body:(d.personen||[]).filter(p=>p.name||num(p.stunden)).map(p=>[p.name||'',hStr(num(p.stunden)).replace(' h',''),p.bem||'']),
+    foot:[[{content:'Gesamt',styles:{halign:'right'}},{content:hStr(sumStd(d.personen)).replace(' h',''),styles:{halign:'right'}},'']],footStyles:{fillColor:[232,236,243],textColor:[47,59,83],fontStyle:'bold'}});
   y=doc.lastAutoTable.finalY+8;
   y=para(doc,y,'Arbeitsbeschreibung',d.beschreibung);
-  const mat=(d.material||[]).filter(m=>m.bez);
+  const mat=(d.material||[]).filter(m=>m.bez||m.artnr), mitNr=mat.some(m=>m.artnr);
   if(mat.length){
     if(y>250){ doc.addPage(); y=20; }
     doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:[47,59,83],textColor:255,fontStyle:'bold',fontSize:9},styles:{fontSize:9.5,cellPadding:1.6},
-      columnStyles:{1:{cellWidth:22,halign:'right'},2:{cellWidth:16},3:{cellWidth:20,halign:'center'},4:{cellWidth:16,halign:'center'}},
-      head:[['Material','Menge','ME','bestellt','Lager']],body:mat.map(m=>[m.bez,String(m.menge??'').replace('.',','),m.me||'',m.quelle==='bestellt'?'X':'',m.quelle==='bestellt'?'':'X'])});
+      columnStyles:mitNr?{1:{cellWidth:30},2:{cellWidth:20,halign:'right'},3:{cellWidth:14},4:{cellWidth:17,halign:'center'},5:{cellWidth:14,halign:'center'}}
+        :{1:{cellWidth:22,halign:'right'},2:{cellWidth:16},3:{cellWidth:20,halign:'center'},4:{cellWidth:16,halign:'center'}},
+      head:[mitNr?['Material','Art.-Nr.','Menge','ME','bestellt','Lager']:['Material','Menge','ME','bestellt','Lager']],
+      body:mat.map(m=>{ const r=[m.bez||'',String(m.menge??'').replace('.',','),m.me||'',m.quelle==='bestellt'?'X':'',m.quelle==='bestellt'?'':'X']; if(mitNr) r.splice(1,0,m.artnr||''); return r; })});
     y=doc.lastAutoTable.finalY+8;
   }
   if(y>235){ doc.addPage(); y=24; }
@@ -526,14 +676,14 @@ function sendDialog(build,name,subject,text){
 }
 function openSheet(html,after){ $('#sheet').innerHTML=html; $('#ov').classList.add('on'); $('#sheet').classList.add('on'); after&&after(); }
 function closeSheet(){ $('#sheet').classList.remove('on'); $('#ov').classList.remove('on'); }
-$('#ov').onclick=closeSheet;
+$('#ov').onclick=()=>{ scanStop(); closeSheet(); };
 
 /* ================= Start ================= */
 async function route(){
   const q=new URLSearchParams(location.search), zid=q.get('za'), sid=q.get('sn');
   try{
     if(zid){ D=await loadDoc('zusatz',zid); KIND='zusatz'; renderZa(); }
-    else if(sid){ D=await loadDoc('stunden',sid); D.personen=D.personen||[]; D.material=D.material||[]; D.zusatz_ids=D.zusatz_ids||[]; KIND='stunden'; renderSn(); }
+    else if(sid){ D=await loadDoc('stunden',sid); D.personen=D.personen||[]; D.material=(D.material||[]).map((m,i)=>({...m,id:m.id||'i'+(i+1)})); D.zusatz_ids=D.zusatz_ids||[]; KIND='stunden'; renderSn(); }
     else renderList();
   }catch(e){ $('#app').innerHTML=`<div class="err">Dokument nicht gefunden.</div><a class="btn ghost" href="?p=${PID}">Zurück</a>`; }
 }

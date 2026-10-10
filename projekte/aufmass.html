@@ -357,13 +357,13 @@ function posRow(p,free){
   const s=sumOf(p.p), has=S.entries.some(e=>e.key===p.p), npre=S.entries.filter(e=>e.key===p.p&&e.pre).length;
   const over = !free && p.m>0 && s>p.m;
   return `<div class="pos${free?' free':''}" data-k="${esc(p.p)}">
-    <div class="l"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.ref?' · '+esc(p.ref):''):''}${!free&&!p.v&&S.filter==='list'?' · <span style="color:var(--warn)">nicht in Aufmaß-Liste</span>':''}</div><div class="bz">${esc(p.b)}</div>${npre?`<div class="src pre">Vorschlag aus Rechnung · bitte prüfen</div>`:''}</div>
+    <div class="l"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.ref?' · '+esc(p.ref):''):''}${!free&&!p.v&&S.filter==='list'?' · <span style="color:var(--warn)">nicht in Aufmaß-Liste</span>':''}</div><div class="bz">${esc(p.b)}</div>${npre?`<div class="src pre">Vorschlag ${preHer(S.entries.filter(e=>e.key===p.p&&e.pre))} · bitte prüfen</div>`:''}</div>
     <div class="r">${has?`<span class="badge${over?' over':''}">${nf(s)} ${esc(p.me)}</span>`:''}
     ${!free?`<div class="lv">LV: ${nf(p.m)} ${esc(p.me)}</div>`:''}${!free&&ZEIT_ON&&p.z>0?`<div class="soll">${sollText(p)}</div>`:''}</div></div>`;
 }
 function renderPreBanner(){
   const np=S.entries.filter(e=>e.pre).length;
-  $('#preBanner').innerHTML=np?`<button class="note" onclick="showPre()">${IC('receipt')}<span><b>${np} Vorschläge aus Rechnungen</b> warten auf Prüfung. Hier tippen, um sie anzuzeigen.</span></button>`:'';
+  $('#preBanner').innerHTML=np?`<button class="note" onclick="showPre()">${IC('receipt')}<span><b>${np} Vorschläge ${preHer(S.entries.filter(e=>e.pre))}</b> warten auf Prüfung. Hier tippen, um sie anzuzeigen.</span></button>`:'';
 }
 function showPre(){ S.filter='pre'; $('#q').value=''; save(); renderPos(); window.scrollTo(0,0); }
 function renderPos(){
@@ -514,6 +514,8 @@ function renderPick(){
   $('#pickList').innerHTML=html||'<div class="hint" style="padding:8px 0">Nichts gefunden. Einfach frei ins Feld eintragen.</div>';
   $('#pickList').querySelectorAll('.pi').forEach(b=>b.onclick=()=>{ $('#e_o').value=b.dataset.o; togglePick(false); $('#e_b').focus(); });
 }
+const isSN=rg=>/^SN-\d/.test(rg||'');
+function preHer(ents){ const sn=ents.some(e=>isSN(e.rg)), rg=ents.some(e=>e.rg&&!isSN(e.rg)); return sn&&rg?'aus Rechnungen und Stundennachweisen':sn?(ents.length>1?'aus Stundennachweisen':'aus Stundennachweis'):(ents.length>1?'aus Rechnungen':'aus Rechnung'); }
 function entSrc(e){ return e.rg? `<small class="src${e.pre?' pre':''}">${e.pre?'Vorschlag aus ':'geprüft · '}${esc(e.rg)}</small>`:''; }
 function okEnt(id){ const e=S.entries.find(x=>x.id===id); if(!e) return; e.pre=false; e.ts=new Date().toISOString(); const k=e.key; dataChanged(); if(cur) openPos(k); toast('Menge bestätigt'); }
 function addEnt(){
@@ -553,6 +555,11 @@ function openFree(prefill, editKey){
       <label for="f_t">Zuordnung im LV</label>
       <select class="f" id="f_t"><option value="">keine Zuordnung (Büro ordnet zu)</option>
         ${LV.filter(o=>o.k==='T').map(o=>`<option value="${esc(o.p)}" ${f&&f.t===o.p?'selected':(!f&&S.lastT===o.p?'selected':'')}>${esc(o.p)} ${esc(o.b)}</option>`).join('')}</select>
+      ${f?`<div class="card" style="margin:12px 0 0;padding:12px 14px;background:var(--surface-2);box-shadow:none">
+        <label for="f_lvq" style="margin-top:0">Steht die Position doch im LV?</label>
+        <input class="f" id="f_lvq" autocomplete="off" placeholder="LV durchsuchen, z. B. Rohr 22" value="${esc(f.b)}">
+        <div id="f_lvr" style="max-height:38vh;overflow:auto;margin-top:6px"></div>
+        <div class="hint" style="margin-top:6px">Antippen bucht alle Mengen dieser freien Position auf die LV-Position um. Die freie Position wird danach entfernt.</div></div>`:''}
       <div class="row" style="margin-top:12px">
         ${f?`<button class="btn del" id="f_del">Löschen</button>`:''}
         <button class="btn cta" id="f_ok">${f?'Speichern':'Anlegen und aufmessen'}</button>
@@ -566,6 +573,19 @@ function openFree(prefill, editKey){
     if(f){ Object.assign(f,{b,me:$('#f_me').value,ref:$('#f_r').value.trim(),t}); dataChanged(); openPos(f.p); }
     else { const p=nextFreeNr(); S.free.push({id:uid(),p,b,me:$('#f_me').value,ref:$('#f_r').value.trim(),t}); $('#q').value=''; dataChanged(); openPos(p); }
   };
+  if(f){
+    const lvRes=()=>{ const terms=$('#f_lvq').value.toLowerCase().split(/\s+/).filter(w=>w.length>1);
+      const sc=o=>{ const t=(o.p+' '+o.b).toLowerCase(); return terms.reduce((a,w)=>a+(t.includes(w)?1:0),0); };
+      const hit=terms.length?LV.filter(o=>o.k==='P').map(o=>({o,n:sc(o)})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n||a.o.i-b.o.i).slice(0,30):[];
+      $('#f_lvr').innerHTML=hit.length?hit.map(({o})=>`<button class="lvhit" data-p="${esc(o.p)}" style="display:block;width:100%;text-align:left;padding:9px 4px;border-bottom:1px solid var(--line)"><b style="font-size:12.5px;color:var(--ink-3)">${esc(o.p)} · ${esc(o.me)}</b><br><span style="font-size:14px">${esc(o.b)}</span></button>`).join(''):'<div class="hint" style="padding:6px 0">Keine passende LV-Position gefunden.</div>';
+      $('#f_lvr').querySelectorAll('.lvhit').forEach(b=>b.onclick=()=>{ const o=POS[b.dataset.p]; if(!o) return;
+        const ents=S.entries.filter(e=>e.key===f.p);
+        if(!confirm(`${ents.length} Eintrag/Einträge von ${f.p} auf LV-Position ${o.p} umbuchen?\n\n${o.b}\nEinheit im LV: ${o.me}${f.me&&o.me&&f.me!==o.me?`\n\nAchtung: Die freie Position war in „${f.me}“ erfasst. Mengen bitte danach prüfen.`:''}`)) return;
+        const t=new Date().toISOString();
+        ents.forEach(e=>{ e.key=o.p; e.bem=[e.bem, f.b!==o.b?'urspr. '+f.p+': '+f.b:''].filter(Boolean).join(' · '); });
+        S.free=S.free.filter(x=>x!==f); dataChanged(); closeSheet(); openPos(o.p); toast('Auf '+o.p+' umgebucht'); }); };
+    $('#f_lvq').addEventListener('input',lvRes); lvRes();
+  }
   if(f) $('#f_del').onclick=()=>{
     const n=S.entries.filter(e=>e.key===f.p).length;
     if(!confirm('Freie Position löschen?'+(n?`\n${n} Aufmaß-Einträge werden mitgelöscht.`:''))) return;
@@ -583,7 +603,7 @@ function renderSum(){
   $('#cntTab').textContent=g.length;
   const np=S.entries.filter(e=>e.pre).length;
   $('#statBox').innerHTML=`<div><b>${g.length}</b>Positionen</div><div><b>${S.entries.length}</b>Einzelaufmaße</div><div><b>${S.free.length}</b>freie Positionen</div>`+
-    (np?`<div class="warn"><b>${np}</b>Vorschläge aus Rechnungen noch nicht geprüft. Menge vor Ort kontrollieren, dann mit Haken bestätigen oder mit Stift anpassen.</div>`:'');
+    (np?`<div class="warn"><b>${np}</b>Vorschläge ${preHer(S.entries.filter(e=>e.pre))} noch nicht geprüft. Menge vor Ort kontrollieren, dann mit Haken bestätigen oder mit Stift anpassen.</div>`:'');
   if(!g.length){ $('#sumList').innerHTML='<div class="empty">Noch nichts erfasst. Unter „Positionen“ eine Position antippen und Menge eintragen.</div>'; return; }
   $('#sumList').innerHTML=g.map(x=>`<div class="card">
     <div style="display:flex;gap:10px;cursor:pointer" onclick="openPos('${esc(x.p.p)}')"><div style="flex:1;min-width:0"><div class="hint">${esc(x.p.p)}${x.free?' · freie Position · '+(x.p.t?'Zuordnung '+esc(titelOf(x.p.p)):'ohne Zuordnung'):` · LV ${nf(x.p.m)} ${esc(x.p.me)}`}</div><b style="overflow-wrap:anywhere">${esc(x.p.b)}</b></div>
@@ -633,7 +653,7 @@ function dl(blob,name){ const a=document.createElement('a'); a.href=URL.createOb
 function checkReady(){
   if(!S.entries.length){ toast('Es ist noch nichts erfasst'); return false; }
   const np=S.entries.filter(e=>e.pre).length;
-  if(np && !confirm(np+' Vorschläge aus Rechnungen sind noch nicht geprüft. Trotzdem erstellen? (Sie werden als „ungeprüft“ gekennzeichnet)')) return false;
+  if(np && !confirm(np+' Vorschläge '+preHer(S.entries.filter(e=>e.pre))+' sind noch nicht geprüft. Trotzdem erstellen? (Sie werden als „ungeprüft“ gekennzeichnet)')) return false;
   if((!S.sig.sig1||!S.sig.sig2) && !confirm('Es fehlen Unterschriften. Trotzdem erstellen?')) return false;
   return true;
 }
@@ -737,7 +757,7 @@ async function makeXlsx(){
   const w2=wb.addWorksheet('Einzelaufmaße',{views:[{state:'frozen',ySplit:1}],pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0}});
   w2.columns=[{header:'Pos.-Nr.',width:14},{header:'Bezeichnung',width:55},{header:'Menge',width:11},{header:'ME',width:7},{header:'Raum / Ort',width:32},{header:'Bemerkung',width:40},{header:'Erfasst am',width:17},{header:'Art',width:12},{header:'LV-Titel / Zuordnung',width:40},{header:'Quelle',width:22},{header:'Rechnung',width:26}];
   styleHead(w2.getRow(1));
-  g.forEach(x=>x.ents.forEach(e=>{ const r=w2.addRow([x.p.p,x.p.b,e.qty,x.p.me,e.ort,e.bem,xlDate(e.ts),x.free?'frei':'LV',titelOf(x.p.p)||(x.free?'ohne Zuordnung':''),e.rg?(e.pre?'Rechnung, UNGEPRÜFT':'Rechnung, geprüft'):'Aufmaß vor Ort',e.rg||'']);
+  g.forEach(x=>x.ents.forEach(e=>{ const r=w2.addRow([x.p.p,x.p.b,e.qty,x.p.me,e.ort,e.bem,xlDate(e.ts),x.free?'frei':'LV',titelOf(x.p.p)||(x.free?'ohne Zuordnung':''),e.rg?(isSN(e.rg)?'Stundennachweis':'Rechnung')+(e.pre?', UNGEPRÜFT':', geprüft'):'Aufmaß vor Ort',e.rg||'']);
     if(e.pre) r.eachCell(c=>c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF4E0'}});
     r.getCell(3).numFmt=numFmt; r.getCell(7).numFmt='dd.mm.yyyy hh:mm'; r.eachCell({includeEmpty:true},c=>{c.border=bd;c.alignment={vertical:'top',wrapText:true};}); }));
   w2.autoFilter={from:'A1',to:'K1'};
