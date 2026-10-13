@@ -113,7 +113,15 @@
     } catch (e) { return PJ.rolle }                           // Netzfehler: mit gespeicherter Rolle weiter
   }
 
-  const PJ = window.PJ = { api, rpc, za, pr, rolle: null, me: null, portal: PORTAL, logout() { authClear(); location.replace(PORTAL) } };
+  // E-Mail über die Edge Function „mail-senden“ (z. B. Ereignis „Bautagebuch unterschrieben“ mit PDF)
+  async function mail(action, payload) {
+    const tok = await ensureToken();
+    const r = await fetch(`${SB}/functions/v1/mail-senden`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, 'x-user-token': tok || '' }, body: JSON.stringify(Object.assign({ action }, payload || {})) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.error) throw new Error(j.error || ('Fehler ' + r.status));
+    return j;
+  }
+  const PJ = window.PJ = { api, rpc, za, pr, mail, rolle: null, me: null, portal: PORTAL, logout() { authClear(); location.replace(PORTAL) } };
   PJ.leitung = () => PJ.rolle === 'bauleitung' || PJ.rolle === 'admin';
   PJ.ready = check();
   window.addEventListener('storage', e => { if (e.key === SESS_KEY && !e.newValue) location.replace(PORTAL) });

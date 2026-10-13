@@ -1003,14 +1003,14 @@ document.addEventListener('change', async e => {
 /* ---------- E-Mail-Benachrichtigungen (Admin, #/mail) ----------
    Einstellungen in mail_einstellungen (nur Admin), Protokoll in mail_protokoll.
    Versand über die Edge Function „mail-senden“ (Microsoft Graph, Postfach myheise@). */
-const MAIL_IMPL = new Set(['unterweisung', 'zusammenfassung']); // Benachrichtigungen, deren Versand schon eingebaut ist
+const MAIL_IMPL = new Set(['unterweisung', 'pruefung', 'fuhrpark', 'nachricht', 'btb_unterschrift', 'aufmass_unterschrift', 'zusammenfassung']); // Benachrichtigungen, deren Versand schon eingebaut ist
 const MAIL_INFO = {
   unterweisung: 'Jede Person bekommt ihre offenen Unterweisungen mit Link in die App.',
   pruefung: 'Fällige Prüfungen von Leitern und Geräten der nächsten 30 Tage an die Verantwortlichen.',
   fuhrpark: 'TÜV, Inspektion und Führerscheinkontrolle der nächsten 30 Tage.',
   nachricht: 'Wenn du in der App eine Nachricht schreibst, bekommen die Empfänger sie zusätzlich per E-Mail.',
-  btb_unterschrift: 'Sobald ein Bautagebuch unterschrieben ist, mit dem PDF im Anhang.',
-  aufmass_unterschrift: 'Sobald ein Aufmaß unterschrieben ist, mit dem PDF im Anhang.',
+  btb_unterschrift: 'Mit PDF, sobald Monteur und Auftraggeber unterschrieben haben. Oder wenn der Monteur meldet, dass niemand vor Ort war: dann mit der Bitte, die Unterschrift einzuholen.',
+  aufmass_unterschrift: 'Mit PDF, sobald beide unterschrieben haben. Oder wenn der Monteur meldet, dass niemand vor Ort war: dann mit der Bitte, die Unterschrift einzuholen.',
   zusammenfassung: 'Nach jedem Erinnerungsversand: wer was noch offen hat.',
 };
 const WOCHENTAGE = ['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
@@ -1398,6 +1398,7 @@ async function nxSenden(bd, upd) {
   const rows = wahl ? ids.map(id => ({ titel, nachricht: text, wichtig, gruppe_id: gid, empfaenger_id: id })) : [{ titel, nachricht: text, wichtig, gruppe_id: gid }];
   try {
     await api('POST', 'benachrichtigungen', rows, '', { Prefer: 'return=minimal' });
+    mailFn('nachricht', { gruppe_id: gid }).then(r => { if (r && r.gesendet) toast(`Zusätzlich per E-Mail an ${r.gesendet} ${r.gesendet === 1 ? 'Person' : 'Personen'}`, 'ok') }).catch(() => { });
     closeSheet(); toast(wahl ? `Gesendet an ${ids.length} ${plural(ids.length, 'Person', 'Personen')}` : 'An alle gesendet', 'ok');
     NX.tab = 'gesendet'; if (location.hash !== '#/nachrichten/gesendet') history.replaceState(null, '', '#/nachrichten/gesendet');
     await nxReload();

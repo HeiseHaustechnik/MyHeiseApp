@@ -66,6 +66,7 @@
 .row-card.pick.on .box{background:var(--accent);box-shadow:none}
 .selhead{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:18px 0 8px}
 .selhead b{flex:1;font-size:15px}
+.ohne{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--amber-bg);color:var(--amber);font-size:14px}.ohne.ok{background:var(--ok-bg);color:var(--ok)}.ohne b{display:block}.ohne span{color:var(--ink-2)}.ohne-btn{margin-top:12px;background:var(--surface-2);color:var(--ink)}
 </style>
 </head>
 <body>
@@ -122,7 +123,7 @@ async function flush(){
     while(q.length){
       const it=q[0];
       if(it.kind==='person') await api('projekte/'+it.pid+'/personen',{method:'POST',body:JSON.stringify(it.data)});
-      else if(it.kind==='entry') await api('bautagebuch/'+it.id,{method:'PUT',body:JSON.stringify(it.data)});
+      else if(it.kind==='entry'){ await api('bautagebuch/'+it.id,{method:'PUT',body:JSON.stringify(it.data)}); if(it.data&&it.data.sig1&&it.data.sig2) mailMerken(it.id); }
       else if(it.kind==='del') await api('bautagebuch/'+it.id,{method:'DELETE'});
       else if(it.kind==='proj') await api('projekte/'+it.id,{method:'PUT',body:JSON.stringify(it.data)});
       else if(it.kind==='foto'){ const f=await idb.get(it.id); if(f){ const d={...f}; delete d.pending; if(d.deleted) delete d.bild; await api('fotos/'+it.id,{method:'PUT',body:JSON.stringify(d)}); if(f.deleted) await idb.del(f.id); else { const g=await idb.get(f.id); if(g&&g.updated_at===f.updated_at){ g.pending=false; await idb.put(g); } } } }
@@ -132,7 +133,64 @@ async function flush(){
   }catch(e){ console.error(e); setSync('err','nicht gespeichert: '+e.message.slice(0,50)); }
   flushing=false;
 }
-window.addEventListener('online',()=>{ updSync(); flush(); });
+window.addEventListener('online',()=>{ updSync(); flush(); setTimeout(mailVersuch,4000); });
+
+/* ================= E-Mail bei Unterschrift =================
+   Sind Mitarbeiter und Auftraggeber unterschrieben und gespeichert, geht nach 45 s Ruhe einmalig eine E-Mail
+   mit dem PDF an die Empfänger aus My Heise → E-Mail-Benachrichtigungen (Server prüft An/Aus und verhindert doppelten Versand).
+   Offline bleibt der Auftrag liegen und wird beim nächsten Online-Sein oder Öffnen nachgeholt. */
+const MAILQ='pj_mail_btb', MAILSENT='pj_mail_btb_sent', MAILOHNE='pj_mail_btb_ohne';
+const blob64=b=>new Promise((ok,no)=>{ const r=new FileReader(); r.onload=()=>ok(String(r.result).split(',')[1]||''); r.onerror=no; r.readAsDataURL(b); });
+function mailMerken(id){
+  if(ls.get(MAILSENT,[]).includes(id)) return;
+  const q=ls.get(MAILQ,{}); q[id]={pid:PID,due:Date.now()+45000}; ls.set(MAILQ,q);
+  setTimeout(mailVersuch,46000);
+}
+let mailLauf=false;
+async function mailVersuch(){
+  if(mailLauf||!navigator.onLine||!PJ.mail) return; mailLauf=true;
+  try{
+    const q=ls.get(MAILQ,{});
+    for(const [key,it] of Object.entries(q)){
+      const id=it.id||key, ohne=!!it.ohne;
+      if(it.pid!==PID||it.due>Date.now()) continue;
+      if(queue().some(x=>x.kind==='entry'&&x.id===id)) continue;
+      const e=ls.get(K.ent(id),null);
+      if(!e||!e.sig1||(!ohne&&!e.sig2)){ const r=ls.get(MAILQ,{}); delete r[key]; ls.set(MAILQ,r); continue; }
+      let fotos=[]; try{ fotos=(await idb.byEntry(id)).filter(f=>!f.deleted).sort((a,b)=>(a.sort-b.sort)||a.created_at.localeCompare(b.created_at)); }catch(x){}
+      const { jsPDF } = window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'});
+      await drawEntry(doc,e,fotos); pdfFooter(doc,[{from:1,datum:e.datum}]);
+      const name=('Bautagebuch_'+(PROJ?.name||'')+'_'+e.datum).replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss').replace(/[^A-Za-z0-9-]+/g,'_')+'.pdf';
+      const res=await PJ.mail('ereignis',{typ:'btb_unterschrift',objekt_id:id,projekt_id:PID,titel:'Bautagebuch '+dDE(e.datum),datum:e.datum,ohne_ag:ohne,notiz:it.notiz||'',pdf:{name,base64:await blob64(doc.output('blob'))}});
+      const r=ls.get(MAILQ,{}); delete r[key]; ls.set(MAILQ,r);
+      if(ohne){ const o=ls.get(MAILOHNE,{}); o[id]=nowIso(); ls.set(MAILOHNE,o); if(E&&E.id===id) renderOhne();
+        toast(res.aus?'E-Mail bei Unterschrift ist in My Heise ausgeschaltet':res.gesendet?`An ${res.gesendet} ${res.gesendet===1?'Person':'Personen'} gesendet`:res.schon?'Wurde schon gesendet':'Kein Empfänger mit E-Mail hinterlegt'); }
+      else ls.set(MAILSENT,ls.get(MAILSENT,[]).concat(id).slice(-500));
+    }
+  }catch(err){ console.warn('E-Mail bei Unterschrift',err); }
+  mailLauf=false;
+}
+setTimeout(mailVersuch,6000);
+/* „Niemand vor Ort“: Monteur schließt mit eigener Unterschrift ab, PDF geht an die Bauleitung */
+function renderOhne(){
+  const el=$('#ohneAg'); if(!el||!E) return;
+  const am=ls.get(MAILOHNE,{})[E.id], wartet=Object.values(ls.get(MAILQ,{})).some(x=>x.id===E.id&&x.ohne);
+  if(E.sig2||!E.sig1){ el.innerHTML=''; return; }
+  el.innerHTML=am?`<div class="ohne ok">${IC('check')}<div><b>An die Bauleitung gesendet ${tsDE(am)}</b><span>Die Unterschrift des Auftraggebers wird nachgeholt. Unterschreibt er später hier, geht das PDF noch einmal mit beiden Unterschriften raus.</span></div></div>`
+    :wartet?`<div class="ohne">${IC('cloudoff')}<div><b>Wird an die Bauleitung gesendet, sobald Netz da ist</b></div></div>`
+    :`<button class="btn block ohne-btn" id="bOhne">${IC('mail')} Niemand vor Ort – an Bauleitung senden</button>`;
+  const b=$('#bOhne'); if(b) b.onclick=()=>openSheet(`<h2>Niemand vor Ort</h2><p class="hint" style="margin:0 0 12px">${'Vor Ort war niemand, der für den Auftraggeber unterschreiben kann? Dann schließt du hier mit deiner Unterschrift ab. Die Bauleitung bekommt das PDF per E-Mail, leitet es an den Auftraggeber weiter und holt die Unterschrift nach.'}</p>
+    <div class="field"><label for="ohneN">Hinweis für die Bauleitung (optional)</label><textarea class="inp" id="ohneN" rows="3" placeholder="z. B. Bauleiter erst ab Montag wieder vor Ort"></textarea></div>
+    <button class="btn cta block" id="ohneOk">${IC('mail')} Abschließen und senden</button>`,()=>{
+    $('#ohneOk').onclick=async()=>{
+      if(!(E.taetigkeit||'').trim()){ closeSheet(); toast('Bitte zuerst eintragen, was gemacht wurde'); return; }
+      const q=ls.get(MAILQ,{}); q[E.id+':ohne']={id:E.id,pid:PID,due:0,ohne:true,notiz:$('#ohneN').value.trim()}; ls.set(MAILQ,q);
+      closeSheet(); clearTimeout(saveT); saveEntry(E); renderOhne();
+      if(!navigator.onLine){ toast('Offline – wird gesendet, sobald wieder Netz da ist'); return; }
+      toast('Wird gesendet …'); await flush(); await mailVersuch();
+    };
+  });
+}
 window.addEventListener('offline',updSync);
 
 /* ================= Laden ================= */
@@ -290,6 +348,7 @@ function renderEntry(){
         </div>
       </div>
       <div id="sAend"></div>
+      <div id="ohneAg"></div>
       <p class="hint" style="margin-top:10px">Änderungen nach der Unterschrift sind möglich, die Unterschriften bleiben erhalten. Hat der Auftraggeber schon unterschrieben, wird die Änderung mit Datum vermerkt und kann kurz begründet werden.</p>
     </div>
 
@@ -474,7 +533,7 @@ function setupSigs(){
   sigText();
 }
 function drawSigs(){ ['sig1','sig2'].forEach(id=>{ const c=$('#'+id); if(c){ c.getContext('2d').clearRect(0,0,c.width,c.height); c._size&&c._size(); } }); sigText(); }
-function sigText(){ ['sig1','sig2'].forEach(id=>{ const el=$('#'+id+'t'); if(el) el.textContent=E[id]?'unterschrieben '+tsDE(E.sig_ts):'Mit Finger oder Stift unterschreiben'; }); renderAend(); }
+function sigText(){ ['sig1','sig2'].forEach(id=>{ const el=$('#'+id+'t'); if(el) el.textContent=E[id]?'unterschrieben '+tsDE(E.sig_ts):'Mit Finger oder Stift unterschreiben'; }); renderAend(); renderOhne(); }
 window.addEventListener('resize',()=>{ if(E) drawSigs(); });
 
 /* ================= PDF ================= */
