@@ -181,7 +181,8 @@ async function flush(){
         ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id&&x.v===it.v)));
         if(it.kind==='pr'&&r){ const loc=ls.get(K.doc(it.id),null); if(loc){ loc.nr=r.nr; ls.set(K.doc(it.id),loc); }
           const row=PL.find(x=>x.id===it.id); if(row){ row.nr=r.nr; ls.set(K.pl,PL); }
-          if(D&&D.id===it.id){ D.nr=r.nr; D.erstellt_von=r.erstellt_von; hdr(); } }
+          if(D&&D.id===it.id){ D.nr=r.nr; D.erstellt_von=r.erstellt_von; hdr(); }
+          if(it.data&&it.data.sig_an) prMailMerken(it.id); }
       }catch(e){
         if(netzFehler(e)) break;
         ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id)));
@@ -199,7 +200,44 @@ async function flush(){
     }
   } finally { flushing=false; filesPending=(await IDB.all().catch(()=>[])).filter(f=>f.pending).length; updSync(); }
 }
-window.addEventListener('online',flushSoon); window.addEventListener('offline',updSync);
+window.addEventListener('online',()=>{ flushSoon(); setTimeout(prMailVersuch,5000); }); window.addEventListener('offline',updSync);
+
+/* ================= E-Mail bei Abschluss =================
+   Sobald der Auftragnehmer unterschrieben hat (Protokoll abgeschlossen) und alles gespeichert ist, geht nach 30 s
+   einmalig das PDF mit Anlagen an die Empfänger aus My Heise → E-Mail-Benachrichtigungen („Bautagebuch, Protokoll,
+   Zusatzarbeit unterschrieben“). Offline wird nachgeholt. */
+const MAILQ_P='pj_mail_pr', MAILSENT_P='pj_mail_pr_sent';
+const blob64=b=>new Promise((ok,no)=>{ const r=new FileReader(); r.onload=()=>ok(String(r.result).split(',')[1]||''); r.onerror=no; r.readAsDataURL(b); });
+function prMailMerken(id){
+  if(ls.get(MAILSENT_P,[]).includes(id)) return;
+  const q=ls.get(MAILQ_P,{}); q[id]={pid:PID,due:Date.now()+30000}; ls.set(MAILQ_P,q);
+  setTimeout(prMailVersuch,31000);
+}
+let prMailLauf=false;
+async function prMailVersuch(){
+  if(prMailLauf||!navigator.onLine||!PJ.mail) return; prMailLauf=true;
+  const keepD=D, keepF=FILES;
+  try{
+    const q=ls.get(MAILQ_P,{});
+    for(const [id,it] of Object.entries(q)){
+      if(it.pid!==PID||it.due>Date.now()) continue;
+      if(queue().some(x=>x.kind==='pr'&&x.id===id)) continue;
+      if((await IDB.all().catch(()=>[])).some(f=>f.protokoll_id===id&&f.pending)) continue;
+      const d=await loadDoc(id);
+      if(!d||!d.sig_an){ const r=ls.get(MAILQ_P,{}); delete r[id]; ls.set(MAILQ_P,r); continue; }
+      D=d; D.werte=D.werte||{}; await loadFiles(id);
+      const blob=await pdfPr(), name=filePr(), titel=titelVon(d)+' '+prNr(d.nr);
+      D=keepD; FILES=keepF;
+      await PJ.mail('ereignis',{typ:'protokoll_unterschrift',objekt_id:id,projekt_id:PID,titel,datum:d.datum,
+        unterschrieben:'Abgeschlossen und unterschrieben von '+(d.name_an||'Auftragnehmer')+(d.sig_ag?' und '+(d.name_ag||'Auftraggeber'):' (ohne Unterschrift des Auftraggebers)'),
+        pdf:{name,base64:await blob64(blob)}});
+      const r=ls.get(MAILQ_P,{}); delete r[id]; ls.set(MAILQ_P,r);
+      ls.set(MAILSENT_P,ls.get(MAILSENT_P,[]).concat(id).slice(-500));
+    }
+  }catch(err){ console.warn('E-Mail bei Abschluss',err); }
+  finally{ D=keepD; FILES=keepF; prMailLauf=false; }
+}
+setTimeout(prMailVersuch,7000);
 
 async function loadBase(){
   PROJ=ls.get(K.proj,null); INFO=ls.get(K.info,{}); VORL=ls.get(K.vorl,[]); PL=ls.get(K.pl,[]);

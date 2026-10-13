@@ -144,7 +144,8 @@ async function flush(){
         if(r){ const loc=ls.get(K.doc(it.kind,it.id),null); if(loc){ loc.nr=r.nr; ls.set(K.doc(it.kind,it.id),loc); }
           if(D&&D.id===it.id){ D.nr=r.nr; D.erstellt_von=r.erstellt_von;
             if(it.kind==='stunden'){ D.ae_map=r.ae_map; D.aufmass_id=r.aufmass_id; const l=ls.get(K.doc(it.kind,it.id),null); if(l){ l.ae_map=r.ae_map; l.aufmass_id=r.aufmass_id; ls.set(K.doc(it.kind,it.id),l); } aufNote(); }
-            hdr(); } }
+            hdr(); }
+          if(it.data&&(it.kind==='zusatz'?it.data.sig_ag:it.data.sig_kunde)) zaMailMerken(it.kind,it.id); }
       }catch(e){
         if(!navigator.onLine || /Verbindung|fetch|network|angemeldet|timeout|abort/i.test(e.message||'')) break;   // Netzproblem: später erneut
         ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id)));   // vom Server abgelehnt: nicht endlos wiederholen
@@ -154,7 +155,44 @@ async function flush(){
     }
   } finally { flushing=false; updSync(); }
 }
-window.addEventListener('online',flushSoon); window.addEventListener('offline',updSync);
+window.addEventListener('online',()=>{ flushSoon(); setTimeout(zaMailVersuch,5000); }); window.addEventListener('offline',updSync);
+
+/* ================= E-Mail bei Unterschrift =================
+   Zusatzauftrag (Auftraggeber unterschrieben) und Stundennachweis (Kunde unterschrieben): nach 30 s einmalig das PDF an die
+   Empfänger aus My Heise → E-Mail-Benachrichtigungen („Bautagebuch, Protokoll, Zusatzarbeit unterschrieben“). Offline wird nachgeholt. */
+const MAILQ_Z='pj_mail_za', MAILSENT_Z='pj_mail_za_sent';
+const blob64=b=>new Promise((ok,no)=>{ const r=new FileReader(); r.onload=()=>ok(String(r.result).split(',')[1]||''); r.onerror=no; r.readAsDataURL(b); });
+function zaMailMerken(kind,id){
+  const key=kind+':'+id; if(ls.get(MAILSENT_Z,[]).includes(key)) return;
+  const q=ls.get(MAILQ_Z,{}); q[key]={kind,id,pid:PID,due:Date.now()+30000}; ls.set(MAILQ_Z,q);
+  setTimeout(zaMailVersuch,31000);
+}
+let zaMailLauf=false;
+async function zaMailVersuch(){
+  if(zaMailLauf||!navigator.onLine||!PJ.mail) return; zaMailLauf=true;
+  const keepD=D, keepK=KIND;
+  try{
+    const q=ls.get(MAILQ_Z,{});
+    for(const [key,it] of Object.entries(q)){
+      if(it.pid!==PID||it.due>Date.now()) continue;
+      if(queue().some(x=>x.kind===it.kind&&x.id===it.id)) continue;
+      const d=await loadDoc(it.kind,it.id), za=it.kind==='zusatz';
+      if(!d||!(za?d.sig_ag:d.sig_kunde)){ const r=ls.get(MAILQ_Z,{}); delete r[key]; ls.set(MAILQ_Z,r); continue; }
+      if(!za){ d.personen=d.personen||[]; d.material=d.material||[]; d.zusatz_ids=d.zusatz_ids||[]; }
+      D=d; KIND=it.kind;
+      const blob=za?await pdfZa():await pdfSn(), name=za?fileZa():fileSn();
+      D=keepD; KIND=keepK;
+      await PJ.mail('ereignis',{typ:za?'zusatz_unterschrift':'stunden_unterschrift',objekt_id:it.id,projekt_id:PID,
+        titel:za?'Auftrag für zusätzliche Arbeiten '+zaNr(d.nr):'Stunden- und Materialnachweis '+snNr(d.nr),datum:d.datum,
+        unterschrieben:za?'Vom Auftraggeber unterschrieben'+(d.name_ag?' ('+d.name_ag+')':'')+', damit beauftragt':'Vom Kunden unterschrieben'+(d.name_kunde?' ('+d.name_kunde+')':''),
+        pdf:{name,base64:await blob64(blob)}});
+      const r=ls.get(MAILQ_Z,{}); delete r[key]; ls.set(MAILQ_Z,r);
+      ls.set(MAILSENT_Z,ls.get(MAILSENT_Z,[]).concat(key).slice(-500));
+    }
+  }catch(err){ console.warn('E-Mail bei Unterschrift',err); }
+  finally{ D=keepD; KIND=keepK; zaMailLauf=false; }
+}
+setTimeout(zaMailVersuch,7000);
 
 async function loadBase(){
   PROJ=ls.get(K.proj,null); PERS=ls.get(K.pers,[]); TEAM=ls.get(K.team,[]); LVP=ls.get(K.lv,[]); ZL=ls.get(K.zl,[]); SL=ls.get(K.sl,[]);
