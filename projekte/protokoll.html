@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f8">
+<title>Protokolle</title>
+<link rel="stylesheet" href="lib/heise-ui.css">
+<style>
+.sync{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:650;color:var(--ink-3);text-align:right;line-height:1.25;max-width:42%}
+.sync .ic{width:16px;height:16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.card .field:last-child{margin-bottom:0}
+.sig{border:1.5px dashed var(--ink-3);border-radius:16px;background:var(--surface);touch-action:none;width:100%;height:160px;display:block}
+.sig.lock{border-style:solid;border-color:var(--line);touch-action:auto}
+.sigbar{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px;color:var(--ink-3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.nrbox{display:grid;place-items:center;min-width:58px;height:52px;padding:0 8px;border-radius:15px;background:var(--surface-2);color:var(--brand);flex:0 0 auto;line-height:1.05;text-align:center}
+.nrbox b{font-size:15px;font-weight:800}
+.nrbox small{font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--ink-3)}
+.row-card .mt .desc{display:block;font-size:13px;color:var(--ink-2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ov{position:fixed;inset:0;background:rgba(8,13,21,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:50;display:none}
+.ov.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--bg);border-radius:28px 28px 0 0;padding:24px 20px calc(20px + var(--safe-b));transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.9,.3,1);max-width:560px;margin:0 auto;box-shadow:0 -24px 70px -20px rgba(0,0,0,.5);max-height:88vh;overflow:auto}
+.sheet::before{content:"";position:absolute;top:9px;left:50%;width:40px;height:5px;border-radius:3px;background:var(--line);transform:translateX(-50%)}
+.sheet.on{transform:none}
+.sheet h2{font-size:20px;font-weight:760;margin-bottom:14px}
+.bottombar{position:sticky;bottom:0;z-index:5;padding:12px 0 calc(8px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:10px}
+.bottombar .btn{flex:1}
+.chk{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--accent);flex:0 0 auto}
+.chk b{display:block;font-size:14.5px}.chk small{display:block;font-size:12.5px;color:var(--ink-3)}
+.lock-note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--ok-bg);color:var(--ink);margin-bottom:14px;font-size:14px}
+.lock-note .ic{color:var(--ok);flex:0 0 auto}
+fieldset:disabled .pp{opacity:.6}
+.delbtn{width:40px;height:50px;border-radius:12px;display:grid;place-items:center;color:var(--ink-3)}
+.delbtn:active{background:var(--red-bg);color:var(--red)}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+fieldset:disabled .inp{background:var(--surface-2);color:var(--ink-2)}
+
+.stepcard{padding:14px 14px 10px}
+.steptop{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:700;color:var(--ink-3);margin-bottom:10px}
+.steptop span:last-child{text-align:right;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.steps{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.steps::-webkit-scrollbar{display:none}
+.stp{display:flex;align-items:center;gap:7px;flex:0 0 auto;height:36px;padding:0 12px 0 5px;border-radius:18px;background:var(--surface-2);color:var(--ink-3);font-size:12.5px;font-weight:700;white-space:nowrap}
+.stp i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--surface);font-style:normal;font-size:12px}
+.stp.on{background:var(--brand);color:#fff}.stp.on i{background:rgba(255,255,255,.18);color:#fff}
+.stp.done i{background:var(--ok-bg);color:var(--ok)}
+.stp.warn i{background:var(--amber-bg);color:var(--amber)}
+@media(max-width:560px){.stp:not(.on) span{display:none}.stp:not(.on){padding:0 5px}}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.fgrid>*{grid-column:1/-1}.fgrid>.half{grid-column:auto}
+@media(max-width:420px){.fgrid>.half{grid-column:1/-1}}
+.pfl{color:var(--accent)}
+.unitwrap{position:relative}.unitwrap .inp{padding-right:58px}.unitwrap span{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--ink-3);font-size:13.5px}
+.calc{min-height:50px;display:flex;align-items:center;padding:0 14px;border-radius:14px;background:var(--surface-2);font-weight:780;font-size:17px;color:var(--brand)}
+.warnt{color:var(--red)!important;font-weight:700}
+.info-box{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:14px;background:var(--blue-bg);color:var(--ink);font-size:13.5px;margin-bottom:12px}
+.info-box .ic{flex:0 0 auto;color:var(--blue)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:14px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:650;font-size:14px;cursor:pointer}
+.opt input{width:19px;height:19px;accent-color:var(--accent);margin:0}
+.opt.on,.opt:has(input:checked){box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+.chk.big{align-items:flex-start;padding:12px 2px}.chk.big input{margin-top:2px}.chk.big b{font-weight:650;font-size:14.5px;line-height:1.35}
+.chk.sw{border-bottom:0;padding-top:0}
+.mess{border-radius:18px;background:var(--surface-2);padding:14px;margin:6px 0 12px}
+.mess-h{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:10px}.mess-h span{color:var(--ink-3);font-weight:700}
+.timer{background:var(--surface);border-radius:16px;padding:14px;text-align:center;box-shadow:var(--shadow)}
+.t-big{font-size:42px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink-2);line-height:1.1}
+.timer.run .t-big{color:var(--brand)}.timer.ok .t-big{color:var(--ok)}
+.t-bar{height:8px;border-radius:4px;background:var(--surface-2);margin:10px 0 8px;overflow:hidden}.t-bar i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .5s}
+.timer.ok .t-bar i{background:var(--ok)}
+.t-txt{font-size:13px;color:var(--ink-3);font-weight:650}
+.t-btns{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:12px 0}
+.t-btns .btn{flex:1}
+.fotos2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.th{position:relative;width:84px;height:84px;border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th-pdf{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:4px;font-size:10.5px;color:var(--ink-3);padding:6px;text-align:center;word-break:break-all}
+.th button{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:12px;background:rgba(13,21,36,.65);color:#fff;display:grid;place-items:center}
+.th-p{position:absolute;left:4px;bottom:4px;width:22px;height:22px;border-radius:11px;background:var(--amber);color:#fff;display:grid;place-items:center}
+.upl{cursor:pointer}
+.vw{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow);margin-bottom:8px}
+.vw b{display:block;font-size:15px}.vw small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:2px}
+.vw>span:nth-child(2){flex:1;min-width:0}
+.vw-ic{width:42px;height:42px;border-radius:13px;background:var(--surface-2);color:var(--brand);display:grid;place-items:center;flex:0 0 auto}
+.warncard{background:var(--amber-bg);box-shadow:none}.warncard h2{display:flex;align-items:center;gap:8px;color:var(--ink)}
+.okcard{display:flex;gap:10px;align-items:center;background:var(--ok-bg);box-shadow:none}.okcard .ic{color:var(--ok)}
+.erg{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;font-weight:700}
+.erg.ok{background:var(--ok-bg)}.erg.ok .ic{color:var(--ok)}.erg.no{background:var(--red-bg)}.erg.no .ic{color:var(--red)}
+
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="iconbtn" id="backBtn" aria-label="Zurück"></a>
+  <div class="brand"><div class="lt"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div><div style="min-width:0"><b id="hTitle">Protokolle</b><small id="hSub"></small></div></div>
+  <span class="sync" id="syncState"></span>
+</header>
+<main class="shell" id="app"><div class="empty">Lädt …</div></main>
+<div class="ov" id="ov"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<script src="lib/heise-icons.js"></script>
+<script src="lib/pj-api.js"></script>
+<script src="lib/pj-shell.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.plugin.autotable.min.js"></script>
+<script>
+/* =====================================================================
+   Protokolle (PR-001 …): Vorlage wählen, Schritt für Schritt erfassen,
+   unterschreiben, PDF erzeugen und senden. Daten über die RPC pj_pr
+   (supabase/protokolle.sql). Vorlagen kommen als Daten aus pj_vorlagen.
+   Offline wird lokal gespeichert (Protokolle im localStorage, Fotos und
+   Diagramme in IndexedDB) und später übertragen.
+   ===================================================================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+const nowIso=()=>new Date().toISOString();
+const todayIso=()=>{ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+const dDE=d=>d?new Date(d+'T12:00').toLocaleDateString('de-DE'):'';
+const tsDE=t=>t?new Date(t).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'}):'';
+const uhr=t=>t?new Date(t).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):'';
+const num=v=>{ if(typeof v==='number') return v; const n=parseFloat(String(v??'').replace(',','.')); return isFinite(n)?n:NaN; };
+const nfmt=v=>{ const n=num(v); return isFinite(n)?n.toLocaleString('de-DE',{maximumFractionDigits:3}):''; };
+const prNr=n=>n?'PR-'+String(n).padStart(3,'0'):'PR neu';
+const mmss=s=>{ s=Math.max(0,Math.floor(s)); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0'); };
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2600); }
+const ls={ get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }, del(k){ try{ localStorage.removeItem(k); }catch(e){} } };
+const api=(path,opt={})=>PJ.api(path,opt);
+const pr=(path,opt={})=>PJ.pr(path,opt);
+const Q=new URLSearchParams(location.search);
+const PID=Q.get('p');
+let PROJ=null, INFO={}, VORL=[], PL=[], D=null, FILES=[], STEP=0;
+const K={proj:'pr_proj_'+PID, info:'pr_info_'+PID, vorl:'pr_vorlagen', pl:'pr_list_'+PID, queue:'pr_queue', doc:id=>'pr_doc_'+id, step:id=>'pr_step_'+id};
+
+/* ================= Dateien (IndexedDB) ================= */
+const IDB={ db:null,
+  open(){ if(this.db) return Promise.resolve(this.db); return new Promise((ok,err)=>{ const r=indexedDB.open('heise_protokolle',1); r.onupgradeneeded=()=>{ r.result.createObjectStore('files',{keyPath:'id'}); }; r.onsuccess=()=>{ this.db=r.result; ok(this.db); }; r.onerror=()=>err(r.error); }); },
+  async tx(mode,fn){ const db=await this.open(); return new Promise((ok,err)=>{ const t=db.transaction('files',mode), s=t.objectStore('files'); const res=fn(s); t.oncomplete=()=>ok(res&&res.result!==undefined?res.result:res); t.onerror=()=>err(t.error); }); },
+  put(rec){ return this.tx('readwrite',s=>s.put(rec)); },
+  del(id){ return this.tx('readwrite',s=>s.delete(id)); },
+  async all(){ const db=await this.open(); return new Promise((ok,err)=>{ const r=db.transaction('files').objectStore('files').getAll(); r.onsuccess=()=>ok(r.result||[]); r.onerror=()=>err(r.error); }); }
+};
+
+/* ================= Speichern / Offline-Warteschlange ================= */
+function setSync(kind,txt){ const el=$('#syncState'); if(!el) return; el.innerHTML=IC(kind==='err'?'cloudoff':kind==='ok'?'cloud':'sync')+'<span>'+esc(txt)+'</span>'; el.style.color=kind==='err'?'var(--amber)':kind==='ok'?'var(--ok)':''; }
+const queue=()=>ls.get(K.queue,[]);
+function enqueue(item){ const q=queue().filter(x=>!(x.kind===item.kind&&x.id===item.id)); q.push(item); ls.set(K.queue,q); flushSoon(); }
+let flushT=null, flushing=false, filesPending=0;
+function flushSoon(){ clearTimeout(flushT); updSync(); flushT=setTimeout(flush,900); }
+function updSync(){ const n=queue().length+filesPending; if(!navigator.onLine) setSync('err',n?`offline · ${n} Änderung${n>1?'en':''} warten`:'offline'); else if(n) setSync('',`${n} Änderung${n>1?'en':''} werden gespeichert …`); else setSync('ok','gespeichert '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})); }
+const netzFehler=e=>!navigator.onLine || /Verbindung|fetch|network|angemeldet|timeout|abort/i.test(e.message||'');
+async function flush(){
+  if(flushing||!navigator.onLine){ updSync(); return; } flushing=true;
+  try{
+    for(const it of queue()){
+      try{
+        const r=it.kind==='info'? await pr('projekte/'+it.id+'/info',{method:'PUT',body:JSON.stringify(it.data)})
+               : await pr('protokolle/'+it.id,{method:'PUT',body:JSON.stringify(it.data)});
+        ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id&&x.v===it.v)));
+        if(it.kind==='pr'&&r){ const loc=ls.get(K.doc(it.id),null); if(loc){ loc.nr=r.nr; ls.set(K.doc(it.id),loc); }
+          const row=PL.find(x=>x.id===it.id); if(row){ row.nr=r.nr; ls.set(K.pl,PL); }
+          if(D&&D.id===it.id){ D.nr=r.nr; D.erstellt_von=r.erstellt_von; hdr(); } }
+      }catch(e){
+        if(netzFehler(e)) break;
+        ls.set(K.queue,queue().filter(x=>!(x.kind===it.kind&&x.id===it.id)));
+        toast('Nicht gespeichert: '+e.message);
+        if(D&&D.id===it.id) setTimeout(()=>location.reload(),1800);
+      }
+    }
+    // Fotos und Diagramme erst, wenn das Protokoll auf dem Server ist
+    const offen=(await IDB.all().catch(()=>[])).filter(f=>f.pending);
+    for(const f of offen){
+      if(queue().some(x=>x.kind==='pr'&&x.id===f.protokoll_id)) continue;
+      try{ await pr('dateien/'+f.id,{method:'PUT',body:JSON.stringify({protokoll_id:f.protokoll_id,feld:f.feld,name:f.name,typ:f.typ,daten:f.daten})});
+        f.pending=false; await IDB.put(f); }
+      catch(e){ if(netzFehler(e)) break; if(/nicht gefunden/i.test(e.message)) continue; toast('Anhang nicht gespeichert: '+e.message); await IDB.del(f.id); }
+    }
+  } finally { flushing=false; filesPending=(await IDB.all().catch(()=>[])).filter(f=>f.pending).length; updSync(); }
+}
+window.addEventListener('online',flushSoon); window.addEventListener('offline',updSync);
+
+async function loadBase(){
+  PROJ=ls.get(K.proj,null); INFO=ls.get(K.info,{}); VORL=ls.get(K.vorl,[]); PL=ls.get(K.pl,[]);
+  try{
+    const [p,info,vorl,pl]=await Promise.all([api('projekte/'+PID),pr('projekte/'+PID+'/info'),pr('vorlagen'),pr('projekte/'+PID+'/protokolle')]);
+    PROJ=p.projekt; INFO=info||{}; VORL=vorl||[]; PL=pl||[];
+    ls.set(K.proj,PROJ); ls.set(K.info,INFO); ls.set(K.vorl,VORL); ls.set(K.pl,PL);
+  }catch(e){
+    if(/pj_pr/.test(e.message)) throw new Error('Die Datenbank für Protokolle ist noch nicht eingerichtet (protokolle.sql ausführen).');
+    if(!PROJ) throw e;
+  }
+  // lokal angelegte, noch nicht übertragene Protokolle in die Liste
+  queue().filter(it=>it.kind==='pr').forEach(it=>{ if(!PL.some(x=>x.id===it.id)){ const d=ls.get(K.doc(it.id),null); if(d) PL.unshift(listRow(d)); } });
+  // Werte für „Auftraggeber vertreten durch“ usw. aus noch nicht übertragenen Änderungen
+  const qi=queue().find(it=>it.kind==='info'&&it.id===PID); if(qi) Object.assign(INFO,qi.data);
+}
+const listRow=d=>({id:d.id,nr:d.nr,vorlage_id:d.vorlage_id,titel:d.titel,datum:d.datum,medium:d.werte?.medium,abschnitt:d.werte?.abschnitt,werkstoff:d.werte?.werkstoff,verbindung:d.werte?.verbindung,ergebnis:d.werte?.dicht,sig_an:!!d.sig_an,sig_ag:!!d.sig_ag,erstellt_von:d.erstellt_von,updated_at:d.updated_at,anhaenge:0});
+function saveDoc(d){
+  d.updated_at=nowIso(); ls.set(K.doc(d.id),d);
+  const data={projekt_id:d.projekt_id,vorlage_id:d.vorlage_id,def:d.def,titel:d.titel,datum:d.datum,werte:d.werte,name_ag:d.name_ag||'',name_an:d.name_an||'',sig_ag:d.sig_ag||'',sig_an:d.sig_an||'',sig_ts:d.sig_ts||''};
+  enqueue({kind:'pr',id:d.id,v:d.updated_at,data});
+  const i=PL.findIndex(x=>x.id===d.id), row={...(PL[i]||{}),...listRow(d),anhaenge:PL[i]?.anhaenge||0};
+  if(i>=0) PL[i]=row; else PL.unshift(row); ls.set(K.pl,PL);
+}
+async function loadDoc(id){
+  const local=ls.get(K.doc(id),null);
+  if(local&&queue().some(x=>x.kind==='pr'&&x.id===id)) return local;
+  try{ const s=await pr('protokolle/'+id); if(!s) throw new Error('nicht gefunden'); s.werte=s.werte||{}; ls.set(K.doc(id),s); return s; }
+  catch(e){ if(local) return local; throw e; }
+}
+async function loadFiles(id){
+  let srv=null;
+  try{ srv=await pr('protokolle/'+id+'/dateien'); }catch(e){}
+  let alle=await IDB.all().catch(()=>[]);
+  if(srv){ for(const f of srv){ await IDB.put({...f,protokoll_id:id,pending:false}).catch(()=>{}); }
+    // auf dem Server gelöscht: lokal auch entfernen
+    for(const f of alle.filter(f=>f.protokoll_id===id&&!f.pending&&!srv.some(x=>x.id===f.id))) await IDB.del(f.id).catch(()=>{});
+    alle=await IDB.all().catch(()=>[]); }
+  FILES=alle.filter(f=>f.protokoll_id===id).sort((a,b)=>String(a.created_at).localeCompare(String(b.created_at)));
+}
+let saveT=null;
+function changed(){ clearTimeout(saveT); setSync('','wird gespeichert …'); saveT=setTimeout(()=>saveDoc(D),500); }
+const locked=()=>!!D.sig_an;
+
+/* ================= Vorlagen-Logik ================= */
+const W_=()=>D.werte;
+const feldListe=def=>def.schritte.flatMap(s=>s.felder.map(f=>({...f,_schritt:s})));
+function optTitel(f,w){ const o=(f.optionen||[]).find(o=>o.w===w); return o?(o.t||o.w):w; }
+function txt(f){ if(typeof f.text!=='object') return f.text||''; const k=W_()[f.text_nach]; return f.text[k]??f.text['*']??''; }
+function sichtbar(f){ if(!f.wenn) return true; const v=W_()[f.wenn.feld]; return (f.wenn.ist||[]).includes(v); }
+function aktiv(s){ return !s.schalter || W_()[s.schalter.id]!==false; }
+function berechne(f){
+  if(f.formel==='fest') return f.wert;
+  if(f.formel==='zvshk_volumen'){ const v=num(W_()[f.aus]); if(!isFinite(v)||v<=0) return ''; return v<=100?120:120+20*Math.ceil((v-100)/100); }
+  return '';
+}
+function maxVon(f){ if(!f.max_aus) return null; const sel=W_()[f.max_aus]; const ff=feldListe(D.def).find(x=>x.id===f.max_aus); const o=(ff?.optionen||[]).find(o=>o.w===sel); return o&&o.max!=null?o.max:null; }
+function aktualisiereBerechnet(){ feldListe(D.def).filter(f=>f.typ==='berechnet').forEach(f=>{ W_()[f.id]=berechne(f); }); }
+function titelVon(d){ const def=d.def; if(!def.pdf_titel) return def.titel; const med=feldListe(def).find(f=>f.id==='medium'); return def.pdf_titel.replace('{medium}',med?optTitel(med,d.werte.medium)||'…':''); }
+function fehlend(){
+  const out=[];
+  D.def.schritte.forEach((s,si)=>{ if(!aktiv(s)) return; s.felder.forEach(f=>{ if(!f.pflicht||!sichtbar(f)) return;
+    const v=W_()[f.id]; const leer=f.typ==='haken'?v!==true:(v==null||String(v).trim()==='');
+    if(leer) out.push({si,label:f.typ==='haken'?txt(f):f.label}); }); });
+  return out;
+}
+const ortAus=a=>{ const t=String(a||'').split(',').pop().trim(); return t.replace(/^\d{5}\s*/,''); };
+function vorbelegung(def){
+  const w={}, letztes=PL.find(x=>x.vorlage_id===D?.vorlage_id)||null;
+  feldListe(def).forEach(f=>{
+    if(f.standard!=null) w[f.id]=f.standard;
+    const vb=f.vorbelegung;
+    if(vb==='projekt') w[f.id]=[PROJ?.name,PROJ?.adresse].filter(Boolean).join(', ');
+    else if(vb==='projekt.nr') w[f.id]=PROJ?.nr||'';
+    else if(vb&&vb.startsWith('info.')) w[f.id]=INFO[vb.slice(5)]||'';
+    else if(vb==='ich') w[f.id]=PJ.me?.name||'';
+    else if(vb==='letztes'&&letztes&&letztes[f.id]) w[f.id]=letztes[f.id];
+  });
+  def.schritte.forEach(s=>{ if(s.schalter) w[s.schalter.id]=s.schalter.standard!==false; });
+  w.ort=ortAus(PROJ?.adresse);
+  return w;
+}
+
+/* ================= Übersicht ================= */
+function hdr(){ $('#hTitle').textContent=D?prNr(D.nr)+' · '+(D.def?.titel||'Protokoll'):'Protokolle'; $('#hSub').textContent=PROJ?.name||''; }
+function renderList(){
+  D=null; PJS.set({seite:'pr',pid:PID,pname:PROJ?.name||'',erfassen:false});
+  hdr(); $('#backBtn').innerHTML=IC('back'); $('#backBtn').href='index.html#p='+PID;
+  const off=PL.filter(x=>!x.sig_an).length;
+  $('#app').innerHTML=`
+    <section class="hero" style="margin-bottom:16px">
+      <div><div class="ey">${esc(PROJ?.name||'')}</div><h1>Protokolle</h1></div>
+      <div class="logo-tile"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div>
+      <p>${PL.length?`${PL.length} Protokoll${PL.length>1?'e':''}${off?` · ${off} noch nicht abgeschlossen`:''}`:'Druckproben, Spülungen, Inbetriebnahmen und Abnahmen dokumentieren.'}</p>
+    </section>
+    <button class="btn cta block" id="newPr">${IC('plus')}Neues Protokoll</button>
+    <div class="sec-title">Protokolle im Projekt</div>
+    ${PL.length?PL.map(x=>{ const v=VORL.find(v=>v.id===x.vorlage_id);
+      return `<a class="row-card" href="?p=${PID}&pr=${x.id}">
+        <div class="nrbox"><b>${x.nr?String(x.nr).padStart(3,'0'):'neu'}</b><small>PR</small></div>
+        <div class="mt"><b>${esc(v?.titel||x.titel||'Protokoll')}</b><small>${[dDE(x.datum),x.medium,x.abschnitt].filter(Boolean).map(esc).join(' · ')}</small>
+          <div class="tags">${x.sig_an?'<span class="pill tone-ok"><i></i>abgeschlossen</span>':'<span class="pill tone-amber"><i></i>in Arbeit</span>'}${x.sig_an&&x.ergebnis===false?'<span class="pill tone-red"><i></i>nicht dicht</span>':''}${x.anhaenge?`<span class="pill tone-gray">${x.anhaenge} Anhang${x.anhaenge>1?'e':''}</span>`:''}</div></div>
+        <span class="chev">${IC('chev')}</span></a>`; }).join('')
+      :`<div class="empty">${IC('clip')}<div>Noch kein Protokoll angelegt.</div></div>`}`;
+  $('#newPr').onclick=waehleVorlage;
+}
+function waehleVorlage(){
+  if(!VORL.length){ toast('Keine Vorlagen vorhanden'); return; }
+  const gw=[...new Set(VORL.map(v=>v.gewerk||'Sonstige'))];
+  openSheet(`<h2>Welches Protokoll?</h2>
+    ${gw.map(g=>`<div class="sec-title" style="margin-top:6px">${esc(g)}</div>`+VORL.filter(v=>(v.gewerk||'Sonstige')===g).map(v=>`<button class="vw" data-v="${esc(v.id)}"><span class="vw-ic">${IC('clip')}</span><span><b>${esc(v.titel)}</b>${v.def?.untertitel?`<small>${esc(v.def.untertitel)}</small>`:''}</span>${IC('chev')}</button>`).join('')).join('')}`,()=>{
+    $$('[data-v]').forEach(b=>b.onclick=()=>{ closeSheet(); neuesProtokoll(VORL.find(v=>v.id===b.dataset.v)); });
+  });
+}
+function neuesProtokoll(v){
+  const d={id:uid(),projekt_id:PID,nr:null,vorlage_id:v.id,def:v.def,titel:v.titel,datum:todayIso(),werte:{},name_ag:INFO.ag_vertreter||'',name_an:PJ.me?.name||'',sig_ag:null,sig_an:null,sig_ts:null,erstellt_von:PJ.me?.name||''};
+  D=d; d.werte=vorbelegung(v.def); aktualisiereBerechnet(); d.titel=v.titel;
+  saveDoc(d); FILES=[]; STEP=0; ls.set(K.step(d.id),0);
+  history.pushState(null,'',`?p=${PID}&pr=${d.id}`); window.scrollTo(0,0); renderPr();
+}
+
+/* ================= Erfassen ================= */
+const schritte=()=>[...D.def.schritte,{id:'_abschluss',titel:'Abschluss',felder:[]}];
+function renderPr(){
+  PJS.set({seite:'pr',pid:PID,pname:PROJ?.name||'',erfassen:true});
+  hdr(); $('#backBtn').innerHTML=IC('back'); $('#backBtn').href='?p='+PID;
+  aktualisiereBerechnet();
+  if(locked()) return renderGesperrt();
+  const S=schritte(); STEP=Math.min(Math.max(0,STEP),S.length-1); ls.set(K.step(D.id),STEP);
+  const s=S[STEP], fe=fehlend();
+  $('#app').innerHTML=`
+    <div class="card stepcard"><div class="steptop"><span>${prNr(D.nr)} · Schritt ${STEP+1} von ${S.length}</span><span>${esc(titelVon(D))}</span></div>
+      <div class="steps">${S.map((x,i)=>`<button class="stp${i===STEP?' on':''}${i<STEP?' done':''}${fe.some(m=>m.si===i)&&i<STEP?' warn':''}" data-step="${i}" title="${esc(x.titel)}"><i>${i+1}</i><span>${esc(x.titel)}</span></button>`).join('')}</div></div>
+    <div id="stepBody">${s.id==='_abschluss'?abschlussHtml(fe):schrittHtml(s)}</div>
+    <div class="bottombar">
+      ${STEP>0?`<button class="btn ghost" id="bBack">${IC('back')}Zurück</button>`:''}
+      ${s.id==='_abschluss'?`<button class="btn ghost" id="bPdf">${IC('file')}PDF</button><button class="btn cta" id="bMail">${IC('mail')}Senden</button>`:`<button class="btn cta" id="bNext">Weiter</button>`}
+    </div>
+    ${PJ.leitung()?`<div style="text-align:center;margin-top:6px"><button class="lnk" id="bDel" style="color:var(--red)">${IC('trash')}Protokoll löschen</button></div>`:''}`;
+  $$('[data-step]').forEach(b=>b.onclick=()=>geheZu(+b.dataset.step));
+  if($('#bBack')) $('#bBack').onclick=()=>geheZu(STEP-1);
+  if($('#bNext')) $('#bNext').onclick=()=>geheZu(STEP+1);
+  if($('#bDel')) $('#bDel').onclick=delPr;
+  if(s.id==='_abschluss') bindAbschluss(); else bindSchritt(s);
+}
+function geheZu(i){ STEP=i; ls.set(K.step(D.id),STEP); renderPr(); window.scrollTo(0,0); }
+
+function feldHtml(f){
+  if(!sichtbar(f)) return '';
+  const w=W_(), v=w[f.id], dis=locked()?' disabled':'';
+  const lab=(t,id)=>`<label for="${id}">${esc(t)}${f.pflicht?' <span class="pfl">*</span>':''}</label>`;
+  const hin=f.hinweis?`<div class="hint" style="margin-top:4px">${esc(f.hinweis)}</div>`:'';
+  switch(f.typ){
+    case 'info': return `<div class="info-box">${IC('info','sm')}<span>${esc(f.text)}</span></div>`;
+    case 'text': return `<div class="field${f.halb?' half':''}">${lab(f.label,'f_'+f.id)}<input class="inp" id="f_${f.id}" data-f="${f.id}" value="${esc(v??'')}" autocomplete="off"${dis}>${hin}</div>`;
+    case 'zahl': { const mx=maxVon(f); const over=mx!=null&&isFinite(num(v))&&num(v)>mx;
+      return `<div class="field${f.halb?' half':''}">${lab(f.label,'f_'+f.id)}<div class="unitwrap"><input class="inp" id="f_${f.id}" data-f="${f.id}" inputmode="decimal" value="${esc(v==null?'':String(v).replace('.',','))}"${dis}><span>${esc(f.einheit||'')}</span></div>
+        ${f.mpa&&isFinite(num(v))?`<div class="hint" style="margin-top:4px" data-mpa="${f.id}">= ${nfmt(num(v)/10)} MPa</div>`:f.mpa?`<div class="hint" data-mpa="${f.id}"></div>`:''}
+        ${mx!=null?`<div class="hint${over?' warnt':''}" data-max="${f.id}" style="margin-top:4px">${over?'Achtung: ':''}höchstens ${nfmt(mx)} ${esc(f.einheit||'')}</div>`:''}${hin}</div>`; }
+    case 'berechnet': { const r=berechne(f); return `<div class="field${f.halb?' half':''}"><label>${esc(f.label)}</label><div class="calc" data-calc="${f.id}">${r===''?'–':nfmt(r)+' '+esc(f.einheit||'')}</div>${f.formel==='zvshk_volumen'?'<div class="hint" style="margin-top:4px">wird aus dem Leitungsvolumen berechnet</div>':''}</div>`; }
+    case 'auswahl': { const opts=f.optionen||[], son=f.sonstiges&&v&&!opts.some(o=>o.w===v);
+      return `<div class="field">${lab(f.label,'')}<div class="opts">${opts.map(o=>`<label class="opt${v===o.w?' on':''}"><input type="radio" name="r_${f.id}" value="${esc(o.w)}" data-r="${f.id}" ${v===o.w?'checked':''}${dis}><span>${esc(o.t&&o.t!==o.w&&f.id!=='medium'?o.t:o.w)}</span></label>`).join('')}
+        ${f.sonstiges?`<label class="opt${son?' on':''}"><input type="radio" name="r_${f.id}" value="__s" data-r="${f.id}" ${son?'checked':''}${dis}><span>sonstige</span></label>`:''}</div>
+        ${f.sonstiges?`<input class="inp" style="margin-top:8px;${son?'':'display:none'}" id="s_${f.id}" data-son="${f.id}" placeholder="bitte eintragen" value="${son?esc(v):''}"${dis}>`:''}${hin}</div>`; }
+    case 'haken': return `<label class="chk big"><input type="checkbox" data-h="${f.id}" ${v===true?'checked':''}${dis}><span><b>${esc(txt(f))}${f.pflicht?' <span class="pfl">*</span>':''}</b>${f.hinweis?`<small>${esc(f.hinweis)}</small>`:''}</span></label>`;
+    case 'messung': return messHtml(f);
+    case 'dateien': return `<div class="field"><label>${esc(f.label)}</label>${f.hinweis?`<div class="hint" style="margin:-2px 0 8px">${esc(f.hinweis)}</div>`:''}
+        <div class="thumbs" data-thumbs="${f.id}">${thumbs(f.id)}</div>
+        ${locked()?'':`<label class="btn ghost sm upl">${IC('upload','sm')}Datei oder Foto hinzufügen<input type="file" accept="${esc(f.accept||'image/*')}" data-file="${f.id}" hidden></label>`}</div>`;
+  }
+  return '';
+}
+function schrittHtml(s){
+  const sch=s.schalter, an=aktiv(s);
+  return `<div class="card"><h2>${esc(s.titel)}</h2>
+    ${sch?`<label class="chk big sw"><input type="checkbox" data-sw="${sch.id}" ${an?'checked':''}${locked()?' disabled':''}><span><b>${esc(sch.text)}</b><small>${an?'':'Abschnitt wird im PDF als „nicht durchgeführt“ vermerkt.'}</small></span></label>`:''}
+    ${an?`<div class="fgrid">${s.felder.map(feldHtml).join('')}</div>`:''}</div>`;
+}
+function bindSchritt(s){
+  const w=W_();
+  $$('[data-f]').forEach(el=>el.addEventListener('input',()=>{ const f=feldListe(D.def).find(x=>x.id===el.dataset.f);
+    w[f.id]=f.typ==='zahl'?el.value.trim().replace(',','.'):el.value;
+    if(f.merken==='info') merkeInfo(f.id,el.value);
+    if(f.typ==='zahl'){ aktualisiereBerechnet(); $$('[data-calc]').forEach(c=>{ const cf=feldListe(D.def).find(x=>x.id===c.dataset.calc); const r=berechne(cf); c.textContent=r===''?'–':nfmt(r)+' '+(cf.einheit||''); });
+      const mp=$(`[data-mpa="${f.id}"]`); if(mp) mp.textContent=isFinite(num(w[f.id]))?'= '+nfmt(num(w[f.id])/10)+' MPa':'';
+      const mx=maxVon(f), mb=$(`[data-max="${f.id}"]`); if(mb&&mx!=null){ const over=isFinite(num(w[f.id]))&&num(w[f.id])>mx; mb.classList.toggle('warnt',over); mb.textContent=(over?'Achtung: ':'')+'höchstens '+nfmt(mx)+' '+(f.einheit||''); }
+      updTimer(); }
+    changed(); }));
+  $$('[data-r]').forEach(el=>el.addEventListener('change',()=>{ const id=el.dataset.r, son=$('#s_'+id);
+    if(el.value==='__s'){ if(son){ son.style.display=''; son.focus(); w[id]=son.value; } } else { w[id]=el.value; if(son) son.style.display='none'; }
+    changed(); renderPr(); }));
+  $$('[data-son]').forEach(el=>el.addEventListener('input',()=>{ w[el.dataset.son]=el.value; changed(); }));
+  $$('[data-h]').forEach(el=>el.addEventListener('change',()=>{ w[el.dataset.h]=el.checked; changed(); }));
+  $$('[data-sw]').forEach(el=>el.addEventListener('change',()=>{ w[el.dataset.sw]=el.checked; changed(); renderPr(); }));
+  bindMess(); bindDateien();
+}
+function merkeInfo(feld,wert){ const k=feld==='ag_vertreter'?'ag_vertreter':feld; INFO[k]=wert; ls.set(K.info,INFO);
+  clearTimeout(merkeInfo._t); merkeInfo._t=setTimeout(()=>enqueue({kind:'info',id:PID,v:nowIso(),data:{vergabenr:INFO.vergabenr||'',ag_vertreter:INFO.ag_vertreter||''}}),800); }
+
+/* ---------- Messung mit Prüfzeit-Timer ---------- */
+function sollMin(f){ const ff=feldListe(D.def).find(x=>x.id===f.dauer_aus); return ff?num(berechne(ff)):NaN; }
+function messHtml(f){
+  const m=W_()[f.id]||{}, soll=sollMin(f), dis=locked();
+  const lauf=m.start&&!m.ende, el=m.start?((m.ende?new Date(m.ende):new Date())-new Date(m.start))/1000:0;
+  const fertig=isFinite(soll)&&el>=soll*60;
+  return `<div class="mess" data-mess="${f.id}">
+    <div class="mess-h"><b>${esc(f.label)}</b><span>${isFinite(soll)?'Prüfzeit '+nfmt(soll)+' min':'Prüfzeit noch offen'}</span></div>
+    <div class="timer${fertig?' ok':''}${lauf?' run':''}" data-timer="${f.id}">
+      <div class="t-big">${m.start?mmss(el):'0:00'}</div>
+      <div class="t-bar"><i style="width:${isFinite(soll)&&soll>0?Math.min(100,el/(soll*60)*100):0}%"></i></div>
+      <div class="t-txt">${!m.start?'Noch nicht gestartet':m.ende?`${uhr(m.start)} bis ${uhr(m.ende)} Uhr · ${nfmt(Math.round(el/60))} min`:fertig?'Prüfzeit erreicht, Prüfung beenden':`läuft seit ${uhr(m.start)} Uhr`}</div>
+    </div>
+    ${dis?'':`<div class="t-btns">${!m.start?`<button class="btn cta" data-ms="${f.id}">${IC('clock','sm')}Prüfung starten</button>`:!m.ende?`<button class="btn ${fertig?'cta':'ghost'}" data-me="${f.id}">${IC('check','sm')}Prüfung beenden</button>`:`<button class="btn ghost sm" data-mr="${f.id}">Zeiten zurücksetzen</button>`}<button class="lnk" data-mz="${f.id}">Zeiten von Hand</button></div>`}
+    <div class="fgrid">
+      <div class="field half"><label for="mp1_${f.id}">Druck zu Beginn</label><div class="unitwrap"><input class="inp" id="mp1_${f.id}" data-mp="${f.id}|p_start" inputmode="decimal" value="${esc(String(m.p_start??'').replace('.',','))}"${dis?' disabled':''}><span>${esc(f.einheit)}</span></div></div>
+      <div class="field half"><label for="mp2_${f.id}">Druck am Ende</label><div class="unitwrap"><input class="inp" id="mp2_${f.id}" data-mp="${f.id}|p_ende" inputmode="decimal" value="${esc(String(m.p_ende??'').replace('.',','))}"${dis?' disabled':''}><span>${esc(f.einheit)}</span></div></div>
+    </div>
+    <div class="fotos2">
+      ${['start','ende'].map(k=>`<div><div class="hint" style="margin-bottom:6px">Manometer-Foto ${k==='start'?'Beginn':'Ende'} (optional)</div><div class="thumbs" data-thumbs="${f.id}_${k}">${thumbs(f.id+'_'+k)}</div>
+        ${dis?'':`<label class="btn ghost sm upl">${IC('camera','sm')}Foto<input type="file" accept="image/*" capture="environment" data-file="${f.id}_${k}" hidden></label>`}</div>`).join('')}
+    </div></div>`;
+}
+let TICK=null;
+function updTimer(){ $$('[data-timer]').forEach(t=>{ const f=feldListe(D.def).find(x=>x.id===t.dataset.timer); const fresh=document.createElement('div'); fresh.innerHTML=messHtml(f); const nt=fresh.querySelector('[data-timer]'); t.className=nt.className; t.innerHTML=nt.innerHTML;
+  const m=W_()[f.id]||{}, soll=sollMin(f); if(m.start&&!m.ende&&isFinite(soll)&&(Date.now()-new Date(m.start))>=soll*60000&&!t._summ){ t._summ=true; try{ navigator.vibrate&&navigator.vibrate([200,100,200]); }catch(e){} toast(f.label+': Prüfzeit erreicht'); } }); }
+function bindMess(){
+  clearInterval(TICK); if($('[data-timer]')) TICK=setInterval(updTimer,1000);
+  const w=W_(), setM=(id,o)=>{ w[id]={...(w[id]||{}),...o}; changed(); renderPr(); };
+  $$('[data-ms]').forEach(b=>b.onclick=()=>setM(b.dataset.ms,{start:nowIso(),ende:null}));
+  $$('[data-me]').forEach(b=>b.onclick=()=>{ const f=feldListe(D.def).find(x=>x.id===b.dataset.me), m=w[f.id]||{}, soll=sollMin(f);
+    if(isFinite(soll)&&(Date.now()-new Date(m.start))<soll*60000&&!confirm('Die Prüfzeit von '+nfmt(soll)+' min ist noch nicht erreicht. Trotzdem beenden?')) return; setM(f.id,{ende:nowIso()}); });
+  $$('[data-mr]').forEach(b=>b.onclick=()=>{ if(confirm('Start- und Endzeit zurücksetzen?')) setM(b.dataset.mr,{start:null,ende:null}); });
+  $$('[data-mz]').forEach(b=>b.onclick=()=>{ const id=b.dataset.mz, m=w[id]||{}; const loc=t=>t?new Date(new Date(t).getTime()-new Date(t).getTimezoneOffset()*60000).toISOString().slice(0,16):'';
+    openSheet(`<h2>Zeiten von Hand eintragen</h2><p class="hint" style="margin:-6px 0 12px">Falls die Prüfung ohne den Timer gelaufen ist.</p>
+      <div class="field"><label>Beginn</label><input class="inp" type="datetime-local" id="mz1" value="${loc(m.start)||loc(nowIso())}"></div>
+      <div class="field"><label>Ende</label><input class="inp" type="datetime-local" id="mz2" value="${loc(m.ende)}"></div>
+      <div class="row2"><button class="btn ghost" onclick="closeSheet()">Abbrechen</button><button class="btn cta" id="mzok">Übernehmen</button></div>`,()=>{
+      $('#mzok').onclick=()=>{ const a=$('#mz1').value, e=$('#mz2').value; if(!a){ toast('Bitte den Beginn eintragen'); return; } if(e&&new Date(e)<new Date(a)){ toast('Ende liegt vor dem Beginn'); return; }
+        closeSheet(); setM(id,{start:new Date(a).toISOString(),ende:e?new Date(e).toISOString():null}); }; }); });
+  $$('[data-mp]').forEach(el=>el.addEventListener('input',()=>{ const [id,k]=el.dataset.mp.split('|'); w[id]={...(w[id]||{}),[k]:el.value.trim().replace(',','.')}; changed(); }));
+}
+
+/* ---------- Fotos und Dateien ---------- */
+function thumbs(feld){ const fs=FILES.filter(f=>f.feld===feld);
+  return fs.map(f=>`<div class="th">${String(f.typ).startsWith('image/')?`<img src="${f.daten}" alt="">`:`<div class="th-pdf">${IC('file')}<span>${esc(f.name||'PDF')}</span></div>`}${f.pending?'<i class="th-p" title="wird noch übertragen">'+IC('sync','sm')+'</i>':''}${locked()?'':`<button data-fdel="${f.id}" aria-label="Entfernen">${IC('x','sm')}</button>`}</div>`).join(''); }
+function bindDateien(){
+  $$('[data-file]').forEach(inp=>inp.onchange=async()=>{ const file=inp.files[0]; inp.value=''; if(!file) return;
+    try{ const daten=file.type.startsWith('image/')?await bildKlein(file):await alsDataUrl(file);
+      if(daten.length>8000000){ toast('Datei zu groß (max. ca. 6 MB)'); return; }
+      const rec={id:uid(),protokoll_id:D.id,feld:inp.dataset.file,name:file.name,typ:file.type.startsWith('image/')?'image/jpeg':file.type,daten,created_at:nowIso(),pending:true};
+      await IDB.put(rec); FILES.push(rec); filesPending++; renderPr(); flushSoon(); toast('Hinzugefügt'); }
+    catch(e){ toast('Datei konnte nicht gelesen werden'); } });
+  $$('[data-fdel]').forEach(b=>b.onclick=async()=>{ const f=FILES.find(x=>x.id===b.dataset.fdel); if(!f||!confirm('Anhang entfernen?')) return;
+    try{ if(!f.pending) await pr('dateien/'+f.id,{method:'DELETE'}); await IDB.del(f.id); FILES=FILES.filter(x=>x!==f); renderPr(); }catch(e){ toast(netzFehler(e)?'Offline: Entfernen geht erst mit Verbindung':e.message); } });
+}
+const alsDataUrl=file=>new Promise((ok,err)=>{ const r=new FileReader(); r.onload=()=>ok(r.result); r.onerror=err; r.readAsDataURL(file); });
+async function bildKlein(file){ const url=await alsDataUrl(file); const im=await new Promise((ok,err)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=err; i.src=url; });
+  const s=Math.min(1,1600/Math.max(im.width,im.height)), c=document.createElement('canvas'); c.width=Math.round(im.width*s); c.height=Math.round(im.height*s);
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height); return c.toDataURL('image/jpeg',0.72); }
+
+/* ---------- Abschluss ---------- */
+function abschlussHtml(fe){
+  const d=D;
+  return `${fe.length?`<div class="card warncard"><h2>${IC('alert')}Noch offen (${fe.length})</h2>${fe.map(m=>`<button class="lnk" data-step="${m.si}" style="display:flex;text-align:left">Schritt ${m.si+1}: ${esc(m.label.length>80?m.label.slice(0,78)+' …':m.label)}</button>`).join('')}
+      <p class="hint" style="margin-top:6px">Pflichtangaben sind mit * markiert. Unterschreiben geht trotzdem, die offenen Punkte bleiben im PDF leer.</p></div>`
+      :`<div class="card okcard">${IC('check')}<b>Alle Pflichtangaben sind ausgefüllt.</b></div>`}
+    <div class="card"><h2>Ergebnis</h2><div class="erg ${W_().dicht===true?'ok':'no'}">${W_().dicht===true?IC('check')+'Die Rohrleitungen sind dicht.':IC('alert')+'„Die Rohrleitungen sind dicht“ ist nicht bestätigt.'}</div></div>
+    <div class="card"><h2>Ort und Datum</h2><div class="row2">
+      <div class="field"><label for="f_ort">Ort</label><input class="inp" id="f_ort" value="${esc(W_().ort||'')}"></div>
+      <div class="field"><label for="f_dat">Datum</label><input class="inp" type="date" id="f_dat" value="${esc(d.datum||'')}"></div></div></div>
+    <div class="card"><h2>Unterschriften</h2>
+      <div class="grid2">
+        <div><div class="field"><label for="f_nag">Auftraggeber bzw. Vertreter (optional)</label><input class="inp" id="f_nag" value="${esc(d.name_ag||'')}"></div>
+          <canvas class="sig" id="sig_ag"></canvas><div class="sigbar"><span id="sig_agt"></span><button class="lnk" data-clr="sig_ag">Löschen</button></div></div>
+        <div><div class="field"><label for="f_nan">Auftragnehmer bzw. Vertreter</label><input class="inp" id="f_nan" value="${esc(d.name_an||'')}"></div>
+          <canvas class="sig" id="sig_an"></canvas><div class="sigbar"><span id="sig_ant"></span><button class="lnk" data-clr="sig_an">Löschen</button></div></div>
+      </div>
+      <p class="hint" style="margin-top:10px">Mit der Unterschrift des Auftragnehmers wird das Protokoll abgeschlossen und gesperrt. Der Auftraggeber kann vorher unterschreiben, muss aber nicht.</p></div>`;
+}
+function bindAbschluss(){
+  const w=W_();
+  $('#f_ort').addEventListener('input',e=>{ w.ort=e.target.value; changed(); });
+  $('#f_dat').addEventListener('input',e=>{ D.datum=e.target.value; changed(); });
+  $('#f_nag').addEventListener('input',e=>{ D.name_ag=e.target.value; changed(); });
+  $('#f_nan').addEventListener('input',e=>{ D.name_an=e.target.value; changed(); });
+  setupSigs(['sig_ag','sig_an'],'sig_an');
+  $('#bPdf').onclick=async()=>{ if(!bereit()) return; dl(await pdfPr(),filePr()); };
+  $('#bMail').onclick=()=>{ if(!bereit()) return; sendDialog(()=>pdfPr(),filePr(),`${titelVon(D)} ${prNr(D.nr)} – ${PROJ?.name||''}`,
+    `Guten Tag,\n\nanbei das ${D.def.titel.startsWith('Druckprobe')?'Druckprobenprotokoll':'Protokoll'} ${prNr(D.nr)} vom ${dDE(D.datum)} für das Bauvorhaben ${PROJ?.name||''}${W_().abschnitt?' ('+W_().abschnitt+')':''}.\n\nMit freundlichen Grüßen\n${D.name_an||''}\nHeise Haustechnik GmbH & Co. KG`); };
+}
+function bereit(){
+  if(!D.nr){ toast('Wird noch gespeichert, bitte kurz warten'); flushSoon(); return false; }
+  if(!D.sig_an && !confirm('Das Protokoll ist noch nicht unterschrieben. Trotzdem PDF erstellen?')) return false;
+  return true;
+}
+function renderGesperrt(){
+  const d=D;
+  $('#app').innerHTML=`
+    <div class="lock-note">${IC('check')}<div><b>Abgeschlossen</b><br>Unterschrieben von ${esc(d.name_an||'Auftragnehmer')}${d.sig_ag?' und '+esc(d.name_ag||'Auftraggeber'):''} am ${tsDE(d.sig_ts)}. Das Protokoll kann nicht mehr geändert werden.${PJ.leitung()?' <button class="lnk" id="unlock">Zum Bearbeiten entsperren</button>':''}</div></div>
+    <div class="card"><h2>${esc(titelVon(d))}</h2><p class="hint">${prNr(d.nr)} · ${dDE(d.datum)}${W_().ort?' · '+esc(W_().ort):''}</p>
+      <div class="erg ${W_().dicht===true?'ok':'no'}" style="margin-top:10px">${W_().dicht===true?IC('check')+'Die Rohrleitungen sind dicht.':IC('alert')+'Dichtheit nicht bestätigt.'}</div></div>
+    <fieldset disabled>${d.def.schritte.map(s=>schrittHtml(s)).join('')}</fieldset>
+    <div class="bottombar"><button class="btn ghost" id="bPdf">${IC('file')}PDF</button><button class="btn cta" id="bMail">${IC('mail')}Senden</button></div>
+    ${PJ.leitung()?`<div style="text-align:center;margin-top:6px"><button class="lnk" id="bDel" style="color:var(--red)">${IC('trash')}Protokoll löschen</button></div>`:''}`;
+  $('#bPdf').onclick=async()=>dl(await pdfPr(),filePr());
+  $('#bMail').onclick=()=>sendDialog(()=>pdfPr(),filePr(),`${titelVon(D)} ${prNr(D.nr)} – ${PROJ?.name||''}`,
+    `Guten Tag,\n\nanbei das Protokoll ${prNr(D.nr)} vom ${dDE(D.datum)} für das Bauvorhaben ${PROJ?.name||''}${W_().abschnitt?' ('+W_().abschnitt+')':''}.\n\nMit freundlichen Grüßen\n${D.name_an||''}\nHeise Haustechnik GmbH & Co. KG`);
+  if($('#unlock')) $('#unlock').onclick=()=>{ if(!confirm('Entsperren löscht die Unterschrift des Auftragnehmers. Danach muss neu unterschrieben werden. Fortfahren?')) return; D.sig_an=null; saveDoc(D); STEP=schritte().length-1; renderPr(); };
+  if($('#bDel')) $('#bDel').onclick=delPr;
+}
+async function delPr(){
+  if(!confirm('Protokoll '+prNr(D.nr)+' endgültig löschen?')) return;
+  try{ if(D.nr) await pr('protokolle/'+D.id,{method:'DELETE'});
+    ls.set(K.queue,queue().filter(x=>!(x.kind==='pr'&&x.id===D.id))); ls.del(K.doc(D.id));
+    for(const f of FILES) await IDB.del(f.id).catch(()=>{});
+    location.href='?p='+PID; }catch(e){ toast(e.message); }
+}
+
+/* ================= Unterschriften ================= */
+function setupSigs(ids,lockId){
+  ids.forEach(id=>{
+    const c=$('#'+id), ctx=c.getContext('2d'); let draw=false,last=null,dirty=false;
+    const size=()=>{ const r=c.getBoundingClientRect(), dp=devicePixelRatio||1; c.width=r.width*dp; c.height=r.height*dp; ctx.setTransform(dp,0,0,dp,0,0); ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#0d1524'; ctx.fillStyle='#0d1524';
+      if(D[id]){ const im=new Image(); im.onload=()=>ctx.drawImage(im,0,0,r.width,r.height); im.src=D[id]; } };
+    c._size=size; size();
+    const pt=e=>{ const r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
+    c.addEventListener('pointerdown',e=>{ e.preventDefault(); c.setPointerCapture(e.pointerId); draw=true; dirty=true; last=pt(e); ctx.beginPath(); ctx.arc(last.x,last.y,1.1,0,7); ctx.fill(); });
+    c.addEventListener('pointermove',e=>{ if(!draw) return; const p=pt(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; });
+    const end=()=>{ if(!draw) return; draw=false; if(!dirty) return; dirty=false;
+      if(id===lockId){ const fe=fehlend(); if(fe.length&&!confirm(fe.length+' Pflichtangabe(n) sind noch offen. Trotzdem abschließen?')){ D[id]=null; ctx.clearRect(0,0,c.width,c.height); return; } }
+      D[id]=c.toDataURL('image/png'); D.sig_ts=nowIso(); sigText(ids);
+      if(id===lockId){ clearTimeout(saveT); saveDoc(D); toast('Unterschrieben – das Protokoll ist abgeschlossen'); setTimeout(renderPr,900); } else changed(); };
+    ['pointerup','pointercancel','pointerleave'].forEach(ev=>c.addEventListener(ev,end));
+  });
+  $$('[data-clr]').forEach(b=>b.onclick=()=>{ D[b.dataset.clr]=null; if(!ids.some(i=>D[i])) D.sig_ts=null; const c=$('#'+b.dataset.clr); c.getContext('2d').clearRect(0,0,c.width,c.height); c._size(); sigText(ids); changed(); });
+  sigText(ids);
+}
+function sigText(ids){ ids.forEach(id=>{ const el=$('#'+id+'t'); if(el) el.textContent=D[id]?'unterschrieben '+tsDE(D.sig_ts):'Mit Finger oder Stift unterschreiben'; }); }
+window.addEventListener('resize',()=>{ $$('canvas.sig').forEach(c=>c._size&&c._size()); });
+
+/* ================= PDF ================= */
+const filePr=()=>safe('Protokoll_'+prNr(D.nr)+'_'+(D.def.titel||'')+'_'+(PROJ?.name||'')+'_'+D.datum)+'.pdf';
+async function pdfPr(){
+  const d=D, w=d.werte, def=d.def, { jsPDF }=window.jspdf, doc=new jsPDF({unit:'mm',format:'a4'});
+  aktualisiereBerechnet();
+  let y=await pdfKopf(doc,titelVon(d),prNr(d.nr)+(w.abschnitt?' · '+w.abschnitt:''));
+  const BR=W-2*M;
+  const need=h=>{ if(y+h>278){ doc.addPage(); y=20; } };
+  const sec=(t,zusatz)=>{ need(14); y+=3; doc.setFillColor(238,240,245); doc.rect(M,y-4.6,BR,7,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(47,59,83); doc.text(t,M+2,y); if(zusatz){ doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(120); doc.text(zusatz,W-M-2,y,{align:'right'}); } y+=6.5; doc.setTextColor(40); };
+  const kv=(l,v)=>{ doc.setFontSize(9.5); const lines=doc.splitTextToSize(v===''||v==null?'–':String(v),BR-62), ll=doc.splitTextToSize(l,57), n=Math.max(lines.length,ll.length); need(n*4.6+1.2); doc.setFont('helvetica','normal'); doc.setTextColor(110); doc.text(ll,M+2,y); doc.setTextColor(30); doc.text(lines,M+62,y); y+=n*4.6+1.2; };
+  const box=(on,text,hin)=>{ doc.setFontSize(9.5); const lines=doc.splitTextToSize(text,BR-10); need(lines.length*4.6+1.6); doc.setDrawColor(70); doc.setLineWidth(0.3); doc.rect(M+2,y-3.3,3.8,3.8);
+    if(on){ doc.setDrawColor(226,83,4); doc.setLineWidth(0.6); doc.line(M+2.6,y-1.4,M+3.7,y-0.1); doc.line(M+3.7,y-0.1,M+5.4,y-2.8); doc.setLineWidth(0.2); }
+    doc.setFont('helvetica','normal'); doc.setTextColor(on?30:110); doc.text(lines,M+9,y); y+=lines.length*4.6+1.6; doc.setTextColor(30); };
+  const info=t=>{ doc.setFontSize(8.5); doc.setFont('helvetica','italic'); doc.setTextColor(110); const lines=doc.splitTextToSize(t,BR-4); need(lines.length*4+1); doc.text(lines,M+2,y); y+=lines.length*4+1.5; doc.setFont('helvetica','normal'); doc.setTextColor(30); };
+  const wert=f=>{ const v=w[f.id]; if(f.typ==='zahl') return isFinite(num(v))?nfmt(v)+' '+(f.einheit||'')+(f.mpa?' ('+nfmt(num(v)/10)+' MPa)':''):''; if(f.typ==='berechnet'){ const r=berechne(f); return r===''?'':nfmt(r)+' '+(f.einheit||''); } if(f.typ==='auswahl') return f.id==='medium'?v||'':(optTitel(f,v)||''); return v||''; };
+  const anlagen=[];
+  def.schritte.forEach((s,si)=>{
+    const an=aktiv(s);
+    sec(si===0?'Angaben zum Bauvorhaben':s.titel, s.schalter?(an?'durchgeführt':'nicht durchgeführt'):'');
+    if(!an) return;
+    if(si===0) kv('Datum',dDE(d.datum));
+    s.felder.forEach(f=>{
+      if(!sichtbar(f)) return;
+      if(f.typ==='info') info(f.text);
+      else if(f.typ==='haken') box(w[f.id]===true,txt(f));
+      else if(f.typ==='messung'){ const m=w[f.id]||{}, soll=sollMin(f), dau=m.start&&m.ende?Math.round((new Date(m.ende)-new Date(m.start))/60000):null;
+        need(26);
+        doc.autoTable({startY:y-2.5,margin:{left:M+2,right:M},tableWidth:BR-2,theme:'grid',styles:{fontSize:8.8,cellPadding:1.3,lineColor:[210,214,222],textColor:[30,30,30]},headStyles:{fillColor:[47,59,83],textColor:255,fontStyle:'bold'},
+          head:[['',`Uhrzeit`,`Druck (${f.einheit})`]],body:[['Beginn',m.start?tsDE(m.start):'',nfmt(m.p_start)],['Ende',m.ende?tsDE(m.ende):'',nfmt(m.p_ende)]],columnStyles:{0:{cellWidth:30,fontStyle:'bold'}}});
+        y=doc.lastAutoTable.finalY+5;
+        kv('Prüfdauer',dau!=null?dau+' min'+(isFinite(soll)?' (gefordert '+nfmt(soll)+' min)':''):(isFinite(soll)?'gefordert '+nfmt(soll)+' min':''));
+        ['start','ende'].forEach(k=>FILES.filter(x=>x.feld===f.id+'_'+k).forEach(x=>anlagen.push({...x,cap:s.titel+', Manometer '+(k==='start'?'Beginn':'Ende')})));
+      }
+      else if(f.typ==='dateien'){ const fs=FILES.filter(x=>x.feld===f.id); fs.forEach(x=>anlagen.push({...x,cap:f.label.replace(' (optional)','')})); kv(f.label.replace(' (optional)',''),fs.length?fs.length+' Anlage'+(fs.length>1?'n':'')+' (siehe Anhang)':'–'); }
+      else kv(f.label,wert(f));
+    });
+  });
+  // Unterschriften
+  need(58); y+=4;
+  doc.setFontSize(9.5); doc.setTextColor(30); doc.text('Ort, Datum: '+[w.ort,dDE(d.datum)].filter(Boolean).join(', '),M,y); y+=4;
+  y=pdfSig(doc,y,[[d.sig_ag,'Auftraggeber bzw. Vertreter',d.name_ag],[d.sig_an,'Auftragnehmer bzw. Vertreter',d.name_an]],d.sig_ts);
+  // Fotos als Anlage
+  const bilder=anlagen.filter(a=>String(a.typ).startsWith('image/')), pdfs=anlagen.filter(a=>a.typ==='application/pdf');
+  if(bilder.length){ doc.addPage(); y=20; doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(47,59,83); doc.text('Anlage: Fotos und Diagramme',M,y); y+=8;
+    const bw=(BR-8)/2, bh=bw*0.75; let col=0;
+    bilder.forEach(b=>{ if(col===0&&y+bh+10>280){ doc.addPage(); y=20; }
+      const x=M+col*(bw+8); try{ const ip=doc.getImageProperties(b.daten); let ww=bw, hh=bw*ip.height/ip.width; if(hh>bh){ hh=bh; ww=bh*ip.width/ip.height; } doc.addImage(b.daten,'JPEG',x,y,ww,hh,undefined,'FAST'); }catch(e){}
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(90); doc.text(doc.splitTextToSize(b.cap,bw),x,y+bh+4);
+      col++; if(col===2){ col=0; y+=bh+12; } }); }
+  pdfFuss(doc,'Heise Haustechnik GmbH & Co. KG · Ramsenweg 2c · 38700 Braunlage');
+  let blob=doc.output('blob');
+  if(pdfs.length){ try{ await ladeSkript('lib/pdf-lib.min.js',()=>window.PDFLib);
+      const haupt=await PDFLib.PDFDocument.load(await blob.arrayBuffer());
+      for(const p of pdfs){ const src=await PDFLib.PDFDocument.load(Uint8Array.from(atob(p.daten.split(',')[1]),c=>c.charCodeAt(0)),{ignoreEncryption:true}); const seiten=await haupt.copyPages(src,src.getPageIndices()); seiten.forEach(s=>haupt.addPage(s)); }
+      blob=new Blob([await haupt.save()],{type:'application/pdf'}); }
+    catch(e){ console.warn(e); toast('PDF-Anhang konnte nicht angefügt werden'); } }
+  return blob;
+}
+function ladeSkript(src,test){ return test()?Promise.resolve():new Promise((ok,err)=>{ const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>err(new Error('Bibliothek fehlt')); document.head.appendChild(s); }); }
+
+
+/* ================= gemeinsame Bausteine (wie Zusätzliche Arbeiten) ================= */
+let LOGO=null;
+async function logoData(){ if(LOGO!==null) return LOGO; try{ const b=await (await fetch('lib/heise-logo.png')).blob(); LOGO=await new Promise(r=>{ const f=new FileReader(); f.onload=()=>r(f.result); f.readAsDataURL(b); }); }catch(e){ LOGO=''; } return LOGO; }
+const safe=s=>String(s).replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss').replace(/[^A-Za-z0-9-]+/g,'_');
+const W=210,M=16;
+async function pdfKopf(doc,titel,nr){
+  const lg=await logoData(); if(lg) doc.addImage(lg,'PNG',W-M-38,8,38,38*91.014/200,undefined,'FAST');
+  doc.setTextColor(47,59,83); doc.setFont('helvetica','bold'); doc.setFontSize(17); const tl=doc.splitTextToSize(titel,W-2*M-46); doc.text(tl,M,17);
+  const o=(tl.length-1)*7;   // zweizeiliger Titel schiebt den Rest nach unten
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100); doc.text('Heise Haustechnik GmbH & Co. KG · Ramsenweg 2c · 38700 Braunlage',M,24+o);
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(226,83,4); doc.text(nr,M,31+o);
+  doc.setDrawColor(226,83,4); doc.setLineWidth(0.8); doc.line(M,34+o,W-M,34+o); doc.setLineWidth(0.2); doc.setTextColor(58,58,58); doc.setFont('helvetica','normal');
+  return 38+o;
+}
+function pdfFuss(doc,txt){ const n=doc.getNumberOfPages(); for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120); doc.text(txt,M,290); doc.text('Seite '+i+' von '+n,W-M,290,{align:'right'}); } }
+function pdfSig(doc,y,felder,ts){
+  const bw=(W-2*M-12)/2;
+  felder.forEach(([img,lab,name],i)=>{
+    const x=M+i*(bw+12);
+    if(img){ try{ const ip=doc.getImageProperties(img); let hh=22, ww=hh*ip.width/ip.height; if(ww>bw){ ww=bw; hh=ww*ip.height/ip.width; } doc.addImage(img,'PNG',x,y+24-hh,ww,hh,undefined,'FAST'); }catch(e){ console.warn('Unterschrift',e); } }
+    doc.setDrawColor(90); doc.line(x,y+25,x+bw,y+25); doc.setFontSize(8.5); doc.setFont('helvetica','normal'); doc.setTextColor(58,58,58);
+    doc.text(doc.splitTextToSize(lab+(name?': '+name:''),bw),x,y+29); doc.setTextColor(120); doc.text(img?'unterschrieben am '+tsDE(ts):'nicht unterschrieben',x,y+37); doc.setTextColor(58,58,58);
+  });
+  return y+40;
+}
+function dl(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500); }
+
+/* ================= Senden (wie im Bautagebuch) ================= */
+function empfaenger(){ try{ const a=JSON.parse(PROJ?.empfaenger||'[]'); return Array.isArray(a)?a.filter(x=>x&&x.email):[]; }catch(e){ return []; } }
+const canShareFiles=()=>{ try{ return !!(navigator.canShare&&navigator.canShare({files:[new File(['x'],'x.pdf',{type:'application/pdf'})]})); }catch(e){ return false; } };
+function sendDialog(build,name,subject,text){
+  const em=empfaenger(), share=canShareFiles();
+  openSheet(`<h2>PDF senden</h2>
+    ${em.length?`<label style="font-size:13px;font-weight:700;color:var(--ink-3)">Empfänger</label>`+em.map((r,i)=>`<label class="chk"><input type="checkbox" data-em="${i}" checked><span><b>${esc(r.name||r.email)}</b><small>${esc([r.rolle,r.email].filter(Boolean).join(' · '))}</small></span></label>`).join('')
+      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Bauleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
+    <div class="field" style="margin-top:12px"><label for="em_x">Weitere Adresse (optional)</label><input class="inp" id="em_x" type="email" inputmode="email" placeholder="name@firma.de"></div>
+    <p class="hint" id="em_st">PDF wird erstellt …</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      ${share?`<button class="btn cta block" id="em_share" disabled>${IC('share')}Teilen mit PDF-Anhang</button>`:''}
+      <button class="btn ${share?'ghost':'cta'} block" id="em_mail" disabled>${IC('mail')}Im Mailprogramm öffnen</button></div>
+    <p class="hint" style="margin-top:10px">${share?'Beim Teilen werden die Empfänger in die Zwischenablage kopiert, im Mailprogramm ins Feld „An“ einfügen. ':''}„Im Mailprogramm öffnen“ trägt die Empfänger ein und speichert das PDF, das dann noch angehängt werden muss.</p>`,async()=>{
+    const to=()=>{ const a=$$('[data-em]').filter(c=>c.checked).map(c=>em[+c.dataset.em].email); const x=$('#em_x').value.trim(); if(x) a.push(x); return [...new Set(a)]; };
+    let blob=null;
+    try{ blob=await build(); }catch(e){ $('#em_st').textContent='PDF konnte nicht erstellt werden: '+e.message; return; }
+    $('#em_st').textContent='PDF ist fertig.';
+    const file=new File([blob],name,{type:'application/pdf'});
+    if($('#em_share')){ $('#em_share').disabled=false; $('#em_share').onclick=async()=>{
+      const a=to(); if(a.length&&navigator.clipboard) navigator.clipboard.writeText(a.join(', ')).catch(()=>{});
+      try{ await navigator.share({files:[file],title:subject,text}); closeSheet(); if(a.length) toast('Empfänger wurden kopiert'); }catch(e){ if(e.name!=='AbortError') toast('Teilen nicht möglich: '+e.message); } }; }
+    $('#em_mail').disabled=false; $('#em_mail').onclick=()=>{
+      const a=to(); dl(blob,name); closeSheet(); toast('PDF gespeichert – bitte an die E-Mail anhängen');
+      setTimeout(()=>location.href=`mailto:${a.map(encodeURIComponent).join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`,600); };
+  });
+}
+function openSheet(html,after){ $('#sheet').innerHTML=html; $('#ov').classList.add('on'); $('#sheet').classList.add('on'); after&&after(); }
+function closeSheet(){ $('#sheet').classList.remove('on'); $('#ov').classList.remove('on'); }
+$('#ov').onclick=closeSheet;
+
+/* ================= Start ================= */
+async function route(){
+  const id=new URLSearchParams(location.search).get('pr');
+  try{
+    if(id){ D=await loadDoc(id); D.werte=D.werte||{}; await loadFiles(id); STEP=ls.get(K.step(id),0); renderPr(); }
+    else renderList();
+  }catch(e){ $('#app').innerHTML=`<div class="err">Protokoll nicht gefunden.</div><a class="btn ghost" href="?p=${PID}">Zurück</a>`; }
+}
+(async function(){
+  $('#backBtn').innerHTML=IC('back');
+  if(!PID){ $('#app').innerHTML='<div class="empty">Kein Projekt gewählt. <a href="index.html">Zur Projektübersicht</a></div>'; return; }
+  if(PJ.ready) await PJ.ready;
+  try{ await loadBase(); }catch(e){ $('#app').innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="index.html#p=${PID}">Zum Projekt</a>`; return; }
+  await route();
+  window.addEventListener('popstate',route);
+  document.title='Protokolle · '+(PROJ?.name||'');
+  filesPending=(await IDB.all().catch(()=>[])).filter(f=>f.pending).length;
+  updSync(); flush();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+
+</script>
+</body>
+</html>

@@ -9,7 +9,7 @@
   const W = 272;
   const css = `
 .pjs-rail{display:none}
-.pjs-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;grid-template-columns:repeat(4,1fr);align-items:end;padding:8px 6px calc(8px + var(--safe-b,0px));background:var(--surface);background:color-mix(in srgb,var(--surface) 86%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line)}
+.pjs-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;grid-template-columns:repeat(5,1fr);align-items:end;padding:8px 6px calc(8px + var(--safe-b,0px));background:var(--surface);background:color-mix(in srgb,var(--surface) 86%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line)}
 body.pjs-tabs .pjs-tabbar{display:grid}
 body.pjs-tabs{padding-bottom:calc(66px + var(--safe-b,0px))}
 body.pjs-tabs .bottombar{bottom:calc(66px + var(--safe-b,0px))}
@@ -101,7 +101,8 @@ body.pjs-tabs .toast{bottom:calc(150px + var(--safe-b,0px))}
       (pid ? `<div class="pjs-sec" title="${esc(S.pname)}">${esc(S.pname || 'Projekt')}</div>` +
         `<a class="pjs-item${onP}" href="index.html#p=${encodeURIComponent(pid)}">${ic('ruler')}Übersicht und Aufmaße</a>` +
         `<a class="pjs-item${on('btb')}" href="bautagebuch.html?p=${encodeURIComponent(pid)}">${ic('book')}Bautagebuch</a>` +
-        `<a class="pjs-item${on('za')}" href="zusatz.html?p=${encodeURIComponent(pid)}">${ic('clock')}Zusätzliche Arbeiten</a>` : '') +
+        `<a class="pjs-item${on('za')}" href="zusatz.html?p=${encodeURIComponent(pid)}">${ic('clock')}Zusätzliche Arbeiten</a>` +
+        `<a class="pjs-item${on('pr')}" href="protokoll.html?p=${encodeURIComponent(pid)}">${ic('clip')}Protokolle</a>` : '') +
       `</nav>` +
       `<div class="pjs-foot">` +
       `<a class="pjs-item" href="${portal()}#/nachrichten">${ic('bell')}Nachrichten${nzb}</a>` +
@@ -116,7 +117,8 @@ body.pjs-tabs .toast{bottom:calc(150px + var(--safe-b,0px))}
       `<a class="pjs-tab${on('liste')}" href="index.html">${ic('folder')}<span>Projekte</span></a>` +
       `<a class="pjs-tab${onP}" href="index.html#p=${encodeURIComponent(pid)}">${ic('ruler')}<span>Aufmaß</span></a>` +
       `<a class="pjs-tab${on('btb')}" href="bautagebuch.html?p=${encodeURIComponent(pid)}">${ic('book')}<span>Bautagebuch</span></a>` +
-      `<a class="pjs-tab${on('za')}" href="zusatz.html?p=${encodeURIComponent(pid)}">${ic('clock')}<span>Zusatz</span></a>` : '';
+      `<a class="pjs-tab${on('za')}" href="zusatz.html?p=${encodeURIComponent(pid)}">${ic('clock')}<span>Zusatz</span></a>` +
+      `<a class="pjs-tab${on('pr')}" href="protokoll.html?p=${encodeURIComponent(pid)}">${ic('clip')}<span>Protokolle</span></a>` : '';
   }
 
   // Leiste „My Heise · Nachrichten“ oben auf der Startseite des Moduls (nur Handy, wie in den anderen Modulen)
