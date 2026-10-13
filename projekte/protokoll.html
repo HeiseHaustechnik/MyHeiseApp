@@ -93,6 +93,20 @@ fieldset:disabled .inp{background:var(--surface-2);color:var(--ink-2)}
 .erg{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;font-weight:700}
 .erg.ok{background:var(--ok-bg)}.erg.ok .ic{color:var(--ok)}.erg.no{background:var(--red-bg)}.erg.no .ic{color:var(--red)}
 
+.liste{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
+.li{border-bottom:1px solid var(--line);padding-bottom:4px}
+.li .chk{border-bottom:0;padding:8px 2px}
+.li .chk b{font-weight:600;font-size:14px;line-height:1.3}
+.li .chk em{font-style:normal;color:var(--ink-3);font-weight:700;margin-right:6px;font-size:12.5px}
+.li.on .chk b{color:var(--ink)}
+.li-bem{min-height:40px;margin:0 0 6px 34px;width:calc(100% - 34px);font-size:14px}
+.li-eig{display:flex;gap:8px;align-items:center;padding:8px 0 6px}
+.li-eig .inp{flex:1}
+.zl{border-radius:16px;background:var(--surface-2);padding:10px 12px 2px;margin-bottom:10px}
+.zl-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.zl .delbtn{height:34px;width:34px}
+.calc.sm{min-height:50px;font-size:15px;background:var(--surface)}
+textarea.inp{min-height:84px;resize:vertical;padding-top:12px}
 </style>
 </head>
 <body>
@@ -202,7 +216,7 @@ async function loadBase(){
   // Werte für „Auftraggeber vertreten durch“ usw. aus noch nicht übertragenen Änderungen
   const qi=queue().find(it=>it.kind==='info'&&it.id===PID); if(qi) Object.assign(INFO,qi.data);
 }
-const listRow=d=>({id:d.id,nr:d.nr,vorlage_id:d.vorlage_id,titel:d.titel,datum:d.datum,medium:d.werte?.medium,abschnitt:d.werte?.abschnitt,werkstoff:d.werte?.werkstoff,verbindung:d.werte?.verbindung,ergebnis:d.werte?.dicht,sig_an:!!d.sig_an,sig_ag:!!d.sig_ag,erstellt_von:d.erstellt_von,updated_at:d.updated_at,anhaenge:0});
+const listRow=d=>({id:d.id,nr:d.nr,vorlage_id:d.vorlage_id,titel:d.titel,datum:d.datum,medium:d.werte?.medium,abschnitt:d.werte?.abschnitt,werkstoff:d.werte?.werkstoff,verbindung:d.werte?.verbindung,ergebnis_ok:d.def?.ergebnis?(ergebnis(d)?.ok??null):null,sig_an:!!d.sig_an,sig_ag:!!d.sig_ag,erstellt_von:d.erstellt_von,updated_at:d.updated_at,anhaenge:0});
 function saveDoc(d){
   d.updated_at=nowIso(); ls.set(K.doc(d.id),d);
   const data={projekt_id:d.projekt_id,vorlage_id:d.vorlage_id,def:d.def,titel:d.titel,datum:d.datum,werte:d.werte,name_ag:d.name_ag||'',name_an:d.name_an||'',sig_ag:d.sig_ag||'',sig_an:d.sig_an||'',sig_ts:d.sig_ts||''};
@@ -236,22 +250,33 @@ const feldListe=def=>def.schritte.flatMap(s=>s.felder.map(f=>({...f,_schritt:s})
 function optTitel(f,w){ const o=(f.optionen||[]).find(o=>o.w===w); return o?(o.t||o.w):w; }
 function txt(f){ if(typeof f.text!=='object') return f.text||''; const k=W_()[f.text_nach]; return f.text[k]??f.text['*']??''; }
 function sichtbar(f){ if(!f.wenn) return true; const v=W_()[f.wenn.feld]; return (f.wenn.ist||[]).includes(v); }
-function aktiv(s){ return !s.schalter || W_()[s.schalter.id]!==false; }
-function berechne(f){
-  if(f.formel==='fest') return f.wert;
-  if(f.formel==='zvshk_volumen'){ const v=num(W_()[f.aus]); if(!isFinite(v)||v<=0) return ''; return v<=100?120:120+20*Math.ceil((v-100)/100); }
+function aktiv(s){ return (!s.schalter || W_()[s.schalter.id]!==false) && sichtbar(s); }
+const feldDef=id=>feldListe(D.def).find(x=>x.id===id);
+function wertVon(id,ctx){ if(ctx&&id in ctx) return num(ctx[id]); const f=feldDef(id); if(f&&f.typ==='berechnet') return num(berechne(f)); return num(W_()[id]); }
+function berechne(f,ctx){
+  const rd=x=>f.runden!=null?Math.round(x*10**f.runden)/10**f.runden:x;
+  switch(f.formel){
+    case 'fest': return f.wert;
+    case 'zvshk_volumen': { const v=wertVon(f.aus,ctx); if(!isFinite(v)||v<=0) return ''; return v<=100?120:120+20*Math.ceil((v-100)/100); }
+    case 'produkt': { const v=wertVon(f.aus,ctx); if(!isFinite(v)) return ''; let x=v*f.faktor; if(f.min_wert!=null) x=Math.max(x,f.min_wert); return rd(x); }
+    case 'differenz_abs': { const a=wertVon(f.a,ctx), b=wertVon(f.b,ctx); if(!isFinite(a)||!isFinite(b)) return ''; return rd(Math.abs(a-b)); }
+    case 'tabelle': { const v=ctx&&f.aus in ctx?ctx[f.aus]:W_()[f.aus]; const x=(f.werte||{})[v]; return x==null?'':x; }
+    case 'stufen': { const v=wertVon(f.aus,ctx); if(!isFinite(v)) return ''; for(const [bis,x] of f.stufen){ if(bis==null||v<bis) return x; } return ''; }
+  }
   return '';
 }
-function maxVon(f){ if(!f.max_aus) return null; const sel=W_()[f.max_aus]; const ff=feldListe(D.def).find(x=>x.id===f.max_aus); const o=(ff?.optionen||[]).find(o=>o.w===sel); return o&&o.max!=null?o.max:null; }
+function maxVon(f){ if(f.max!=null) return f.max; if(!f.max_aus) return null; const sel=W_()[f.max_aus]; const ff=feldDef(f.max_aus); const o=(ff?.optionen||[]).find(o=>o.w===sel); return o&&o.max!=null?o.max:null; }
 function aktualisiereBerechnet(){ feldListe(D.def).filter(f=>f.typ==='berechnet').forEach(f=>{ W_()[f.id]=berechne(f); }); }
-function titelVon(d){ const def=d.def; if(!def.pdf_titel) return def.titel; const med=feldListe(def).find(f=>f.id==='medium'); return def.pdf_titel.replace('{medium}',med?optTitel(med,d.werte.medium)||'…':''); }
+function titelVon(d){ const def=d.def; if(!def.pdf_titel) return def.titel; const med=feldListe(def).find(f=>f.id==='medium'||f.id==='anlage'); return def.pdf_titel.replace(/\{(medium|anlage)\}/,()=>med?optTitel(med,d.werte[med.id])||'…':''); }
 function fehlend(){
   const out=[];
   D.def.schritte.forEach((s,si)=>{ if(!aktiv(s)) return; s.felder.forEach(f=>{ if(!f.pflicht||!sichtbar(f)) return;
-    const v=W_()[f.id]; const leer=f.typ==='haken'?v!==true:(v==null||String(v).trim()==='');
+    const v=W_()[f.id]; const leer=f.typ==='haken'?v!==true:f.typ==='liste'||f.typ==='zeilen'?!(Array.isArray(v)&&v.length):(v==null||String(v).trim()==='');
     if(leer) out.push({si,label:f.typ==='haken'?txt(f):f.label}); }); });
   return out;
 }
+// Ergebnis der Vorlage (z. B. „Die Rohrleitungen sind dicht.“), nicht jede Vorlage hat eins
+function ergebnis(d){ const e=(d||D).def.ergebnis; if(!e) return null; const v=(d||D).werte[e.feld]; const ok=e.ok_wert!=null?v===e.ok_wert:v===true; return {ok, offen:v==null||v==='', ja:e.ja, nein:e.nein}; }
 const ortAus=a=>{ const t=String(a||'').split(',').pop().trim(); return t.replace(/^\d{5}\s*/,''); };
 function vorbelegung(def){
   const w={}, letztes=PL.find(x=>x.vorlage_id===D?.vorlage_id)||null;
@@ -262,6 +287,7 @@ function vorbelegung(def){
     else if(vb==='projekt.nr') w[f.id]=PROJ?.nr||'';
     else if(vb&&vb.startsWith('info.')) w[f.id]=INFO[vb.slice(5)]||'';
     else if(vb==='ich') w[f.id]=PJ.me?.name||'';
+    else if(vb==='heute') w[f.id]=todayIso();
     else if(vb==='letztes'&&letztes&&letztes[f.id]) w[f.id]=letztes[f.id];
   });
   def.schritte.forEach(s=>{ if(s.schalter) w[s.schalter.id]=s.schalter.standard!==false; });
@@ -287,7 +313,7 @@ function renderList(){
       return `<a class="row-card" href="?p=${PID}&pr=${x.id}">
         <div class="nrbox"><b>${x.nr?String(x.nr).padStart(3,'0'):'neu'}</b><small>PR</small></div>
         <div class="mt"><b>${esc(v?.titel||x.titel||'Protokoll')}</b><small>${[dDE(x.datum),x.medium,x.abschnitt].filter(Boolean).map(esc).join(' · ')}</small>
-          <div class="tags">${x.sig_an?'<span class="pill tone-ok"><i></i>abgeschlossen</span>':'<span class="pill tone-amber"><i></i>in Arbeit</span>'}${x.sig_an&&x.ergebnis===false?'<span class="pill tone-red"><i></i>nicht dicht</span>':''}${x.anhaenge?`<span class="pill tone-gray">${x.anhaenge} Anhang${x.anhaenge>1?'e':''}</span>`:''}</div></div>
+          <div class="tags">${x.sig_an?'<span class="pill tone-ok"><i></i>abgeschlossen</span>':'<span class="pill tone-amber"><i></i>in Arbeit</span>'}${x.sig_an&&x.ergebnis_ok===false?`<span class="pill tone-red"><i></i>${esc(VORL.find(v=>v.id===x.vorlage_id)?.def?.ergebnis?.kurz_nein||'Ergebnis offen')}</span>`:''}${x.anhaenge?`<span class="pill tone-gray">${x.anhaenge} Anhang${x.anhaenge>1?'e':''}</span>`:''}</div></div>
         <span class="chev">${IC('chev')}</span></a>`; }).join('')
       :`<div class="empty">${IC('clip')}<div>Noch kein Protokoll angelegt.</div></div>`}`;
   $('#newPr').onclick=waehleVorlage;
@@ -340,25 +366,70 @@ function feldHtml(f){
   const hin=f.hinweis?`<div class="hint" style="margin-top:4px">${esc(f.hinweis)}</div>`:'';
   switch(f.typ){
     case 'info': return `<div class="info-box">${IC('info','sm')}<span>${esc(f.text)}</span></div>`;
-    case 'text': return `<div class="field${f.halb?' half':''}">${lab(f.label,'f_'+f.id)}<input class="inp" id="f_${f.id}" data-f="${f.id}" value="${esc(v??'')}" autocomplete="off"${dis}>${hin}</div>`;
+    case 'text': return f.mehrzeilig
+      ? `<div class="field">${lab(f.label,'f_'+f.id)}<textarea class="inp" rows="3" id="f_${f.id}" data-f="${f.id}" placeholder="${esc(f.platzhalter||'')}"${dis}>${esc(v??'')}</textarea>${hin}</div>`
+      : `<div class="field${f.halb?' half':''}">${lab(f.label,'f_'+f.id)}<input class="inp" id="f_${f.id}" data-f="${f.id}" value="${esc(v??'')}" placeholder="${esc(f.platzhalter||'')}" autocomplete="off"${dis}>${hin}</div>`;
+    case 'datum': return `<div class="field${f.halb?' half':''}">${lab(f.label,'f_'+f.id)}<input class="inp" type="date" id="f_${f.id}" data-f="${f.id}" value="${esc(v??'')}"${dis}>${hin}</div>`;
     case 'zahl': { const mx=maxVon(f); const over=mx!=null&&isFinite(num(v))&&num(v)>mx;
       return `<div class="field${f.halb?' half':''}">${lab(f.label,'f_'+f.id)}<div class="unitwrap"><input class="inp" id="f_${f.id}" data-f="${f.id}" inputmode="decimal" value="${esc(v==null?'':String(v).replace('.',','))}"${dis}><span>${esc(f.einheit||'')}</span></div>
-        ${f.mpa&&isFinite(num(v))?`<div class="hint" style="margin-top:4px" data-mpa="${f.id}">= ${nfmt(num(v)/10)} MPa</div>`:f.mpa?`<div class="hint" data-mpa="${f.id}"></div>`:''}
+        ${f.mpa?`<div class="hint" style="margin-top:4px" data-mpa="${f.id}">${isFinite(num(v))?'= '+nfmt(num(v)/10)+' MPa':''}</div>`:''}
         ${mx!=null?`<div class="hint${over?' warnt':''}" data-max="${f.id}" style="margin-top:4px">${over?'Achtung: ':''}höchstens ${nfmt(mx)} ${esc(f.einheit||'')}</div>`:''}${hin}</div>`; }
-    case 'berechnet': { const r=berechne(f); return `<div class="field${f.halb?' half':''}"><label>${esc(f.label)}</label><div class="calc" data-calc="${f.id}">${r===''?'–':nfmt(r)+' '+esc(f.einheit||'')}</div>${f.formel==='zvshk_volumen'?'<div class="hint" style="margin-top:4px">wird aus dem Leitungsvolumen berechnet</div>':''}</div>`; }
+    case 'berechnet': { const r=berechne(f); return `<div class="field${f.halb?' half':''}"><label>${esc(f.label)}</label><div class="calc" data-calc="${f.id}">${r===''?'–':nfmt(r)+' '+esc(f.einheit||'')}</div>${f.hinweis?`<div class="hint" style="margin-top:4px">${esc(f.hinweis)}</div>`:''}</div>`; }
     case 'auswahl': { const opts=f.optionen||[], son=f.sonstiges&&v&&!opts.some(o=>o.w===v);
-      return `<div class="field">${lab(f.label,'')}<div class="opts">${opts.map(o=>`<label class="opt${v===o.w?' on':''}"><input type="radio" name="r_${f.id}" value="${esc(o.w)}" data-r="${f.id}" ${v===o.w?'checked':''}${dis}><span>${esc(o.t&&o.t!==o.w&&f.id!=='medium'?o.t:o.w)}</span></label>`).join('')}
+      return `<div class="field">${lab(f.label,'')}<div class="opts">${opts.map(o=>`<label class="opt${v===o.w?' on':''}"><input type="radio" name="r_${f.id}" value="${esc(o.w)}" data-r="${f.id}" ${v===o.w?'checked':''}${dis}><span>${esc(o.t&&o.t!==o.w&&!f.kurz_anzeige?o.t:o.w)}</span></label>`).join('')}
         ${f.sonstiges?`<label class="opt${son?' on':''}"><input type="radio" name="r_${f.id}" value="__s" data-r="${f.id}" ${son?'checked':''}${dis}><span>sonstige</span></label>`:''}</div>
         ${f.sonstiges?`<input class="inp" style="margin-top:8px;${son?'':'display:none'}" id="s_${f.id}" data-son="${f.id}" placeholder="bitte eintragen" value="${son?esc(v):''}"${dis}>`:''}${hin}</div>`; }
     case 'haken': return `<label class="chk big"><input type="checkbox" data-h="${f.id}" ${v===true?'checked':''}${dis}><span><b>${esc(txt(f))}${f.pflicht?' <span class="pfl">*</span>':''}</b>${f.hinweis?`<small>${esc(f.hinweis)}</small>`:''}</span></label>`;
     case 'messung': return messHtml(f);
+    case 'liste': return listeHtml(f);
+    case 'zeilen': return zeilenHtml(f);
     case 'dateien': return `<div class="field"><label>${esc(f.label)}</label>${f.hinweis?`<div class="hint" style="margin:-2px 0 8px">${esc(f.hinweis)}</div>`:''}
         <div class="thumbs" data-thumbs="${f.id}">${thumbs(f.id)}</div>
         ${locked()?'':`<label class="btn ghost sm upl">${IC('upload','sm')}Datei oder Foto hinzufügen<input type="file" accept="${esc(f.accept||'image/*')}" data-file="${f.id}" hidden></label>`}</div>`;
   }
   return '';
 }
+/* ---------- Checkliste (Anlagenteile) ---------- */
+function listeHtml(f){
+  const sel=Array.isArray(W_()[f.id])?W_()[f.id]:[], dis=locked()?' disabled':'';
+  const eig=sel.filter(s=>String(s.nr).startsWith('x'));
+  return `<div class="field">${f.label?`<label>${esc(f.label)}${f.pflicht?' <span class="pfl">*</span>':''}</label>`:''}${f.hinweis?`<div class="hint" style="margin:-2px 0 6px">${esc(f.hinweis)}</div>`:''}
+    <div class="liste">${(f.punkte||[]).map((t,i)=>{ const nr=i+1, s=sel.find(x=>x.nr===nr);
+      return `<div class="li${s?' on':''}"><label class="chk"><input type="checkbox" data-li="${f.id}|${nr}" ${s?'checked':''}${dis}><span><b><em>${nr}</em>${esc(t)}</b></span></label>
+        ${s?`<input class="inp li-bem" data-lib="${f.id}|${nr}" placeholder="${esc(f.bem_platzhalter||'Bemerkung (optional)')}" value="${esc(s.bem||'')}"${dis}>`:''}</div>`; }).join('')}
+    ${eig.map(s=>`<div class="li on"><div class="li-eig"><input class="inp" data-lit="${f.id}|${s.nr}" placeholder="Anlagenteil" value="${esc(s.text||'')}"${dis}>${locked()?'':`<button class="delbtn" data-lix="${f.id}|${s.nr}" aria-label="Entfernen">${IC('trash','sm')}</button>`}</div>
+        <input class="inp li-bem" data-lib="${f.id}|${s.nr}" placeholder="Bemerkung (optional)" value="${esc(s.bem||'')}"${dis}></div>`).join('')}</div>
+    ${locked()?'':`<button type="button" class="lnk" data-liadd="${f.id}">${IC('plus','sm')}Weiteres Anlagenteil</button>`}</div>`;
+}
+/* ---------- Tabelle mit Zeilen (z. B. Spülabschnitte) ---------- */
+function zeilenHtml(f){
+  const rows=Array.isArray(W_()[f.id])?W_()[f.id]:[], dis=locked()?' disabled':'';
+  return `<div class="field"><label>${esc(f.label)}${f.pflicht?' <span class="pfl">*</span>':''}</label>${f.hinweis?`<div class="hint" style="margin:-2px 0 6px">${esc(f.hinweis)}</div>`:''}
+    ${rows.map((r,i)=>`<div class="zl"><div class="zl-h"><b>${esc(f.zeile||'Zeile')} ${i+1}</b>${locked()?'':`<button class="delbtn" data-zx="${f.id}|${i}" aria-label="Entfernen">${IC('trash','sm')}</button>`}</div><div class="fgrid">
+      ${f.spalten.map(c=>{ if(c.typ==='berechnet'){ const x=berechne(c,r); return `<div class="field half"><label>${esc(c.label)}</label><div class="calc sm" data-zc="${f.id}|${i}|${c.id}">${x===''?'–':nfmt(x)+' '+esc(c.einheit||'')}</div></div>`; }
+        if(c.typ==='auswahl') return `<div class="field half"><label>${esc(c.label)}</label><select class="inp" data-zf="${f.id}|${i}|${c.id}"${dis}><option value=""></option>${c.optionen.map(o=>`<option ${r[c.id]===o.w?'selected':''}>${esc(o.w)}</option>`).join('')}</select></div>`;
+        return `<div class="field half"><label>${esc(c.label)}</label><div class="unitwrap"><input class="inp" data-zf="${f.id}|${i}|${c.id}" ${c.typ==='zahl'?'inputmode="decimal"':''} value="${esc(String(r[c.id]??'').replace(c.typ==='zahl'?'.':'§',','))}"${dis}><span>${esc(c.einheit||'')}</span></div></div>`; }).join('')}
+    </div></div>`).join('')||'<p class="hint">Noch nichts eingetragen.</p>'}
+    ${locked()?'':`<button type="button" class="lnk" data-zadd="${f.id}">${IC('plus','sm')}${esc(f.zeile||'Zeile')} hinzufügen</button>`}</div>`;
+}
+function bindListen(){
+  const w=W_(), arr=id=>Array.isArray(w[id])?w[id]:(w[id]=[]);
+  $$('[data-li]').forEach(el=>el.addEventListener('change',()=>{ const [id,nr]=el.dataset.li.split('|'); const a=arr(id), n=+nr;
+    if(el.checked){ if(!a.some(x=>x.nr===n)) a.push({nr:n,bem:''}); a.sort((x,y)=>(typeof x.nr==='number'?x.nr:999)-(typeof y.nr==='number'?y.nr:999)); } else w[id]=a.filter(x=>x.nr!==n);
+    changed(); renderPr(); }));
+  $$('[data-lib]').forEach(el=>el.addEventListener('input',()=>{ const [id,nr]=el.dataset.lib.split('|'); const s=arr(id).find(x=>String(x.nr)===nr); if(s){ s.bem=el.value; changed(); } }));
+  $$('[data-lit]').forEach(el=>el.addEventListener('input',()=>{ const [id,nr]=el.dataset.lit.split('|'); const s=arr(id).find(x=>String(x.nr)===nr); if(s){ s.text=el.value; changed(); } }));
+  $$('[data-lix]').forEach(b=>b.onclick=()=>{ const [id,nr]=b.dataset.lix.split('|'); w[id]=arr(id).filter(x=>String(x.nr)!==nr); changed(); renderPr(); });
+  $$('[data-liadd]').forEach(b=>b.onclick=()=>{ const id=b.dataset.liadd; arr(id).push({nr:'x'+Date.now().toString(36),text:'',bem:''}); changed(); renderPr(); const ins=$$('[data-lit]'); ins.length&&ins[ins.length-1].focus(); });
+  $$('[data-zadd]').forEach(b=>b.onclick=()=>{ arr(b.dataset.zadd).push({}); changed(); renderPr(); });
+  $$('[data-zx]').forEach(b=>b.onclick=()=>{ const [id,i]=b.dataset.zx.split('|'); arr(id).splice(+i,1); changed(); renderPr(); });
+  $$('[data-zf]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{ const [id,i,c]=el.dataset.zf.split('|'); const f=feldDef(id), col=f.spalten.find(x=>x.id===c);
+    arr(id)[+i][c]=col.typ==='zahl'?el.value.trim().replace(',','.'):el.value;
+    f.spalten.filter(x=>x.typ==='berechnet').forEach(x=>{ const e=$(`[data-zc="${id}|${i}|${x.id}"]`); if(e){ const r=berechne(x,arr(id)[+i]); e.textContent=r===''?'–':nfmt(r)+' '+(x.einheit||''); } });
+    changed(); }));
+}
 function schrittHtml(s){
+  if(!sichtbar(s)) return `<div class="card"><h2>${esc(s.titel)}</h2><p class="hint">Entfällt bei dieser Auswahl.</p></div>`;
   const sch=s.schalter, an=aktiv(s);
   return `<div class="card"><h2>${esc(s.titel)}</h2>
     ${sch?`<label class="chk big sw"><input type="checkbox" data-sw="${sch.id}" ${an?'checked':''}${locked()?' disabled':''}><span><b>${esc(sch.text)}</b><small>${an?'':'Abschnitt wird im PDF als „nicht durchgeführt“ vermerkt.'}</small></span></label>`:''}
@@ -368,8 +439,8 @@ function bindSchritt(s){
   const w=W_();
   $$('[data-f]').forEach(el=>el.addEventListener('input',()=>{ const f=feldListe(D.def).find(x=>x.id===el.dataset.f);
     w[f.id]=f.typ==='zahl'?el.value.trim().replace(',','.'):el.value;
-    if(f.merken==='info') merkeInfo(f.id,el.value);
-    if(f.typ==='zahl'){ aktualisiereBerechnet(); $$('[data-calc]').forEach(c=>{ const cf=feldListe(D.def).find(x=>x.id===c.dataset.calc); const r=berechne(cf); c.textContent=r===''?'–':nfmt(r)+' '+(cf.einheit||''); });
+    if(f.merken==='info') merkeInfo(f.info_key||f.id,el.value);
+    if(f.typ==='zahl'){ aktualisiereBerechnet(); $$('[data-calc]').forEach(c=>{ const cf=feldDef(c.dataset.calc); const r=berechne(cf); c.textContent=r===''?'–':nfmt(r)+' '+(cf.einheit||''); });
       const mp=$(`[data-mpa="${f.id}"]`); if(mp) mp.textContent=isFinite(num(w[f.id]))?'= '+nfmt(num(w[f.id])/10)+' MPa':'';
       const mx=maxVon(f), mb=$(`[data-max="${f.id}"]`); if(mb&&mx!=null){ const over=isFinite(num(w[f.id]))&&num(w[f.id])>mx; mb.classList.toggle('warnt',over); mb.textContent=(over?'Achtung: ':'')+'höchstens '+nfmt(mx)+' '+(f.einheit||''); }
       updTimer(); }
@@ -380,10 +451,10 @@ function bindSchritt(s){
   $$('[data-son]').forEach(el=>el.addEventListener('input',()=>{ w[el.dataset.son]=el.value; changed(); }));
   $$('[data-h]').forEach(el=>el.addEventListener('change',()=>{ w[el.dataset.h]=el.checked; changed(); }));
   $$('[data-sw]').forEach(el=>el.addEventListener('change',()=>{ w[el.dataset.sw]=el.checked; changed(); renderPr(); }));
-  bindMess(); bindDateien();
+  bindMess(); bindDateien(); bindListen();
 }
-function merkeInfo(feld,wert){ const k=feld==='ag_vertreter'?'ag_vertreter':feld; INFO[k]=wert; ls.set(K.info,INFO);
-  clearTimeout(merkeInfo._t); merkeInfo._t=setTimeout(()=>enqueue({kind:'info',id:PID,v:nowIso(),data:{vergabenr:INFO.vergabenr||'',ag_vertreter:INFO.ag_vertreter||''}}),800); }
+function merkeInfo(k,wert){ INFO[k]=wert; ls.set(K.info,INFO);
+  clearTimeout(merkeInfo._t); merkeInfo._t=setTimeout(()=>enqueue({kind:'info',id:PID,v:nowIso(),data:{vergabenr:INFO.vergabenr||'',ag_vertreter:INFO.ag_vertreter||'',auftraggeber:INFO.auftraggeber||''}}),800); }
 
 /* ---------- Messung mit Prüfzeit-Timer ---------- */
 function sollMin(f){ const ff=feldListe(D.def).find(x=>x.id===f.dauer_aus); return ff?num(berechne(ff)):NaN; }
@@ -452,7 +523,7 @@ function abschlussHtml(fe){
   return `${fe.length?`<div class="card warncard"><h2>${IC('alert')}Noch offen (${fe.length})</h2>${fe.map(m=>`<button class="lnk" data-step="${m.si}" style="display:flex;text-align:left">Schritt ${m.si+1}: ${esc(m.label.length>80?m.label.slice(0,78)+' …':m.label)}</button>`).join('')}
       <p class="hint" style="margin-top:6px">Pflichtangaben sind mit * markiert. Unterschreiben geht trotzdem, die offenen Punkte bleiben im PDF leer.</p></div>`
       :`<div class="card okcard">${IC('check')}<b>Alle Pflichtangaben sind ausgefüllt.</b></div>`}
-    <div class="card"><h2>Ergebnis</h2><div class="erg ${W_().dicht===true?'ok':'no'}">${W_().dicht===true?IC('check')+'Die Rohrleitungen sind dicht.':IC('alert')+'„Die Rohrleitungen sind dicht“ ist nicht bestätigt.'}</div></div>
+    ${ergKarte()}
     <div class="card"><h2>Ort und Datum</h2><div class="row2">
       <div class="field"><label for="f_ort">Ort</label><input class="inp" id="f_ort" value="${esc(W_().ort||'')}"></div>
       <div class="field"><label for="f_dat">Datum</label><input class="inp" type="date" id="f_dat" value="${esc(d.datum||'')}"></div></div></div>
@@ -465,6 +536,9 @@ function abschlussHtml(fe){
       </div>
       <p class="hint" style="margin-top:10px">Mit der Unterschrift des Auftragnehmers wird das Protokoll abgeschlossen und gesperrt. Der Auftraggeber kann vorher unterschreiben, muss aber nicht.</p></div>`;
 }
+function ergZeile(){ const e=ergebnis(); if(!e) return ''; return `<div class="erg ${e.ok?'ok':'no'}" style="margin-top:10px">${e.ok?IC('check')+esc(e.ja):IC('alert')+esc(e.nein)}</div>`; }
+function ergKarte(){ const e=ergebnis(); return e?`<div class="card"><h2>Ergebnis</h2>${ergZeile()}</div>`:''; }
+const mailText=()=>`Guten Tag,\n\nanbei ${D.def.mail_name||'das Protokoll'} ${prNr(D.nr)} vom ${dDE(D.datum)} für das Bauvorhaben ${PROJ?.name||''}${W_().abschnitt?' ('+W_().abschnitt+')':''}.\n\nMit freundlichen Grüßen\n${D.name_an||''}\nHeise Haustechnik GmbH & Co. KG`;
 function bindAbschluss(){
   const w=W_();
   $('#f_ort').addEventListener('input',e=>{ w.ort=e.target.value; changed(); });
@@ -474,7 +548,7 @@ function bindAbschluss(){
   setupSigs(['sig_ag','sig_an'],'sig_an');
   $('#bPdf').onclick=async()=>{ if(!bereit()) return; dl(await pdfPr(),filePr()); };
   $('#bMail').onclick=()=>{ if(!bereit()) return; sendDialog(()=>pdfPr(),filePr(),`${titelVon(D)} ${prNr(D.nr)} – ${PROJ?.name||''}`,
-    `Guten Tag,\n\nanbei das ${D.def.titel.startsWith('Druckprobe')?'Druckprobenprotokoll':'Protokoll'} ${prNr(D.nr)} vom ${dDE(D.datum)} für das Bauvorhaben ${PROJ?.name||''}${W_().abschnitt?' ('+W_().abschnitt+')':''}.\n\nMit freundlichen Grüßen\n${D.name_an||''}\nHeise Haustechnik GmbH & Co. KG`); };
+    mailText()); };
 }
 function bereit(){
   if(!D.nr){ toast('Wird noch gespeichert, bitte kurz warten'); flushSoon(); return false; }
@@ -486,13 +560,13 @@ function renderGesperrt(){
   $('#app').innerHTML=`
     <div class="lock-note">${IC('check')}<div><b>Abgeschlossen</b><br>Unterschrieben von ${esc(d.name_an||'Auftragnehmer')}${d.sig_ag?' und '+esc(d.name_ag||'Auftraggeber'):''} am ${tsDE(d.sig_ts)}. Das Protokoll kann nicht mehr geändert werden.${PJ.leitung()?' <button class="lnk" id="unlock">Zum Bearbeiten entsperren</button>':''}</div></div>
     <div class="card"><h2>${esc(titelVon(d))}</h2><p class="hint">${prNr(d.nr)} · ${dDE(d.datum)}${W_().ort?' · '+esc(W_().ort):''}</p>
-      <div class="erg ${W_().dicht===true?'ok':'no'}" style="margin-top:10px">${W_().dicht===true?IC('check')+'Die Rohrleitungen sind dicht.':IC('alert')+'Dichtheit nicht bestätigt.'}</div></div>
+      ${ergZeile()}</div>
     <fieldset disabled>${d.def.schritte.map(s=>schrittHtml(s)).join('')}</fieldset>
     <div class="bottombar"><button class="btn ghost" id="bPdf">${IC('file')}PDF</button><button class="btn cta" id="bMail">${IC('mail')}Senden</button></div>
     ${PJ.leitung()?`<div style="text-align:center;margin-top:6px"><button class="lnk" id="bDel" style="color:var(--red)">${IC('trash')}Protokoll löschen</button></div>`:''}`;
   $('#bPdf').onclick=async()=>dl(await pdfPr(),filePr());
   $('#bMail').onclick=()=>sendDialog(()=>pdfPr(),filePr(),`${titelVon(D)} ${prNr(D.nr)} – ${PROJ?.name||''}`,
-    `Guten Tag,\n\nanbei das Protokoll ${prNr(D.nr)} vom ${dDE(D.datum)} für das Bauvorhaben ${PROJ?.name||''}${W_().abschnitt?' ('+W_().abschnitt+')':''}.\n\nMit freundlichen Grüßen\n${D.name_an||''}\nHeise Haustechnik GmbH & Co. KG`);
+    mailText());
   if($('#unlock')) $('#unlock').onclick=()=>{ if(!confirm('Entsperren löscht die Unterschrift des Auftragnehmers. Danach muss neu unterschrieben werden. Fortfahren?')) return; D.sig_an=null; saveDoc(D); STEP=schritte().length-1; renderPr(); };
   if($('#bDel')) $('#bDel').onclick=delPr;
 }
@@ -530,42 +604,72 @@ window.addEventListener('resize',()=>{ $$('canvas.sig').forEach(c=>c._size&&c._s
 const filePr=()=>safe('Protokoll_'+prNr(D.nr)+'_'+(D.def.titel||'')+'_'+(PROJ?.name||'')+'_'+D.datum)+'.pdf';
 async function pdfPr(){
   const d=D, w=d.werte, def=d.def, { jsPDF }=window.jspdf, doc=new jsPDF({unit:'mm',format:'a4'});
+  // Standardschrift im PDF kennt keine griechischen Zeichen und Vergleichszeichen
+  const san=t=>typeof t==='string'?t.replace(/Δ/g,'Delta ').replace(/ϑ/g,'t').replace(/≤/g,'<=').replace(/≥/g,'>=').replace(/−/g,'-'):t;
+  const _t=doc.text.bind(doc); doc.text=(t,...a)=>_t(Array.isArray(t)?t.map(san):san(t),...a);
+  const _s=doc.splitTextToSize.bind(doc); doc.splitTextToSize=(t,...a)=>_s(san(t),...a);
   aktualisiereBerechnet();
   let y=await pdfKopf(doc,titelVon(d),prNr(d.nr)+(w.abschnitt?' · '+w.abschnitt:''));
-  const BR=W-2*M;
-  const need=h=>{ if(y+h>278){ doc.addPage(); y=20; } };
-  const sec=(t,zusatz)=>{ need(14); y+=3; doc.setFillColor(238,240,245); doc.rect(M,y-4.6,BR,7,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(47,59,83); doc.text(t,M+2,y); if(zusatz){ doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(120); doc.text(zusatz,W-M-2,y,{align:'right'}); } y+=6.5; doc.setTextColor(40); };
-  const kv=(l,v)=>{ doc.setFontSize(9.5); const lines=doc.splitTextToSize(v===''||v==null?'–':String(v),BR-62), ll=doc.splitTextToSize(l,57), n=Math.max(lines.length,ll.length); need(n*4.6+1.2); doc.setFont('helvetica','normal'); doc.setTextColor(110); doc.text(ll,M+2,y); doc.setTextColor(30); doc.text(lines,M+62,y); y+=n*4.6+1.2; };
-  const box=(on,text,hin)=>{ doc.setFontSize(9.5); const lines=doc.splitTextToSize(text,BR-10); need(lines.length*4.6+1.6); doc.setDrawColor(70); doc.setLineWidth(0.3); doc.rect(M+2,y-3.3,3.8,3.8);
-    if(on){ doc.setDrawColor(226,83,4); doc.setLineWidth(0.6); doc.line(M+2.6,y-1.4,M+3.7,y-0.1); doc.line(M+3.7,y-0.1,M+5.4,y-2.8); doc.setLineWidth(0.2); }
-    doc.setFont('helvetica','normal'); doc.setTextColor(on?30:110); doc.text(lines,M+9,y); y+=lines.length*4.6+1.6; doc.setTextColor(30); };
-  const info=t=>{ doc.setFontSize(8.5); doc.setFont('helvetica','italic'); doc.setTextColor(110); const lines=doc.splitTextToSize(t,BR-4); need(lines.length*4+1); doc.text(lines,M+2,y); y+=lines.length*4+1.5; doc.setFont('helvetica','normal'); doc.setTextColor(30); };
-  const wert=f=>{ const v=w[f.id]; if(f.typ==='zahl') return isFinite(num(v))?nfmt(v)+' '+(f.einheit||'')+(f.mpa?' ('+nfmt(num(v)/10)+' MPa)':''):''; if(f.typ==='berechnet'){ const r=berechne(f); return r===''?'':nfmt(r)+' '+(f.einheit||''); } if(f.typ==='auswahl') return f.id==='medium'?v||'':(optTitel(f,v)||''); return v||''; };
+  y-=1;
+  const BR=W-2*M, CW=(BR-6)/2, LW=30, FS=8.6, LH=3.7;
+  const need=h=>{ if(y+h>279){ doc.addPage(); y=18; } };
+  const sec=(t,zusatz)=>{ need(12); y+=2.2; doc.setFillColor(238,240,245); doc.rect(M,y-3.9,BR,5.6,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(47,59,83); doc.text(t,M+1.6,y); if(zusatz){ doc.setFont('helvetica','normal'); doc.setFontSize(7.8); doc.setTextColor(120); doc.text(zusatz,W-M-1.6,y,{align:'right'}); } y+=5; doc.setTextColor(30); };
+  const leer=v=>v===''||v==null?'–':String(v);
+  // zweispaltiges Raster aus Bezeichnung/Wert-Paaren; lange Werte über die volle Breite
+  const raster=paare=>{ doc.setFontSize(FS); doc.setFont('helvetica','normal');
+    const teile=(p,breit)=>({l:doc.splitTextToSize(p.l,LW-1),v:doc.splitTextToSize(leer(p.v),(breit?BR:CW)-LW-2)});
+    let i=0;
+    while(i<paare.length){
+      let p=paare[i]; const halb=teile(p,false); const voll=p.voll||halb.v.length>2;
+      if(voll){ const t=teile(p,true), n=Math.max(t.l.length,t.v.length); need(n*LH+1); doc.setTextColor(115); doc.text(t.l,M+1.6,y); doc.setTextColor(25); doc.text(t.v,M+1.6+LW,y); y+=n*LH+1.1; i++; continue; }
+      let q=paare[i+1], tq=null; if(q){ tq=teile(q,false); if(q.voll||tq.v.length>2){ q=null; tq=null; } }
+      const n=Math.max(halb.l.length,halb.v.length,tq?Math.max(tq.l.length,tq.v.length):0); need(n*LH+1);
+      doc.setTextColor(115); doc.text(halb.l,M+1.6,y); doc.setTextColor(25); doc.text(halb.v,M+1.6+LW,y);
+      if(q){ const x=M+CW+6; doc.setTextColor(115); doc.text(tq.l,x,y); doc.setTextColor(25); doc.text(tq.v,x+LW,y); }
+      y+=n*LH+1.1; i+=q?2:1;
+    } };
+  const box=(on,text)=>{ doc.setFontSize(FS); const lines=doc.splitTextToSize(text,BR-9); need(lines.length*LH+1.2); doc.setDrawColor(80); doc.setLineWidth(0.25); doc.rect(M+1.6,y-2.9,3.3,3.3);
+    if(on){ doc.setDrawColor(226,83,4); doc.setLineWidth(0.55); doc.line(M+2.2,y-1.3,M+3.1,y-0.1); doc.line(M+3.1,y-0.1,M+4.6,y-2.5); doc.setLineWidth(0.2); }
+    doc.setFont('helvetica','normal'); doc.setTextColor(on?25:115); doc.text(lines,M+7,y); y+=lines.length*LH+1.2; doc.setTextColor(25); };
+  const info=t=>{ doc.setFontSize(7.6); doc.setFont('helvetica','italic'); doc.setTextColor(115); const lines=doc.splitTextToSize(t,BR-3); need(lines.length*3.2+1); doc.text(lines,M+1.6,y); y+=lines.length*3.2+1.2; doc.setFont('helvetica','normal'); doc.setTextColor(25); };
+  const wert=f=>{ const v=w[f.id]; if(f.typ==='zahl') return isFinite(num(v))?nfmt(v)+' '+(f.einheit||'')+(f.mpa?' ('+nfmt(num(v)/10)+' MPa)':''):''; if(f.typ==='berechnet'){ const r=berechne(f); return r===''?'':nfmt(r)+' '+(f.einheit||''); } if(f.typ==='auswahl') return f.id==='medium'||f.id==='anlage'?optTitel(f,v)||'':(optTitel(f,v)||''); if(f.typ==='datum') return dDE(v); return v||''; };
   const anlagen=[];
   def.schritte.forEach((s,si)=>{
+    if(!sichtbar(s)) return;
     const an=aktiv(s);
-    sec(si===0?'Angaben zum Bauvorhaben':s.titel, s.schalter?(an?'durchgeführt':'nicht durchgeführt'):'');
+    sec(si===0?'Angaben':s.titel, s.schalter?(an?'durchgeführt':'nicht durchgeführt'):'');
     if(!an) return;
-    if(si===0) kv('Datum',dDE(d.datum));
+    let puffer=[]; const leeren=()=>{ if(puffer.length){ raster(puffer); puffer=[]; } };
+    if(si===0) puffer.push({l:'Datum',v:dDE(d.datum)},{l:'Ort',v:w.ort||''});
     s.felder.forEach(f=>{
       if(!sichtbar(f)) return;
-      if(f.typ==='info') info(f.text);
-      else if(f.typ==='haken') box(w[f.id]===true,txt(f));
-      else if(f.typ==='messung'){ const m=w[f.id]||{}, soll=sollMin(f), dau=m.start&&m.ende?Math.round((new Date(m.ende)-new Date(m.start))/60000):null;
-        need(26);
-        doc.autoTable({startY:y-2.5,margin:{left:M+2,right:M},tableWidth:BR-2,theme:'grid',styles:{fontSize:8.8,cellPadding:1.3,lineColor:[210,214,222],textColor:[30,30,30]},headStyles:{fillColor:[47,59,83],textColor:255,fontStyle:'bold'},
-          head:[['',`Uhrzeit`,`Druck (${f.einheit})`]],body:[['Beginn',m.start?tsDE(m.start):'',nfmt(m.p_start)],['Ende',m.ende?tsDE(m.ende):'',nfmt(m.p_ende)]],columnStyles:{0:{cellWidth:30,fontStyle:'bold'}}});
-        y=doc.lastAutoTable.finalY+5;
-        kv('Prüfdauer',dau!=null?dau+' min'+(isFinite(soll)?' (gefordert '+nfmt(soll)+' min)':''):(isFinite(soll)?'gefordert '+nfmt(soll)+' min':''));
-        ['start','ende'].forEach(k=>FILES.filter(x=>x.feld===f.id+'_'+k).forEach(x=>anlagen.push({...x,cap:s.titel+', Manometer '+(k==='start'?'Beginn':'Ende')})));
-      }
-      else if(f.typ==='dateien'){ const fs=FILES.filter(x=>x.feld===f.id); fs.forEach(x=>anlagen.push({...x,cap:f.label.replace(' (optional)','')})); kv(f.label.replace(' (optional)',''),fs.length?fs.length+' Anlage'+(fs.length>1?'n':'')+' (siehe Anhang)':'–'); }
-      else kv(f.label,wert(f));
+      const l=f.kurz||f.label;
+      if(f.typ==='info'){ leeren(); info(f.text); }
+      else if(f.typ==='haken'){ leeren(); box(w[f.id]===true,txt(f)); }
+      else if(f.typ==='messung'){ const m=w[f.id]||{}, soll=sollMin(f), dau=m.start&&m.ende?Math.round((new Date(m.ende)-new Date(m.start))/60000):null, e=' '+(f.einheit||'');
+        puffer.push({l:'Beginn',v:[m.start?tsDE(m.start):'',m.p_start!=null&&m.p_start!==''?nfmt(m.p_start)+e:''].filter(Boolean).join(' · ')},
+                    {l:'Ende',v:[m.ende?tsDE(m.ende):'',m.p_ende!=null&&m.p_ende!==''?nfmt(m.p_ende)+e:''].filter(Boolean).join(' · ')},
+                    {l:'Prüfdauer',v:dau!=null?dau+' min'+(isFinite(soll)?' (gefordert '+nfmt(soll)+' min)':''):(isFinite(soll)?'gefordert '+nfmt(soll)+' min':'')});
+        ['start','ende'].forEach(k=>FILES.filter(x=>x.feld===f.id+'_'+k).forEach(x=>anlagen.push({...x,cap:s.titel+', Manometer '+(k==='start'?'Beginn':'Ende')}))); }
+      else if(f.typ==='dateien'){ const fs=FILES.filter(x=>x.feld===f.id); fs.forEach(x=>anlagen.push({...x,cap:l.replace(' (optional)','')})); if(fs.length) puffer.push({l:l.replace(' (optional)',''),v:fs.length+' Anlage'+(fs.length>1?'n':'')+' (siehe Anhang)'}); }
+      else if(f.typ==='liste'){ leeren(); const sel=Array.isArray(w[f.id])?w[f.id]:[];
+        if(f.label){ doc.setFontSize(FS); doc.setTextColor(115); need(LH+1); doc.text(f.label,M+1.6,y); y+=LH+0.6; doc.setTextColor(25); }
+        if(!sel.length){ info('Keine Angaben.'); return; }
+        sel.forEach(x=>{ const t=typeof x.nr==='number'?x.nr+'. '+(f.punkte[x.nr-1]||''):(x.text||'weiteres Anlagenteil'); box(true,t+(x.bem?' – '+x.bem:'')); }); }
+      else if(f.typ==='zeilen'){ leeren(); const rows=Array.isArray(w[f.id])?w[f.id]:[];
+        if(!rows.length){ info(f.label+': keine Angaben.'); return; }
+        need(14);
+        doc.autoTable({startY:y-2.4,margin:{left:M+1.6,right:M},theme:'grid',styles:{fontSize:7.8,cellPadding:1.1,lineColor:[210,214,222],textColor:[25,25,25]},headStyles:{fillColor:[47,59,83],textColor:255,fontStyle:'bold'},
+          head:[[f.zeile||'Nr.',...f.spalten.map(c=>c.label+(c.einheit?' ('+c.einheit+')':''))]],
+          body:rows.map((r,i)=>[String(i+1),...f.spalten.map(c=>{ const v=c.typ==='berechnet'?berechne(c,r):r[c.id]; return c.typ==='zahl'||c.typ==='berechnet'?nfmt(v):leer(v); })])});
+        y=doc.lastAutoTable.finalY+4.5; }
+      else puffer.push({l, v:wert(f), voll:f.typ==='text'&&f.mehrzeilig});
     });
+    leeren();
   });
   // Unterschriften
-  need(58); y+=4;
-  doc.setFontSize(9.5); doc.setTextColor(30); doc.text('Ort, Datum: '+[w.ort,dDE(d.datum)].filter(Boolean).join(', '),M,y); y+=4;
+  need(50); y+=3;
+  doc.setFontSize(FS); doc.setTextColor(25); doc.text('Ort, Datum: '+[w.ort,dDE(d.datum)].filter(Boolean).join(', '),M,y); y+=2;
   y=pdfSig(doc,y,[[d.sig_ag,'Auftraggeber bzw. Vertreter',d.name_ag],[d.sig_an,'Auftragnehmer bzw. Vertreter',d.name_an]],d.sig_ts);
   // Fotos als Anlage
   const bilder=anlagen.filter(a=>String(a.typ).startsWith('image/')), pdfs=anlagen.filter(a=>a.typ==='application/pdf');
@@ -585,7 +689,6 @@ async function pdfPr(){
   return blob;
 }
 function ladeSkript(src,test){ return test()?Promise.resolve():new Promise((ok,err)=>{ const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>err(new Error('Bibliothek fehlt')); document.head.appendChild(s); }); }
-
 
 /* ================= gemeinsame Bausteine (wie Zusätzliche Arbeiten) ================= */
 let LOGO=null;
