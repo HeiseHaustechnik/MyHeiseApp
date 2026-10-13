@@ -308,6 +308,27 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 .rinfo{width:34px;height:34px;color:var(--ink-3)}
 .lrollen .rinfo{height:34px}
 @media(max-width:420px){.ulist .uhead{gap:10px;padding-left:12px}.ubody{padding:0 12px 12px}}
+/* E-Mail-Benachrichtigungen (13.10.2026) */
+.mgrp{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin:20px 4px 8px}
+.mkarte{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px;margin-bottom:10px}
+.mkopf{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.mkopf b{font-weight:720;margin-right:8px}.mkopf .chip{height:22px;font-size:11.5px;vertical-align:1px}
+.mkopf small{display:block;color:var(--ink-2);font-size:13.5px;margin-top:3px;line-height:1.4}
+.mkarte:not(.an) .mopt{opacity:.55}
+.mopt{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.mseg{flex:1 1 280px}.mseg button{min-height:36px;font-size:13.5px}
+.mzeit{display:flex;gap:8px;flex:1 1 220px}.mzeit .inp{height:42px;font-size:14px;font-weight:650}.mzeit select.inp{flex:1}.mzeit input.inp{width:124px;flex:none}
+.mempf{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.mperson{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 6px 0 12px;border-radius:17px;background:var(--surface-2);font-size:13.5px;font-weight:650}
+.mperson em{font-style:normal;color:var(--red);font-size:12px}.mperson button{display:grid;place-items:center;width:24px;height:24px;border-radius:12px;color:var(--ink-3)}
+.mempf .lnk{display:inline-flex;align-items:center;gap:4px;font-size:13.5px;font-weight:700;color:var(--blue)}
+.mprot{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.mprot-r{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}.mprot-r:last-child{border-bottom:0}
+.mprot-d{font-size:13px;color:var(--ink-3)}.mprot-t{min-width:0}.mprot-t b{display:block;font-size:14px;font-weight:700}
+.mprot-t small{display:block;color:var(--ink-3);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mprot-t .mprot-f{color:var(--red);white-space:normal}
+.mwahl{display:grid;gap:4px}.mwahl-r{display:flex;align-items:center;gap:12px;padding:8px;border-radius:12px;text-align:left}
+.mwahl-r:hover{background:var(--surface-2)}.mwahl-r[disabled]{opacity:.45;cursor:default}.mwahl-r b{display:block;font-weight:700}.mwahl-r small{color:var(--ink-3)}
+@media(max-width:480px){.mprot-r{grid-template-columns:1fr auto}.mprot-d{grid-column:1/-1}}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -538,6 +559,7 @@ function route() {
   if (!ME || !ready) return;
   const h = location.hash;
   if (h === '#/zugriff' && ME.rolle === 'admin') showZugriff();
+  else if (h === '#/mail' && ME.rolle === 'admin') showMail();
   else if (/^#\/bereich\/[\w-]+$/.test(h) && BEREICHE.some(b => b.id === h.split('/')[2])) showBereich(h.split('/')[2]);
   else if (/^#\/nachrichten(\/(inbox|gesendet|meldungen))?$/.test(h)) showNachrichten(h.split('/')[2]);
   else showHome();
@@ -706,7 +728,7 @@ async function showZugriff() {
     ZU = users; ZM = {}; zg.forEach(z => { (ZM[z.benutzer_id] = ZM[z.benutzer_id] || {})[z.app] = z.rolle });
     const offen = zgOffen(), q = ZQ;
     root.innerHTML = `<div class="shell">
-      <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1><button class="btn btn-primary btn-sm" data-act="uNeu" style="margin-left:auto">${ic('plus','sm')} Neu</button></div>
+      <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1><a class="iconbtn" href="#/mail" aria-label="E-Mail-Benachrichtigungen" title="E-Mail-Benachrichtigungen" style="margin-left:auto">${ic('mail')}</a><button class="btn btn-primary btn-sm" data-act="uNeu">${ic('plus','sm')} Neu</button></div>
       <div class="callout plain tone-blue">${ic('info')}<div><b>Benutzer verwalten</b><span>Tippe auf einen Benutzer, um Apps freizuschalten und Rollen zu vergeben. Änderungen gelten sofort. Über „⋯“ änderst du E-Mail und Rolle, setzt ein Passwort zurück oder löschst den Benutzer. Neue Benutzer bekommen zunächst Lagerverwaltung und Leiterprüfung.</span></div></div>
       <div class="usuche"><label class="usuche-f">${ic('search', 'sm')}<input class="inp" id="zgSuche" type="search" placeholder="Benutzer suchen" value="${esc(q)}" autocomplete="off" aria-label="Benutzer suchen"></label><span class="faint num" id="zgAnz">${users.length} Benutzer</span></div>
       <div class="ulist">${users.map(u => uRowHTML(u, offen.includes(u.id))).join('')}</div>
@@ -972,6 +994,106 @@ document.addEventListener('change', async e => {
   s.disabled = true;
   try { await setZugriff(s.dataset.u, s.dataset.m, true, s.value); (ZM[s.dataset.u] = ZM[s.dataset.u] || {})[s.dataset.m] = s.value; uAppsAktualisieren(s.dataset.u); toast('Rolle gespeichert', 'ok') } catch (err) { toast(niceErr(err), 'err'); showZugriff() }
   s.disabled = false;
+});
+
+/* ---------- E-Mail-Benachrichtigungen (Admin, #/mail) ----------
+   Einstellungen in mail_einstellungen (nur Admin), Protokoll in mail_protokoll.
+   Versand über die Edge Function „mail-senden“ (Microsoft Graph, Postfach myheise@). */
+const MAIL_IMPL = new Set([]); // Benachrichtigungen, deren Versand schon eingebaut ist
+const MAIL_INFO = {
+  unterweisung: 'Jede Person bekommt ihre offenen Unterweisungen mit Link in die App.',
+  pruefung: 'Fällige Prüfungen von Leitern und Geräten der nächsten 30 Tage an die Verantwortlichen.',
+  fuhrpark: 'TÜV, Inspektion und Führerscheinkontrolle der nächsten 30 Tage.',
+  nachricht: 'Wenn du in der App eine Nachricht schreibst, bekommen die Empfänger sie zusätzlich per E-Mail.',
+  btb_unterschrift: 'Sobald ein Bautagebuch unterschrieben ist, mit dem PDF im Anhang.',
+  aufmass_unterschrift: 'Sobald ein Aufmaß unterschrieben ist, mit dem PDF im Anhang.',
+  zusammenfassung: 'Nach jedem Erinnerungsversand: wer was noch offen hat.',
+};
+const WOCHENTAGE = ['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
+let ME_MAIL = { e: [], u: [] };
+async function mailFn(action, payload = {}) {
+  const tok = await ensureToken();
+  const r = await fetch(`${SB}/functions/v1/mail-senden`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, 'x-user-token': tok || '' }, body: JSON.stringify({ action, ...payload }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.error) throw new Error(j.error || (r.status === 404 ? 'Die Funktion „mail-senden“ ist in Supabase noch nicht angelegt.' : 'Fehler ' + r.status));
+  return j;
+}
+const mailHead = extra => `<div class="pagehead"><a class="iconbtn" href="#/zugriff" aria-label="Zurück">${ic('back')}</a><h1>E-Mail-Benachrichtigungen</h1>${extra || ''}</div>`;
+async function showMail() {
+  root.innerHTML = `<div class="shell">${mailHead()}<div class="empty"><div class="spinner" style="margin:6px auto"></div></div></div>`;
+  try {
+    const [e, u, p] = await Promise.all([api('GET', 'mail_einstellungen', null, '?order=sort.asc'), api('GET', 'benutzer', null, '?select=id,name,email&order=name.asc'), api('GET', 'mail_protokoll', null, '?order=ts.desc&limit=40').catch(() => [])]);
+    if (location.hash !== '#/mail') return;
+    ME_MAIL = { e, u };
+    const gruppe = (art, titel) => { const l = e.filter(x => x.art === art); return l.length ? `<h2 class="mgrp">${titel}</h2>${l.map(mailKarte).join('')}` : '' };
+    root.innerHTML = `<div class="shell">${mailHead(`<button class="btn btn-soft btn-sm" data-act="mailTest" style="margin-left:auto">${ic('send', 'sm')} Testmail</button>`)}
+      <div class="callout plain tone-blue">${ic('mail')}<div><b>Absender myheise@heise-haustechnik.de</b><span>Die App verschickt diese E-Mails selbst, ohne Outlook. Erinnerungen gehen nur an Personen mit offenen Punkten. Wer keine E-Mail-Adresse hat, bekommt nichts.</span></div></div>
+      ${gruppe('erinnerung', 'Erinnerungen')}${gruppe('ereignis', 'Bei Ereignissen')}${gruppe('zusammenfassung', 'Überblick')}
+      <h2 class="mgrp">Zuletzt verschickt</h2>
+      <div class="mprot">${p.length ? p.map(x => `<div class="mprot-r"><span class="mprot-d num">${new Date(x.ts).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' })}</span><span class="mprot-t"><b>${esc((e.find(y => y.typ === x.typ) || {}).titel || (x.typ === 'test' ? 'Testmail' : x.typ))}</b><small>${esc(x.name || '')} · ${esc(x.an)}</small>${x.ok ? '' : `<small class="mprot-f">${esc(x.fehler || 'Fehler')}</small>`}</span><span class="chip ${x.ok ? 'tone-ok' : 'tone-red'}">${x.ok ? 'gesendet' : 'Fehler'}</span></div>`).join('') : `<p class="faint" style="padding:14px 16px">Noch keine E-Mails verschickt.</p>`}</div></div>`;
+  } catch (err) {
+    const fehlt = /mail_einstellungen|does not exist|schema cache/i.test(err.message || '');
+    root.innerHTML = `<div class="shell">${mailHead()}<div class="empty">${ic('info')}<h3>${fehlt ? 'Noch nicht eingerichtet' : 'Konnte nicht geladen werden'}</h3><p class="muted">${fehlt ? 'Die Datei mail.sql wurde in Supabase noch nicht ausgeführt.' : esc(niceErr(err))}</p></div></div>`;
+  }
+}
+function mailKarte(x) {
+  const impl = MAIL_IMPL.has(x.typ);
+  let opt = '';
+  if (x.art === 'erinnerung') {
+    const tagSel = x.rhythmus === 'monatlich'
+      ? `<select class="inp" data-mf="tag" data-t="${x.typ}" aria-label="Tag im Monat"><option value="0" ${x.tag === 0 ? 'selected' : ''}>1. Werktag</option>${Array.from({ length: 28 }, (_, i) => i + 1).map(d => `<option value="${d}" ${x.tag === d ? 'selected' : ''}>am ${d}.</option>`).join('')}</select>`
+      : x.rhythmus === 'woechentlich' ? `<select class="inp" data-mf="tag" data-t="${x.typ}" aria-label="Wochentag">${[1, 2, 3, 4, 5].map(d => `<option value="${d}" ${x.tag === d ? 'selected' : ''}>${WOCHENTAGE[d]}</option>`).join('')}</select>`
+      : `<span class="faint" style="font-size:14px">Montag bis Freitag</span>`;
+    opt = `<div class="mopt"><div class="seg mseg" role="group" aria-label="Rhythmus">${[['monatlich', 'Monatlich'], ['woechentlich', 'Wöchentlich'], ['taeglich', 'Täglich']].map(([k, l]) => `<button type="button" class="${x.rhythmus === k ? 'on' : ''}" data-act="mailRh" data-t="${x.typ}" data-v="${k}">${l}</button>`).join('')}</div>
+      <div class="mzeit">${tagSel}<input class="inp" type="time" data-mf="uhrzeit" data-t="${x.typ}" value="${esc(x.uhrzeit)}" aria-label="Uhrzeit"></div></div>`;
+  } else if (x.typ !== 'nachricht') {
+    opt = `<div class="mopt">${x.art === 'ereignis' ? `<label class="lrecht"><input type="checkbox" data-mf="bauleitung" data-t="${x.typ}" ${x.bauleitung ? 'checked' : ''}><span>Bauleitung des Projekts</span></label>` : ''}${mailEmpf(x)}</div>`;
+  }
+  return `<div class="mkarte${x.aktiv ? ' an' : ''}" data-t="${x.typ}"><div class="mkopf"><div><b>${esc(x.titel)}</b>${impl ? '' : '<span class="chip tone-amber">wird eingebaut</span>'}<small>${esc(MAIL_INFO[x.typ] || '')}</small></div>
+    <button class="switch ${x.aktiv ? 'on' : ''}" data-act="mailAn" data-t="${x.typ}" role="switch" aria-checked="${x.aktiv}" aria-label="${esc(x.titel)}"></button></div>${opt}</div>`;
+}
+function mailEmpf(x) {
+  const pers = (x.empfaenger || []).map(id => ME_MAIL.u.find(b => b.id === id)).filter(Boolean);
+  return `<div class="mempf">${pers.map(b => `<span class="mperson">${esc(b.name)}${b.email ? '' : ' <em>keine E-Mail</em>'}<button data-act="mailWeg" data-t="${x.typ}" data-u="${b.id}" aria-label="${esc(b.name)} entfernen">${ic('x', 'sm')}</button></span>`).join('')}<button class="lnk" data-act="mailPlus" data-t="${x.typ}">${ic('plus', 'sm')} Person</button></div>`;
+}
+async function mailSpeichern(typ, feld) {
+  await api('PATCH', 'mail_einstellungen', { ...feld, updated_at: new Date().toISOString() }, `?typ=eq.${typ}`);
+  const x = ME_MAIL.e.find(y => y.typ === typ); Object.assign(x, feld); return x;
+}
+function mailNeu(typ) { const k = $(`.mkarte[data-t="${typ}"]`); if (k) k.outerHTML = mailKarte(ME_MAIL.e.find(y => y.typ === typ)) }
+Object.assign(ACT, {
+  async mailAn(el) {
+    const on = !el.classList.contains('on'); el.disabled = true;
+    try { await mailSpeichern(el.dataset.t, { aktiv: on }); mailNeu(el.dataset.t); toast(on ? 'Eingeschaltet' : 'Ausgeschaltet', 'ok') } catch (e) { toast(niceErr(e), 'err'); el.disabled = false }
+  },
+  async mailRh(el) {
+    const v = el.dataset.v, tag = v === 'monatlich' ? 0 : 1;
+    try { await mailSpeichern(el.dataset.t, { rhythmus: v, tag }); mailNeu(el.dataset.t); toast('Gespeichert', 'ok') } catch (e) { toast(niceErr(e), 'err') }
+  },
+  async mailWeg(el) {
+    const x = ME_MAIL.e.find(y => y.typ === el.dataset.t);
+    try { await mailSpeichern(x.typ, { empfaenger: (x.empfaenger || []).filter(id => id !== el.dataset.u) }); mailNeu(x.typ); toast('Empfänger entfernt', 'ok') } catch (e) { toast(niceErr(e), 'err') }
+  },
+  mailPlus(el) {
+    const x = ME_MAIL.e.find(y => y.typ === el.dataset.t), drin = new Set(x.empfaenger || []);
+    const frei = ME_MAIL.u.filter(b => !drin.has(b.id));
+    const bd = sheet('Empfänger hinzufügen', `<p class="muted" style="margin:2px 0 10px">${esc(x.titel)}</p><div class="mwahl">${frei.map(b => `<button class="mwahl-r" data-u="${b.id}" ${b.email ? '' : 'disabled'}><span class="avatar" style="width:32px;height:32px;font-size:13px">${esc((b.name || '?').charAt(0))}</span><span><b>${esc(b.name)}</b><small>${b.email ? esc(b.email) : 'keine E-Mail hinterlegt'}</small></span></button>`).join('') || '<p class="faint">Alle sind schon eingetragen.</p>'}</div>`);
+    bd.addEventListener('click', async ev => {
+      const r = ev.target.closest('.mwahl-r'); if (!r || r.disabled) return;
+      try { await mailSpeichern(x.typ, { empfaenger: [...(x.empfaenger || []), r.dataset.u] }); closeSheet(); mailNeu(x.typ); toast('Empfänger hinzugefügt', 'ok') } catch (e) { toast(niceErr(e), 'err') }
+    });
+  },
+  async mailTest(el) {
+    el.disabled = true;
+    try { const r = await mailFn('test'); toast(`Testmail an ${r.an} verschickt`, 'ok'); showMail() }
+    catch (e) { toast(niceErr(e), 'err'); el.disabled = false }
+  },
+});
+document.addEventListener('change', async e => {
+  const f = e.target.closest('[data-mf]'); if (!f) return;
+  const k = f.dataset.mf, v = k === 'bauleitung' ? f.checked : k === 'tag' ? +f.value : f.value;
+  if (k === 'uhrzeit' && !/^\d{2}:\d{2}$/.test(v)) return;
+  try { await mailSpeichern(f.dataset.t, { [k]: v }); toast('Gespeichert', 'ok') } catch (err) { toast(niceErr(err), 'err') }
 });
 
 /* ---------- Easter Egg: Klick aufs Logo auf der Startseite = kleines Feuerwerk ---------- */
