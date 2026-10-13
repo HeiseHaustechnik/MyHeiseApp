@@ -329,6 +329,10 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 .mwahl{display:grid;gap:4px}.mwahl-r{display:flex;align-items:center;gap:12px;padding:8px;border-radius:12px;text-align:left}
 .mwahl-r:hover{background:var(--surface-2)}.mwahl-r[disabled]{opacity:.45;cursor:default}.mwahl-r b{display:block;font-weight:700}.mwahl-r small{color:var(--ink-3)}
 @media(max-width:480px){.mprot-r{grid-template-columns:1fr auto}.mprot-d{grid-column:1/-1}}
+.mfuss{flex-basis:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px}
+.mvor{display:grid;gap:6px}.mvor-r{background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.mvor-r summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none}.mvor-r summary::-webkit-details-marker{display:none}
+.mvor-r ul{margin:8px 0 2px 18px;font-size:14px;color:var(--ink-2)}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -999,7 +1003,7 @@ document.addEventListener('change', async e => {
 /* ---------- E-Mail-Benachrichtigungen (Admin, #/mail) ----------
    Einstellungen in mail_einstellungen (nur Admin), Protokoll in mail_protokoll.
    Versand über die Edge Function „mail-senden“ (Microsoft Graph, Postfach myheise@). */
-const MAIL_IMPL = new Set([]); // Benachrichtigungen, deren Versand schon eingebaut ist
+const MAIL_IMPL = new Set(['unterweisung', 'zusammenfassung']); // Benachrichtigungen, deren Versand schon eingebaut ist
 const MAIL_INFO = {
   unterweisung: 'Jede Person bekommt ihre offenen Unterweisungen mit Link in die App.',
   pruefung: 'Fällige Prüfungen von Leitern und Geräten der nächsten 30 Tage an die Verantwortlichen.',
@@ -1045,7 +1049,8 @@ function mailKarte(x) {
       : x.rhythmus === 'woechentlich' ? `<select class="inp" data-mf="tag" data-t="${x.typ}" aria-label="Wochentag">${[1, 2, 3, 4, 5].map(d => `<option value="${d}" ${x.tag === d ? 'selected' : ''}>${WOCHENTAGE[d]}</option>`).join('')}</select>`
       : `<span class="faint" style="font-size:14px">Montag bis Freitag</span>`;
     opt = `<div class="mopt"><div class="seg mseg" role="group" aria-label="Rhythmus">${[['monatlich', 'Monatlich'], ['woechentlich', 'Wöchentlich'], ['taeglich', 'Täglich']].map(([k, l]) => `<button type="button" class="${x.rhythmus === k ? 'on' : ''}" data-act="mailRh" data-t="${x.typ}" data-v="${k}">${l}</button>`).join('')}</div>
-      <div class="mzeit">${tagSel}<input class="inp" type="time" data-mf="uhrzeit" data-t="${x.typ}" value="${esc(x.uhrzeit)}" aria-label="Uhrzeit"></div></div>`;
+      <div class="mzeit">${tagSel}<input class="inp" type="time" data-mf="uhrzeit" data-t="${x.typ}" value="${esc(x.uhrzeit)}" aria-label="Uhrzeit"></div>
+      ${impl ? `<div class="mfuss"><span class="faint">${x.letzter_lauf ? 'Zuletzt verschickt ' + new Date(x.letzter_lauf).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }) : 'Noch nie verschickt'}</span><button class="btn btn-soft btn-sm" data-act="mailVorschau" data-t="${x.typ}">Wer bekäme sie jetzt?</button></div>` : ''}</div>`;
   } else if (x.typ !== 'nachricht') {
     opt = `<div class="mopt">${x.art === 'ereignis' ? `<label class="lrecht"><input type="checkbox" data-mf="bauleitung" data-t="${x.typ}" ${x.bauleitung ? 'checked' : ''}><span>Bauleitung des Projekts</span></label>` : ''}${mailEmpf(x)}</div>`;
   }
@@ -1082,6 +1087,21 @@ Object.assign(ACT, {
       const r = ev.target.closest('.mwahl-r'); if (!r || r.disabled) return;
       try { await mailSpeichern(x.typ, { empfaenger: [...(x.empfaenger || []), r.dataset.u] }); closeSheet(); mailNeu(x.typ); toast('Empfänger hinzugefügt', 'ok') } catch (e) { toast(niceErr(e), 'err') }
     });
+  },
+  async mailVorschau(el) {
+    const x = ME_MAIL.e.find(y => y.typ === el.dataset.t); el.disabled = true;
+    try {
+      const r = await mailFn('vorschau', { typ: x.typ }); el.disabled = false;
+      const mit = r.liste.filter(p => p.email), ohne = r.liste.filter(p => !p.email);
+      const bd = sheet(x.titel, `<p class="muted" style="margin:2px 0 12px">${r.liste.length ? `${r.liste.length} ${r.liste.length === 1 ? 'Person hat' : 'Personen haben'} gerade etwas offen. ${mit.length} ${mit.length === 1 ? 'bekäme' : 'bekämen'} eine E-Mail${ohne.length ? `, ${ohne.length} ohne E-Mail-Adresse nicht` : ''}.` : 'Gerade hat niemand etwas offen.'}</p>
+        <div class="mvor">${r.liste.map(p => `<details class="mvor-r"><summary><b>${esc(p.name)}</b><span class="chip ${p.email ? 'tone-blue' : 'tone-red'}">${p.email ? p.anzahl + ' offen' : 'keine E-Mail'}</span></summary><ul>${p.punkte.map(t => `<li>${esc(t)}</li>`).join('')}</ul></details>`).join('')}</div>`,
+        mit.length ? `<button class="btn btn-ghost" data-act="closeSheet">Schließen</button><button class="btn btn-primary" id="mvJetzt">${ic('send', 'sm')} Jetzt an ${mit.length} ${mit.length === 1 ? 'Person' : 'Personen'} senden</button>` : `<button class="btn btn-ghost" data-act="closeSheet">Schließen</button>`);
+      const go = $('#mvJetzt', bd); if (go) go.onclick = async () => {
+        go.disabled = true; go.textContent = 'Wird verschickt …';
+        try { const e = await mailFn('jetzt', { typ: x.typ }); closeSheet(); const n = e.ergebnis.filter(z => z.status === 'gesendet').length; toast(`${n} ${n === 1 ? 'E-Mail' : 'E-Mails'} verschickt`, 'ok'); showMail() }
+        catch (err) { toast(niceErr(err), 'err'); go.disabled = false; go.textContent = 'Erneut versuchen' }
+      };
+    } catch (e) { toast(niceErr(e), 'err'); el.disabled = false }
   },
   async mailTest(el) {
     el.disabled = true;
