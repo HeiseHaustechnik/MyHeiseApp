@@ -87,6 +87,17 @@ textarea.inp{height:64px;padding:8px 12px}
 .warn{background:#fff4e5;color:#8a4b00;border-radius:10px;padding:8px 10px;font-size:13px;margin-top:6px}
 .lesend .cell{cursor:default}
 .bubadge{display:block;font-size:10.5px;font-weight:700;color:#8a3b00;background:#F8CBAD;border-radius:6px;padding:1px 6px;margin-top:3px;width:max-content}th.buk{cursor:pointer}th.buk:hover{text-decoration:underline}
+.wpwrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;align-items:start}
+.leiste{position:sticky;top:66px;background:var(--s);border-radius:16px;box-shadow:var(--sh);padding:10px;max-height:calc(100vh - 190px);overflow:auto}
+.lkopf b{font-size:12.5px;display:block;margin:2px 2px 6px;color:var(--ink2)}
+.lgr{font-size:11px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin:12px 2px 4px}
+.lchip{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y;font-size:12.5px;line-height:1.2}
+.lchip:hover{background:var(--s2)}.lchip.on{background:#fff3ea;box-shadow:inset 0 0 0 2px var(--acc)}
+.lchip i{width:14px;height:14px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.lchip small{display:block;color:var(--ink3);font-weight:500;font-size:11px}
+.stempel{background:#fff3ea;color:#8a3b00;border-radius:9px;padding:7px 9px;font-size:12px;margin-top:8px;line-height:1.35}.stempel button{text-decoration:underline;font-weight:700;color:inherit}
+.lghost{position:fixed;z-index:70;pointer-events:none;pointer-events:none;background:var(--s);border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:700;box-shadow:0 12px 28px -8px rgba(13,21,36,.45);display:flex;gap:8px;align-items:center}.lghost i{width:14px;height:14px;border-radius:4px}
+@media(max-width:900px){.wpwrap{grid-template-columns:1fr}.leiste{position:static;max-height:none;display:flex;gap:6px;overflow-x:auto;padding:8px;align-items:center}.leiste .lkopf,.leiste .lgr{display:none}.lchip{flex:none;background:var(--s2);touch-action:pan-x}.lchip small{display:none}.stempel{flex:none;margin:0}}
 .home{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-weight:650;font-size:13px;background:rgba(255,255,255,.12);padding:7px 11px;border-radius:10px}
 .lade{padding:60px 16px;text-align:center;color:var(--ink3)}
 .it b.klick{cursor:pointer}.it b.klick:hover{text-decoration:underline}
@@ -279,17 +290,63 @@ function rWoche(){
    <div class="chips" style="margin-left:6px">${['alle',...GR].map(g=>`<button class="chip${FIL===g?' on':''}" data-f="${g}">${g==='alle'?'Alle':g}</button>`).join('')}</div>
    ${darf.verwalten()?`<button class="btn" id="bsbtn" style="margin-left:auto">Baustellen</button>`:''}${darf.verwalten()?`<button class="btn" id="mabtn">Mitarbeiter${ausgebl?` <small style="color:var(--ink3)">(${ausgebl} ausgeblendet)</small>`:''}</button>`:''}${darf.planen()?`<button class="btn" id="kopie" title="Alle Einträge dieser Woche in die nächste Woche übernehmen"${darf.verwalten()?'':' style="margin-left:auto"'}>Woche kopieren</button>`:'<span style="margin-left:auto;color:var(--ink3);font-size:12.5px">Nur ansehen</span>'}</div>
    ${offen&&darf.planen()?`<div class="note">${offen} Einträge aus der Excel sind nicht eindeutig und rot markiert. Antippen und Baustelle wählen.</div>`:''}
-   <div class="card wp${darf.planen()?'':' lesend'}"><table class="g"><thead><tr><th class="nm">Mitarbeiter</th>${tage.map((d,i)=>`<th class="${d===iso(HEUTE)?'today':''}${darf.verwalten()?' buk':''}" data-tag="${d}"${darf.verwalten()?' title="Betriebsurlaub festlegen"':''}>${WT[i]} ${dDE(d)}${FT[d]?`<span class="bubadge" style="background:#DCE3EC;color:#2F3B53">${FT[d]}</span>`:BU[d]?`<span class="bubadge">${BU[d]===1?'Betriebsurlaub':'½ Betriebsurlaub'}</span>`:''}</th>`).join('')}</tr></thead><tbody>
+   ${darf.planen()?`<div class="wpwrap">${leisteHTML()}<div class="wpmain">`:''}<div class="card wp${darf.planen()?'':' lesend'}"><table class="g"><thead><tr><th class="nm">Mitarbeiter</th>${tage.map((d,i)=>`<th class="${d===iso(HEUTE)?'today':''}${darf.verwalten()?' buk':''}" data-tag="${d}"${darf.verwalten()?' title="Betriebsurlaub festlegen"':''}>${WT[i]} ${dDE(d)}${FT[d]?`<span class="bubadge" style="background:#DCE3EC;color:#2F3B53">${FT[d]}</span>`:BU[d]?`<span class="bubadge">${BU[d]===1?'Betriebsurlaub':'½ Betriebsurlaub'}</span>`:''}</th>`).join('')}</tr></thead><tbody>
    ${GR.map(g=>{const L=leute.filter(p=>p.gruppe===g); if(!L.length) return ''; return `<tr class="gr"><td colspan="6">${({Obermonteur:'Obermonteure',Monteur:'Monteure',Kundendienst:'Kundendienst',Azubi:'Auszubildende',Leiharbeiter:'Leiharbeiter',Praktikant:'Praktikanten'})[g]} · ${L.length}</td></tr>`+L.map(p=>`<tr><td class="nm"${darf.verwalten()?` data-nm="${p.id}" title="Mitarbeiter bearbeiten"`:''}><b>${esc(p.name)}</b><small>${p.tage===4?'Mo–Do':'Mo–Fr'}${p.bis?' · bis '+dDE(p.bis):''}</small></td>${tage.map((d,i)=>`<td class="${d===iso(HEUTE)?'today':''}">${zelle(p,d,i)}</td>`).join('')}</tr>`).join('')}).join('')}
-   </tbody></table></div>
-   ${darf.planen()?'':'<!--'}<div class="leg" style="color:var(--ink3)">Tipp: Einträge mit der Maus auf einen anderen Tag oder eine andere Person ziehen. Mit gedrückter Strg-Taste wird kopiert. Am Handy kurz gedrückt halten, dann ziehen.</div>${darf.planen()?'':'-->'}
+   </tbody></table></div>${darf.planen()?'</div></div>':''}
+   ${darf.planen()?'':'<!--'}<div class="leg" style="color:var(--ink3)">Tipp: Baustellen aus der Liste links auf einen Tag ziehen oder antippen und dann Felder antippen. Einträge im Plan lassen sich ebenfalls ziehen. Mit gedrückter Strg-Taste wird kopiert. Am Handy kurz gedrückt halten, dann ziehen.</div>${darf.planen()?'':'-->'}
    <div class="leg"><b>Besetzung diese Woche (Personentage):</b> ${Object.entries(bes).sort((a,b)=>b[1]-a[1]).map(([k,n])=>{const c=codeInfo(k);return `<span><i class="dot" style="background:${c.farbe}"></i>${esc(c.name)} ${n}</span>`}).join('')||'–'}</div>`;
   $('#prev').onclick=()=>{WOCHE=addD(WOCHE,-7);nachladen(WOCHE).then(rWoche)}; $('#next').onclick=()=>{WOCHE=addD(WOCHE,7);nachladen(WOCHE).then(rWoche)}; $('#heute').onclick=()=>{WOCHE=montag(HEUTE);rWoche()};
   document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{FIL=b.dataset.f;rWoche()});
   if($('#kopie')) $('#kopie').onclick=()=>{ let n=0; leute.forEach(p=>tage.forEach(d=>{const e=EIN[p.id+'|'+d]; if(e&&e.code&&e.code!=='?'){ const z=iso(addD(new Date(d+'T12:00'),7)); if(!EIN[p.id+'|'+z]&&dabei(p,z)&&!FT[z]&&BU[z]!==1){EIN[p.id+'|'+z]={...e};n++} }})); toast(n+' Einträge in KW '+(kwOf(WOCHE)+1)+' übernommen (freie Tage bleiben frei)'); };
   if(darf.planen()) document.querySelectorAll('.wp [data-p]').forEach(c=>c.addEventListener('pointerdown',ev=>ziehStart(ev,c)));
+  if(darf.planen()) leisteBinden();
   if(darf.verwalten()) document.querySelectorAll('th[data-tag]').forEach(t=>t.onclick=()=>buTag(t.dataset.tag));
   if($('#mabtn')) $('#mabtn').onclick=maListe; if($('#bsbtn')) $('#bsbtn').onclick=bsListe; document.querySelectorAll('[data-nm]').forEach(t=>t.onclick=()=>maBearbeiten(+t.dataset.nm));
+}
+/* ---------- Seitenleiste: Baustellen auf Tage ziehen ---------- */
+let STEMPEL=null, LSUCH='';
+function leisteHTML(){
+  const akt=D.projects.filter(p=>!p.fertig), nm=(a,b)=>a.name.localeCompare(b.name,'de');
+  const bs=akt.filter(p=>!FEST.includes(p.id)&&!p.klein).sort(nm), kl=akt.filter(p=>p.klein&&!FEST.includes(p.id)).sort(nm), fe=akt.filter(p=>FEST.includes(p.id)).sort(nm);
+  const chip=(code,name,farbe,sub)=>`<div class="lchip${STEMPEL===code?' on':''}" data-code="${code}" title="Auf einen Tag ziehen oder antippen und dann Felder antippen"><i style="background:${farbe}"></i><span><b>${esc(name)}</b>${sub?`<small>${esc(sub)}</small>`:''}</span></div>`;
+  const st=STEMPEL&&codeInfo(STEMPEL);
+  return `<aside class="leiste"><div class="lkopf"><b>Auf einen Tag ziehen</b><input class="inp" id="lsuch" placeholder="Baustelle oder Nummer" value="${esc(LSUCH)}"></div>
+    ${st?`<div class="stempel">Antippen setzt <b>${esc(st.name)}</b>. <button id="stempelaus">Beenden</button></div>`:''}
+    <div class="lgr">Baustellen</div>${bs.map(p=>chip('p:'+p.id,p.name,p.farbe,nrVon(p))).join('')}
+    ${kl.length?'<div class="lgr">Kleinaufträge</div>'+kl.map(p=>chip('p:'+p.id,p.name,p.farbe,nrVon(p))).join(''):''}
+    <div class="lgr">Sammelblöcke</div>${fe.map(p=>chip('p:'+p.id,p.name,p.farbe)).join('')}
+    <div class="lgr">Abwesend</div>${Object.entries(ABS).filter(([k])=>k!=='ft').map(([k,v])=>chip('a:'+k,v[0],v[1])).join('')}</aside>`;
+}
+function leisteFiltern(){ const q=LSUCH.toLowerCase(); document.querySelectorAll('.leiste .lchip').forEach(c=>c.style.display=!q||c.textContent.toLowerCase().includes(q)?'':'none'); }
+function leisteBinden(){
+  document.querySelectorAll('.leiste .lchip').forEach(c=>c.addEventListener('pointerdown',ev=>leisteZieh(ev,c)));
+  if($('#lsuch')) $('#lsuch').oninput=e=>{LSUCH=e.target.value;leisteFiltern()};
+  if($('#stempelaus')) $('#stempelaus').onclick=()=>{STEMPEL=null;rWoche()};
+  leisteFiltern();
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&STEMPEL){ STEMPEL=null; if(VIEW==='woche') rWoche() } });
+function setze(pid,d,code){
+  const p=D.people.find(x=>x.id===pid); if(!p) return;
+  const i=(new Date(d+'T12:00').getDay()+6)%7; if(i>=p.tage||!dabei(p,d)) return toast(p.name.split(/[ ,]/)[0]+' hat an diesem Tag frei');
+  if(code==='p:dis') return einsatz(pid,d,code);   // Diverses braucht Kunde, Projekt oder Nummer
+  const k=pid+'|'+d, alt=EIN[k], c=codeInfo(code);
+  if(alt&&alt.code===code&&!alt.code2) return;
+  EIN[k]={code,note:''}; rWoche();
+  toast(`${c?c.name:''} → ${p.name.split(/[ ,]/)[0]}, ${dDE(d)}${alt?' (vorheriger Eintrag ersetzt)':''}`,()=>{ if(alt) EIN[k]=alt; else delete EIN[k]; rWoche(); });
+}
+function leisteZieh(ev,c){
+  const code=c.dataset.code, touch=ev.pointerType==='touch', x0=ev.clientX, y0=ev.clientY; let aktiv=false, ghost=null, ziel=null, timer=null;
+  const los=e=>{ aktiv=true; const ci=codeInfo(code); ghost=document.createElement('div'); ghost.className='lghost'; ghost.innerHTML=`<i style="background:${ci.farbe}"></i>${esc(ci.name)}`; document.body.appendChild(ghost); if(navigator.vibrate) navigator.vibrate(15); bewege(e); };
+  const bewege=e=>{ ghost.style.left=(e.clientX+8)+'px'; ghost.style.top=(e.clientY+8)+'px';
+    const el=document.elementFromPoint(e.clientX,e.clientY), t=el&&el.closest('.wp [data-p]'); if(ziel&&ziel!==t) ziel.classList.remove('drop'); ziel=t&&!t.dataset.frei?t:null; if(ziel) ziel.classList.add('drop'); };
+  const move=e=>{ if(aktiv){ e.preventDefault(); bewege(e); return } if(Math.hypot(e.clientX-x0,e.clientY-y0)>6){ if(touch){ clearTimeout(timer); ende() } else los(e) } };
+  const ende=()=>{ clearTimeout(timer); document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',auf); document.removeEventListener('pointercancel',ende); if(ghost) ghost.remove(); if(ziel) ziel.classList.remove('drop'); };
+  const auf=e=>{ const war=aktiv, z=ziel; ende();
+    if(!war){ if(Math.hypot(e.clientX-x0,e.clientY-y0)<=6){ STEMPEL=STEMPEL===code?null:code; rWoche(); } return }
+    if(z) setze(+z.dataset.p,z.dataset.d,code); };
+  document.addEventListener('pointermove',move,{passive:false}); document.addEventListener('pointerup',auf); document.addEventListener('pointercancel',ende);
+  if(touch) timer=setTimeout(()=>los({clientX:x0,clientY:y0}),350);
+  if(!touch) ev.preventDefault();
 }
 /* Drag & Drop im Wochenplan: Maus sofort, Finger nach kurzem Halten. Strg/Alt gedrückt = kopieren. */
 function ziehStart(ev,c){
@@ -302,7 +359,7 @@ function ziehStart(ev,c){
   const move=e=>{ if(aktiv){ e.preventDefault(); bewege(e); return; } if(Math.hypot(e.clientX-x0,e.clientY-y0)>6){ if(touch){ clearTimeout(timer); ende(); } else los(e); } };
   const ende=e=>{ clearTimeout(timer); document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',auf); document.removeEventListener('pointercancel',ende);
     if(ghost) ghost.remove(); c.classList.remove('dragsrc'); if(ziel) ziel.classList.remove('drop'); };
-  const auf=e=>{ const war=aktiv, z=ziel; ende(); if(!war){ if(e&&Math.hypot(e.clientX-x0,e.clientY-y0)<=6) einsatz(pid,d); return; } if(!z) return;
+  const auf=e=>{ const war=aktiv, z=ziel; ende(); if(!war){ if(e&&Math.hypot(e.clientX-x0,e.clientY-y0)<=6) (STEMPEL?setze(pid,d,STEMPEL):einsatz(pid,d)); return; } if(!z) return;
     const kopie=e.ctrlKey||e.altKey||e.metaKey, k1=pid+'|'+d, k2=z.dataset.p+'|'+z.dataset.d, alt1=EIN[k1], alt2=EIN[k2];
     EIN[k2]={...alt1}; if(!kopie) delete EIN[k1];
     const wer=D.people.find(x=>x.id===+z.dataset.p).name.split(' ')[0];
@@ -311,8 +368,8 @@ function ziehStart(ev,c){
   document.addEventListener('pointermove',move,{passive:false}); document.addEventListener('pointerup',auf); document.addEventListener('pointercancel',ende);
   if(touch&&voll) timer=setTimeout(()=>los({clientX:x0,clientY:y0}),350);
 }
-function einsatz(pid,d){
-  const p=D.people.find(x=>x.id===pid), e={...(EIN[pid+'|'+d]||{})}; let sel=e.code&&e.code!=='?'?e.code:'', sel2=e.code2||''; let auf2=!!sel2;
+function einsatz(pid,d,vorwahl){
+  const p=D.people.find(x=>x.id===pid), e={...(EIN[pid+'|'+d]||{})}; let sel=vorwahl||(e.code&&e.code!=='?'?e.code:''), sel2=e.code2||''; let auf2=!!sel2;
   const projs=D.projects.filter(x=>!x.fertig);
   const draw=()=>{ sheet(`<h3>${esc(p.name)}</h3><div class="sub">${new Date(d+'T12:00').toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'})}${e.code==='?'?` · Excel: „${esc(e.note)}“`:''}</div>
     <input class="inp" id="such" placeholder="Baustelle oder Auftragsnummer suchen">
