@@ -1,0 +1,630 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Planung – My Heise App</title><meta name="theme-color" content="#2f3b53"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon.png">
+<style>
+:root{--bg:#f4f5f8;--s:#fff;--s2:#eef0f4;--ink:#0d1524;--ink2:#485468;--ink3:#8491a3;--line:#e3e7ee;--brand:#2f3b53;--acc:#e25304;--ok:#15803d;--okb:#e6f6ec;--red:#c32328;--redb:#fdeceb;--amb:#b54203;--ambb:#fdeee5;--blue:#2c60a7;--blueb:#e8effe;--sh:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16)}
+*{box-sizing:border-box;margin:0;padding:0}body{font:14px/1.45 Montserrat,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}input,select,textarea{font:inherit}
+.top{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1{font-size:17px;letter-spacing:-.01em}.top small{opacity:.7;font-size:12px;display:block;font-weight:500}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.1);padding:4px;border-radius:12px;margin-left:auto}
+.tabs button{padding:7px 14px;border-radius:9px;font-weight:650;font-size:13.5px;color:#dfe4ee}.tabs button.on{background:#fff;color:var(--brand)}
+.wrap{padding:14px 16px 60px;max-width:1500px;margin:0 auto}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:11px;background:var(--s);box-shadow:var(--sh);font-weight:650;font-size:13.5px}
+.btn.pri{background:var(--acc);color:#fff}.btn.ic{width:38px;padding:0;justify-content:center;font-size:18px}
+.kw{font-weight:750;font-size:16px;min-width:200px;text-align:center}.kw small{display:block;font-weight:500;color:var(--ink3);font-size:12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{height:30px;padding:0 12px;border-radius:15px;background:var(--s);box-shadow:inset 0 0 0 1px var(--line);font-size:12.5px;font-weight:650;color:var(--ink2)}.chip.on{background:var(--brand);color:#fff;box-shadow:none}
+.card{background:var(--s);border-radius:16px;box-shadow:var(--sh);overflow:hidden}
+.note{background:var(--ambb);color:var(--amb);border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:12px}
+/* Wochenplan */
+.wp{overflow:auto;max-height:calc(100vh - 190px)}
+table.g{border-collapse:separate;border-spacing:0;width:100%;min-width:760px}
+.g th,.g td{border-bottom:1px solid var(--line);padding:4px}
+.g thead th{position:sticky;top:0;background:var(--s);z-index:3;font-size:12px;color:var(--ink3);font-weight:700;text-align:left;padding:8px 6px}
+.g thead th.today{color:var(--acc)}
+.g .nm{position:sticky;left:0;background:var(--s);z-index:2;min-width:170px;max-width:190px;padding:6px 10px;border-right:1px solid var(--line)}
+.g thead .nm{z-index:4}
+.nm b{display:block;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nm small{color:var(--ink3);font-size:11.5px}
+.g tr.gr td{background:var(--s2);font-size:11px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);padding:6px 10px;position:sticky;left:0}
+.cell{height:40px;border-radius:9px;display:flex;flex-direction:column;justify-content:center;padding:0 8px;font-size:12px;font-weight:700;line-height:1.15;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:transform .08s}
+.cell:hover{transform:scale(1.02)}.cell small{font-weight:500;font-size:10.5px;opacity:.85;overflow:hidden;text-overflow:ellipsis}
+.cell.leer{background:transparent;box-shadow:inset 0 0 0 1px dashed var(--line);border:1px dashed var(--line);color:var(--ink3);font-weight:500;align-items:center}
+.cell.frei{background:repeating-linear-gradient(45deg,#f1f2f5,#f1f2f5 6px,#e9ebf0 6px,#e9ebf0 12px);cursor:default;color:var(--ink3);font-weight:500;align-items:center}
+.cell.unk{background:#fff;box-shadow:inset 0 0 0 2px var(--red);color:var(--red)}
+.cell.zwei{background-image:linear-gradient(135deg,transparent 50%,var(--c2) 50%)}
+.g td.today{background:#fff8f3}
+.sum td{font-size:11.5px;color:var(--ink2)}
+/* Zeitplan */
+.gantt{overflow:auto;max-height:calc(100vh - 190px)}
+.gt{display:grid;position:relative}
+.gh{position:sticky;top:0;z-index:5;background:var(--s);font-size:11px;color:var(--ink3);font-weight:700;border-bottom:1px solid var(--line);height:44px}
+.gn{position:sticky;left:0;z-index:4;background:var(--s);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 10px;display:flex;flex-direction:column;justify-content:center}
+.gn b{font-size:13px;display:flex;align-items:center;gap:6px}.gn b i{width:10px;height:10px;border-radius:3px;flex:none}.gn small{font-size:11px;color:var(--ink3)}
+.gr2{position:relative;border-bottom:1px solid var(--line);height:52px}.ist{position:absolute;top:35px;height:13px;border-radius:4px;background:#e8ecf2;color:#2F3B53;font-size:9.5px;font-weight:750;display:flex;align-items:center;justify-content:center;line-height:1}.ist.aus{background:#fdeceb;color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
+.gb{position:absolute;top:6px;height:26px;border-radius:7px;font-size:11.5px;font-weight:700;color:#0d1524;padding:0 8px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.gb.abg{opacity:.45}
+.ms{position:absolute;top:9px;width:18px;height:18px;transform:rotate(45deg);border-radius:3px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer;z-index:2}
+.ms.offen{background:var(--acc)}.ms.ok{background:var(--ok)}.ms.ent{background:#9aa3b2}
+.today-line{position:absolute;top:0;bottom:0;width:2px;background:var(--acc);z-index:3;pointer-events:none}
+.kwc{position:absolute;top:0;height:100%;border-left:1px solid var(--line);font-size:10.5px;padding:4px 0 0 4px}
+.load{font-size:11px;font-weight:750;text-align:center;border-radius:6px;position:absolute;top:10px;height:26px;display:flex;align-items:center;justify-content:center}
+/* Besprechung */
+.bes{display:grid;gap:12px}.pr-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}.pr-h i{width:12px;height:12px;border-radius:4px}.pr-h b{font-size:15px}
+.it{display:grid;grid-template-columns:28px 1fr auto;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);align-items:start}.it:last-child{border-bottom:0}
+.it .ty{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:14px;background:var(--s2)}
+.it b{font-weight:700}.it p{color:var(--ink2);font-size:13px;margin-top:2px}.it .meta{font-size:12px;color:var(--ink3);margin-top:3px}
+.st{height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:700;white-space:nowrap}
+.st.offen{background:var(--ambb);color:var(--amb)}.st.eingeplant{background:var(--blueb);color:var(--blue)}.st.erledigt{background:var(--okb);color:var(--ok)}.st.entfaellt{background:var(--s2);color:var(--ink3)}
+/* Mein Einsatz */
+.me{max-width:460px;margin:0 auto;display:grid;gap:12px}
+.today{border-radius:18px;padding:18px;color:#fff;background:var(--brand)}.today small{opacity:.8}.today h2{font-size:22px;margin:4px 0}
+.dl{display:grid}.dl>div{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}.dl>div:last-child{border-bottom:0}
+.dl .d{width:46px;text-align:center;font-weight:750}.dl .d small{display:block;font-weight:500;color:var(--ink3);font-size:11px}
+.dot{width:12px;height:12px;border-radius:4px;flex:none}
+/* Sheet */
+.ov{position:fixed;inset:0;background:rgba(13,21,36,.4);z-index:50;display:none}.ov.on{display:block}
+.sh{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:min(560px,100%);max-height:86vh;overflow:auto;background:var(--s);border-radius:20px 20px 0 0;z-index:51;padding:18px 18px 24px;transition:transform .2s}.sh.on{transform:translate(-50%,0)}
+.sh h3{font-size:17px;margin-bottom:4px}.sh .sub{color:var(--ink3);font-size:13px;margin-bottom:12px}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin:8px 0 12px}
+.pick button{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;background:var(--s2);font-weight:650;font-size:12.5px;text-align:left}.pick button.on{box-shadow:inset 0 0 0 2px var(--brand);background:#fff}
+.lab{font-size:11.5px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
+.inp{width:100%;height:40px;border-radius:10px;border:1px solid var(--line);padding:0 12px;background:#fff}
+textarea.inp{height:64px;padding:8px 12px}
+.row{display:flex;gap:8px;margin-top:12px}.row .btn{flex:1;justify-content:center}
+.leg{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-top:10px}.leg span{display:flex;align-items:center;gap:5px}
+.ghost{position:fixed;z-index:70;pointer-events:none;opacity:.92;box-shadow:0 12px 28px -8px rgba(13,21,36,.45);transform:rotate(-2deg)}
+.cell.drop{box-shadow:inset 0 0 0 3px var(--acc)!important}.cell.dragsrc{opacity:.35}
+.gb{touch-action:none;user-select:none}.gb .rz{position:absolute;right:0;top:0;bottom:0;width:9px;cursor:ew-resize;background:rgba(0,0,0,.12)}
+.ms{touch-action:none}.cell{touch-action:pan-x pan-y;user-select:none;-webkit-user-select:none}
+.toast button{color:#ffc79a;font-weight:750;margin-left:12px;text-decoration:underline}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 16px;border-radius:12px;font-weight:650;z-index:60;display:none}
+@media(max-width:700px){.tabs{margin-left:0;width:100%;overflow:auto}.tabs button{padding:7px 10px;font-size:12.5px}.kw{min-width:0}}
+.marow{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}.marow.weg{opacity:.5}.maname{flex:1;text-align:left;background:none;border:0;padding:9px 2px;font:inherit;cursor:pointer;color:inherit}.maname small{display:block;color:var(--ink3);font-size:12px}td.nm[data-nm]{cursor:pointer}td.nm[data-nm]:hover b{text-decoration:underline}
+.rolle{display:flex;align-items:center;gap:6px;color:#c9d0dc;font-size:12.5px;margin-left:auto;margin-right:10px}.rolle select{border-radius:8px;border:0;padding:6px 8px;font:inherit;font-weight:650;color:#2F3B53}
+.bsrow{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:2px 0}.bsrow .maname{display:flex;align-items:center;gap:10px}.bsrow .maname span{flex:1}
+.bsdot{width:18px;height:18px;border-radius:5px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.pal{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:6px 0}.pal button{aspect-ratio:1;border-radius:8px;border:2px solid transparent;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}.pal button.on{border-color:#2F3B53;box-shadow:0 0 0 2px #fff inset}.pal button{position:relative}.pal button.belegt::after{content:"";position:absolute;right:4px;top:4px;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #2F3B53}
+.warn{background:#fff4e5;color:#8a4b00;border-radius:10px;padding:8px 10px;font-size:13px;margin-top:6px}
+.lesend .cell{cursor:default}
+.bubadge{display:block;font-size:10.5px;font-weight:700;color:#8a3b00;background:#F8CBAD;border-radius:6px;padding:1px 6px;margin-top:3px;width:max-content}th.buk{cursor:pointer}th.buk:hover{text-decoration:underline}
+.home{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-weight:650;font-size:13px;background:rgba(255,255,255,.12);padding:7px 11px;border-radius:10px}
+.lade{padding:60px 16px;text-align:center;color:var(--ink3)}
+.it b.klick{cursor:pointer}.it b.klick:hover{text-decoration:underline}
+.speichert{position:fixed;right:14px;bottom:14px;background:var(--brand);color:#fff;font-size:12px;font-weight:650;padding:6px 10px;border-radius:9px;opacity:0;transition:opacity .2s;z-index:55}.speichert.on{opacity:.85}
+textarea.inp{min-height:70px;resize:vertical}
+@media(max-width:700px){.top .rolle{display:none}}
+</style></head><body>
+<div class="top"><a class="home" href="index.html" title="Zur My Heise Startseite">‹ My Heise</a><div><h1>Planung</h1><small id="wer-bin-ich">Heise Haustechnik</small></div>
+<label class="rolle" id="rolle-box" hidden>Ansicht als <select id="rolle"><option value="monteur">Monteur (nur ansehen)</option><option value="planer">Planer</option><option value="admin">Verwaltung</option></select></label><div class="tabs" id="tabs"><button data-v="woche" class="on">Wochenplan</button><button data-v="zeit">Zeitplan</button><button data-v="bes">Besprechung</button><button data-v="me">Mein Einsatz</button></div></div>
+<div class="wrap" id="app"><div class="lade">Planung wird geladen …</div></div><div class="speichert" id="speichert">Speichert …</div>
+<div class="ov" id="ov"></div><div class="sh" id="sh"></div><div class="toast" id="toast"></div>
+<script>
+let D={people:[],projects:[]};
+const HEUTE=(()=>{const d=new Date();d.setHours(12,0,0,0);return d})();
+const $=s=>document.querySelector(s), esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const iso=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}, addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const kwOf=d=>{const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const dn=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-dn);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y)/864e5+1)/7)};
+const montag=d=>{const x=new Date(d);x.setHours(12);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+const dDE=d=>new Date(d+'T12:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+const WT=['Mo','Di','Mi','Do','Fr'];
+const dJ=d=>new Date(d+'T12:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});
+const ABS={ft:['Feiertag','#DCE3EC'],bu:['Betriebsurlaub','#F8CBAD'],url:['Urlaub','#C6E0B4'],kra:['Krank','#F4B6B6'],sch:['Schulung','#D9D9D9'],leh:['Lehrgang','#FFF59D'],bs:['Berufsschule','#CCCCFF'],ueb:['Überstunden frei','#BDD7EE'],ext:['Abwesend (extern)','#E7E6E6'],evt:['Betriebsveranstaltung','#FFD8F2']};
+let PR={};
+// Einsätze: key pid|datum -> {code,note,code2}
+let BU={}; // Betriebsurlaub: datum -> 1 (ganzer Tag) oder 0.5
+let EIN={};
+// Eintrag inkl. Betriebsurlaub (gilt für alle, wenn nichts anderes eingetragen ist)
+// Gesetzliche Feiertage Niedersachsen (automatisch je Jahr)
+function feiertage(j){ const a=j%19,b=Math.floor(j/100),c=j%100,dd=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-dd-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),ta=((h+l-7*m+114)%31)+1;
+  const O=new Date(j,mo-1,ta,12), o=n=>iso(addD(O,n));
+  return {[j+'-01-01']:'Neujahr',[o(-2)]:'Karfreitag',[o(1)]:'Ostermontag',[j+'-05-01']:'Tag der Arbeit',[o(39)]:'Christi Himmelfahrt',[o(50)]:'Pfingstmontag',[j+'-10-03']:'Tag der Deutschen Einheit',[j+'-10-31']:'Reformationstag',[j+'-12-25']:'1. Weihnachtstag',[j+'-12-26']:'2. Weihnachtstag'}; }
+const FT=Object.assign({},...[-1,0,1,2].map(n=>feiertage(HEUTE.getFullYear()+n)));
+// Eintrag inkl. Feiertag, Betriebsurlaub und „geht mit“
+function eintrag(pid,d,tiefe){ const e=EIN[pid+'|'+d];
+  if(e&&e.code&&e.code.startsWith('m:')&&!tiefe){ const mid=+e.code.slice(2), wer=(D.people.find(x=>x.id===mid)||{name:'?'}).name.split(/[ ,]/)[0], r=eintrag(mid,d,1);
+    return {code:r&&r.code&&!r.code.startsWith('m:')?r.code:e.code, code2:r&&r.code2, note:[r&&!r.auto&&r.note,'mit '+wer,e.note].filter(Boolean).join(' · '), mit:mid}; }
+  if(e) return e; if(FT[d]) return {code:'a:ft',note:FT[d],auto:1}; if(BU[d]===1) return {code:'a:bu',note:'für alle',auto:1}; return null; }
+const txtCol=hex=>{const h=hex.replace('#','');const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);return (r*299+g*587+b*114)/1000>150?'#0d1524':'#fff'};
+function codeInfo(code){ if(!code) return null; if(code==='?') return {name:'unklar',farbe:'#fff',unk:1}; const [t,id]=code.split(':'); if(t==='a') return {name:ABS[id][0],farbe:ABS[id][1],abs:1}; if(t==='m'){const w=D.people.find(x=>x.id===+id);return {name:'mit '+(w?w.name.split(/[ ,]/)[0]:'?'),farbe:'#E7E6E6'}} const p=PR[id]; return p?{name:p.name,farbe:p.farbe}:null }
+// Termine & Aufgaben aus der Besprechung
+let T=[]; // Termine und Aufgaben {id,p,art,t,von,bis,faellig,v,st,n}
+const SPAN={}; let ALT=false, VIEW='woche', WOCHE=montag(HEUTE), FIL='alle', ME_ID=null, NUR_OFFEN=true;
+const toast=(t,undo)=>{const e=$('#toast');e.innerHTML=esc(t)+(undo?'<button id="undo">Rückgängig</button>':'');e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',undo?5000:2200);if(undo)$('#undo').onclick=()=>{undo();e.style.display='none'}};
+const sheet=h=>{$('#sh').innerHTML=h;$('#ov').classList.add('on');$('#sh').classList.add('on')};
+const closeSh=()=>{$('#ov').classList.remove('on');$('#sh').classList.remove('on')};
+$('#ov').onclick=closeSh;
+/* ---------- Rechte (im echten Modul aus Benutzer & Zugriff) ---------- */
+let ROLLE='monteur', SERVER_ROLLE='leser';
+const darf={planen:()=>ROLLE!=='monteur', verwalten:()=>ROLLE==='admin'};
+function rolleSetzen(r){ ROLLE=r; $('#rolle').value=r; const b=document.querySelector('#tabs [data-v="bes"]'); b.style.display=r==='monteur'?'none':''; if(r==='monteur'&&VIEW==='bes'){VIEW='woche';[...$('#tabs').children].forEach(x=>x.classList.toggle('on',x.dataset.v==='woche'))} closeSh(); render(); }
+$('#rolle').onchange=e=>rolleSetzen(e.target.value);
+/* ---------- Betriebsurlaub (Firma, gilt für alle) ---------- */
+function buTag(d){
+  const alt=BU[d]||0, n=D.people.filter(p=>EIN[p.id+'|'+d]).length;
+  sheet(`<h3>Betriebsurlaub</h3><div class="sub">${new Date(d+'T12:00').toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})} · gilt für alle Mitarbeiter</div>
+    <div class="pick" style="margin-top:10px">${[[0,'Kein Betriebsurlaub'],[0.5,'Halber Tag'],[1,'Ganzer Tag']].map(([v,t])=>`<button data-bu="${v}" class="${alt===v?'on':''}">${t}</button>`).join('')}</div>
+    <p class="sub" style="margin-top:10px">Wer an dem Tag trotzdem eingeplant ist (z. B. Notdienst), behält seinen Eintrag.${n?` Für diesen Tag gibt es ${n} eigene Einträge.`:''}</p>
+    <div class="row"><button class="btn" onclick="closeSh()">Schließen</button></div>`);
+  document.querySelectorAll('#sh [data-bu]').forEach(b=>b.onclick=()=>{const v=+b.dataset.bu; if(v) BU[d]=v; else delete BU[d]; closeSh(); render(); toast(v?'Betriebsurlaub am '+dDE(d)+' eingetragen':'Betriebsurlaub am '+dDE(d)+' entfernt',()=>{if(alt)BU[d]=alt;else delete BU[d];render()})});
+}
+/* ---------- Baustellen ---------- */
+const FEST=['kd','lag','dis']; // wird beim Laden aus den Baustellen (fest) gefüllt
+const PAL=['#C32328','#E25304','#FF9933','#FFC000','#F5D423','#C9D96F','#92D050','#669900','#2E8B57','#4FB3BF','#00B0F0','#2C60A7','#2F3B53','#6666FF','#8E6CC8','#B38FD9','#FF66FF','#FF0066','#A0522D','#E07A2E','#8497B0','#A6B5C9','#9DC3E6','#BFC5CF'];
+// Beispiel: Projekte aus dem Modul Projekte (im echten Modul aus der Datenbank)
+let APP=[]; // Projekte aus dem Modul Projekte {id,nr,name,link}
+D.projects.forEach(p=>{ if(p.bis&&p.bis<iso(addD(HEUTE,-28))) p.fertig=true; if(p.id==='thw') p.fertig=true; });
+const appVon=id=>APP.find(a=>a.link===id);
+const nrVon=p=>((appVon(p.id)||{}).nr)||p.nr||'';
+const nrOk=nr=>!nr||/^32\d{6}$/.test(nr)||/^32\d{5}-\d{4}$/.test(nr);
+const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const abstand=(a,b)=>{const x=rgb(a),y=rgb(b);return Math.hypot(x[0]-y[0],x[1]-y[1],x[2]-y[2])};
+const aktiveFarben=ohne=>D.projects.filter(p=>!p.fertig&&p.id!==ohne).map(p=>({f:p.farbe,n:p.name}));
+function farbVorschlag(){ const A=aktiveFarben(); return PAL.slice().sort((a,b)=>Math.min(...A.map(x=>abstand(b,x.f)))-Math.min(...A.map(x=>abstand(a,x.f))))[0]; }
+const eintraege=id=>Object.values(EIN).filter(e=>e.code==='p:'+id||e.code2==='p:'+id).length;
+function bsListe(){
+  const zeile=p=>{const a=appVon(p.id);return `<div class="bsrow"><button class="maname" data-bs="${p.id}"><i class="bsdot" style="background:${p.farbe}"></i><span><b>${esc(p.name)}</b><small>${nrVon(p)?'Auftrag '+nrVon(p)+' · ':''}${FEST.includes(p.id)?'fester Block':a?'aus Projekte':'nur Planung'}${p.von?' · '+dDE(p.von)+(p.bis?' – '+dDE(p.bis):''):''}</small></span></button></div>`};
+  const akt=D.projects.filter(p=>!p.fertig).sort((a,b)=>a.name.localeCompare(b.name,'de')), alt=D.projects.filter(p=>p.fertig), frei=APP.filter(a=>!a.link);
+  sheet(`<h3>Baustellen</h3><div class="sub">Was hier aktiv ist, steht im Wochenplan zur Auswahl. Abgeschlossene bleiben im Verlauf sichtbar.</div>
+    <input class="inp" id="bssuch" placeholder="Name oder Auftragsnummer suchen">
+    <div id="bsli"><div class="lab">Aktiv · ${akt.length}</div>${akt.map(zeile).join('')}
+    ${frei.length?`<div class="lab">Projekte aus der App, noch nicht in der Planung · ${frei.length}</div>`+frei.map(a=>`<div class="bsrow"><span class="maname"><i class="bsdot" style="background:#fff"></i><span><b>${esc(a.name)}</b><small>Auftrag ${a.nr} · aus Projekte</small></span></span><button class="btn" data-app="${a.id}" style="font-size:12.5px;padding:6px 10px">In Planung anzeigen</button></div>`).join(''):''}
+    <details><summary class="lab" style="cursor:pointer">Abgeschlossen · ${alt.length}</summary>${alt.map(zeile).join('')}</details></div>
+    <div class="row"><button class="btn" id="bszu">Schließen</button><button class="btn pri" id="bsneu">+ Baustelle anlegen</button></div>`);
+  document.querySelectorAll('#sh [data-bs]').forEach(b=>b.onclick=()=>bsBearbeiten(b.dataset.bs));
+  document.querySelectorAll('#sh [data-app]').forEach(b=>b.onclick=()=>bsBearbeiten(null,APP.find(a=>a.id===b.dataset.app)));
+  $('#bssuch').oninput=ev=>{const q=ev.target.value.toLowerCase();document.querySelectorAll('#bsli .bsrow').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none');if(q)document.querySelector('#bsli details').open=true};
+  $('#bszu').onclick=closeSh; $('#bsneu').onclick=()=>bsBearbeiten(null);
+}
+function bsBearbeiten(id,app){
+  const neu=!id, orig=neu?null:PR[id], p=neu?{id:'b'+Date.now().toString(36),name:app?app.name:'',farbe:farbVorschlag(),von:null,bis:null,nr:'',ort:'',kunde:''}:{...orig,von:(SPAN[id]||[])[0]||null,bis:(SPAN[id]||[])[1]||null};
+  const fest=FEST.includes(p.id); let farbe=p.farbe, link=neu?(app?app.id:''):((appVon(p.id)||{}).id||'');
+  const n=neu?0:eintraege(p.id);
+  const draw=()=>{ const A=aktiveFarben(p.id), aehnl=A.filter(x=>abstand(x.f,farbe)<60);
+    sheet(`<h3>${neu?'Baustelle anlegen':esc(p.name)}</h3><div class="sub">${neu?(app?'Aus dem Modul Projekte, Projekt '+app.nr:'Nur für die Planung. Kann später mit einem App-Projekt verknüpft werden.'):(fest?'Fester Block':n+' Einträge im Wochenplan')}</div>
+    <div class="lab">Name</div><input class="inp" id="bn" value="${esc(p.name)}" placeholder="z. B. Hotel Ahorn Hallenbad"${fest?' disabled':''}>
+    ${fest?'':`<div class="lab">Auftragsnummer</div><input class="inp" id="bnr" inputmode="numeric" value="${esc((APP.find(a=>a.id===link)||{}).nr||p.nr||'')}" placeholder="z. B. 32600972 oder 3261000-0004"${link?' disabled title="Kommt aus dem verknüpften Projekt"':''}>${link?'<div class="sub" style="margin-top:4px">Kommt aus dem verknüpften Projekt.</div>':(nrOk(p.nr)?'':'<div class="sub" style="margin-top:4px;color:#8a4b00">Übliche Form: 32600972 (Projekt) oder 3261000-0004 (Kleinauftrag).</div>')}`}
+    <div class="lab">Farbe</div><div class="pal">${PAL.map(f=>`<button data-f="${f}" class="${f.toLowerCase()===farbe.toLowerCase()?'on':''}${A.some(x=>x.f.toLowerCase()===f.toLowerCase())?' belegt':''}" style="background:${f}" title="${A.filter(x=>x.f.toLowerCase()===f.toLowerCase()).map(x=>x.n).join(', ')||'frei'}"></button>`).join('')}</div>
+    <div style="display:flex;gap:8px;align-items:center"><input type="color" id="bf" value="${farbe}" style="width:44px;height:36px;border:0;background:none"><span class="sub" style="margin:0">Eigene Farbe · Felder mit Punkt sind schon vergeben</span><span class="cell" style="margin-left:auto;min-width:140px;background:${farbe};color:${txtCol(farbe)}">${esc(p.name||'Vorschau')}</span></div>
+    ${aehnl.length?`<div class="warn">Sehr ähnlich wie: ${aehnl.map(x=>esc(x.n)).join(', ')}. Im Wochenplan schwer zu unterscheiden.</div>`:''}
+    ${fest?'':`<div class="lab">Ort und Kunde (optional)</div><div style="display:flex;gap:8px"><input class="inp" id="bo" value="${esc(p.ort||'')}" placeholder="Ort"><input class="inp" id="bk" value="${esc(p.kunde||'')}" placeholder="Kunde"></div>
+    <div class="lab">Zeitraum (optional, für den Zeitplan)</div><div style="display:flex;gap:8px;align-items:center"><input class="inp" type="date" id="bv" value="${p.von||''}"><span>bis</span><input class="inp" type="date" id="bb" value="${p.bis||''}"></div>
+    <div class="lab">Verknüpft mit Projekt aus der App</div><select class="inp" id="bl"><option value="">nicht verknüpft (nur Planung)</option>${APP.filter(a=>!a.link||a.link===p.id||a.id===link).map(a=>`<option value="${a.id}"${a.id===link?' selected':''}>${a.nr?esc(a.nr)+' · ':''}${esc(a.name)}</option>`).join('')}</select>
+    ${neu?'':`<label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="bfe"${p.fertig?' checked':''}> Abgeschlossen (nicht mehr zur Auswahl)</label>`}`}
+    <div class="row"><button class="btn" id="bzur">Zurück</button>${!neu&&!fest?`<button class="btn" id="bweg" style="color:#c32328">${n?'Entfernen nicht möglich':'Entfernen'}</button>`:''}<button class="btn pri" id="bok">Speichern</button></div>`);
+    document.querySelectorAll('#sh [data-f]').forEach(b=>b.onclick=()=>{keep();farbe=b.dataset.f;draw()});
+    $('#bf').onchange=e=>{keep();farbe=e.target.value.toUpperCase();draw()};
+    $('#bzur').onclick=bsListe;
+    if($('#bweg')) $('#bweg').onclick=()=>{ if(n) return toast('Hat Einträge im Plan. Bitte „Abgeschlossen“ setzen.'); const i=D.projects.indexOf(orig), ap=APP.filter(a=>a.link===p.id); D.projects.splice(i,1); delete PR[p.id]; ap.forEach(a=>a.link=null); render(); bsListe(); toast(p.name+' entfernt',()=>{D.projects.splice(i,0,orig);PR[p.id]=orig;ap.forEach(a=>a.link=p.id);render();bsListe()}); };
+    $('#bok').onclick=()=>{ keep(); if(!p.name.trim()) return toast('Bitte einen Namen eingeben'); if(p.von&&p.bis&&p.bis<p.von) return toast('Das Enddatum liegt vor dem Start'); if(p.nr&&!link&&D.projects.some(x=>x!==orig&&nrVon(x)===p.nr)) return toast('Auftragsnummer '+p.nr+' gibt es schon');
+      p.farbe=farbe; if($('#bfe')) p.fertig=$('#bfe').checked;
+      if($('#bl')){ APP.forEach(a=>{if(a.link===p.id)a.link=null}); const a=APP.find(a=>a.id===$('#bl').value); if(a) a.link=p.id; }
+      if(p.von&&p.bis) SPAN[p.id]=[p.von,p.bis]; else delete SPAN[p.id]; delete p.von; delete p.bis; if(neu){ D.projects.push(p); PR[p.id]=p; } else Object.assign(orig,p); render(); bsListe(); toast(neu?p.name+' angelegt':'Gespeichert'); };
+  };
+  const keep=()=>{ if(fest||!$('#bn')) return; p.name=$('#bn').value.trim(); p.ort=$('#bo').value.trim(); p.kunde=$('#bk').value.trim(); p.von=$('#bv').value||null; p.bis=$('#bb').value||null; if($('#bnr')&&!$('#bnr').disabled) p.nr=$('#bnr').value.replace(/\s/g,''); if($('#bl')) link=$('#bl').value; };
+  draw();
+}
+/* ---------- Mitarbeiter verwalten ---------- */
+const GRUPPEN=['Obermonteur','Monteur','Kundendienst','Azubi','Leiharbeiter','Praktikant'];
+const dabei=(p,d)=>(!p.ab||p.ab<=d)&&(!p.bis||p.bis>=d);
+const imPlan=(p,von,bis)=>!p.aus&&(!p.ab||p.ab<=bis)&&(!p.bis||p.bis>=von);
+function maStatus(p){ const h=iso(HEUTE); if(p.aus) return 'ausgeblendet'; if(p.bis&&p.bis<h) return 'abgemeldet, letzter Tag '+dDE(p.bis); if(p.ab&&p.ab>h) return 'ab '+dDE(p.ab); if(p.bis) return 'bis '+dDE(p.bis); return ''; }
+function maListe(){
+  const zeile=p=>{const st=maStatus(p);return `<div class="marow${p.aus||(p.bis&&p.bis<iso(HEUTE))?' weg':''}"><button class="maname" data-ma="${p.id}"><b>${esc(p.name)}</b><small>${p.tage===4?'Mo–Do':'Mo–Fr'}${st?' · '+st:''}</small></button><button class="btn" data-aus="${p.id}" style="font-size:12.5px;padding:6px 10px">${p.aus?'Einblenden':'Ausblenden'}</button></div>`};
+  sheet(`<h3>Mitarbeiter</h3><div class="sub">Antippen zum Bearbeiten. „Ausblenden“ nimmt jemanden aus dem Wochenplan, ohne etwas zu löschen.</div>
+    <input class="inp" id="masuch" placeholder="Name suchen">
+    <div id="mali">${GRUPPEN.map(g=>{const L=D.people.filter(p=>p.gruppe===g);return L.length?`<div class="lab">${g} · ${L.length}</div>`+L.map(zeile).join(''):''}).join('')}</div>
+    <div class="row"><button class="btn" id="mazu">Schließen</button><button class="btn pri" id="maneu">+ Mitarbeiter hinzufügen</button></div>`);
+  document.querySelectorAll('#sh [data-ma]').forEach(b=>b.onclick=()=>maBearbeiten(+b.dataset.ma));
+  document.querySelectorAll('#sh [data-aus]').forEach(b=>b.onclick=()=>{const p=D.people.find(x=>x.id===+b.dataset.aus);p.aus=!p.aus;render();maListe();toast(p.name+(p.aus?' ausgeblendet':' wieder eingeblendet'),()=>{p.aus=!p.aus;render();maListe()})});
+  $('#masuch').oninput=ev=>{const q=ev.target.value.toLowerCase();document.querySelectorAll('#mali .marow').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')};
+  $('#mazu').onclick=closeSh; $('#maneu').onclick=()=>maBearbeiten(null);
+}
+function maBearbeiten(id){
+  const neu=id===null, orig=neu?null:D.people.find(x=>x.id===id), p=neu?{id:Math.max(Date.now(),...D.people.map(x=>x.id+1)),name:'',gruppe:'Leiharbeiter',tage:4,ab:'',bis:'',aus:false,benutzer_id:null}:{...orig};
+  let gr=p.gruppe, tg=p.tage;
+  const n=Object.keys(EIN).filter(k=>k.startsWith(p.id+'|')).length;
+  const draw=()=>{ sheet(`<h3>${neu?'Mitarbeiter hinzufügen':esc(p.name)}</h3><div class="sub">${neu?'Erscheint danach im Wochenplan in seiner Gruppe.':n+' Einträge im Plan'+(p.benutzer_id?' · hat App-Login':' · ohne App-Login')}</div>
+    <div class="lab">Name</div><input class="inp" id="mn" value="${esc(p.name)}" placeholder="Vorname Nachname">
+    <div class="lab">Gruppe</div><div class="pick">${GRUPPEN.map(g=>`<button data-g="${g}" class="${gr===g?'on':''}">${g}</button>`).join('')}</div>
+    <div class="lab">Arbeitstage</div><div class="pick"><button data-t="4" class="${tg===4?'on':''}">Mo–Do</button><button data-t="5" class="${tg===5?'on':''}">Mo–Fr</button></div>
+    <div class="lab">Im Betrieb (leer lassen = unbegrenzt)</div><div style="display:flex;gap:8px;align-items:center"><input class="inp" type="date" id="mab" value="${p.ab||''}"><span>bis</span><input class="inp" type="date" id="mbis" value="${p.bis||''}"></div>
+    <div class="lab">App-Benutzer (für „Mein Einsatz“)</div><select class="inp" id="mben"><option value="">kein App-Login</option>${BEN.filter(b=>b.id===p.benutzer_id||!D.people.some(x=>x.benutzer_id===b.id&&x.id!==p.id)).map(b=>`<option value="${b.id}"${b.id===p.benutzer_id?' selected':''}>${esc(b.name)}</option>`).join('')}</select>
+    <div class="sub" style="margin-top:6px">Bei Leiharbeitern, die abgemeldet werden: einfach das Enddatum eintragen. Bis dahin bleiben die Einträge sichtbar, danach verschwindet die Person aus dem Wochenplan.</div>
+    ${neu?'':`<label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="maus"${p.aus?' checked':''}> Im Wochenplan ausblenden</label>`}
+    <div class="row">${neu?'<button class="btn" id="mzur">Zurück</button>':'<button class="btn" id="mweg" style="color:#c32328">Entfernen</button>'}<button class="btn pri" id="mok">Speichern</button></div>`);
+    document.querySelectorAll('#sh [data-g]').forEach(b=>b.onclick=()=>{gr=b.dataset.g;keep();draw()});
+    document.querySelectorAll('#sh [data-t]').forEach(b=>b.onclick=()=>{tg=+b.dataset.t;keep();draw()});
+    if($('#mzur')) $('#mzur').onclick=maListe;
+    $('#mok').onclick=()=>{ keep(); if(!p.name.trim()) return toast('Bitte einen Namen eingeben'); if(p.ab&&p.bis&&p.bis<p.ab) return toast('Das Enddatum liegt vor dem Startdatum');
+      p.gruppe=gr; p.tage=tg; if($('#maus')) p.aus=$('#maus').checked; if(neu) D.people.push(p); else Object.assign(orig,p); render(); maListe(); toast(neu?p.name+' hinzugefügt':'Gespeichert'); };
+    if($('#mweg')) $('#mweg').onclick=()=>maEntfernen(orig,n);
+  };
+  const keep=()=>{ if(!$('#mn')) return; p.name=$('#mn').value.trim(); p.ab=$('#mab').value||''; p.bis=$('#mbis').value||''; p.benutzer_id=$('#mben').value||null; };
+  draw();
+}
+function maEntfernen(p,n){
+  sheet(`<h3>${esc(p.name)} entfernen?</h3><div class="sub">${n?`Die Person hat ${n} Einträge im Plan.`:'Die Person hat keine Einträge im Plan.'}</div>
+    ${n?`<p style="margin:10px 0">Empfehlung: <b>Abmelden</b> statt entfernen. Dann bleibt nachvollziehbar, wer wann wo war, und die Person verschwindet ab morgen aus dem Wochenplan.</p>`:''}
+    <div class="row"><button class="btn" id="eab">Zurück</button>${n?'<button class="btn" id="eabm">Ab morgen abmelden</button>':''}<button class="btn" id="eja" style="color:#c32328">Endgültig entfernen</button></div>`);
+  $('#eab').onclick=()=>maBearbeiten(p.id);
+  if($('#eabm')) $('#eabm').onclick=()=>{const alt=p.bis;p.bis=iso(HEUTE);render();maListe();toast(p.name+' abgemeldet zum '+dDE(p.bis),()=>{p.bis=alt;render();maListe()})};
+  $('#eja').onclick=()=>{ const i=D.people.indexOf(p), weg={}; Object.keys(EIN).forEach(k=>{if(k.startsWith(p.id+'|')){weg[k]=EIN[k];delete EIN[k]}}); D.people.splice(i,1); render(); maListe();
+    toast(p.name+' entfernt',()=>{D.people.splice(i,0,p);Object.assign(EIN,weg);render();maListe()}); };
+}
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;VIEW=b.dataset.v;[...$('#tabs').children].forEach(x=>x.classList.toggle('on',x===b));render()};
+function render(){ ({woche:rWoche,zeit:rZeit,bes:rBes,me:rMe})[VIEW](); }
+/* ---------- Wochenplan ---------- */
+function zelle(p,d,i){
+  if(i>=p.tage) return `<div class="cell frei" data-p="${p.id}" data-d="${d}" data-frei="1">frei</div>`;
+  if(!dabei(p,d)) return `<div class="cell frei" data-p="${p.id}" data-d="${d}" data-frei="1">nicht dabei</div>`;
+  const e=eintrag(p.id,d), c=codeInfo(e&&e.code);
+  if(!c&&BU[d]===0.5&&!FT[d]) return `<div class="cell" data-p="${p.id}" data-d="${d}" style="background:#FDEADF;box-shadow:inset 7px 0 0 ${ABS.bu[1]}">½ Betriebsurlaub<small>andere Hälfte frei planbar</small></div>`;
+  if(!c) return `<div class="cell leer" data-p="${p.id}" data-d="${d}">+</div>`;
+  if(e.auto) return `<div class="cell" data-p="${p.id}" data-d="${d}" style="background:${c.farbe}">${c.name}<small>${esc(e.note)}</small></div>`;
+  if(c.unk) return `<div class="cell unk" data-p="${p.id}" data-d="${d}" title="Aus der Excel, nicht zugeordnet">? ${esc(e.note)}<small>bitte prüfen</small></div>`;
+  const c2=e.code2?codeInfo(e.code2):null;
+  if(e.code==='p:dis'&&e.note) return `<div class="cell" data-p="${p.id}" data-d="${d}" style="background-color:${c.farbe};color:${txtCol(c.farbe)}">${esc(e.note)}<small>Diverses</small></div>`;
+  return `<div class="cell${c2?' zwei':''}" data-p="${p.id}" data-d="${d}" style="background-color:${c.farbe};color:${txtCol(c.farbe)};${c2?'--c2:'+c2.farbe:''}">${esc(c.name)}${e.note||c2||BU[d]===0.5?`<small>${esc([c2&&('+ '+c2.name),BU[d]===0.5&&'½ Betriebsurlaub',e.note].filter(Boolean).join(' · '))}</small>`:''}</div>`;
+}
+function rWoche(){
+  const tage=[0,1,2,3,4].map(i=>iso(addD(WOCHE,i)));
+  const GR=['Obermonteur','Monteur','Kundendienst','Azubi','Leiharbeiter','Praktikant'];
+  const leute=D.people.filter(p=>(FIL==='alle'||p.gruppe===FIL)&&imPlan(p,tage[0],tage[4]));
+  const ausgebl=D.people.filter(p=>p.aus).length;
+  const offen=tage.reduce((n,d)=>n+leute.filter(p=>{const e=EIN[p.id+'|'+d];return e&&e.code==='?'}).length,0);
+  // Besetzung je Baustelle in der Woche
+  const bes={}; leute.forEach(p=>tage.forEach(d=>{const e=EIN[p.id+'|'+d]; if(e&&e.code&&e.code.startsWith('p:')){ bes[e.code]=(bes[e.code]||0)+1 }}));
+  $('#app').innerHTML=`
+   <div class="bar"><button class="btn ic" id="prev">‹</button><div class="kw">KW ${kwOf(WOCHE)}<small>${dDE(tage[0])} – ${dDE(tage[4])}${tage[4].slice(0,4)}</small></div><button class="btn ic" id="next">›</button><button class="btn" id="heute">Heute</button>
+   <div class="chips" style="margin-left:6px">${['alle',...GR].map(g=>`<button class="chip${FIL===g?' on':''}" data-f="${g}">${g==='alle'?'Alle':g}</button>`).join('')}</div>
+   ${darf.verwalten()?`<button class="btn" id="bsbtn" style="margin-left:auto">Baustellen</button>`:''}${darf.verwalten()?`<button class="btn" id="mabtn">Mitarbeiter${ausgebl?` <small style="color:var(--ink3)">(${ausgebl} ausgeblendet)</small>`:''}</button>`:''}${darf.planen()?`<button class="btn" id="kopie" title="Alle Einträge dieser Woche in die nächste Woche übernehmen"${darf.verwalten()?'':' style="margin-left:auto"'}>Woche kopieren</button>`:'<span style="margin-left:auto;color:var(--ink3);font-size:12.5px">Nur ansehen</span>'}</div>
+   ${offen&&darf.planen()?`<div class="note">${offen} Einträge aus der Excel sind nicht eindeutig und rot markiert. Antippen und Baustelle wählen.</div>`:''}
+   <div class="card wp${darf.planen()?'':' lesend'}"><table class="g"><thead><tr><th class="nm">Mitarbeiter</th>${tage.map((d,i)=>`<th class="${d===iso(HEUTE)?'today':''}${darf.verwalten()?' buk':''}" data-tag="${d}"${darf.verwalten()?' title="Betriebsurlaub festlegen"':''}>${WT[i]} ${dDE(d)}${FT[d]?`<span class="bubadge" style="background:#DCE3EC;color:#2F3B53">${FT[d]}</span>`:BU[d]?`<span class="bubadge">${BU[d]===1?'Betriebsurlaub':'½ Betriebsurlaub'}</span>`:''}</th>`).join('')}</tr></thead><tbody>
+   ${GR.map(g=>{const L=leute.filter(p=>p.gruppe===g); if(!L.length) return ''; return `<tr class="gr"><td colspan="6">${({Obermonteur:'Obermonteure',Monteur:'Monteure',Kundendienst:'Kundendienst',Azubi:'Auszubildende',Leiharbeiter:'Leiharbeiter',Praktikant:'Praktikanten'})[g]} · ${L.length}</td></tr>`+L.map(p=>`<tr><td class="nm"${darf.verwalten()?` data-nm="${p.id}" title="Mitarbeiter bearbeiten"`:''}><b>${esc(p.name)}</b><small>${p.tage===4?'Mo–Do':'Mo–Fr'}${p.bis?' · bis '+dDE(p.bis):''}</small></td>${tage.map((d,i)=>`<td class="${d===iso(HEUTE)?'today':''}">${zelle(p,d,i)}</td>`).join('')}</tr>`).join('')}).join('')}
+   </tbody></table></div>
+   ${darf.planen()?'':'<!--'}<div class="leg" style="color:var(--ink3)">Tipp: Einträge mit der Maus auf einen anderen Tag oder eine andere Person ziehen. Mit gedrückter Strg-Taste wird kopiert. Am Handy kurz gedrückt halten, dann ziehen.</div>${darf.planen()?'':'-->'}
+   <div class="leg"><b>Besetzung diese Woche (Personentage):</b> ${Object.entries(bes).sort((a,b)=>b[1]-a[1]).map(([k,n])=>{const c=codeInfo(k);return `<span><i class="dot" style="background:${c.farbe}"></i>${esc(c.name)} ${n}</span>`}).join('')||'–'}</div>`;
+  $('#prev').onclick=()=>{WOCHE=addD(WOCHE,-7);nachladen(WOCHE).then(rWoche)}; $('#next').onclick=()=>{WOCHE=addD(WOCHE,7);nachladen(WOCHE).then(rWoche)}; $('#heute').onclick=()=>{WOCHE=montag(HEUTE);rWoche()};
+  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{FIL=b.dataset.f;rWoche()});
+  if($('#kopie')) $('#kopie').onclick=()=>{ let n=0; leute.forEach(p=>tage.forEach(d=>{const e=EIN[p.id+'|'+d]; if(e&&e.code&&e.code!=='?'){ const z=iso(addD(new Date(d+'T12:00'),7)); if(!EIN[p.id+'|'+z]&&dabei(p,z)&&!FT[z]&&BU[z]!==1){EIN[p.id+'|'+z]={...e};n++} }})); toast(n+' Einträge in KW '+(kwOf(WOCHE)+1)+' übernommen (freie Tage bleiben frei)'); };
+  if(darf.planen()) document.querySelectorAll('.wp [data-p]').forEach(c=>c.addEventListener('pointerdown',ev=>ziehStart(ev,c)));
+  if(darf.verwalten()) document.querySelectorAll('th[data-tag]').forEach(t=>t.onclick=()=>buTag(t.dataset.tag));
+  if($('#mabtn')) $('#mabtn').onclick=maListe; if($('#bsbtn')) $('#bsbtn').onclick=bsListe; document.querySelectorAll('[data-nm]').forEach(t=>t.onclick=()=>maBearbeiten(+t.dataset.nm));
+}
+/* Drag & Drop im Wochenplan: Maus sofort, Finger nach kurzem Halten. Strg/Alt gedrückt = kopieren. */
+function ziehStart(ev,c){
+  if(c.dataset.frei) return;
+  const pid=+c.dataset.p, d=c.dataset.d, voll=!!EIN[pid+'|'+d];
+  const touch=ev.pointerType==='touch'; let aktiv=false, ghost=null, ziel=null, timer=null; const x0=ev.clientX,y0=ev.clientY;
+  const los=e=>{ if(!voll) return; aktiv=true; c.classList.add('dragsrc'); ghost=c.cloneNode(true); ghost.classList.add('ghost'); const r=c.getBoundingClientRect(); ghost.style.width=r.width+'px'; document.body.appendChild(ghost); if(navigator.vibrate) navigator.vibrate(15); bewege(e); };
+  const bewege=e=>{ if(!aktiv) return; ghost.style.left=(e.clientX-40)+'px'; ghost.style.top=(e.clientY-20)+'px';
+    const el=document.elementFromPoint(e.clientX,e.clientY), t=el&&el.closest('.wp [data-p]'); if(ziel&&ziel!==t) ziel.classList.remove('drop'); ziel=t&&t!==c&&!t.dataset.frei?t:null; if(ziel) ziel.classList.add('drop'); };
+  const move=e=>{ if(aktiv){ e.preventDefault(); bewege(e); return; } if(Math.hypot(e.clientX-x0,e.clientY-y0)>6){ if(touch){ clearTimeout(timer); ende(); } else los(e); } };
+  const ende=e=>{ clearTimeout(timer); document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',auf); document.removeEventListener('pointercancel',ende);
+    if(ghost) ghost.remove(); c.classList.remove('dragsrc'); if(ziel) ziel.classList.remove('drop'); };
+  const auf=e=>{ const war=aktiv, z=ziel; ende(); if(!war){ if(e&&Math.hypot(e.clientX-x0,e.clientY-y0)<=6) einsatz(pid,d); return; } if(!z) return;
+    const kopie=e.ctrlKey||e.altKey||e.metaKey, k1=pid+'|'+d, k2=z.dataset.p+'|'+z.dataset.d, alt1=EIN[k1], alt2=EIN[k2];
+    EIN[k2]={...alt1}; if(!kopie) delete EIN[k1];
+    const wer=D.people.find(x=>x.id===+z.dataset.p).name.split(' ')[0];
+    rWoche(); toast(`${kopie?'Kopiert':'Verschoben'} nach ${wer}, ${dDE(z.dataset.d)}${alt2?' (vorheriger Eintrag ersetzt)':''}`,()=>{ EIN[k1]=alt1; if(alt2) EIN[k2]=alt2; else delete EIN[k2]; rWoche(); });
+  };
+  document.addEventListener('pointermove',move,{passive:false}); document.addEventListener('pointerup',auf); document.addEventListener('pointercancel',ende);
+  if(touch&&voll) timer=setTimeout(()=>los({clientX:x0,clientY:y0}),350);
+}
+function einsatz(pid,d){
+  const p=D.people.find(x=>x.id===pid), e={...(EIN[pid+'|'+d]||{})}; let sel=e.code&&e.code!=='?'?e.code:'', sel2=e.code2||''; let auf2=!!sel2;
+  const projs=D.projects.filter(x=>!x.fertig);
+  const draw=()=>{ sheet(`<h3>${esc(p.name)}</h3><div class="sub">${new Date(d+'T12:00').toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'})}${e.code==='?'?` · Excel: „${esc(e.note)}“`:''}</div>
+    <input class="inp" id="such" placeholder="Baustelle oder Auftragsnummer suchen">
+    <div class="lab">Baustelle</div><div class="pick" id="pp">${projs.map(x=>`<button data-c="p:${x.id}" class="${sel==='p:'+x.id?'on':''}"><i class="dot" style="background:${x.farbe}"></i><span>${esc(x.name)}${nrVon(x)?`<small style="display:block;color:var(--ink3);font-weight:500">${nrVon(x)}</small>`:''}</span></button>`).join('')}</div>
+    <div class="lab">Abwesend</div><div class="pick">${Object.entries(ABS).filter(([k])=>k!=='ft').map(([k,v])=>`<button data-c="a:${k}" class="${sel==='a:'+k?'on':''}"><i class="dot" style="background:${v[1]}"></i>${v[0]}</button>`).join('')}</div>
+    <details${sel.startsWith('m:')?' open':''} style="margin-top:6px"><summary class="lab" style="cursor:pointer">Geht mit (z. B. Azubi mit Monteur)</summary><div class="sub" style="margin:4px 0">Übernimmt automatisch die Baustelle der Person an diesem Tag.</div><div class="pick">${D.people.filter(x=>x.id!==pid&&['Obermonteur','Monteur','Kundendienst'].includes(x.gruppe)&&dabei(x,d)&&!x.aus).map(x=>`<button data-c="m:${x.id}" class="${sel==='m:'+x.id?'on':''}">${esc(x.name)}</button>`).join('')}</div></details>
+    <details id="d2" style="margin-top:6px"${auf2?' open':''}><summary class="lab" style="cursor:pointer">+ zweiter Eintrag am selben Tag (z. B. halber Tag Urlaub)</summary><div class="lab" style="margin-top:4px">Baustelle</div><div class="pick" id="p2">${projs.map(x=>`<button data-c2="p:${x.id}" class="${sel2==='p:'+x.id?'on':''}"><i class="dot" style="background:${x.farbe}"></i>${esc(x.name)}</button>`).join('')}</div><div class="lab">Abwesend</div><div class="pick">${Object.entries(ABS).map(([k,v])=>`<button data-c2="a:${k}" class="${sel2==='a:'+k?'on':''}"><i class="dot" style="background:${v[1]}"></i>${v[0]}</button>`).join('')}</div></details>
+    <div class="lab">${sel==='p:dis'?'Kunde, Projekt oder Auftragsnummer':'Notiz'}</div><input class="inp" id="nt" value="${esc(e.code==='?'?'':e.note||'')}" placeholder="${sel==='p:dis'?'z. B. Kundenname, Ort oder 3261000-0012':'z. B. bis 11 Uhr, ab 12 Uhr Urlaub'}">
+    <div class="row"><button class="btn" id="leer">Leeren</button><button class="btn" id="woche">Ganze Woche</button><button class="btn pri" id="ok">Übernehmen</button></div>`);
+    document.querySelectorAll('#sh [data-c]').forEach(b=>b.onclick=()=>{e.note=$('#nt').value;if(e.code==='?')e.code='';sel=b.dataset.c;draw()});
+    $('#d2').ontoggle=()=>{auf2=$('#d2').open}; document.querySelectorAll('#sh [data-c2]').forEach(b=>b.onclick=()=>{sel2=sel2===b.dataset.c2?'':b.dataset.c2;draw()});
+    $('#such').oninput=ev=>{const q=ev.target.value.toLowerCase();document.querySelectorAll('#pp button').forEach(b=>b.style.display=b.textContent.toLowerCase().includes(q)?'':'none')};
+    const save=dates=>{dates.forEach(x=>{EIN[pid+'|'+x]={code:sel,code2:sel2,note:$('#nt').value.trim()}});closeSh();rWoche();toast('Gespeichert (nur im Entwurf)')};
+    $('#ok').onclick=()=>{if(!sel)return toast('Bitte Baustelle oder Abwesenheit wählen');if(sel==='p:dis'&&!$('#nt').value.trim())return toast('Bei Diverses bitte Kunde, Projekt oder Nummer eintragen');if(sel2===sel)sel2='';save([d])};
+    $('#woche').onclick=()=>{if(!sel)return toast('Bitte Baustelle oder Abwesenheit wählen');if(sel==='p:dis'&&!$('#nt').value.trim())return toast('Bei Diverses bitte Kunde, Projekt oder Nummer eintragen');save([0,1,2,3,4].slice(0,p.tage).map(i=>iso(addD(montag(new Date(d+'T12:00')),i))).filter(x=>x===d||(!FT[x]&&BU[x]!==1&&dabei(p,x))))};
+    $('#leer').onclick=()=>{delete EIN[pid+'|'+d];closeSh();rWoche()};
+  }; draw();
+}
+/* ---------- Zeitplan ---------- */
+// Tage aus dem Wochenplan, an denen jemand auf der Baustelle eingeplant ist (Ist)
+function istDaten(id){ const L=[]; Object.entries(EIN).forEach(([k,e])=>{ if(e.code==='p:'+id||e.code2==='p:'+id) L.push(k.split('|')); }); return L; }
+function verschiebeEintraege(id,von,bis,tage){ const L=istDaten(id).filter(([,d])=>d>=von&&d<=bis), neu={}, alt={}; let ok=0, konf=0;
+  L.forEach(([pid,d])=>{ const z=iso(addD(new Date(d+'T12:00'),tage)), kz=pid+'|'+z, p=D.people.find(x=>x.id===+pid);
+    if((EIN[kz]&&!L.some(([q,dd])=>q===pid&&dd===z))||FT[z]||(p&&!dabei(p,z))){konf++;return}
+    alt[pid+'|'+d]=EIN[pid+'|'+d]; neu[kz]=EIN[pid+'|'+d]; ok++; });
+  const vorher={}; Object.keys(neu).forEach(k=>vorher[k]=EIN[k]);
+  Object.keys(alt).forEach(k=>delete EIN[k]); Object.assign(EIN,neu);
+  return {ok,konf,undo:()=>{Object.keys(neu).forEach(k=>{if(vorher[k])EIN[k]=vorher[k];else delete EIN[k]});Object.assign(EIN,alt)}}; }
+function rZeit(){
+  const start=montag(addD(HEUTE,-42)), W=30, n=34; // 6 Wochen zurück, 28 Wochen voraus
+  const x=d=>Math.round((new Date(d+'T12:00')-start)/864e5/7*W);
+  const ende=p=>{if(SPAN[p.id])return SPAN[p.id][1];const tt=T.filter(t=>t.p===p.id).map(t=>t.bis||t.von).filter(Boolean);return [p.bis,...tt].filter(Boolean).sort().pop()};
+  const anf=p=>{if(SPAN[p.id])return SPAN[p.id][0];const tt=T.filter(t=>t.p===p.id).map(t=>t.von).filter(Boolean);return [p.von,...tt].filter(Boolean).sort()[0]};
+  const projs=D.projects.filter(p=>!FEST.includes(p.id)&&!p.klein&&(ALT||(ende(p)||'')>=iso(addD(HEUTE,-7)))).sort((a,b)=>(anf(a)||'9')<(anf(b)||'9')?-1:1);
+  // Leute je KW aus dem Wochenplan
+  const last=[];for(let k=0;k<n;k++){const m=addD(start,k*7);const s=new Set();for(let i=0;i<5;i++){const d=iso(addD(m,i));D.people.forEach(p=>{const e=EIN[p.id+'|'+d];if(e&&e.code&&e.code.startsWith('p:')&&e.code!=='p:kd')s.add(p.id)})}last.push(s.size)}
+  const total=D.people.filter(p=>p.gruppe!=='Kundendienst'&&imPlan(p,iso(HEUTE),iso(HEUTE))).length;
+  const IST={}, AUS={}; projs.forEach(p=>{ const a=anf(p), b=ende(p), wk=[...Array(n)].map(()=>new Set()), out=[...Array(n)].map(()=>false); let na=0;
+    istDaten(p.id).forEach(([pid,d])=>{ const k=Math.floor((new Date(d+'T12:00')-start)/864e5/7); if(k<0||k>=n) return; wk[k].add(pid); if(!a||!b||d<a||d>b){out[k]=true;na++} });
+    IST[p.id]=wk.map(x=>x.size); IST[p.id].out=out; AUS[p.id]=na; });
+  const kwHead=[...Array(n)].map((_,k)=>{const m=addD(start,k*7);return `<div class="kwc" style="left:${k*W}px;width:${W}px">${kwOf(m)}${m.getDate()<=7?`<br><span style="color:var(--ink2)">${m.toLocaleDateString('de-DE',{month:'short'})}</span>`:''}</div>`}).join('');
+  const tl=x(iso(HEUTE));
+  $('#app').innerHTML=`<div class="bar"><b style="font-size:15px">Laufende und geplante Projekte</b>${darf.planen()?'<span style="color:var(--ink3);font-size:12.5px">Balken ziehen verschiebt, rechter Rand ändert das Ende, Rauten ziehen verschiebt Termine</span>':''}<button class="chip${ALT?' on':''}" id="alt">auch abgeschlossene</button><span class="leg" style="margin:0 0 0 auto"><span><i class="dot" style="background:var(--acc);transform:rotate(45deg)"></i>Termin offen</span><span><i class="dot" style="background:var(--ok);transform:rotate(45deg)"></i>eingeplant</span><span><i class="dot" style="background:#9aa3b2;transform:rotate(45deg)"></i>entfällt</span></span></div>
+  <div class="note" style="background:var(--blueb);color:var(--blue)">Balken = geplanter Zeitraum. Zahlen darunter = Personen je KW laut Wochenplan, die passen sich automatisch an. Rot = Einsätze außerhalb des Zeitraums.</div>
+  <div class="card gantt"><div style="display:grid;grid-template-columns:230px ${n*W}px">
+   <div class="gn gh" style="z-index:6">Projekt</div><div class="gh" style="position:sticky;top:0">${kwHead}<div class="today-line" style="left:${tl}px"></div></div>
+   ${projs.map(p=>{const a=anf(p),b=ende(p);const ts=T.filter(t=>t.p===p.id&&t.art==='termin'&&t.von);return `<div class="gn"><b><i style="background:${p.farbe}"></i>${esc(p.name)}</b><small>${a?dJ(a):'–'} bis ${b?dJ(b):'offen'} · ${T.filter(t=>t.p===p.id&&t.st==='offen').length} offen${AUS[p.id]?` · <span style="color:var(--red)">${AUS[p.id]} Einsätze außerhalb</span>`:''}</small></div>
+   <div class="gr2">${a&&b?`<div class="gb${b<iso(HEUTE)?' abg':''}" data-p="${p.id}" style="left:${Math.max(0,x(a))}px;width:${Math.max(W/2,x(b)-Math.max(0,x(a))+W/5)}px;background:${p.farbe};color:${txtCol(p.farbe)}">${esc(p.name)}<span class="rz"></span></div>`:''}
+    ${ts.map((t,i)=>`<div class="ms ${t.st==='entfaellt'?'ent':t.st==='eingeplant'?'ok':'offen'}" title="${esc(t.t)} · ${dDE(t.von)}" data-t="${T.indexOf(t)}" style="left:${x(t.von)-9}px"></div>`).join('')}${IST[p.id].map((v,k)=>v?`<div class="ist${IST[p.id].out[k]?' aus':''}" style="left:${k*W+3}px;width:${W-6}px" title="KW ${kwOf(addD(start,k*7))}: ${v} Person(en) laut Wochenplan${IST[p.id].out[k]?', außerhalb des Zeitraums':''}">${v}</div>`:'').join('')}<div class="today-line" style="left:${tl}px"></div></div>`}).join('')}
+   <div class="gn" style="background:var(--s2)"><b>Montage gebunden</b><small>Personen je KW aus dem Wochenplan, von ${total}</small></div>
+   <div class="gr2" style="background:var(--s2)">${last.map((v,k)=>{const r=v/total;const c=!v?'transparent':r>.9?'#fdeceb':r>.75?'#fdeee5':'#e6f6ec';const f=r>.9?'var(--red)':r>.75?'var(--amb)':'var(--ok)';return v?`<div class="load" style="left:${k*W+2}px;width:${W-4}px;background:${c};color:${f}">${v}</div>`:''}).join('')}</div>
+  </div></div>`;
+  $('#alt').onclick=()=>{ALT=!ALT;rZeit()};
+  // Balken ziehen = verschieben (wochenweise), rechten Rand ziehen = Ende ändern; Rauten ziehen = Termin verschieben (tageweise)
+  const ziehG=(el,onMove,onDone,onClick)=>!darf.planen()?el.addEventListener('click',onClick):el.addEventListener('pointerdown',ev=>{ ev.preventDefault(); el.setPointerCapture(ev.pointerId); const x0=ev.clientX; let dx=0;
+    const mv=e=>{dx=e.clientX-x0; if(Math.abs(dx)>4) onMove(dx)}; const up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up); Math.abs(dx)>4?onDone(dx):onClick()};
+    el.addEventListener('pointermove',mv); el.addEventListener('pointerup',up); });
+  const plusTage=(d,n)=>iso(addD(new Date(d+'T12:00'),n));
+  document.querySelectorAll('.gb').forEach(b=>{ const p=PR[b.dataset.p], a=anf(p), e=ende(p), l0=parseFloat(b.style.left), w0=parseFloat(b.style.width);
+    ziehG(b,dx=>{ if(b._rz){ b.style.width=Math.max(W/2,w0+dx)+'px' } else b.style.left=(l0+dx)+'px' },
+      dx=>{ const wk=Math.round(dx/W)*7, alt=[a,e], altSpan=SPAN[p.id], rz=b._rz; SPAN[p.id]=rz?[a,plusTage(e,wk)]:[plusTage(a,wk),plusTage(e,wk)]; if(SPAN[p.id][1]<SPAN[p.id][0]) SPAN[p.id][1]=SPAN[p.id][0]; rZeit();
+        const undoSpan=()=>{ if(altSpan) SPAN[p.id]=altSpan; else delete SPAN[p.id]; rZeit(); };
+        const ab=a>iso(HEUTE)?a:iso(HEUTE), n=istDaten(p.id).filter(([,d])=>d>=ab&&d<=e).length;
+        if(!rz&&wk&&n) mitVerschieben(p,ab,e,wk,undoSpan);
+        else toast(`${p.name}: ${dJ(SPAN[p.id][0])} bis ${dJ(SPAN[p.id][1])}`,undoSpan); },
+      ()=>projekt(p.id));
+    b.querySelector('.rz').addEventListener('pointerdown',()=>{b._rz=true;setTimeout(()=>b._rz=false,4000)},true); });
+  document.querySelectorAll('.ms').forEach(m=>{ const t=T[+m.dataset.t], l0=parseFloat(m.style.left);
+    ziehG(m,dx=>{m.style.left=(l0+dx)+'px'}, dx=>{ const n=Math.round(dx/(W/7)), alt=[t.von,t.bis]; t.von=plusTage(t.von,n); if(t.bis) t.bis=plusTage(t.bis,n); rZeit(); toast(`${t.t}: ${dJ(t.von)}`,()=>{[t.von,t.bis]=alt;rZeit()}); }, ()=>projekt(t.p)); });
+}
+function mitVerschieben(p,a,e,wk,undoSpan){
+  const n=istDaten(p.id).filter(([,d])=>d>=a&&d<=e).length, w=Math.abs(wk/7);
+  sheet(`<h3>${esc(p.name)} verschoben</h3><div class="sub">Neuer Zeitraum: ${dJ(SPAN[p.id][0])} bis ${dJ(SPAN[p.id][1])} (${wk>0?w+' Woche'+(w>1?'n':'')+' später':w+' Woche'+(w>1?'n':'')+' früher'})</div>
+    <p style="margin:10px 0">Ab heute sind im Wochenplan ${n} Einsätze auf dieser Baustelle eingeplant. Sollen sie mitverschoben werden? Jeder Einsatz bleibt bei derselben Person und am selben Wochentag. Vergangene Tage bleiben unverändert.</p>
+    <div class="row"><button class="btn" id="mvz">Rückgängig</button><button class="btn" id="mvn">Nur Zeitplan</button><button class="btn pri" id="mvj">Mitverschieben</button></div>`);
+  $('#mvz').onclick=()=>{closeSh();undoSpan()};
+  $('#mvn').onclick=()=>{closeSh();toast('Nur der Zeitplan wurde geändert. Einsätze außerhalb sind rot markiert.',()=>undoSpan())};
+  $('#mvj').onclick=()=>{ const r=verschiebeEintraege(p.id,a,e,wk); closeSh(); rZeit(); toast(`${r.ok} Einsätze verschoben${r.konf?`, ${r.konf} nicht (Ziel belegt, Feiertag oder Person nicht dabei)`:''}`,()=>{r.undo();undoSpan()}); };
+}
+function projekt(id){
+  const p=PR[id], L=T.filter(t=>t.p===id);
+  sheet(`<h3><span class="dot" style="display:inline-block;background:${p.farbe};margin-right:6px"></span>${esc(p.name)}</h3><div class="sub">${nrVon(p)?'Auftrag '+nrVon(p)+' · ':''}${SPAN[id]?'Geplant '+dJ(SPAN[id][0])+' bis '+dJ(SPAN[id][1]):'Noch kein Zeitraum geplant'}</div>
+   ${(()=>{const I=istDaten(id).map(x=>x[1]).sort();if(!I.length)return '<p class="sub" style="margin-top:8px">Im Wochenplan noch keine Einsätze.</p>';return `<p class="sub" style="margin-top:8px">Wochenplan: ${I.length} Einsätze von ${dJ(I[0])} bis ${dJ(I[I.length-1])}.</p>${darf.planen()?`<button class="btn" style="margin-top:4px" onclick="anpassen('${id}')">Zeitraum an Wochenplan anpassen</button>`:''}`})()}
+   <div class="lab">Termine und Aufgaben</div>${L.length?L.map(item).join(''):'<p class="sub">Keine.</p>'}
+   <div class="row"><button class="btn" onclick="closeSh()">Schließen</button>${darf.planen()?`<button class="btn pri" onclick="punktSheet(null,'${id}')">+ Termin oder Aufgabe</button>`:''}</div>`);
+}
+function anpassen(id){ const I=istDaten(id).map(x=>x[1]).sort(), alt=SPAN[id]; SPAN[id]=[I[0],I[I.length-1]]; closeSh(); rZeit(); toast(`${PR[id].name}: ${dJ(I[0])} bis ${dJ(I[I.length-1])}`,()=>{if(alt)SPAN[id]=alt;else delete SPAN[id];rZeit()}); }
+/* ---------- Besprechung ---------- */
+const ST={offen:'offen',eingeplant:'eingeplant',erledigt:'erledigt',entfaellt:'entfällt'};
+function item(t){const i=T.indexOf(t);return `<div class="it"><div class="ty" title="${t.art==='termin'?'Termin':'Aufgabe'}">${t.art==='termin'?'◆':'✓'}</div><div><b${darf.planen()?` class="klick" onclick="punktSheet(T[${i}])"`:''}>${esc(t.t)}</b>${t.n?`<p>${esc(t.n)}</p>`:''}<div class="meta">${t.art==='termin'?(t.von?dDE(t.von)+(t.bis?' – '+dDE(t.bis):'')+' · KW '+kwOf(new Date(t.von+'T12:00')):'Termin offen'):(t.faellig?'fällig '+dDE(t.faellig):'')}${t.v?' · '+esc(t.v):''}</div></div><button class="st ${t.st}" data-st="${i}"${darf.planen()?'':' disabled'}>${ST[t.st]}</button></div>`}
+function rBes(){
+  const ids=[...new Set(T.map(t=>t.p))].filter(id=>PR[id]).sort((a,b)=>PR[a].name.localeCompare(PR[b].name,'de'));
+  $('#app').innerHTML=`<div class="bar"><b style="font-size:15px">Besprechung KW ${kwOf(HEUTE)} · ${HEUTE.toLocaleDateString('de-DE')}</b>
+   <button class="chip${NUR_OFFEN?' on':''}" id="nof" style="margin-left:10px">nur offene</button>
+   <button class="btn" style="margin-left:auto" onclick="punktSheet(null,null)">+ Punkt</button><button class="btn pri" onclick="besprechungPdf()">Protokoll als PDF</button></div>
+   <div class="bes">${ids.map(id=>{const L=T.filter(t=>t.p===id&&(!NUR_OFFEN||t.st==='offen'));if(!L.length)return'';const p=PR[id];return `<div class="card"><div class="pr-h"><i style="background:${p.farbe}"></i><b>${esc(p.name)}</b><span style="margin-left:auto;color:var(--ink3);font-size:12.5px">${L.length} ${NUR_OFFEN?'offen':'Punkte'}</span></div>${L.map(item).join('')}</div>`}).join('')}</div>
+   <div class="leg" style="margin-top:14px">Status antippen zum Weiterschalten: offen → eingeplant → erledigt → entfällt. Titel antippen zum Bearbeiten.</div>`;
+  $('#nof').onclick=()=>{NUR_OFFEN=!NUR_OFFEN;rBes()};
+  document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const t=T[+b.dataset.st];const k=Object.keys(ST);t.st=k[(k.indexOf(t.st)+1)%k.length];rBes()});
+}
+/* ---------- Mein Einsatz ---------- */
+function rMe(){
+  const wahl=D.people.filter(x=>!x.aus&&dabei(x,iso(HEUTE))).sort((a,b)=>a.name.localeCompare(b.name,'de'));
+  if(ME_ID==null||!D.people.some(x=>x.id===ME_ID)){
+    if(!darf.planen()){ $('#app').innerHTML=`<div class="me"><div class="card" style="padding:18px"><b>Noch keinem Mitarbeiter zugeordnet</b><p style="margin-top:6px;color:var(--ink3)">Dein Konto ist im Planer noch mit keinem Mitarbeiter verknüpft. Bitte kurz im Büro melden, dann siehst du hier deine Einsätze.</p></div></div>`; return }
+    ME_ID=(wahl[0]||D.people[0]||{}).id; if(ME_ID==null){ $('#app').innerHTML='<div class="lade">Noch keine Mitarbeiter angelegt.</div>'; return }
+  }
+  const p=D.people.find(x=>x.id===ME_ID), m=montag(HEUTE);
+  const tage=[...Array(10)].map((_,i)=>addD(m,i<5?i:i+2)).filter((d,i)=>(i%5)<p.tage);
+  const heute=eintrag(p.id,iso(HEUTE)), hc=codeInfo(heute&&heute.code);
+  const bid=heute&&heute.code&&heute.code.startsWith('p:')?heute.code.slice(2):null, bs=bid?PR[bid]:null, ap=bid?appVon(bid):null;
+  const vorname=p.name.split(/[ ,]/)[0].toLowerCase(), ganz=p.name.toLowerCase();
+  const meine=T.filter(t=>t.art==='aufgabe'&&t.st==='offen'&&((t.v||'').toLowerCase().includes(vorname)||(t.v||'').toLowerCase().includes(ganz)));
+  const knoepfe=[ap?`<a class="btn" style="color:var(--ink)" href="projekte.html#bautagebuch.html?p=${encodeURIComponent(ap.id)}">Bautagebuch</a>`:'', ap?`<a class="btn" style="color:var(--ink)" href="projekte.html#index.html#p=${encodeURIComponent(ap.id)}">Aufmaß</a>`:'', bs&&bs.ort?`<a class="btn" style="color:var(--ink)" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(bs.ort)}">Route</a>`:''].filter(Boolean).join('');
+  $('#app').innerHTML=`<div class="me">${darf.planen()?`<div class="bar"><span style="color:var(--ink3);font-size:13px">Ansicht für</span><select class="inp" id="wer" style="width:auto;flex:1">${wahl.map(x=>`<option value="${x.id}"${x.id===ME_ID?' selected':''}>${esc(x.name)}</option>`).join('')}</select></div>`:''}
+   <div class="today" style="${hc?`background:${hc.farbe};color:${txtCol(hc.farbe)}`:''}"><small>Heute, ${HEUTE.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'})}</small><h2>${hc?esc(hc.name):'Nichts eingeplant'}</h2>${heute&&heute.note?`<div>${esc(heute.note)}</div>`:''}${knoepfe?`<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${knoepfe}</div>`:''}</div>
+   <div class="card"><div class="pr-h"><b>Diese und nächste Woche</b></div><div class="dl">${tage.map(d=>{const e=dabei(p,iso(d))?eintrag(p.id,iso(d)):null,c=codeInfo(e&&e.code);return `<div><div class="d">${WT[(d.getDay()+6)%7]}<small>${d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})}</small></div><i class="dot" style="background:${c?c.farbe:'var(--line)'}"></i><div style="flex:1"><b>${c?(c.unk?'noch offen':esc(c.name)):'–'}</b>${e&&e.note&&c&&!c.unk?`<div style="font-size:12px;color:var(--ink3)">${esc(e.note)}</div>`:''}${e&&e.code2&&codeInfo(e.code2)?`<div style="font-size:12px;color:var(--ink3)">+ ${esc(codeInfo(e.code2).name)}</div>`:''}</div></div>`}).join('')}</div></div>
+   <div class="card"><div class="pr-h"><b>Meine Aufgaben</b><span style="margin-left:auto;color:var(--ink3);font-size:12.5px">${meine.length}</span></div>${meine.length?meine.map(item).join(''):'<p style="padding:12px 16px;color:var(--ink3)">Keine offenen Aufgaben.</p>'}</div></div>`;
+  if($('#wer')) $('#wer').onchange=e=>{ME_ID=+e.target.value;rMe()};
+  document.querySelectorAll('#app [data-st]').forEach(b=>b.onclick=()=>{if(!darf.planen())return;const t=T[+b.dataset.st];const k=Object.keys(ST);t.st=k[(k.indexOf(t.st)+1)%k.length];rMe()});
+}
+/* ---------- Termine und Aufgaben bearbeiten ---------- */
+function punktSheet(t,bid){
+  const neu=!t, x=neu?{id:'t'+Date.now().toString(36),p:bid||'',art:'aufgabe',t:'',von:'',bis:'',faellig:'',v:'',st:'offen',n:''}:{...t};
+  const projs=D.projects.filter(p=>!p.fertig||p.id===x.p).sort((a,b)=>a.name.localeCompare(b.name,'de'));
+  const namen=[...new Set([...D.people.filter(p=>!p.aus).map(p=>p.name.split(/[ ,]/)[0]),...BEN.map(b=>b.name)])].sort();
+  const keep=()=>{ if(!$('#pt')) return; x.p=$('#pb').value; x.t=$('#pt').value.trim(); x.v=$('#pvw').value.trim(); x.n=$('#pn').value.trim();
+    if($('#pv')){ x.von=$('#pv').value; x.bis=$('#pbis').value; } if($('#pf')) x.faellig=$('#pf').value; };
+  const draw=()=>{ sheet(`<h3>${neu?'Neuer Punkt':'Punkt bearbeiten'}</h3>
+    <div class="pick" style="margin-top:8px"><button data-art="aufgabe" class="${x.art==='aufgabe'?'on':''}">Aufgabe</button><button data-art="termin" class="${x.art==='termin'?'on':''}">Termin</button></div>
+    <div class="lab">Baustelle</div><select class="inp" id="pb"><option value="">bitte wählen</option>${projs.map(p=>`<option value="${p.id}"${p.id===x.p?' selected':''}>${esc(p.name)}</option>`).join('')}</select>
+    <div class="lab">${x.art==='termin'?'Termin':'Aufgabe'}</div><input class="inp" id="pt" value="${esc(x.t)}" placeholder="${x.art==='termin'?'z. B. Inbetriebnahme':'z. B. Liefertermin nachfragen'}">
+    ${x.art==='termin'?`<div class="lab">Datum (leer lassen, wenn der Termin noch offen ist)</div><div style="display:flex;gap:8px;align-items:center"><input class="inp" type="date" id="pv" value="${x.von||''}"><span>bis</span><input class="inp" type="date" id="pbis" value="${x.bis||''}"></div>`
+      :`<div class="lab">Fällig am</div><input class="inp" type="date" id="pf" value="${x.faellig||''}">`}
+    <div class="lab">Verantwortlich</div><input class="inp" id="pvw" list="pl-namen" value="${esc(x.v)}" placeholder="z. B. Name, auch mehrere mit /"><datalist id="pl-namen">${namen.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+    <div class="lab">Status</div><div class="pick">${Object.entries(ST).map(([k,l])=>`<button data-stt="${k}" class="${x.st===k?'on':''}">${l}</button>`).join('')}</div>
+    <div class="lab">Notiz</div><textarea class="inp" id="pn" placeholder="optional">${esc(x.n)}</textarea>
+    <div class="row">${neu?'<button class="btn" id="pzu">Abbrechen</button>':'<button class="btn" id="pweg" style="color:#c32328">Löschen</button>'}<button class="btn pri" id="pok">Speichern</button></div>`);
+    document.querySelectorAll('#sh [data-art]').forEach(b=>b.onclick=()=>{keep();x.art=b.dataset.art;draw()});
+    document.querySelectorAll('#sh [data-stt]').forEach(b=>b.onclick=()=>{keep();x.st=b.dataset.stt;draw()});
+    if($('#pzu')) $('#pzu').onclick=closeSh;
+    if($('#pweg')) $('#pweg').onclick=()=>{ const i=T.indexOf(t); T.splice(i,1); closeSh(); render(); toast('Punkt gelöscht',()=>{T.splice(i,0,t);render()}); };
+    $('#pok').onclick=()=>{ keep(); if(!x.p) return toast('Bitte eine Baustelle wählen'); if(!x.t) return toast('Bitte beschreiben, worum es geht');
+      if(x.von&&x.bis&&x.bis<x.von) return toast('Das Enddatum liegt vor dem Start');
+      if(neu) T.push(x); else Object.assign(t,x); closeSh(); render(); toast(neu?'Punkt angelegt':'Gespeichert'); };
+  };
+  draw();
+}
+/* ---------- Besprechungsprotokoll als PDF ---------- */
+const ladeSkript=src=>new Promise((ok,nein)=>{ if(document.querySelector(`script[src="${src}"]`)) return ok(); const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>nein(new Error('Konnte '+src+' nicht laden')); document.head.appendChild(s); });
+const ladeBild=src=>new Promise(ok=>{ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'); c.width=i.naturalWidth; c.height=i.naturalHeight; c.getContext('2d').drawImage(i,0,0); ok({d:c.toDataURL('image/png'),w:i.naturalWidth,h:i.naturalHeight}) }; i.onerror=()=>ok(null); i.src=src; });
+async function besprechungPdf(){
+  try{
+    toast('PDF wird erstellt …');
+    await ladeSkript('projekte/lib/jspdf.umd.min.js'); await ladeSkript('projekte/lib/jspdf.plugin.autotable.min.js');
+    const logo=await ladeBild('projekte/lib/heise-logo.png');
+    const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}), B=[47,59,83], O=[226,83,4];
+    const datum=HEUTE.toLocaleDateString('de-DE'), titel='Besprechung Termine und Projekte';
+    const kopf=()=>{ if(logo){ const h=12, w=h*logo.w/logo.h; doc.addImage(logo.d,'PNG',196-w,10,w,h) } doc.setDrawColor(...O); doc.setLineWidth(.6); doc.line(14,25,196,25); };
+    kopf();
+    doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(...B); doc.text(titel,14,18);
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(90);
+    doc.text(`KW ${kwOf(HEUTE)} · ${datum}${NUR_OFFEN?' · nur offene Punkte':''}`,14,31);
+    let y=37;
+    const ids=[...new Set(T.map(t=>t.p))].filter(id=>PR[id]).sort((a,b)=>PR[a].name.localeCompare(PR[b].name,'de'));
+    const wann=t=>t.art==='termin'?(t.von?dJ(t.von)+(t.bis?' bis '+dJ(t.bis):''):'offen'):(t.faellig?'bis '+dJ(t.faellig):'');
+    let leer=true;
+    ids.forEach(id=>{
+      const L=T.filter(t=>t.p===id&&(!NUR_OFFEN||t.st==='offen')); if(!L.length) return; leer=false;
+      const p=PR[id], nr=nrVon(p);
+      doc.autoTable({startY:y,margin:{left:14,right:14,top:30},theme:'grid',
+        head:[[{content:p.name+(nr?'  ·  Auftrag '+nr:''),colSpan:5,styles:{fillColor:B,textColor:255,fontStyle:'bold',fontSize:10.5}}],['Art','Punkt','Wann','Verantwortlich','Status']],
+        body:L.map(t=>[t.art==='termin'?'Termin':'Aufgabe',t.t+(t.n?'\n'+t.n:''),wann(t),t.v||'',ST[t.st]]),
+        styles:{font:'helvetica',fontSize:9,cellPadding:2,lineColor:[220,224,232],lineWidth:.2,textColor:[25,30,40],valign:'top'},
+        headStyles:{fillColor:[238,240,244],textColor:B,fontStyle:'bold'},
+        columnStyles:{0:{cellWidth:17},1:{cellWidth:86},2:{cellWidth:27},3:{cellWidth:32},4:{cellWidth:20}},
+        didDrawPage:()=>kopf()});
+      y=doc.lastAutoTable.finalY+6;
+    });
+    if(leer){ doc.setFontSize(11); doc.setTextColor(60); doc.text('Keine Punkte vorhanden.',14,y+4); }
+    const n=doc.getNumberOfPages();
+    for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(130); doc.text('Heise Haustechnik GmbH & Co. KG · '+titel+' · '+datum,14,289); doc.text('Seite '+i+' von '+n,196,289,{align:'right'}); }
+    doc.save(`Besprechung_${iso(HEUTE)}.pdf`);
+  }catch(e){ toast('PDF fehlgeschlagen: '+e.message) }
+}
+
+/* =====================================================================
+   Anbindung an die My Heise App (Supabase)
+   • gemeinsames Login über „heiseSession“ wie alle Module
+   • Laden: pl_laden(), Speichern: pl_speichern() – es werden nur Änderungen geschickt
+   ===================================================================== */
+const SB='https://bbjzfoirefcsqqgztjpt.supabase.co', KEY='sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H', SESS_KEY='heiseSession';
+let BEN=[], GELADEN={von:'',bis:''}, SNAP=null, ME_NAME='', LETZT=0;
+const AUTH={access:null,refresh:null,exp:0}; let refreshP=null;
+const storedRefresh=()=>{ try{ return (JSON.parse(localStorage.getItem(SESS_KEY)||'null')||{}).r||null }catch(e){ return null } };
+function authSave(j){ AUTH.access=j.access_token; AUTH.refresh=j.refresh_token; AUTH.exp=j.expires_at?j.expires_at*1000:Date.now()+(j.expires_in||3600)*1000; try{ localStorage.setItem(SESS_KEY,JSON.stringify({r:AUTH.refresh})) }catch(e){} }
+function toLogin(){ location.replace('index.html?next='+encodeURIComponent('planung.html')) }
+async function refreshTok(){
+  let r; try{ r=await fetch(`${SB}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify({refresh_token:AUTH.refresh})}) }catch(e){ throw new Error('Keine Verbindung – bitte Netz prüfen') }
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){ try{ localStorage.removeItem(SESS_KEY) }catch(e){} toLogin(); throw new Error('Sitzung abgelaufen – bitte neu anmelden') }
+  authSave(j);
+}
+async function ensureToken(){
+  if(AUTH.access&&AUTH.exp-Date.now()>60000) return AUTH.access;
+  const r=storedRefresh()||AUTH.refresh; if(!r){ toLogin(); throw new Error('Nicht angemeldet') }
+  AUTH.refresh=r; if(!refreshP) refreshP=refreshTok().finally(()=>{refreshP=null}); await refreshP; return AUTH.access;
+}
+async function rpc(name,args){
+  const tok=await ensureToken(); let r;
+  try{ r=await fetch(`${SB}/rest/v1/rpc/${name}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+tok},body:JSON.stringify(args||{})}) }catch(e){ throw new Error('Keine Verbindung – bitte Netz prüfen') }
+  const j=await r.json().catch(()=>null);
+  if(!r.ok){ const m=(j&&j.message)||r.statusText||'Fehler'; if(r.status===401) AUTH.access=null; throw new Error(/permission denied|42501/i.test(m)&&!/[äöü]/.test(m)?'Dafür fehlt dir die Berechtigung':m) }
+  return j;
+}
+
+/* ---------- Daten übernehmen ---------- */
+const einsatzAus=([pid,d,code,code2,note])=>{ const e={code,note:note||''}; if(code2) e.code2=code2; return [pid+'|'+d,e] };
+function uebernehmen(j,von,bis){
+  SERVER_ROLLE=j.rolle; BEN=j.benutzer||[]; ME_NAME=(j.me&&j.me.name)||'';
+  D.people=(j.personen||[]).map(p=>({id:+p.id,name:p.name,gruppe:p.gruppe,tage:+p.tage||4,ab:p.ab||'',bis:p.bis||'',aus:!!p.aus,benutzer_id:p.benutzer_id||null}));
+  for(const k in SPAN) delete SPAN[k];
+  D.projects=(j.baustellen||[]).map(b=>{ if(b.von&&b.bis) SPAN[b.id]=[b.von,b.bis]; return {id:b.id,name:b.name,farbe:b.farbe||'#8497B0',nr:b.nr||'',ort:b.ort||'',kunde:b.kunde||'',fertig:!!b.fertig,fest:!!b.fest,klein:!!b.klein} });
+  PR=Object.fromEntries(D.projects.map(p=>[p.id,p]));
+  FEST.length=0; D.projects.filter(p=>p.fest).forEach(p=>FEST.push(p.id));
+  APP=(j.app_projekte||[]).map(a=>({id:a.id,nr:a.nr||'',name:a.name,link:((j.baustellen||[]).find(b=>b.projekt_id===a.id)||{}).id||null}));
+  EIN=Object.fromEntries((j.einsaetze||[]).map(einsatzAus));
+  BU={}; (j.bu||[]).forEach(u=>BU[u.datum]=+u.anteil);
+  T=(j.punkte||[]).map(t=>({id:t.id,p:t.baustelle_id||'',art:t.art,t:t.titel,von:t.von||'',bis:t.bis||'',faellig:t.faellig||'',v:t.verantwortlich||'',st:t.status,n:t.notiz||''}));
+  if(ME_ID==null||!D.people.some(x=>x.id===ME_ID)) ME_ID=j.person_id!=null?+j.person_id:null;
+  GELADEN={von,bis}; LETZT=Date.now();
+  SNAP=schnappschuss();
+}
+const sEin=e=>JSON.stringify([e.code,e.code2||'',e.note||'']);
+const sPer=p=>JSON.stringify([p.name,p.gruppe,p.tage,p.ab||'',p.bis||'',!!p.aus,p.benutzer_id||'']);
+const sBau=p=>JSON.stringify([p.name,p.farbe,p.nr||'',p.ort||'',p.kunde||'',(SPAN[p.id]||[])[0]||'',(SPAN[p.id]||[])[1]||'',!!p.fertig,!!p.fest,!!p.klein,(appVon(p.id)||{}).id||'']);
+const sT=t=>JSON.stringify([t.p,t.art,t.t,t.von||'',t.bis||'',t.faellig||'',t.v||'',t.st,t.n||'']);
+function schnappschuss(){
+  const m=(arr,key,f)=>Object.fromEntries(arr.map(x=>[key(x),f(x)]));
+  return { ein:Object.fromEntries(Object.entries(EIN).map(([k,e])=>[k,sEin(e)])), per:m(D.people,p=>p.id,sPer), bau:m(D.projects,p=>p.id,sBau), bu:{...BU}, t:m(T,t=>t.id,sT) };
+}
+
+/* ---------- Änderungen ermitteln und speichern ---------- */
+function aenderungen(){
+  const S=SNAP, P={}, neu={ein:{},per:{},bau:{},bu:{},t:{}, weg:{ein:[],per:[],bau:[],bu:[],t:[]}}; let n=0;
+  const add=(k,teil,x)=>{ P[k]=P[k]||{upsert:[],delete:[]}; P[k][teil].push(x); n++ };
+  Object.entries(EIN).forEach(([k,e])=>{ const v=sEin(e); if(S.ein[k]!==v){ const [pid,d]=k.split('|'); add('einsaetze','upsert',{person_id:+pid,datum:d,code:e.code,code2:e.code2||'',note:e.note||''}); neu.ein[k]=v } });
+  Object.keys(S.ein).forEach(k=>{ if(!EIN[k]){ const [pid,d]=k.split('|'); add('einsaetze','delete',{person_id:+pid,datum:d}); neu.weg.ein.push(k) } });
+  D.people.forEach(p=>{ const v=sPer(p); if(S.per[p.id]!==v){ add('personen','upsert',{id:p.id,name:p.name,gruppe:p.gruppe,tage:p.tage,ab:p.ab||'',bis:p.bis||'',aus:!!p.aus,benutzer_id:p.benutzer_id||''}); neu.per[p.id]=v } });
+  Object.keys(S.per).forEach(id=>{ if(!D.people.some(p=>String(p.id)===id)){ add('personen','delete',+id); neu.weg.per.push(id) } });
+  D.projects.forEach(p=>{ const v=sBau(p); if(S.bau[p.id]!==v){ add('baustellen','upsert',{id:p.id,name:p.name,farbe:p.farbe,nr:p.nr||'',ort:p.ort||'',kunde:p.kunde||'',von:(SPAN[p.id]||[])[0]||'',bis:(SPAN[p.id]||[])[1]||'',fertig:!!p.fertig,fest:!!p.fest,klein:!!p.klein,projekt_id:(appVon(p.id)||{}).id||''}); neu.bau[p.id]=v } });
+  Object.keys(S.bau).forEach(id=>{ if(!PR[id]){ add('baustellen','delete',id); neu.weg.bau.push(id) } });
+  Object.entries(BU).forEach(([d,a])=>{ if(S.bu[d]!==a){ add('bu','upsert',{datum:d,anteil:a}); neu.bu[d]=a } });
+  Object.keys(S.bu).forEach(d=>{ if(BU[d]==null){ add('bu','delete',d); neu.weg.bu.push(d) } });
+  T.forEach(t=>{ const v=sT(t); if(S.t[t.id]!==v){ add('punkte','upsert',{id:t.id,baustelle_id:t.p,art:t.art,titel:t.t,von:t.von||'',bis:t.bis||'',faellig:t.faellig||'',verantwortlich:t.v||'',status:t.st,notiz:t.n||''}); neu.t[t.id]=v } });
+  Object.keys(S.t).forEach(id=>{ if(!T.some(t=>t.id===id)){ add('punkte','delete',id); neu.weg.t.push(id) } });
+  return {n,P,neu};
+}
+let speichertGerade=false, nochmal=false, speicherTimer=null;
+function planeSpeichern(){ clearTimeout(speicherTimer); speicherTimer=setTimeout(speichern,350) }
+async function speichern(){
+  if(!SNAP||SERVER_ROLLE==='leser'||!darf.planen()) return;
+  if(speichertGerade){ nochmal=true; return }
+  const {n,P,neu}=aenderungen(); if(!n) return;
+  speichertGerade=true; $('#speichert').classList.add('on');
+  try{
+    await rpc('pl_speichern',{p:P});
+    ['ein','per','bau','bu','t'].forEach(k=>{ Object.assign(SNAP[k],neu[k]); neu.weg[k].forEach(x=>delete SNAP[k][x]) });
+  }catch(e){
+    toast('Nicht gespeichert: '+e.message);
+    try{ await laden(); render() }catch(e2){}
+  }finally{
+    speichertGerade=false; $('#speichert').classList.remove('on');
+    if(nochmal){ nochmal=false; planeSpeichern() }
+  }
+}
+// Jede neu gezeichnete Ansicht prüft, ob es etwas zu speichern gibt
+['rWoche','rZeit','rBes','rMe'].forEach(n=>{ const f=window[n]; window[n]=function(){ const r=f.apply(this,arguments); planeSpeichern(); return r } });
+window.addEventListener('beforeunload',e=>{ if(SNAP&&darf.planen()&&(speichertGerade||aenderungen().n)){ e.preventDefault(); e.returnValue='' } });
+
+/* ---------- Laden ---------- */
+const bereichStd=()=>({von:iso(addD(montag(HEUTE),-56)),bis:iso(addD(HEUTE,300))});
+async function laden(){ const b=bereichStd(); const j=await rpc('pl_laden',{p_von:b.von,p_bis:b.bis}); uebernehmen(j,b.von,b.bis); }
+async function nachladen(woche){
+  const a=iso(addD(woche,-14)), e=iso(addD(woche,20));
+  if(a>=GELADEN.von&&e<=GELADEN.bis) return;
+  const von=a<GELADEN.von?iso(addD(woche,-120)):GELADEN.bis, bis=e>GELADEN.bis?iso(addD(woche,180)):GELADEN.von;
+  try{
+    const j=await rpc('pl_laden',{p_von:von,p_bis:bis,p_nur_einsatz:true});
+    (j.einsaetze||[]).map(einsatzAus).forEach(([k,ein])=>{ if(!(k in SNAP.ein)&&!EIN[k]){ EIN[k]=ein; SNAP.ein[k]=sEin(ein) } });
+    GELADEN={von:von<GELADEN.von?von:GELADEN.von,bis:bis>GELADEN.bis?bis:GELADEN.bis};
+  }catch(err){ toast(err.message) }
+}
+document.addEventListener('visibilitychange',async()=>{
+  if(document.hidden||!SNAP||Date.now()-LETZT<60000||$('#sh').classList.contains('on')||speichertGerade||aenderungen().n) return;
+  try{ await laden(); render() }catch(e){}
+});
+
+/* ---------- Start ---------- */
+(async()=>{
+  try{
+    if(!storedRefresh()) return toLogin();
+    await laden();
+    const rn={leser:'Ansehen',planer:'Planer',verwalter:'Verwaltung',admin:'Admin'}[SERVER_ROLLE]||'';
+    $('#wer-bin-ich').textContent=[ME_NAME,rn].filter(Boolean).join(' · ');
+    ROLLE=SERVER_ROLLE==='leser'?'monteur':SERVER_ROLLE==='planer'?'planer':'admin';
+    if(ROLLE==='admin') $('#rolle-box').hidden=false;
+    if(ROLLE==='monteur'){ VIEW='me'; [...$('#tabs').children].forEach(x=>x.classList.toggle('on',x.dataset.v==='me')) }
+    rolleSetzen(ROLLE);
+  }catch(e){
+    $('#app').innerHTML=`<div class="lade"><b style="color:var(--ink)">Planung konnte nicht geladen werden</b><p style="margin:8px 0 16px">${esc(e.message)}</p><button class="btn pri" onclick="location.reload()">Erneut versuchen</button></div>`;
+  }
+})();
+
+</script></body></html>
