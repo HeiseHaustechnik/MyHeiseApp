@@ -104,9 +104,35 @@ textarea.inp{height:64px;padding:8px 12px}
 .speichert{position:fixed;right:14px;bottom:14px;background:var(--brand);color:#fff;font-size:12px;font-weight:650;padding:6px 10px;border-radius:9px;opacity:0;transition:opacity .2s;z-index:55}.speichert.on{opacity:.85}
 textarea.inp{min-height:70px;resize:vertical}
 @media(max-width:700px){.top .rolle{display:none}}
+/* v2: Monat, Filter, Zeitplan, Besprechungen */
+.seg{display:inline-flex;background:var(--s);box-shadow:var(--sh);border-radius:11px;padding:3px;gap:2px}.seg button{height:32px;padding:0 12px;border-radius:9px;font-weight:650;font-size:13px;color:var(--ink2)}.seg button.on{background:var(--brand);color:#fff}
+table.g.mon{min-width:0}
+.g.mon thead th.mt{padding:4px 1px;text-align:center;font-size:10.5px;line-height:1.15;min-width:30px;font-weight:700}
+.g.mon th.mt small{display:block;font-size:9.5px;color:var(--brand);height:12px;font-weight:750}
+.g.mon th.ftag{background:#eef2f7}.g.mon td{padding:2px 1px}.g.mon .kws{border-left:2px solid #d5dbe5}
+.g.mon .nm{min-width:130px;max-width:150px;padding:3px 8px}.g.mon .nm b{font-size:12px}.g.mon td.nm small{display:none}
+.cell.mini{height:26px;padding:0 2px;font-size:10px;align-items:center;border-radius:5px;min-width:26px;letter-spacing:-.01em}
+.cell.mini.frei{background:#eef0f4}.cell.mini:hover{transform:none;outline:2px solid var(--brand);outline-offset:-1px}
+.cell.dim{opacity:.16;filter:grayscale(.7)}
+.fbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-4px 0 12px}.flab{font-size:12px;color:var(--ink3);font-weight:700}
+.fchip{height:28px;padding:0 10px;border-radius:14px;background:var(--brand);color:#fff;font-size:12px;font-weight:650}.fchip span{opacity:.75;margin-left:6px}
+.fweg{font-size:12px;font-weight:650;color:var(--acc);text-decoration:underline;margin-left:4px}
+.btn.fon{box-shadow:inset 0 0 0 2px var(--brand)}.fz{background:var(--brand);color:#fff;border-radius:9px;padding:0 6px;font-size:11px}
+.fliste{max-height:260px;overflow:auto;margin-top:6px;border:1px solid var(--line);border-radius:10px}
+.frow{display:flex;gap:8px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}.frow:last-child{border-bottom:0}.frow small{display:block;color:var(--ink3);font-size:11px}
+.gantt.kompakt .gr2{height:32px}.gantt.kompakt .gb{top:4px;height:17px;font-size:10.5px}.gantt.kompakt .ist{top:23px;height:8px;font-size:0}.gantt.kompakt .ms{top:4px;width:13px;height:13px}.gantt.kompakt .gn{padding:2px 10px}.gantt.kompakt .gn small{display:none}.gantt.kompakt .gn b{font-size:12px}
+.kwc.mw{border-left-color:#c5ccd8}.gb.li{border-top-left-radius:0;border-bottom-left-radius:0}.gb.re{border-top-right-radius:0;border-bottom-right-radius:0}
+.gn b span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bkopf{padding:12px 16px;margin-bottom:12px}.bk-z{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--ink2);font-size:13px}.bk-z span{margin-right:auto}
+.bk-f{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-top:10px}.bk-f label{display:block}.bk-f.lesend{font-size:13.5px}
+.itr{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.zr{font-size:11.5px;color:var(--ink3);text-decoration:underline;white-space:nowrap}.it.zur{opacity:.72}
+.st.fix{cursor:default;box-shadow:inset 0 0 0 1px currentColor}.vlk{font-size:12px;color:var(--blue);text-decoration:underline}.lnk{color:inherit;font-weight:700;text-decoration:underline}
+.bl{margin:6px 0 4px 18px;font-size:13.5px;color:var(--ink2)}.bl li{margin:3px 0}
+.verl{margin-top:8px}.vz{display:grid;grid-template-columns:112px 1fr;gap:2px 10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}.vz span{color:var(--ink3)}.vz small{grid-column:2;color:var(--ink3)}
+@media(max-width:700px){.bk-f{grid-template-columns:1fr}.seg button{padding:0 9px}}
 </style></head><body>
 <div class="top"><a class="home" href="index.html" title="Zur My Heise Startseite">‹ My Heise</a><div><h1>Planung</h1><small id="wer-bin-ich">Heise Haustechnik</small></div>
-<label class="rolle" id="rolle-box" hidden>Ansicht als <select id="rolle"><option value="monteur">Monteur (nur ansehen)</option><option value="planer">Planer</option><option value="admin">Verwaltung</option></select></label><div class="tabs" id="tabs"><button data-v="woche" class="on">Wochenplan</button><button data-v="zeit">Zeitplan</button><button data-v="bes">Besprechung</button><button data-v="me">Mein Einsatz</button></div></div>
+<label class="rolle" id="rolle-box" hidden>Ansicht als <select id="rolle"><option value="monteur">Monteur (nur ansehen)</option><option value="planer">Planer</option><option value="admin">Verwaltung</option></select></label><div class="tabs" id="tabs"><button data-v="woche" class="on">Wochenplan</button><button data-v="zeit">Zeitplan</button><button data-v="bes">Besprechungen</button><button data-v="me">Mein Einsatz</button></div></div>
 <div class="wrap" id="app"><div class="lade">Planung wird geladen …</div></div><div class="speichert" id="speichert">Speichert …</div>
 <div class="ov" id="ov"></div><div class="sh" id="sh"></div><div class="toast" id="toast"></div>
 <script>
@@ -144,6 +170,48 @@ const toast=(t,undo)=>{const e=$('#toast');e.innerHTML=esc(t)+(undo?'<button id=
 const sheet=h=>{$('#sh').innerHTML=h;$('#ov').classList.add('on');$('#sh').classList.add('on')};
 const closeSh=()=>{$('#ov').classList.remove('on');$('#sh').classList.remove('on')};
 $('#ov').onclick=closeSh;
+/* ---------- Kategorien, Filter, gespeicherte Ansicht ---------- */
+const GROESSE={gross:'Großbaustelle',klein:'Kleinprojekt',sammel:'Sammelblock'};
+const GEWERK={bad:'Bad',heizung:'Heizungserneuerung',waermepumpe:'Heizungsanlage / Wärmepumpe',pv:'Elektro / PV',lueftung:'Lüftung',sanitaer:'Sanitär'};
+const lsGet=(k,d)=>{ try{ const v=JSON.parse(localStorage.getItem('pl.'+k)); return v==null?d:v }catch(e){ return d } };
+const lsSet=(k,v)=>{ try{ localStorage.setItem('pl.'+k,JSON.stringify(v)) }catch(e){} };
+let MODUS=lsGet('modus','woche')==='monat'?'monat':'woche', MONAT=new Date(HEUTE.getFullYear(),HEUTE.getMonth(),1,12);
+const FLT={bs:[],gr:[],gw:[],nur:true}; (()=>{ const f=lsGet('filter',{}); ['bs','gr','gw'].forEach(k=>{ if(Array.isArray(f[k])) FLT[k]=f[k].map(String) }); if(typeof f.nur==='boolean') FLT.nur=f.nur; })();
+FIL=lsGet('gruppe','alle'); if(FIL!=='alle'&&!['Obermonteur','Monteur','Kundendienst','Azubi','Leiharbeiter','Praktikant'].includes(FIL)) FIL='alle';
+const fltZahl=()=>FLT.bs.length+FLT.gr.length+FLT.gw.length, fltAktiv=()=>fltZahl()>0;
+function fltSpeichern(){ lsSet('filter',FLT); lsSet('gruppe',FIL); }
+function passtBau(id){ const p=PR[id]; if(!p) return false;
+  if(FLT.bs.length&&!FLT.bs.includes(id)) return false;
+  if(FLT.gr.length&&!FLT.gr.includes(p.groesse||'ohne')) return false;
+  if(FLT.gw.length&&!(p.gewerke||[]).some(g=>FLT.gw.includes(g))) return false;
+  return true; }
+const passtEintrag=e=>!!e&&[e.code,e.code2].some(c=>c&&c.startsWith('p:')&&passtBau(c.slice(2)));
+const katText=p=>[p.groesse?GROESSE[p.groesse]:'',...(p.gewerke||[]).map(g=>GEWERK[g])].filter(Boolean).join(' · ');
+const fltKnopf=()=>`<button class="btn${fltAktiv()?' fon':''}" id="fbtn" title="Nach Baustellen, Größe und Gewerken filtern">Filter${fltAktiv()?` <b class="fz">${fltZahl()}</b>`:''}</button>`;
+function fltLeiste(){ if(!fltAktiv()) return '';
+  const ch=(t,k,v)=>`<button class="fchip" data-fx="${k}|${esc(v)}" title="Filter entfernen">${esc(t)}<span>×</span></button>`;
+  return `<div class="fbar"><span class="flab">Gefiltert:</span>${FLT.bs.map(id=>ch(PR[id]?PR[id].name:id,'bs',id)).join('')}${FLT.gr.map(g=>ch(g==='ohne'?'Größe ohne Angabe':GROESSE[g],'gr',g)).join('')}${FLT.gw.map(g=>ch(GEWERK[g]||g,'gw',g)).join('')}<button class="fweg" id="fweg">Filter zurücksetzen</button></div>`; }
+function fltBinden(neu){
+  document.querySelectorAll('#app [data-fx]').forEach(b=>b.onclick=()=>{ const [k,v]=b.dataset.fx.split('|'); FLT[k]=FLT[k].filter(x=>x!==v); fltSpeichern(); neu() });
+  if($('#fweg')) $('#fweg').onclick=()=>{ FLT.bs=[];FLT.gr=[];FLT.gw=[]; fltSpeichern(); neu() };
+  if($('#fbtn')) $('#fbtn').onclick=()=>filterSheet(neu); }
+function filterSheet(neu){
+  const L=D.projects.filter(p=>!p.fertig||FLT.bs.includes(p.id)).sort((a,b)=>a.name.localeCompare(b.name,'de'));
+  sheet(`<h3>Filter</h3><div class="sub">Mehrere gleichzeitig möglich. Innerhalb einer Gruppe gilt „oder“, zwischen den Gruppen „und“. Gilt für Woche, Monat und Zeitplan und bleibt gespeichert.</div>
+    <div class="lab">Größe</div><div class="chips" style="margin:6px 0">${[...Object.entries(GROESSE),['ohne','ohne Angabe']].map(([k,v])=>`<button class="chip${FLT.gr.includes(k)?' on':''}" data-fk="gr|${k}">${v}</button>`).join('')}</div>
+    <div class="lab">Gewerke</div><div class="chips" style="margin:6px 0">${Object.entries(GEWERK).map(([k,v])=>`<button class="chip${FLT.gw.includes(k)?' on':''}" data-fk="gw|${k}">${v}</button>`).join('')}</div>
+    <div class="lab">Baustellen und Projekte <span id="fbz">${FLT.bs.length?'· '+FLT.bs.length+' gewählt':''}</span></div><input class="inp" id="fsuch" placeholder="Name oder Auftragsnummer suchen" style="margin-top:6px">
+    <div class="fliste">${L.map(p=>`<label class="frow"><input type="checkbox" data-fb="${p.id}"${FLT.bs.includes(p.id)?' checked':''}><i class="dot" style="background:${p.farbe}"></i><span>${esc(p.name)}<small>${esc([nrVon(p),katText(p)].filter(Boolean).join(' · ')||'ohne Kategorie')}</small></span></label>`).join('')}</div>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="fnur"${FLT.nur?' checked':''}> Im Wochenplan nur Mitarbeiter mit passenden Einsätzen zeigen</label>
+    <div class="row"><button class="btn" id="fzur">Zurücksetzen</button><button class="btn pri" id="fok">Fertig</button></div>`);
+  const nachher=()=>{ fltSpeichern(); neu(); $('#fbz').textContent=FLT.bs.length?'· '+FLT.bs.length+' gewählt':''; };
+  document.querySelectorAll('#sh [data-fk]').forEach(b=>b.onclick=()=>{ const [k,v]=b.dataset.fk.split('|'); FLT[k]=FLT[k].includes(v)?FLT[k].filter(x=>x!==v):[...FLT[k],v]; b.classList.toggle('on',FLT[k].includes(v)); nachher() });
+  document.querySelectorAll('#sh [data-fb]').forEach(c=>c.onchange=()=>{ const id=c.dataset.fb; FLT.bs=c.checked?[...new Set([...FLT.bs,id])]:FLT.bs.filter(x=>x!==id); nachher() });
+  $('#fsuch').oninput=e=>{ const s=e.target.value.toLowerCase(); document.querySelectorAll('#sh .frow').forEach(r=>r.style.display=!s||r.textContent.toLowerCase().includes(s)?'':'none') };
+  $('#fnur').onchange=e=>{ FLT.nur=e.target.checked; nachher() };
+  $('#fzur').onclick=()=>{ FLT.bs=[];FLT.gr=[];FLT.gw=[]; fltSpeichern(); neu(); filterSheet(neu) };
+  $('#fok').onclick=closeSh;
+}
 /* ---------- Rechte (im echten Modul aus Benutzer & Zugriff) ---------- */
 let ROLLE='monteur', SERVER_ROLLE='leser';
 const darf={planen:()=>ROLLE!=='monteur', verwalten:()=>ROLLE==='admin'};
@@ -173,7 +241,7 @@ const aktiveFarben=ohne=>D.projects.filter(p=>!p.fertig&&p.id!==ohne).map(p=>({f
 function farbVorschlag(){ const A=aktiveFarben(); return PAL.slice().sort((a,b)=>Math.min(...A.map(x=>abstand(b,x.f)))-Math.min(...A.map(x=>abstand(a,x.f))))[0]; }
 const eintraege=id=>Object.values(EIN).filter(e=>e.code==='p:'+id||e.code2==='p:'+id).length;
 function bsListe(){
-  const zeile=p=>{const a=appVon(p.id);return `<div class="bsrow"><button class="maname" data-bs="${p.id}"><i class="bsdot" style="background:${p.farbe}"></i><span><b>${esc(p.name)}</b><small>${nrVon(p)?'Auftrag '+nrVon(p)+' · ':''}${FEST.includes(p.id)?'fester Block':a?'aus Projekte':'nur Planung'}${p.von?' · '+dDE(p.von)+(p.bis?' – '+dDE(p.bis):''):''}</small></span></button></div>`};
+  const zeile=p=>{const a=appVon(p.id);return `<div class="bsrow"><button class="maname" data-bs="${p.id}"><i class="bsdot" style="background:${p.farbe}"></i><span><b>${esc(p.name)}</b><small>${nrVon(p)?'Auftrag '+nrVon(p)+' · ':''}${FEST.includes(p.id)?'fester Block':a?'aus Projekte':'nur Planung'}${katText(p)&&!FEST.includes(p.id)?' · '+esc(katText(p)):''}${p.von?' · '+dDE(p.von)+(p.bis?' – '+dDE(p.bis):''):''}</small></span></button></div>`};
   const akt=D.projects.filter(p=>!p.fertig).sort((a,b)=>a.name.localeCompare(b.name,'de')), alt=D.projects.filter(p=>p.fertig), frei=APP.filter(a=>!a.link);
   sheet(`<h3>Baustellen</h3><div class="sub">Was hier aktiv ist, steht im Wochenplan zur Auswahl. Abgeschlossene bleiben im Verlauf sichtbar.</div>
     <input class="inp" id="bssuch" placeholder="Name oder Auftragsnummer suchen">
@@ -187,13 +255,15 @@ function bsListe(){
   $('#bszu').onclick=closeSh; $('#bsneu').onclick=()=>bsBearbeiten(null);
 }
 function bsBearbeiten(id,app){
-  const neu=!id, orig=neu?null:PR[id], p=neu?{id:'b'+Date.now().toString(36),name:app?app.name:'',farbe:farbVorschlag(),von:null,bis:null,nr:'',ort:'',kunde:''}:{...orig,von:(SPAN[id]||[])[0]||null,bis:(SPAN[id]||[])[1]||null};
-  const fest=FEST.includes(p.id); let farbe=p.farbe, link=neu?(app?app.id:''):((appVon(p.id)||{}).id||'');
+  const neu=!id, orig=neu?null:PR[id], p=neu?{id:'b'+Date.now().toString(36),name:app?app.name:'',farbe:farbVorschlag(),von:null,bis:null,nr:'',ort:'',kunde:'',groesse:'',gewerke:[]}:{...orig,von:(SPAN[id]||[])[0]||null,bis:(SPAN[id]||[])[1]||null};
+  const fest=FEST.includes(p.id); let gr=p.groesse||'', gw=[...(p.gewerke||[])]; let farbe=p.farbe, link=neu?(app?app.id:''):((appVon(p.id)||{}).id||'');
   const n=neu?0:eintraege(p.id);
   const draw=()=>{ const A=aktiveFarben(p.id), aehnl=A.filter(x=>abstand(x.f,farbe)<60);
     sheet(`<h3>${neu?'Baustelle anlegen':esc(p.name)}</h3><div class="sub">${neu?(app?'Aus dem Modul Projekte, Projekt '+app.nr:'Nur für die Planung. Kann später mit einem App-Projekt verknüpft werden.'):(fest?'Fester Block':n+' Einträge im Wochenplan')}</div>
     <div class="lab">Name</div><input class="inp" id="bn" value="${esc(p.name)}" placeholder="z. B. Hotel Ahorn Hallenbad"${fest?' disabled':''}>
     ${fest?'':`<div class="lab">Auftragsnummer</div><input class="inp" id="bnr" inputmode="numeric" value="${esc((APP.find(a=>a.id===link)||{}).nr||p.nr||'')}" placeholder="z. B. 32600972 oder 3261000-0004"${link?' disabled title="Kommt aus dem verknüpften Projekt"':''}>${link?'<div class="sub" style="margin-top:4px">Kommt aus dem verknüpften Projekt.</div>':(nrOk(p.nr)?'':'<div class="sub" style="margin-top:4px;color:#8a4b00">Übliche Form: 32600972 (Projekt) oder 3261000-0004 (Kleinauftrag).</div>')}`}
+    ${fest?'':`<div class="lab">Größe</div><div class="pick" style="grid-template-columns:repeat(3,1fr)">${Object.entries(GROESSE).map(([k,v])=>`<button data-gr="${k}" class="${gr===k?'on':''}">${v}</button>`).join('')}</div>
+    <div class="lab">Gewerke (mehrere möglich)</div><div class="pick">${Object.entries(GEWERK).map(([k,v])=>`<button data-gw="${k}" class="${gw.includes(k)?'on':''}">${gw.includes(k)?'✓ ':''}${v}</button>`).join('')}</div>`}
     <div class="lab">Farbe</div><div class="pal">${PAL.map(f=>`<button data-f="${f}" class="${f.toLowerCase()===farbe.toLowerCase()?'on':''}${A.some(x=>x.f.toLowerCase()===f.toLowerCase())?' belegt':''}" style="background:${f}" title="${A.filter(x=>x.f.toLowerCase()===f.toLowerCase()).map(x=>x.n).join(', ')||'frei'}"></button>`).join('')}</div>
     <div style="display:flex;gap:8px;align-items:center"><input type="color" id="bf" value="${farbe}" style="width:44px;height:36px;border:0;background:none"><span class="sub" style="margin:0">Eigene Farbe · Felder mit Punkt sind schon vergeben</span><span class="cell" style="margin-left:auto;min-width:140px;background:${farbe};color:${txtCol(farbe)}">${esc(p.name||'Vorschau')}</span></div>
     ${aehnl.length?`<div class="warn">Sehr ähnlich wie: ${aehnl.map(x=>esc(x.n)).join(', ')}. Im Wochenplan schwer zu unterscheiden.</div>`:''}
@@ -204,10 +274,12 @@ function bsBearbeiten(id,app){
     <div class="row"><button class="btn" id="bzur">Zurück</button>${!neu&&!fest?`<button class="btn" id="bweg" style="color:#c32328">${n?'Entfernen nicht möglich':'Entfernen'}</button>`:''}<button class="btn pri" id="bok">Speichern</button></div>`);
     document.querySelectorAll('#sh [data-f]').forEach(b=>b.onclick=()=>{keep();farbe=b.dataset.f;draw()});
     $('#bf').onchange=e=>{keep();farbe=e.target.value.toUpperCase();draw()};
+    document.querySelectorAll('#sh [data-gr]').forEach(b=>b.onclick=()=>{keep();gr=gr===b.dataset.gr?'':b.dataset.gr;draw()});
+    document.querySelectorAll('#sh [data-gw]').forEach(b=>b.onclick=()=>{keep();const k=b.dataset.gw;gw=gw.includes(k)?gw.filter(x=>x!==k):Object.keys(GEWERK).filter(x=>x===k||gw.includes(x));draw()});
     $('#bzur').onclick=bsListe;
     if($('#bweg')) $('#bweg').onclick=()=>{ if(n) return toast('Hat Einträge im Plan. Bitte „Abgeschlossen“ setzen.'); const i=D.projects.indexOf(orig), ap=APP.filter(a=>a.link===p.id); D.projects.splice(i,1); delete PR[p.id]; ap.forEach(a=>a.link=null); render(); bsListe(); toast(p.name+' entfernt',()=>{D.projects.splice(i,0,orig);PR[p.id]=orig;ap.forEach(a=>a.link=p.id);render();bsListe()}); };
     $('#bok').onclick=()=>{ keep(); if(!p.name.trim()) return toast('Bitte einen Namen eingeben'); if(p.von&&p.bis&&p.bis<p.von) return toast('Das Enddatum liegt vor dem Start'); if(p.nr&&!link&&D.projects.some(x=>x!==orig&&nrVon(x)===p.nr)) return toast('Auftragsnummer '+p.nr+' gibt es schon');
-      p.farbe=farbe; if($('#bfe')) p.fertig=$('#bfe').checked;
+      p.farbe=farbe; if(!fest){ p.groesse=gr; p.gewerke=gw.slice() } if($('#bfe')) p.fertig=$('#bfe').checked;
       if($('#bl')){ APP.forEach(a=>{if(a.link===p.id)a.link=null}); const a=APP.find(a=>a.id===$('#bl').value); if(a) a.link=p.id; }
       if(p.von&&p.bis) SPAN[p.id]=[p.von,p.bis]; else delete SPAN[p.id]; delete p.von; delete p.bis; if(neu){ D.projects.push(p); PR[p.id]=p; } else Object.assign(orig,p); render(); bsListe(); toast(neu?p.name+' angelegt':'Gespeichert'); };
   };
@@ -277,31 +349,73 @@ function zelle(p,d,i){
   if(e.code==='p:dis'&&e.note) return `<div class="cell" data-p="${p.id}" data-d="${d}" style="background-color:${c.farbe};color:${txtCol(c.farbe)}">${esc(e.note)}<small>Diverses</small></div>`;
   return `<div class="cell${c2?' zwei':''}" data-p="${p.id}" data-d="${d}" style="background-color:${c.farbe};color:${txtCol(c.farbe)};${c2?'--c2:'+c2.farbe:''}">${esc(c.name)}${e.note||c2||BU[d]===0.5?`<small>${esc([c2&&('+ '+c2.name),BU[d]===0.5&&'½ Betriebsurlaub',e.note].filter(Boolean).join(' · '))}</small>`:''}</div>`;
 }
+const GR_ALLE=['Obermonteur','Monteur','Kundendienst','Azubi','Leiharbeiter','Praktikant'];
+const GR_TXT={Obermonteur:'Obermonteure',Monteur:'Monteure',Kundendienst:'Kundendienst',Azubi:'Auszubildende',Leiharbeiter:'Leiharbeiter',Praktikant:'Praktikanten'};
+function monatsTage(m){ const L=[]; for(let d=new Date(m.getFullYear(),m.getMonth(),1,12);d.getMonth()===m.getMonth();d=addD(d,1)){ if((d.getDay()+6)%7<5) L.push(iso(d)) } return L; }
+const ABK={ft:'FT',bu:'BU',url:'U',kra:'K',sch:'S',leh:'L',bs:'BS',ueb:'Ü',ext:'ext',evt:'BV'};
+function kurz(code,e,c){ if(c.unk) return '?'; if(code.startsWith('a:')) return ABK[code.slice(2)]||'?';
+  const t=code==='p:dis'&&e.note?e.note:c.name, w=t.replace(/^mit /,'').split(/[\s\/,]+/)[0]||t; return (code.startsWith('m:')?'↳':'')+(w.length<=5?w:w.slice(0,4)+'.'); }
+function zelleMini(p,d){
+  const i=(new Date(d+'T12:00').getDay()+6)%7;
+  if(i>=p.tage||!dabei(p,d)) return `<div class="cell mini frei" data-p="${p.id}" data-d="${d}" data-frei="1" title="${i>=p.tage?'frei':'nicht dabei'}"></div>`;
+  const e=eintrag(p.id,d), c=codeInfo(e&&e.code), dim=fltAktiv()&&!passtEintrag(e)?' dim':'', wer=esc(p.name.split(/[ ,]/)[0])+', '+dDE(d)+': ';
+  if(!c&&BU[d]===0.5&&!FT[d]) return `<div class="cell mini${dim}" data-p="${p.id}" data-d="${d}" style="background:#FDEADF;color:#8a3b00" title="${wer}½ Betriebsurlaub">½</div>`;
+  if(!c) return `<div class="cell mini leer${dim}" data-p="${p.id}" data-d="${d}" title="${wer}frei planbar"></div>`;
+  const c2=e.code2?codeInfo(e.code2):null, tip=[c.name,c2&&('+ '+c2.name),BU[d]===0.5&&'½ Betriebsurlaub',e.note].filter(Boolean).join(' · ');
+  if(c.unk) return `<div class="cell mini unk${dim}" data-p="${p.id}" data-d="${d}" title="${wer}${esc(e.note)} (bitte prüfen)">?</div>`;
+  return `<div class="cell mini${c2?' zwei':''}${dim}" data-p="${p.id}" data-d="${d}" title="${wer}${esc(tip)}" style="background-color:${c.farbe};color:${txtCol(c.farbe)};${c2?'--c2:'+c2.farbe:''}">${esc(kurz(e.code,e,c))}</div>`;
+}
+function blaettern(r){
+  if(MODUS==='monat'){ MONAT=new Date(MONAT.getFullYear(),MONAT.getMonth()+r,1,12); const t=monatsTage(MONAT);
+    return nachladenBereich(iso(addD(new Date(t[0]+'T12:00'),-14)),iso(addD(new Date(t[t.length-1]+'T12:00'),14))).then(rWoche); }
+  WOCHE=addD(WOCHE,7*r); return nachladen(WOCHE).then(rWoche);
+}
+function modusSetzen(m){ if(m===MODUS) return; MODUS=m; lsSet('modus',m);
+  if(m==='monat'){ const d=addD(WOCHE,3); MONAT=new Date(d.getFullYear(),d.getMonth(),1,12) }
+  else { const t=monatsTage(MONAT); WOCHE=t.includes(iso(HEUTE))?montag(HEUTE):montag(new Date(t[0]+'T12:00')) }
+  blaettern(0); }
 function rWoche(){
-  const tage=[0,1,2,3,4].map(i=>iso(addD(WOCHE,i)));
-  const GR=['Obermonteur','Monteur','Kundendienst','Azubi','Leiharbeiter','Praktikant'];
-  const leute=D.people.filter(p=>(FIL==='alle'||p.gruppe===FIL)&&imPlan(p,tage[0],tage[4]));
+  const mon=MODUS==='monat', h=iso(HEUTE);
+  const tage=mon?monatsTage(MONAT):[0,1,2,3,4].map(i=>iso(addD(WOCHE,i))), von=tage[0], bis=tage[tage.length-1];
+  const fa=fltAktiv(), GR=GR_ALLE;
+  const leute=D.people.filter(p=>(FIL==='alle'||p.gruppe===FIL)&&imPlan(p,von,bis)&&(!fa||!FLT.nur||tage.some(d=>dabei(p,d)&&passtEintrag(eintrag(p.id,d)))));
   const ausgebl=D.people.filter(p=>p.aus).length;
   const offen=tage.reduce((n,d)=>n+leute.filter(p=>{const e=EIN[p.id+'|'+d];return e&&e.code==='?'}).length,0);
-  // Besetzung je Baustelle in der Woche
-  const bes={}; leute.forEach(p=>tage.forEach(d=>{const e=EIN[p.id+'|'+d]; if(e&&e.code&&e.code.startsWith('p:')){ bes[e.code]=(bes[e.code]||0)+1 }}));
+  // Besetzung je Baustelle im angezeigten Zeitraum (mit Filter nur passende Baustellen)
+  const bes={}; leute.forEach(p=>tage.forEach(d=>{const e=EIN[p.id+'|'+d]; if(e&&e.code&&e.code.startsWith('p:')&&(!fa||passtBau(e.code.slice(2)))){ bes[e.code]=(bes[e.code]||0)+1 }}));
+  const titel=mon?`${MONAT.toLocaleDateString('de-DE',{month:'long',year:'numeric'})}<small>KW ${kwOf(new Date(von+'T12:00'))} bis KW ${kwOf(new Date(bis+'T12:00'))}</small>`:`KW ${kwOf(WOCHE)}<small>${dDE(tage[0])} – ${dDE(tage[4])}${tage[4].slice(0,4)}</small>`;
+  const zelleW=(p,d,i)=>{ const z=zelle(p,d,i); return fa&&!z.includes('data-frei')&&!passtEintrag(eintrag(p.id,d))?z.replace('class="cell','class="cell dim'):z };
+  const kopf=mon?tage.map(d=>{const dt=new Date(d+'T12:00'),w=(dt.getDay()+6)%7,info=[FT[d],BU[d]?(BU[d]===1?'Betriebsurlaub':'½ Betriebsurlaub'):''].filter(Boolean).join(' · ');
+      return `<th class="mt${w===0?' kws':''}${d===h?' today':''}${FT[d]||BU[d]?' ftag':''}${darf.verwalten()?' buk':''}" data-tag="${d}" title="${esc(info||(darf.verwalten()?'Betriebsurlaub festlegen':''))}"><small>${w===0||d===von?'KW '+kwOf(dt):''}</small>${dt.getDate()}<br>${WT[w]}</th>`}).join('')
+    :tage.map((d,i)=>`<th class="${d===h?'today':''}${darf.verwalten()?' buk':''}" data-tag="${d}"${darf.verwalten()?' title="Betriebsurlaub festlegen"':''}>${WT[i]} ${dDE(d)}${FT[d]?`<span class="bubadge" style="background:#DCE3EC;color:#2F3B53">${FT[d]}</span>`:BU[d]?`<span class="bubadge">${BU[d]===1?'Betriebsurlaub':'½ Betriebsurlaub'}</span>`:''}</th>`).join('');
+  const zeile=p=>`<tr><td class="nm"${darf.verwalten()?` data-nm="${p.id}" title="Mitarbeiter bearbeiten"`:''}><b>${esc(p.name)}</b><small>${p.tage===4?'Mo–Do':'Mo–Fr'}${p.bis?' · bis '+dDE(p.bis):''}</small></td>${mon
+      ?tage.map(d=>`<td class="${(new Date(d+'T12:00').getDay()===1)?'kws ':''}${d===h?'today':''}">${zelleMini(p,d)}</td>`).join('')
+      :tage.map((d,i)=>`<td class="${d===h?'today':''}">${zelleW(p,d,i)}</td>`).join('')}</tr>`;
+  const leerHinweis=!leute.length?`<tr><td colspan="${tage.length+1}" style="padding:24px;text-align:center;color:var(--ink3)">${fa?'Keine Mitarbeiter mit Einsätzen auf den gefilterten Baustellen in diesem Zeitraum.':'Keine Mitarbeiter in dieser Auswahl.'}</td></tr>`:'';
   $('#app').innerHTML=`
-   <div class="bar"><button class="btn ic" id="prev">‹</button><div class="kw">KW ${kwOf(WOCHE)}<small>${dDE(tage[0])} – ${dDE(tage[4])}${tage[4].slice(0,4)}</small></div><button class="btn ic" id="next">›</button><button class="btn" id="heute">Heute</button>
+   <div class="bar"><div class="seg" id="modus" role="tablist" aria-label="Ansicht"><button data-m="woche" class="${mon?'':'on'}" aria-selected="${!mon}">Woche</button><button data-m="monat" class="${mon?'on':''}" aria-selected="${mon}">Monat</button></div>
+   <button class="btn ic" id="prev" title="${mon?'Vorheriger Monat':'Vorherige Woche'}">‹</button><div class="kw">${titel}</div><button class="btn ic" id="next" title="${mon?'Nächster Monat':'Nächste Woche'}">›</button><button class="btn" id="heute">Heute</button>
    <div class="chips" style="margin-left:6px">${['alle',...GR].map(g=>`<button class="chip${FIL===g?' on':''}" data-f="${g}">${g==='alle'?'Alle':g}</button>`).join('')}</div>
-   ${darf.verwalten()?`<button class="btn" id="bsbtn" style="margin-left:auto">Baustellen</button>`:''}${darf.verwalten()?`<button class="btn" id="mabtn">Mitarbeiter${ausgebl?` <small style="color:var(--ink3)">(${ausgebl} ausgeblendet)</small>`:''}</button>`:''}${darf.planen()?`<button class="btn" id="kopie" title="Alle Einträge dieser Woche in die nächste Woche übernehmen"${darf.verwalten()?'':' style="margin-left:auto"'}>Woche kopieren</button>`:'<span style="margin-left:auto;color:var(--ink3);font-size:12.5px">Nur ansehen</span>'}</div>
+   ${fltKnopf()}
+   ${darf.verwalten()?`<button class="btn" id="bsbtn" style="margin-left:auto">Baustellen</button>`:''}${darf.verwalten()?`<button class="btn" id="mabtn">Mitarbeiter${ausgebl?` <small style="color:var(--ink3)">(${ausgebl} ausgeblendet)</small>`:''}</button>`:''}${darf.planen()?(mon?'':`<button class="btn" id="kopie" title="Alle Einträge dieser Woche in die nächste Woche übernehmen"${darf.verwalten()?'':' style="margin-left:auto"'}>Woche kopieren</button>`):'<span style="margin-left:auto;color:var(--ink3);font-size:12.5px">Nur ansehen</span>'}</div>
+   ${fltLeiste()}
    ${offen&&darf.planen()?`<div class="note">${offen} Einträge aus der Excel sind nicht eindeutig und rot markiert. Antippen und Baustelle wählen.</div>`:''}
-   ${darf.planen()?`<div class="wpwrap">${leisteHTML()}<div class="wpmain">`:''}<div class="card wp${darf.planen()?'':' lesend'}"><table class="g"><thead><tr><th class="nm">Mitarbeiter</th>${tage.map((d,i)=>`<th class="${d===iso(HEUTE)?'today':''}${darf.verwalten()?' buk':''}" data-tag="${d}"${darf.verwalten()?' title="Betriebsurlaub festlegen"':''}>${WT[i]} ${dDE(d)}${FT[d]?`<span class="bubadge" style="background:#DCE3EC;color:#2F3B53">${FT[d]}</span>`:BU[d]?`<span class="bubadge">${BU[d]===1?'Betriebsurlaub':'½ Betriebsurlaub'}</span>`:''}</th>`).join('')}</tr></thead><tbody>
-   ${GR.map(g=>{const L=leute.filter(p=>p.gruppe===g); if(!L.length) return ''; return `<tr class="gr"><td colspan="6">${({Obermonteur:'Obermonteure',Monteur:'Monteure',Kundendienst:'Kundendienst',Azubi:'Auszubildende',Leiharbeiter:'Leiharbeiter',Praktikant:'Praktikanten'})[g]} · ${L.length}</td></tr>`+L.map(p=>`<tr><td class="nm"${darf.verwalten()?` data-nm="${p.id}" title="Mitarbeiter bearbeiten"`:''}><b>${esc(p.name)}</b><small>${p.tage===4?'Mo–Do':'Mo–Fr'}${p.bis?' · bis '+dDE(p.bis):''}</small></td>${tage.map((d,i)=>`<td class="${d===iso(HEUTE)?'today':''}">${zelle(p,d,i)}</td>`).join('')}</tr>`).join('')}).join('')}
+   ${darf.planen()?`<div class="wpwrap">${leisteHTML()}<div class="wpmain">`:''}<div class="card wp${darf.planen()?'':' lesend'}"><table class="g${mon?' mon':''}"><thead><tr><th class="nm">Mitarbeiter${fa?`<small style="display:block;font-weight:600">${leute.length} passend</small>`:''}</th>${kopf}</tr></thead><tbody>
+   ${leerHinweis}${GR.map(g=>{const L=leute.filter(p=>p.gruppe===g); if(!L.length) return ''; return `<tr class="gr"><td colspan="${tage.length+1}">${GR_TXT[g]} · ${L.length}</td></tr>`+L.map(zeile).join('')}).join('')}
    </tbody></table></div>${darf.planen()?'</div></div>':''}
-   ${darf.planen()?'':'<!--'}<div class="leg" style="color:var(--ink3)">Tipp: Baustellen aus der Liste links auf einen Tag ziehen oder antippen und dann Felder antippen. Einträge im Plan lassen sich ebenfalls ziehen. Mit gedrückter Strg-Taste wird kopiert. Am Handy kurz gedrückt halten, dann ziehen.</div>${darf.planen()?'':'-->'}
-   <div class="leg"><b>Besetzung diese Woche (Personentage):</b> ${Object.entries(bes).sort((a,b)=>b[1]-a[1]).map(([k,n])=>{const c=codeInfo(k);return `<span><i class="dot" style="background:${c.farbe}"></i>${esc(c.name)} ${n}</span>`}).join('')||'–'}</div>`;
-  $('#prev').onclick=()=>{WOCHE=addD(WOCHE,-7);nachladen(WOCHE).then(rWoche)}; $('#next').onclick=()=>{WOCHE=addD(WOCHE,7);nachladen(WOCHE).then(rWoche)}; $('#heute').onclick=()=>{WOCHE=montag(HEUTE);rWoche()};
-  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{FIL=b.dataset.f;rWoche()});
+   ${darf.planen()?'':'<!--'}<div class="leg" style="color:var(--ink3)">${mon?'Monatsansicht: Kürzel antippen öffnet den Eintrag, mit der Maus darauf zeigen zeigt den vollen Namen. ':''}Tipp: Baustellen aus der Liste links auf einen Tag ziehen oder antippen und dann Felder antippen. Einträge im Plan lassen sich ebenfalls ziehen. Mit gedrückter Strg-Taste wird kopiert. Am Handy kurz gedrückt halten, dann ziehen.</div>${darf.planen()?'':'-->'}
+   <div class="leg"><b>Besetzung ${mon?'in diesem Monat':'diese Woche'} (Personentage)${fa?', gefiltert':''}:</b> ${Object.entries(bes).sort((a,b)=>b[1]-a[1]).map(([k,n])=>{const c=codeInfo(k);return c?`<span><i class="dot" style="background:${c.farbe}"></i>${esc(c.name)} ${n}</span>`:''}).join('')||'–'}</div>`;
+  $('#prev').onclick=()=>blaettern(-1); $('#next').onclick=()=>blaettern(1);
+  $('#heute').onclick=()=>{ if(mon) MONAT=new Date(HEUTE.getFullYear(),HEUTE.getMonth(),1,12); else WOCHE=montag(HEUTE); blaettern(0) };
+  document.querySelectorAll('#modus [data-m]').forEach(b=>b.onclick=()=>modusSetzen(b.dataset.m));
+  document.querySelectorAll('#app [data-f]').forEach(b=>b.onclick=()=>{FIL=b.dataset.f;fltSpeichern();rWoche()});
+  fltBinden(rWoche);
   if($('#kopie')) $('#kopie').onclick=()=>{ let n=0; leute.forEach(p=>tage.forEach(d=>{const e=EIN[p.id+'|'+d]; if(e&&e.code&&e.code!=='?'){ const z=iso(addD(new Date(d+'T12:00'),7)); if(!EIN[p.id+'|'+z]&&dabei(p,z)&&!FT[z]&&BU[z]!==1){EIN[p.id+'|'+z]={...e};n++} }})); toast(n+' Einträge in KW '+(kwOf(WOCHE)+1)+' übernommen (freie Tage bleiben frei)'); };
   if(darf.planen()) document.querySelectorAll('.wp [data-p]').forEach(c=>c.addEventListener('pointerdown',ev=>ziehStart(ev,c)));
   if(darf.planen()) leisteBinden();
   if(darf.verwalten()) document.querySelectorAll('th[data-tag]').forEach(t=>t.onclick=()=>buTag(t.dataset.tag));
   if($('#mabtn')) $('#mabtn').onclick=maListe; if($('#bsbtn')) $('#bsbtn').onclick=bsListe; document.querySelectorAll('[data-nm]').forEach(t=>t.onclick=()=>maBearbeiten(+t.dataset.nm));
+  if(mon){ const t=document.querySelector('.wp th.today'); const w=$('.wp'); if(t&&w&&!rWoche._gescrollt){ rWoche._gescrollt=1; w.scrollLeft=Math.max(0,t.offsetLeft-260) } }
 }
 /* ---------- Seitenleiste: Baustellen auf Tage ziehen ---------- */
 let STEMPEL=null, LSUCH='';
@@ -398,31 +512,60 @@ function verschiebeEintraege(id,von,bis,tage){ const L=istDaten(id).filter(([,d]
   const vorher={}; Object.keys(neu).forEach(k=>vorher[k]=EIN[k]);
   Object.keys(alt).forEach(k=>delete EIN[k]); Object.assign(EIN,neu);
   return {ok,konf,undo:()=>{Object.keys(neu).forEach(k=>{if(vorher[k])EIN[k]=vorher[k];else delete EIN[k]});Object.assign(EIN,alt)}}; }
+const ZP={wochen:[13,26,52].includes(lsGet('zpw',26))?lsGet('zpw',26):26, start:null, kompakt:!!lsGet('zpk',false), nurSicht:lsGet('zps',true)!==false};
+const ZOOM={13:'3 Monate',26:'6 Monate',52:'12 Monate'};
+function zpSpringen(st){ ZP.start=st; ZP.manuell=true; const a=iso(addD(ZP.start,-7)), e=iso(addD(ZP.start,ZP.wochen*7+7)); nachladenBereich(a,e).then(rZeit); }
 function rZeit(){
-  const start=montag(addD(HEUTE,-42)), W=30, n=34; // 6 Wochen zurück, 28 Wochen voraus
-  const x=d=>Math.round((new Date(d+'T12:00')-start)/864e5/7*W);
+  if(!ZP.start) ZP.start=montag(addD(HEUTE,-7*Math.max(2,Math.round(ZP.wochen/6))));
+  const start=ZP.start, n=ZP.wochen, klein=innerWidth<700, NW=klein?150:230;
+  const breite=Math.max(300,(($('#app').clientWidth||1200)-NW-4));
+  const W=Math.max(klein?16:12,Math.floor(breite/n));
+  const vonS=iso(start), bisS=iso(addD(start,n*7-1)), h=iso(HEUTE);
+  const x=d=>Math.round((new Date(d+'T12:00')-start)/864e5/7*W), maxX=n*W;
   const ende=p=>{if(SPAN[p.id])return SPAN[p.id][1];const tt=T.filter(t=>t.p===p.id).map(t=>t.bis||t.von).filter(Boolean);return [p.bis,...tt].filter(Boolean).sort().pop()};
   const anf=p=>{if(SPAN[p.id])return SPAN[p.id][0];const tt=T.filter(t=>t.p===p.id).map(t=>t.von).filter(Boolean);return [p.von,...tt].filter(Boolean).sort()[0]};
-  const projs=D.projects.filter(p=>!FEST.includes(p.id)&&!p.klein&&(ALT||(ende(p)||'')>=iso(addD(HEUTE,-7)))).sort((a,b)=>(anf(a)||'9')<(anf(b)||'9')?-1:1);
+  const sichtbar=p=>{ const a=anf(p), b=ende(p); if(!a&&!b) return ALT; if(a&&b&&a<=bisS&&b>=vonS) return true;
+    return T.some(t=>t.p===p.id&&t.von&&t.von>=vonS&&t.von<=bisS)||istDaten(p.id).some(([,d])=>d>=vonS&&d<=bisS); };
+  const grenze=ZP.manuell&&vonS<iso(addD(HEUTE,-7))?vonS:iso(addD(HEUTE,-7)); // beim Zurückblättern auch beendete Projekte des Zeitraums zeigen
+  const alle=D.projects.filter(p=>!FEST.includes(p.id)&&!p.klein&&(ALT||(ende(p)||'')>=grenze)&&passtBau(p.id));
+  const projs=alle.filter(p=>!ZP.nurSicht||sichtbar(p)).sort((a,b)=>(anf(a)||'9')<(anf(b)||'9')?-1:1);
   // Leute je KW aus dem Wochenplan
   const last=[];for(let k=0;k<n;k++){const m=addD(start,k*7);const s=new Set();for(let i=0;i<5;i++){const d=iso(addD(m,i));D.people.forEach(p=>{const e=EIN[p.id+'|'+d];if(e&&e.code&&e.code.startsWith('p:')&&e.code!=='p:kd')s.add(p.id)})}last.push(s.size)}
-  const total=D.people.filter(p=>p.gruppe!=='Kundendienst'&&imPlan(p,iso(HEUTE),iso(HEUTE))).length;
+  const total=D.people.filter(p=>p.gruppe!=='Kundendienst'&&imPlan(p,h,h)).length||1;
   const IST={}, AUS={}; projs.forEach(p=>{ const a=anf(p), b=ende(p), wk=[...Array(n)].map(()=>new Set()), out=[...Array(n)].map(()=>false); let na=0;
     istDaten(p.id).forEach(([pid,d])=>{ const k=Math.floor((new Date(d+'T12:00')-start)/864e5/7); if(k<0||k>=n) return; wk[k].add(pid); if(!a||!b||d<a||d>b){out[k]=true;na++} });
     IST[p.id]=wk.map(x=>x.size); IST[p.id].out=out; AUS[p.id]=na; });
-  const kwHead=[...Array(n)].map((_,k)=>{const m=addD(start,k*7);return `<div class="kwc" style="left:${k*W}px;width:${W}px">${kwOf(m)}${m.getDate()<=7?`<br><span style="color:var(--ink2)">${m.toLocaleDateString('de-DE',{month:'short'})}</span>`:''}</div>`}).join('');
-  const tl=x(iso(HEUTE));
-  $('#app').innerHTML=`<div class="bar"><b style="font-size:15px">Laufende und geplante Projekte</b>${darf.planen()?'<span style="color:var(--ink3);font-size:12.5px">Balken ziehen verschiebt, rechter Rand ändert das Ende, Rauten ziehen verschiebt Termine</span>':''}<button class="chip${ALT?' on':''}" id="alt">auch abgeschlossene</button><span class="leg" style="margin:0 0 0 auto"><span><i class="dot" style="background:var(--acc);transform:rotate(45deg)"></i>Termin offen</span><span><i class="dot" style="background:var(--ok);transform:rotate(45deg)"></i>eingeplant</span><span><i class="dot" style="background:#9aa3b2;transform:rotate(45deg)"></i>entfällt</span></span></div>
-  <div class="note" style="background:var(--blueb);color:var(--blue)">Balken = geplanter Zeitraum. Zahlen darunter = Personen je KW laut Wochenplan, die passen sich automatisch an. Rot = Einsätze außerhalb des Zeitraums.</div>
-  <div class="card gantt"><div style="display:grid;grid-template-columns:230px ${n*W}px">
-   <div class="gn gh" style="z-index:6">Projekt</div><div class="gh" style="position:sticky;top:0">${kwHead}<div class="today-line" style="left:${tl}px"></div></div>
-   ${projs.map(p=>{const a=anf(p),b=ende(p);const ts=T.filter(t=>t.p===p.id&&t.art==='termin'&&t.von);return `<div class="gn"><b><i style="background:${p.farbe}"></i>${esc(p.name)}</b><small>${a?dJ(a):'–'} bis ${b?dJ(b):'offen'} · ${T.filter(t=>t.p===p.id&&t.st==='offen').length} offen${AUS[p.id]?` · <span style="color:var(--red)">${AUS[p.id]} Einsätze außerhalb</span>`:''}</small></div>
-   <div class="gr2">${a&&b?`<div class="gb${b<iso(HEUTE)?' abg':''}" data-p="${p.id}" style="left:${Math.max(0,x(a))}px;width:${Math.max(W/2,x(b)-Math.max(0,x(a))+W/5)}px;background:${p.farbe};color:${txtCol(p.farbe)}">${esc(p.name)}<span class="rz"></span></div>`:''}
-    ${ts.map((t,i)=>`<div class="ms ${t.st==='entfaellt'?'ent':t.st==='eingeplant'?'ok':'offen'}" title="${esc(t.t)} · ${dDE(t.von)}" data-t="${T.indexOf(t)}" style="left:${x(t.von)-9}px"></div>`).join('')}${IST[p.id].map((v,k)=>v?`<div class="ist${IST[p.id].out[k]?' aus':''}" style="left:${k*W+3}px;width:${W-6}px" title="KW ${kwOf(addD(start,k*7))}: ${v} Person(en) laut Wochenplan${IST[p.id].out[k]?', außerhalb des Zeitraums':''}">${v}</div>`:'').join('')}<div class="today-line" style="left:${tl}px"></div></div>`}).join('')}
+  const jede=Math.max(1,Math.ceil(24/W));
+  const kwHead=[...Array(n)].map((_,k)=>{const m=addD(start,k*7), mw=m.getDate()<=7;return `<div class="kwc${mw?' mw':''}" style="left:${k*W}px;width:${W}px">${k%jede===0?kwOf(m):''}${mw?`<br><span style="color:var(--ink2)">${m.toLocaleDateString('de-DE',{month:'short'})}${m.getMonth()===0||k===0?' '+String(m.getFullYear()).slice(2):''}</span>`:''}</div>`}).join('');
+  const tl=x(h), heuteDa=h>=vonS&&h<=bisS;
+  const ms=(t,v)=>`<div class="ms ${t.st==='entfaellt'?'ent':t.st==='eingeplant'?'ok':t.st==='erledigt'?'ok':'offen'}" title="${esc(t.t)} · ${dDE(t.von)}" data-t="${T.indexOf(t)}" style="left:${x(t.von)-9}px"></div>`;
+  const balken=(p,a,b)=>{ if(!a||!b||b<vonS||a>bisS) return ''; const l=Math.max(0,x(a)), r=Math.min(maxX,x(b)+W/5); return `<div class="gb${b<h?' abg':''}${a<vonS?' li':''}${b>bisS?' re':''}" data-p="${p.id}" title="${esc(p.name)}: ${dJ(a)} bis ${dJ(b)}" style="left:${l}px;width:${Math.max(W/2,r-l)}px;background:${p.farbe};color:${txtCol(p.farbe)}">${esc(p.name)}<span class="rz"></span></div>`; };
+  const ausgeblendet=alle.length-projs.length;
+  $('#app').innerHTML=`<div class="bar"><b style="font-size:15px">Zeitplan</b>
+   <button class="btn ic" id="zprev" title="Zurück">‹</button><div class="kw" style="min-width:170px">${start.toLocaleDateString('de-DE',{month:'short',year:'numeric'})} – ${addD(start,n*7-1).toLocaleDateString('de-DE',{month:'short',year:'numeric'})}<small>KW ${kwOf(start)} bis KW ${kwOf(addD(start,n*7-1))}</small></div><button class="btn ic" id="znext" title="Weiter">›</button><button class="btn" id="zheute">Heute</button>
+   <div class="seg" id="zoom" aria-label="Zeitraum">${Object.entries(ZOOM).map(([k,v])=>`<button data-z="${k}" class="${+k===n?'on':''}">${v}</button>`).join('')}</div>
+   ${fltKnopf()}
+   <button class="chip${ZP.kompakt?' on':''}" id="zkomp" title="Niedrigere Zeilen, mehr Projekte auf einen Blick">kompakt</button><button class="chip${ZP.nurSicht?' on':''}" id="zsicht" title="Nur Projekte mit Zeitraum, Terminen oder Einsätzen im angezeigten Zeitraum">nur im Zeitraum</button><button class="chip${ALT?' on':''}" id="alt">auch abgeschlossene</button>
+   <span class="leg" style="margin:0 0 0 auto"><span><i class="dot" style="background:var(--acc);transform:rotate(45deg)"></i>Termin offen</span><span><i class="dot" style="background:var(--ok);transform:rotate(45deg)"></i>eingeplant</span><span><i class="dot" style="background:#9aa3b2;transform:rotate(45deg)"></i>entfällt</span></span></div>
+  ${fltLeiste()}
+  <div class="note" style="background:var(--blueb);color:var(--blue)">${projs.length} Projekte${ausgeblendet?` (${ausgeblendet} ohne Bezug zum angezeigten Zeitraum ausgeblendet)`:''}. Balken = geplanter Zeitraum. Zahlen darunter = Personen je KW laut Wochenplan. Rot = Einsätze außerhalb des Zeitraums.${darf.planen()?' Balken ziehen verschiebt, rechter Rand ändert das Ende, Rauten ziehen verschiebt Termine.':''}</div>
+  <div class="card gantt${ZP.kompakt?' kompakt':''}"><div style="display:grid;grid-template-columns:${NW}px ${maxX}px">
+   <div class="gn gh" style="z-index:6">Projekt</div><div class="gh" style="position:sticky;top:0">${kwHead}${heuteDa?`<div class="today-line" style="left:${tl}px"></div>`:''}</div>
+   ${projs.map(p=>{const a=anf(p),b=ende(p);const ts=T.filter(t=>t.p===p.id&&t.art==='termin'&&t.von&&t.von>=vonS&&t.von<=bisS);return `<div class="gn" title="${esc(p.name)}"><b><i style="background:${p.farbe}"></i><span>${esc(p.name)}</span></b><small>${a?dJ(a):'–'} bis ${b?dJ(b):'offen'} · ${T.filter(t=>t.p===p.id&&t.st==='offen').length} offen${AUS[p.id]?` · <span style="color:var(--red)">${AUS[p.id]} Einsätze außerhalb</span>`:''}</small></div>
+   <div class="gr2">${balken(p,a,b)}
+    ${ts.map(t=>ms(t)).join('')}${IST[p.id].map((v,k)=>v?`<div class="ist${IST[p.id].out[k]?' aus':''}" style="left:${k*W+1}px;width:${W-2}px" title="KW ${kwOf(addD(start,k*7))}: ${v} Person(en) laut Wochenplan${IST[p.id].out[k]?', außerhalb des Zeitraums':''}">${W>=18?v:''}</div>`:'').join('')}${heuteDa?`<div class="today-line" style="left:${tl}px"></div>`:''}</div>`}).join('')}
+   ${projs.length?'':`<div class="gn" style="grid-column:1/3;color:var(--ink3)">Keine Projekte im angezeigten Zeitraum${fltAktiv()?' mit diesem Filter':''}.</div>`}
    <div class="gn" style="background:var(--s2)"><b>Montage gebunden</b><small>Personen je KW aus dem Wochenplan, von ${total}</small></div>
-   <div class="gr2" style="background:var(--s2)">${last.map((v,k)=>{const r=v/total;const c=!v?'transparent':r>.9?'#fdeceb':r>.75?'#fdeee5':'#e6f6ec';const f=r>.9?'var(--red)':r>.75?'var(--amb)':'var(--ok)';return v?`<div class="load" style="left:${k*W+2}px;width:${W-4}px;background:${c};color:${f}">${v}</div>`:''}).join('')}</div>
+   <div class="gr2" style="background:var(--s2)">${last.map((v,k)=>{const r=v/total;const c=!v?'transparent':r>.9?'#fdeceb':r>.75?'#fdeee5':'#e6f6ec';const f=r>.9?'var(--red)':r>.75?'var(--amb)':'var(--ok)';return v?`<div class="load" style="left:${k*W+1}px;width:${W-2}px;background:${c};color:${f}" title="KW ${kwOf(addD(start,k*7))}: ${v} von ${total}">${W>=18?v:''}</div>`:''}).join('')}</div>
   </div></div>`;
+  const schritt=Math.max(4,Math.round(n/2));
+  $('#zprev').onclick=()=>zpSpringen(addD(start,-7*schritt)); $('#znext').onclick=()=>zpSpringen(addD(start,7*schritt));
+  $('#zheute').onclick=()=>{ ZP.start=null; ZP.manuell=false; rZeit() };
+  document.querySelectorAll('#zoom [data-z]').forEach(b=>b.onclick=()=>{ const v=+b.dataset.z; if(v===ZP.wochen) return; ZP.wochen=v; lsSet('zpw',v); if(heuteDa){ ZP.start=null; ZP.manuell=false; const st=montag(addD(HEUTE,-7*Math.max(2,Math.round(v/6)))); nachladenBereich(iso(addD(st,-7)),iso(addD(st,v*7+7))).then(rZeit) } else zpSpringen(ZP.start) });
+  $('#zkomp').onclick=()=>{ ZP.kompakt=!ZP.kompakt; lsSet('zpk',ZP.kompakt); rZeit() };
+  $('#zsicht').onclick=()=>{ ZP.nurSicht=!ZP.nurSicht; lsSet('zps',ZP.nurSicht); rZeit() };
   $('#alt').onclick=()=>{ALT=!ALT;rZeit()};
+  fltBinden(rZeit);
   // Balken ziehen = verschieben (wochenweise), rechten Rand ziehen = Ende ändern; Rauten ziehen = Termin verschieben (tageweise)
   const ziehG=(el,onMove,onDone,onClick)=>!darf.planen()?el.addEventListener('click',onClick):el.addEventListener('pointerdown',ev=>{ ev.preventDefault(); el.setPointerCapture(ev.pointerId); const x0=ev.clientX; let dx=0;
     const mv=e=>{dx=e.clientX-x0; if(Math.abs(dx)>4) onMove(dx)}; const up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up); Math.abs(dx)>4?onDone(dx):onClick()};
@@ -430,16 +573,17 @@ function rZeit(){
   const plusTage=(d,n)=>iso(addD(new Date(d+'T12:00'),n));
   document.querySelectorAll('.gb').forEach(b=>{ const p=PR[b.dataset.p], a=anf(p), e=ende(p), l0=parseFloat(b.style.left), w0=parseFloat(b.style.width);
     ziehG(b,dx=>{ if(b._rz){ b.style.width=Math.max(W/2,w0+dx)+'px' } else b.style.left=(l0+dx)+'px' },
-      dx=>{ const wk=Math.round(dx/W)*7, alt=[a,e], altSpan=SPAN[p.id], rz=b._rz; SPAN[p.id]=rz?[a,plusTage(e,wk)]:[plusTage(a,wk),plusTage(e,wk)]; if(SPAN[p.id][1]<SPAN[p.id][0]) SPAN[p.id][1]=SPAN[p.id][0]; rZeit();
+      dx=>{ const wk=Math.round(dx/W)*7, altSpan=SPAN[p.id], rz=b._rz; SPAN[p.id]=rz?[a,plusTage(e,wk)]:[plusTage(a,wk),plusTage(e,wk)]; if(SPAN[p.id][1]<SPAN[p.id][0]) SPAN[p.id][1]=SPAN[p.id][0]; rZeit();
         const undoSpan=()=>{ if(altSpan) SPAN[p.id]=altSpan; else delete SPAN[p.id]; rZeit(); };
-        const ab=a>iso(HEUTE)?a:iso(HEUTE), n=istDaten(p.id).filter(([,d])=>d>=ab&&d<=e).length;
-        if(!rz&&wk&&n) mitVerschieben(p,ab,e,wk,undoSpan);
+        const ab=a>h?a:h, cnt=istDaten(p.id).filter(([,d])=>d>=ab&&d<=e).length;
+        if(!rz&&wk&&cnt) mitVerschieben(p,ab,e,wk,undoSpan);
         else toast(`${p.name}: ${dJ(SPAN[p.id][0])} bis ${dJ(SPAN[p.id][1])}`,undoSpan); },
       ()=>projekt(p.id));
     b.querySelector('.rz').addEventListener('pointerdown',()=>{b._rz=true;setTimeout(()=>b._rz=false,4000)},true); });
   document.querySelectorAll('.ms').forEach(m=>{ const t=T[+m.dataset.t], l0=parseFloat(m.style.left);
-    ziehG(m,dx=>{m.style.left=(l0+dx)+'px'}, dx=>{ const n=Math.round(dx/(W/7)), alt=[t.von,t.bis]; t.von=plusTage(t.von,n); if(t.bis) t.bis=plusTage(t.bis,n); rZeit(); toast(`${t.t}: ${dJ(t.von)}`,()=>{[t.von,t.bis]=alt;rZeit()}); }, ()=>projekt(t.p)); });
+    ziehG(m,dx=>{m.style.left=(l0+dx)+'px'}, dx=>{ const d=Math.round(dx/(W/7)), alt=[t.von,t.bis]; t.von=plusTage(t.von,d); if(t.bis) t.bis=plusTage(t.bis,d); rZeit(); toast(`${t.t}: ${dJ(t.von)}`,()=>{[t.von,t.bis]=alt;rZeit()}); }, ()=>projekt(t.p)); });
 }
+window.addEventListener('resize',()=>{ clearTimeout(window._zpr); window._zpr=setTimeout(()=>{ if(VIEW==='zeit'&&!$('#sh').classList.contains('on')) rZeit() },200) });
 function mitVerschieben(p,a,e,wk,undoSpan){
   const n=istDaten(p.id).filter(([,d])=>d>=a&&d<=e).length, w=Math.abs(wk/7);
   sheet(`<h3>${esc(p.name)} verschoben</h3><div class="sub">Neuer Zeitraum: ${dJ(SPAN[p.id][0])} bis ${dJ(SPAN[p.id][1])} (${wk>0?w+' Woche'+(w>1?'n':'')+' später':w+' Woche'+(w>1?'n':'')+' früher'})</div>
@@ -460,15 +604,87 @@ function anpassen(id){ const I=istDaten(id).map(x=>x[1]).sort(), alt=SPAN[id]; S
 /* ---------- Besprechung ---------- */
 const ST={offen:'offen',eingeplant:'eingeplant',erledigt:'erledigt',entfaellt:'entfällt'};
 function item(t){const i=T.indexOf(t);return `<div class="it"><div class="ty" title="${t.art==='termin'?'Termin':'Aufgabe'}">${t.art==='termin'?'◆':'✓'}</div><div><b${darf.planen()?` class="klick" onclick="punktSheet(T[${i}])"`:''}>${esc(t.t)}</b>${t.n?`<p>${esc(t.n)}</p>`:''}<div class="meta">${t.art==='termin'?(t.von?dDE(t.von)+(t.bis?' – '+dDE(t.bis):'')+' · KW '+kwOf(new Date(t.von+'T12:00')):'Termin offen'):(t.faellig?'fällig '+dDE(t.faellig):'')}${t.v?' · '+esc(t.v):''}</div></div><button class="st ${t.st}" data-st="${i}"${darf.planen()?'':' disabled'}>${ST[t.st]}</button></div>`}
+/* ---------- Einsatzplanungs-Besprechungen (je KW eine, mit Historie) ---------- */
+let BES=[], BPL=[], VERL={}, BSEL=null, BES_DB=true;
+const isoJahr=d=>addD(montag(d),3).getFullYear();
+const bAkt=()=>BES.filter(b=>!b.abg).slice(-1)[0]||null;          // jüngste offene Besprechung
+const bLetzte=()=>BES[BES.length-1]||null;
+const offenSt=s=>s==='offen'||s==='eingeplant';
+const wannTxt=t=>t.art==='termin'?(t.von?dDE(t.von)+(t.bis?' – '+dDE(t.bis):'')+' · KW '+kwOf(new Date(t.von+'T12:00')):'Termin offen'):(t.faellig?'fällig '+dDE(t.faellig):'');
+function bVorschlag(){
+  const l=bLetzte(); let d=l?addD(new Date(l.datum+'T12:00'),7):new Date(HEUTE);
+  if(d<montag(HEUTE)){ const wt=l?(new Date(l.datum+'T12:00').getDay()+6)%7:(HEUTE.getDay()+6)%7; d=addD(montag(HEUTE),Math.min(wt,4)) }
+  return iso(d);
+}
+function itemB(t,l,B){
+  const i=T.indexOf(t), st=B.abg?(l.se||t.st):t.st, auf=!B.abg&&darf.planen(), nv=(VERL[t.id]||[]).filter(v=>!/^(übernommen|angelegt)/.test(v.text)).length;
+  return `<div class="it${l.z?' zur':''}"><div class="ty" title="${t.art==='termin'?'Termin':'Aufgabe'}">${t.art==='termin'?'◆':'✓'}</div><div><b${darf.planen()?` class="klick" onclick="punktSheet(T[${i}])"`:''}>${esc(t.t)}</b>${t.n?`<p>${esc(t.n)}</p>`:''}<div class="meta">${wannTxt(t)}${t.v?' · '+esc(t.v):''}${B.abg&&st!==t.st?` · <span style="color:var(--blue)">heute: ${ST[t.st]}</span>`:''}${nv&&darf.planen()?` · <button class="vlk" onclick="punktSheet(T[${i}],null,true)">Verlauf (${nv})</button>`:''}</div></div>
+    <div class="itr"><button class="st ${st}${B.abg?' fix':''}"${auf?` data-st="${i}"`:' disabled'}${B.abg?' title="Stand beim Abschluss der Besprechung"':''}>${ST[st]}</button>${auf?`<button class="zr" data-zr="${B.id}|${t.id}" title="${l.z?'Wieder in dieser Besprechung behandeln':'Heute nicht besprechen, kommt in die nächste Besprechung'}">${l.z?'wieder aufnehmen':'zurückstellen'}</button>`:''}</div></div>`;
+}
+function bGruppen(L,B){ const ids=[...new Set(L.map(x=>x.t.p))].sort((a,b)=>((PR[a]||{}).name||'~').localeCompare((PR[b]||{}).name||'~','de'));
+  return ids.map(id=>{ const M=L.filter(x=>x.t.p===id), p=PR[id]||{name:'Ohne Baustelle',farbe:'#ccc'};
+    return `<div class="card"><div class="pr-h"><i style="background:${p.farbe}"></i><b>${esc(p.name)}</b><span style="margin-left:auto;color:var(--ink3);font-size:12.5px">${M.length} ${NUR_OFFEN?'offen':'Punkte'}</span></div>${M.map(x=>itemB(x.t,x.l,B)).join('')}</div>` }).join(''); }
+function bPunkte(B){ return BPL.filter(l=>l.b===B.id).map(l=>({l,t:T.find(t=>t.id===l.p)})).filter(x=>x.t); }
 function rBes(){
-  const ids=[...new Set(T.map(t=>t.p))].filter(id=>PR[id]).sort((a,b)=>PR[a].name.localeCompare(PR[b].name,'de'));
-  $('#app').innerHTML=`<div class="bar"><b style="font-size:15px">Besprechung KW ${kwOf(HEUTE)} · ${HEUTE.toLocaleDateString('de-DE')}</b>
-   <button class="chip${NUR_OFFEN?' on':''}" id="nof" style="margin-left:10px">nur offene</button>
-   <button class="btn" style="margin-left:auto" onclick="punktSheet(null,null)">+ Punkt</button><button class="btn pri" onclick="besprechungPdf()">Protokoll als PDF</button></div>
-   <div class="bes">${ids.map(id=>{const L=T.filter(t=>t.p===id&&(!NUR_OFFEN||t.st==='offen'));if(!L.length)return'';const p=PR[id];return `<div class="card"><div class="pr-h"><i style="background:${p.farbe}"></i><b>${esc(p.name)}</b><span style="margin-left:auto;color:var(--ink3);font-size:12.5px">${L.length} ${NUR_OFFEN?'offen':'Punkte'}</span></div>${L.map(item).join('')}</div>`}).join('')}</div>
-   <div class="leg" style="margin-top:14px">Status antippen zum Weiterschalten: offen → eingeplant → erledigt → entfällt. Titel antippen zum Bearbeiten.</div>`;
+  if(!BES.length){
+    $('#app').innerHTML=`<div class="card" style="padding:22px;max-width:620px"><b style="font-size:16px">Einsatzplanungs-Besprechungen</b><p style="margin:8px 0 14px;color:var(--ink2)">${BES_DB?'Je Kalenderwoche eine Besprechung. Offene Punkte werden in die nächste Woche übernommen, frühere Besprechungen bleiben mit Protokoll einsehbar.':'Die Datenbank-Erweiterung (planung_v2.sql) ist noch nicht eingespielt.'}</p>${darf.planen()&&BES_DB?'<button class="btn pri" id="bneu">Erste Besprechung anlegen</button>':''}</div>`;
+    if($('#bneu')) $('#bneu').onclick=besNeu; return; }
+  if(!BES.some(b=>b.id===BSEL)) BSEL=bLetzte().id;
+  const B=BES.find(b=>b.id===BSEL), idx=BES.indexOf(B), letzte=B===bLetzte(), pl=darf.planen();
+  const alle=bPunkte(B), sicht=x=>!NUR_OFFEN||(B.abg?(x.l.se||x.t.st):x.t.st)==='offen';
+  const L=alle.filter(x=>!x.l.z&&sicht(x)), Z=alle.filter(x=>x.l.z&&sicht(x));
+  const ohne=letzte?T.filter(t=>offenSt(t.st)&&!BPL.some(l=>l.p===t.id)):[];
+  const datumLang=new Date(B.datum+'T12:00').toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const erl=alle.filter(x=>(B.abg?(x.l.se||x.t.st):x.t.st)==='erledigt').length;
+  $('#app').innerHTML=`<div class="bar">
+    <button class="btn ic" id="bprev" title="Frühere Besprechung"${idx>0?'':' disabled style="opacity:.4"'}>‹</button><div class="kw" style="min-width:230px">${esc(B.titel)}<small>${datumLang} · ${B.abg?'abgeschlossen':'offen'}</small></div><button class="btn ic" id="bnext" title="Spätere Besprechung"${letzte?' disabled style="opacity:.4"':''}>›</button>
+    <select class="inp" id="bwahl" style="width:auto;height:38px" title="Alle Besprechungen">${BES.slice().reverse().map(b=>`<option value="${b.id}"${b.id===B.id?' selected':''}>${esc(b.titel)}${b.abg?'':' (offen)'}</option>`).join('')}</select>
+    <button class="chip${NUR_OFFEN?' on':''}" id="nof">nur offene</button>
+    ${pl?`<button class="btn" style="margin-left:auto" onclick="punktSheet(null,null)">+ Punkt</button><button class="btn" id="bneu">Neue Besprechung KW ${kwOf(new Date(bVorschlag()+'T12:00'))}</button>`:''}<button class="btn pri"${pl?'':' style="margin-left:auto"'} onclick="besprechungPdf()">Protokoll als PDF</button></div>
+   <div class="card bkopf"><div class="bk-z"><span>${alle.length} Punkte · ${erl} erledigt${Z.length||alle.some(x=>x.l.z)?' · '+alle.filter(x=>x.l.z).length+' zurückgestellt':''}${B.von?' · angelegt von '+esc(B.von):''}</span>
+     ${pl&&!B.abg?`<button class="btn" id="babs">Besprechung abschließen</button>`:''}${pl&&B.abg&&letzte?`<button class="btn" id="bauf">Wieder öffnen</button>`:''}</div>
+     ${!B.abg&&pl?`<div class="bk-f"><label><span class="lab">Teilnehmer</span><input class="inp" id="btn" value="${esc(B.tn)}" placeholder="z. B. Lotta, Jan, Heiko, Mandy"></label><label><span class="lab">Notiz zur Besprechung</span><textarea class="inp" id="bnotiz" placeholder="optional">${esc(B.notiz)}</textarea></label></div>`
+       :(B.tn||B.notiz?`<div class="bk-f lesend">${B.tn?`<div><span class="lab">Teilnehmer</span><div>${esc(B.tn)}</div></div>`:''}${B.notiz?`<div><span class="lab">Notiz</span><div style="white-space:pre-wrap">${esc(B.notiz)}</div></div>`:''}</div>`:'')}</div>
+   ${B.abg?`<div class="note" style="background:var(--s2);color:var(--ink2)">Abgeschlossene Besprechung: Der Status zeigt den Stand beim Abschluss. Änderungen danach stehen als „heute: …“ dabei.</div>`:''}
+   ${ohne.length&&pl?`<div class="note">${ohne.length} offene Punkte gehören noch zu keiner Besprechung.${!B.abg?' <button class="lnk" id="bohne">In diese Besprechung aufnehmen</button>':' Sie werden in die nächste Besprechung übernommen.'}</div>`:''}
+   <div class="bes">${bGruppen(L,B)||`<div class="card" style="padding:16px;color:var(--ink3)">${NUR_OFFEN?'Keine offenen Punkte.':'Keine Punkte.'}</div>`}</div>
+   ${Z.length?`<details class="zurk"${B.abg?'':' open'}><summary class="lab" style="cursor:pointer;margin:16px 0 8px">Zurückgestellt · ${Z.length} (nicht besprochen, kommen in die nächste Besprechung)</summary><div class="bes">${bGruppen(Z,B)}</div></details>`:''}
+   <div class="leg" style="margin-top:14px">${B.abg?'Titel antippen zeigt den Punkt mit Verlauf.':'Status antippen zum Weiterschalten: offen → eingeplant → erledigt → entfällt. Titel antippen zum Bearbeiten. „Zurückstellen“ nimmt einen Punkt aus dieser Besprechung, er bleibt offen.'}</div>`;
   $('#nof').onclick=()=>{NUR_OFFEN=!NUR_OFFEN;rBes()};
-  document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const t=T[+b.dataset.st];const k=Object.keys(ST);t.st=k[(k.indexOf(t.st)+1)%k.length];rBes()});
+  $('#bwahl').onchange=e=>{BSEL=e.target.value;rBes()};
+  if(idx>0) $('#bprev').onclick=()=>{BSEL=BES[idx-1].id;rBes()};
+  if(!letzte) $('#bnext').onclick=()=>{BSEL=BES[idx+1].id;rBes()};
+  if($('#bneu')) $('#bneu').onclick=besNeu;
+  if($('#btn')){ $('#btn').onchange=e=>{B.tn=e.target.value.trim();planeSpeichern()}; $('#bnotiz').onchange=e=>{B.notiz=e.target.value.trim();planeSpeichern()}; }
+  if($('#babs')) $('#babs').onclick=()=>{ sheet(`<h3>${esc(B.titel)} abschließen?</h3><div class="sub">Der aktuelle Status aller Punkte wird als Stand dieser Besprechung festgehalten. Die Punkte selbst bleiben offen und bearbeitbar.</div><p style="margin:10px 0">Tipp: Mit „Neue Besprechung“ wird die laufende automatisch abgeschlossen und alle offenen Punkte werden übernommen.</p><div class="row"><button class="btn" onclick="closeSh()">Abbrechen</button><button class="btn pri" id="babsok">Abschließen</button></div>`);
+    $('#babsok').onclick=()=>{ B.abg=true; BPL.filter(l=>l.b===B.id).forEach(l=>{const t=T.find(x=>x.id===l.p); if(t) l.se=t.st}); closeSh(); rBes(); toast(B.titel+' abgeschlossen',()=>{B.abg=false;rBes()}) } };
+  if($('#bauf')) $('#bauf').onclick=()=>{ B.abg=false; rBes(); toast(B.titel+' wieder geöffnet',()=>{B.abg=true;rBes()}) };
+  if($('#bohne')) $('#bohne').onclick=()=>{ ohne.forEach(t=>BPL.push({b:B.id,p:t.id,z:false,se:''})); rBes() };
+  document.querySelectorAll('#app [data-st]').forEach(b=>b.onclick=()=>{const t=T[+b.dataset.st];const k=Object.keys(ST);t.st=k[(k.indexOf(t.st)+1)%k.length];rBes()});
+  document.querySelectorAll('#app [data-zr]').forEach(b=>b.onclick=()=>{ const [bid,pid]=b.dataset.zr.split('|'), l=BPL.find(x=>x.b===bid&&x.p===pid); if(!l) return; l.z=!l.z; rBes(); toast(l.z?'Zurückgestellt, kommt in die nächste Besprechung':'Wieder aufgenommen',()=>{l.z=!l.z;rBes()}) });
+}
+async function speichernJetzt(){ clearTimeout(speicherTimer); while(speichertGerade) await new Promise(r=>setTimeout(r,100)); await speichern(); if(aenderungen().n) throw new Error('Änderungen konnten nicht gespeichert werden. Bitte erneut versuchen.'); }
+function besNeu(){
+  let d=bVorschlag(); const akt=bAkt(), offen=T.filter(t=>offenSt(t.st)).length;
+  const draw=()=>{ const dt=new Date(d+'T12:00'), kw=kwOf(dt), j=isoJahr(dt), l=bLetzte(), dop=BES.some(b=>b.jahr===j&&b.kw===kw), frueh=l&&(j<l.jahr||(j===l.jahr&&kw<l.kw));
+    sheet(`<h3>Neue Besprechung</h3><div class="sub">Vorschlag: die Woche nach der letzten Besprechung, gleicher Wochentag.</div>
+      <div class="lab">Datum</div><input class="inp" type="date" id="bnd" value="${d}">
+      <p style="margin:12px 0 6px;font-size:16px"><b>Besprechung KW ${kw}/${j}</b></p>
+      ${dop?'<div class="warn">Für diese Kalenderwoche gibt es schon eine Besprechung.</div>':frueh?'<div class="warn">Es gibt bereits eine spätere Besprechung.</div>':''}
+      <ul class="bl"><li>${offen} offene Punkte werden übernommen. Einzelne kannst du danach zurückstellen.</li>${akt?`<li>${esc(akt.titel)} wird abgeschlossen und bleibt mit Protokoll einsehbar.</li>`:''}<li>Erledigte und entfallene Punkte bleiben in den früheren Besprechungen.</li></ul>
+      <div class="row"><button class="btn" id="bnz">Abbrechen</button><button class="btn pri" id="bnok"${dop||frueh?' disabled style="opacity:.5"':''}>Anlegen</button></div>`);
+    $('#bnd').onchange=e=>{ d=e.target.value||d; draw() }; $('#bnz').onclick=closeSh;
+    $('#bnok').onclick=async()=>{ if(dop||frueh) return; const b=$('#bnok'); b.disabled=true; b.textContent='Wird angelegt …';
+      try{ await speichernJetzt(); const id=await rpc('pl_besprechung_neu',{p_jahr:j,p_kw:kw,p_datum:d}); await laden(); BSEL=id; closeSh(); render(); toast('Besprechung KW '+kw+'/'+j+' angelegt'); }
+      catch(e){ b.disabled=false; b.textContent='Anlegen'; toast(e.message) } }; };
+  draw();
+}
+function verlaufHTML(id,offen){
+  const L=(VERL[id]||[]).slice().reverse(), B=BPL.filter(l=>l.p===id).map(l=>{const b=BES.find(x=>x.id===l.b);return b?{b,z:l.z}:null}).filter(Boolean).sort((a,b)=>a.b.jahr-b.b.jahr||a.b.kw-b.b.kw);
+  if(!L.length&&!B.length) return '';
+  return `<details class="verl"${offen?' open':''}><summary class="lab" style="cursor:pointer">Verlauf · ${L.length} Einträge</summary>
+    ${B.length?`<div class="sub" style="margin:6px 0 4px">In Besprechung: ${B.map(x=>`KW ${x.b.kw}/${x.b.jahr}${x.z?' (zurückgestellt)':''}`).join(', ')}</div>`:''}
+    ${L.map(v=>`<div class="vz"><span>${new Date(v.ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><b>${esc(v.text)}</b><small>${esc(v.wer||'')}</small></div>`).join('')}</details>`;
 }
 /* ---------- Mein Einsatz ---------- */
 function rMe(){
@@ -492,7 +708,7 @@ function rMe(){
   document.querySelectorAll('#app [data-st]').forEach(b=>b.onclick=()=>{if(!darf.planen())return;const t=T[+b.dataset.st];const k=Object.keys(ST);t.st=k[(k.indexOf(t.st)+1)%k.length];rMe()});
 }
 /* ---------- Termine und Aufgaben bearbeiten ---------- */
-function punktSheet(t,bid){
+function punktSheet(t,bid,vOffen){
   const neu=!t, x=neu?{id:'t'+Date.now().toString(36),p:bid||'',art:'aufgabe',t:'',von:'',bis:'',faellig:'',v:'',st:'offen',n:''}:{...t};
   const projs=D.projects.filter(p=>!p.fertig||p.id===x.p).sort((a,b)=>a.name.localeCompare(b.name,'de'));
   const namen=[...new Set([...D.people.filter(p=>!p.aus).map(p=>p.name.split(/[ ,]/)[0]),...BEN.map(b=>b.name)])].sort();
@@ -507,14 +723,15 @@ function punktSheet(t,bid){
     <div class="lab">Verantwortlich</div><input class="inp" id="pvw" list="pl-namen" value="${esc(x.v)}" placeholder="z. B. Name, auch mehrere mit /"><datalist id="pl-namen">${namen.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
     <div class="lab">Status</div><div class="pick">${Object.entries(ST).map(([k,l])=>`<button data-stt="${k}" class="${x.st===k?'on':''}">${l}</button>`).join('')}</div>
     <div class="lab">Notiz</div><textarea class="inp" id="pn" placeholder="optional">${esc(x.n)}</textarea>
+    ${neu?'':verlaufHTML(t.id,vOffen)}
     <div class="row">${neu?'<button class="btn" id="pzu">Abbrechen</button>':'<button class="btn" id="pweg" style="color:#c32328">Löschen</button>'}<button class="btn pri" id="pok">Speichern</button></div>`);
     document.querySelectorAll('#sh [data-art]').forEach(b=>b.onclick=()=>{keep();x.art=b.dataset.art;draw()});
     document.querySelectorAll('#sh [data-stt]').forEach(b=>b.onclick=()=>{keep();x.st=b.dataset.stt;draw()});
     if($('#pzu')) $('#pzu').onclick=closeSh;
-    if($('#pweg')) $('#pweg').onclick=()=>{ const i=T.indexOf(t); T.splice(i,1); closeSh(); render(); toast('Punkt gelöscht',()=>{T.splice(i,0,t);render()}); };
+    if($('#pweg')) $('#pweg').onclick=()=>{ const i=T.indexOf(t), bl=BPL.filter(l=>l.p===t.id); T.splice(i,1); BPL=BPL.filter(l=>l.p!==t.id); closeSh(); render(); toast('Punkt gelöscht',()=>{T.splice(i,0,t);BPL.push(...bl);render()}); };
     $('#pok').onclick=()=>{ keep(); if(!x.p) return toast('Bitte eine Baustelle wählen'); if(!x.t) return toast('Bitte beschreiben, worum es geht');
       if(x.von&&x.bis&&x.bis<x.von) return toast('Das Enddatum liegt vor dem Start');
-      if(neu) T.push(x); else Object.assign(t,x); closeSh(); render(); toast(neu?'Punkt angelegt':'Gespeichert'); };
+      if(neu){ T.push(x); const a=bAkt(); if(a) BPL.push({b:a.id,p:x.id,z:false,se:''}) } else Object.assign(t,x); closeSh(); render(); toast(neu?'Punkt angelegt':'Gespeichert'); };
   };
   draw();
 }
@@ -526,35 +743,40 @@ async function besprechungPdf(){
     toast('PDF wird erstellt …');
     await ladeSkript('projekte/lib/jspdf.umd.min.js'); await ladeSkript('projekte/lib/jspdf.plugin.autotable.min.js');
     const logo=await ladeBild('projekte/lib/heise-logo.png');
-    const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}), B=[47,59,83], O=[226,83,4];
-    const datum=HEUTE.toLocaleDateString('de-DE'), titel='Besprechung Termine und Projekte';
+    const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}), B0=[47,59,83], O=[226,83,4];
+    const BB=BES.find(b=>b.id===BSEL)||null;
+    const datum=BB?dJ(BB.datum).replace(/\.(\d\d)$/,'.20$1'):HEUTE.toLocaleDateString('de-DE'), titel=BB?BB.titel:'Besprechung Termine und Projekte';
     const kopf=()=>{ if(logo){ const h=12, w=h*logo.w/logo.h; doc.addImage(logo.d,'PNG',196-w,10,w,h) } doc.setDrawColor(...O); doc.setLineWidth(.6); doc.line(14,25,196,25); };
     kopf();
-    doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(...B); doc.text(titel,14,18);
+    doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(...B0); doc.text(titel,14,18);
     doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(90);
-    doc.text(`KW ${kwOf(HEUTE)} · ${datum}${NUR_OFFEN?' · nur offene Punkte':''}`,14,31);
+    doc.text(`${BB?'':'KW '+kwOf(HEUTE)+' · '}${datum}${BB?(BB.abg?' · abgeschlossen':' · Stand '+HEUTE.toLocaleDateString('de-DE')):''}${NUR_OFFEN?' · nur offene Punkte':''}`,14,31);
     let y=37;
-    const ids=[...new Set(T.map(t=>t.p))].filter(id=>PR[id]).sort((a,b)=>PR[a].name.localeCompare(PR[b].name,'de'));
+    if(BB&&BB.tn){ const z=doc.splitTextToSize('Teilnehmer: '+BB.tn,182); doc.text(z,14,y); y+=z.length*4.6+1 }
+    if(BB&&BB.notiz){ const z=doc.splitTextToSize('Notiz: '+BB.notiz,182); doc.text(z,14,y); y+=z.length*4.6+1 }
+    if(BB&&(BB.tn||BB.notiz)) y+=2;
     const wann=t=>t.art==='termin'?(t.von?dJ(t.von)+(t.bis?' bis '+dJ(t.bis):''):'offen'):(t.faellig?'bis '+dJ(t.faellig):'');
-    let leer=true;
-    ids.forEach(id=>{
-      const L=T.filter(t=>t.p===id&&(!NUR_OFFEN||t.st==='offen')); if(!L.length) return; leer=false;
-      const p=PR[id], nr=nrVon(p);
-      doc.autoTable({startY:y,margin:{left:14,right:14,top:30},theme:'grid',
-        head:[[{content:p.name+(nr?'  ·  Auftrag '+nr:''),colSpan:5,styles:{fillColor:B,textColor:255,fontStyle:'bold',fontSize:10.5}}],['Art','Punkt','Wann','Verantwortlich','Status']],
-        body:L.map(t=>[t.art==='termin'?'Termin':'Aufgabe',t.t+(t.n?'\n'+t.n:''),wann(t),t.v||'',ST[t.st]]),
+    const stv=x=>BB&&BB.abg?(x.l.se||x.t.st):x.t.st;
+    const P=(BB?bPunkte(BB):T.map(t=>({t,l:{}}))).filter(x=>!NUR_OFFEN||stv(x)==='offen');
+    const tab=(L,kopfzeile,farbe)=>{ doc.autoTable({startY:y,margin:{left:14,right:14,top:30},theme:'grid',
+        head:[[{content:kopfzeile,colSpan:5,styles:{fillColor:farbe,textColor:255,fontStyle:'bold',fontSize:10.5}}],['Art','Punkt','Wann','Verantwortlich','Status']],
+        body:L.map(x=>[x.t.art==='termin'?'Termin':'Aufgabe',x.t.t+(x.t.n?'\n'+x.t.n:''),wann(x.t),x.t.v||'',ST[stv(x)]]),
         styles:{font:'helvetica',fontSize:9,cellPadding:2,lineColor:[220,224,232],lineWidth:.2,textColor:[25,30,40],valign:'top'},
-        headStyles:{fillColor:[238,240,244],textColor:B,fontStyle:'bold'},
+        headStyles:{fillColor:[238,240,244],textColor:B0,fontStyle:'bold'},
         columnStyles:{0:{cellWidth:17},1:{cellWidth:86},2:{cellWidth:27},3:{cellWidth:32},4:{cellWidth:20}},
         didDrawPage:()=>kopf()});
-      y=doc.lastAutoTable.finalY+6;
-    });
-    if(leer){ doc.setFontSize(11); doc.setTextColor(60); doc.text('Keine Punkte vorhanden.',14,y+4); }
+      y=doc.lastAutoTable.finalY+6; };
+    const haupt=P.filter(x=>!x.l.z), zur=P.filter(x=>x.l.z);
+    const ids=[...new Set(haupt.map(x=>x.t.p))].filter(id=>PR[id]).sort((a,b)=>PR[a].name.localeCompare(PR[b].name,'de'));
+    ids.forEach(id=>{ const p=PR[id], nr=nrVon(p); tab(haupt.filter(x=>x.t.p===id),p.name+(nr?'  ·  Auftrag '+nr:''),B0) });
+    if(zur.length) tab(zur.map(x=>({...x,t:{...x.t,t:(PR[x.t.p]?PR[x.t.p].name+': ':'')+x.t.t}})),'Zurückgestellt (nicht besprochen)',[132,145,163]);
+    if(!ids.length&&!zur.length){ doc.setFontSize(11); doc.setTextColor(60); doc.text('Keine Punkte vorhanden.',14,y+4); }
     const n=doc.getNumberOfPages();
     for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(130); doc.text('Heise Haustechnik GmbH & Co. KG · '+titel+' · '+datum,14,289); doc.text('Seite '+i+' von '+n,196,289,{align:'right'}); }
-    doc.save(`Besprechung_${iso(HEUTE)}.pdf`);
+    doc.save(BB?`Besprechung_KW${String(BB.kw).padStart(2,'0')}_${BB.jahr}.pdf`:`Besprechung_${iso(HEUTE)}.pdf`);
   }catch(e){ toast('PDF fehlgeschlagen: '+e.message) }
 }
+
 
 /* =====================================================================
    Anbindung an die My Heise App (Supabase)
@@ -592,42 +814,56 @@ function uebernehmen(j,von,bis){
   SERVER_ROLLE=j.rolle; BEN=j.benutzer||[]; ME_NAME=(j.me&&j.me.name)||'';
   D.people=(j.personen||[]).map(p=>({id:+p.id,name:p.name,gruppe:p.gruppe,tage:+p.tage||4,ab:p.ab||'',bis:p.bis||'',aus:!!p.aus,benutzer_id:p.benutzer_id||null}));
   for(const k in SPAN) delete SPAN[k];
-  D.projects=(j.baustellen||[]).map(b=>{ if(b.von&&b.bis) SPAN[b.id]=[b.von,b.bis]; return {id:b.id,name:b.name,farbe:b.farbe||'#8497B0',nr:b.nr||'',ort:b.ort||'',kunde:b.kunde||'',fertig:!!b.fertig,fest:!!b.fest,klein:!!b.klein} });
+  D.projects=(j.baustellen||[]).map(b=>{ if(b.von&&b.bis) SPAN[b.id]=[b.von,b.bis]; return {id:b.id,name:b.name,farbe:b.farbe||'#8497B0',nr:b.nr||'',ort:b.ort||'',kunde:b.kunde||'',fertig:!!b.fertig,fest:!!b.fest,klein:!!b.klein,groesse:b.groesse||'',gewerke:Array.isArray(b.gewerke)?b.gewerke:[]} });
   PR=Object.fromEntries(D.projects.map(p=>[p.id,p]));
   FEST.length=0; D.projects.filter(p=>p.fest).forEach(p=>FEST.push(p.id));
   APP=(j.app_projekte||[]).map(a=>({id:a.id,nr:a.nr||'',name:a.name,link:((j.baustellen||[]).find(b=>b.projekt_id===a.id)||{}).id||null}));
   EIN=Object.fromEntries((j.einsaetze||[]).map(einsatzAus));
   BU={}; (j.bu||[]).forEach(u=>BU[u.datum]=+u.anteil);
   T=(j.punkte||[]).map(t=>({id:t.id,p:t.baustelle_id||'',art:t.art,t:t.titel,von:t.von||'',bis:t.bis||'',faellig:t.faellig||'',v:t.verantwortlich||'',st:t.status,n:t.notiz||''}));
+  BES_DB=Array.isArray(j.besprechungen);
+  BES=(j.besprechungen||[]).map(b=>({id:b.id,jahr:+b.jahr,kw:+b.kw,datum:b.datum,titel:b.titel,tn:b.teilnehmer||'',notiz:b.notiz||'',abg:!!b.abgeschlossen,von:b.angelegt_von||''}));
+  BPL=(j.bp_links||[]).map(([b,p,z,se])=>({b,p,z:!!z,se:se||''}));
+  VERL={}; (j.verlauf||[]).forEach(([p,ts,wer,text])=>(VERL[p]=VERL[p]||[]).push({ts,wer,text}));
+  if(!BES.some(b=>b.id===BSEL)) BSEL=BES.length?BES[BES.length-1].id:null;
+  FLT.bs=FLT.bs.filter(id=>PR[id]);
   if(ME_ID==null||!D.people.some(x=>x.id===ME_ID)) ME_ID=j.person_id!=null?+j.person_id:null;
   GELADEN={von,bis}; LETZT=Date.now();
   SNAP=schnappschuss();
 }
 const sEin=e=>JSON.stringify([e.code,e.code2||'',e.note||'']);
 const sPer=p=>JSON.stringify([p.name,p.gruppe,p.tage,p.ab||'',p.bis||'',!!p.aus,p.benutzer_id||'']);
-const sBau=p=>JSON.stringify([p.name,p.farbe,p.nr||'',p.ort||'',p.kunde||'',(SPAN[p.id]||[])[0]||'',(SPAN[p.id]||[])[1]||'',!!p.fertig,!!p.fest,!!p.klein,(appVon(p.id)||{}).id||'']);
+const sBau=p=>JSON.stringify([p.name,p.farbe,p.nr||'',p.ort||'',p.kunde||'',(SPAN[p.id]||[])[0]||'',(SPAN[p.id]||[])[1]||'',!!p.fertig,!!p.fest,!!p.klein,(appVon(p.id)||{}).id||'',p.groesse||'',(p.gewerke||[]).join(',')]);
+const sBes=b=>JSON.stringify([b.datum,b.tn,b.notiz,b.abg]), sBpl=l=>JSON.stringify([l.z]);
 const sT=t=>JSON.stringify([t.p,t.art,t.t,t.von||'',t.bis||'',t.faellig||'',t.v||'',t.st,t.n||'']);
 function schnappschuss(){
   const m=(arr,key,f)=>Object.fromEntries(arr.map(x=>[key(x),f(x)]));
-  return { ein:Object.fromEntries(Object.entries(EIN).map(([k,e])=>[k,sEin(e)])), per:m(D.people,p=>p.id,sPer), bau:m(D.projects,p=>p.id,sBau), bu:{...BU}, t:m(T,t=>t.id,sT) };
+  return { ein:Object.fromEntries(Object.entries(EIN).map(([k,e])=>[k,sEin(e)])), per:m(D.people,p=>p.id,sPer), bau:m(D.projects,p=>p.id,sBau), bu:{...BU}, t:m(T,t=>t.id,sT), bes:m(BES,b=>b.id,sBes), bpl:m(BPL,l=>l.b+'|'+l.p,sBpl) };
 }
 
 /* ---------- Änderungen ermitteln und speichern ---------- */
 function aenderungen(){
-  const S=SNAP, P={}, neu={ein:{},per:{},bau:{},bu:{},t:{}, weg:{ein:[],per:[],bau:[],bu:[],t:[]}}; let n=0;
+  const S=SNAP, P={}, neu={ein:{},per:{},bau:{},bu:{},t:{},bes:{},bpl:{}, weg:{ein:[],per:[],bau:[],bu:[],t:[],bes:[],bpl:[]}}; let n=0;
   const add=(k,teil,x)=>{ P[k]=P[k]||{upsert:[],delete:[]}; P[k][teil].push(x); n++ };
   Object.entries(EIN).forEach(([k,e])=>{ const v=sEin(e); if(S.ein[k]!==v){ const [pid,d]=k.split('|'); add('einsaetze','upsert',{person_id:+pid,datum:d,code:e.code,code2:e.code2||'',note:e.note||''}); neu.ein[k]=v } });
   Object.keys(S.ein).forEach(k=>{ if(!EIN[k]){ const [pid,d]=k.split('|'); add('einsaetze','delete',{person_id:+pid,datum:d}); neu.weg.ein.push(k) } });
   D.people.forEach(p=>{ const v=sPer(p); if(S.per[p.id]!==v){ add('personen','upsert',{id:p.id,name:p.name,gruppe:p.gruppe,tage:p.tage,ab:p.ab||'',bis:p.bis||'',aus:!!p.aus,benutzer_id:p.benutzer_id||''}); neu.per[p.id]=v } });
   Object.keys(S.per).forEach(id=>{ if(!D.people.some(p=>String(p.id)===id)){ add('personen','delete',+id); neu.weg.per.push(id) } });
-  D.projects.forEach(p=>{ const v=sBau(p); if(S.bau[p.id]!==v){ add('baustellen','upsert',{id:p.id,name:p.name,farbe:p.farbe,nr:p.nr||'',ort:p.ort||'',kunde:p.kunde||'',von:(SPAN[p.id]||[])[0]||'',bis:(SPAN[p.id]||[])[1]||'',fertig:!!p.fertig,fest:!!p.fest,klein:!!p.klein,projekt_id:(appVon(p.id)||{}).id||''}); neu.bau[p.id]=v } });
+  D.projects.forEach(p=>{ const v=sBau(p); if(S.bau[p.id]!==v){ add('baustellen','upsert',{id:p.id,name:p.name,farbe:p.farbe,nr:p.nr||'',ort:p.ort||'',kunde:p.kunde||'',von:(SPAN[p.id]||[])[0]||'',bis:(SPAN[p.id]||[])[1]||'',fertig:!!p.fertig,fest:!!p.fest,klein:!!p.klein,projekt_id:(appVon(p.id)||{}).id||'',groesse:p.groesse||'',gewerke:p.gewerke||[]}); neu.bau[p.id]=v } });
   Object.keys(S.bau).forEach(id=>{ if(!PR[id]){ add('baustellen','delete',id); neu.weg.bau.push(id) } });
   Object.entries(BU).forEach(([d,a])=>{ if(S.bu[d]!==a){ add('bu','upsert',{datum:d,anteil:a}); neu.bu[d]=a } });
   Object.keys(S.bu).forEach(d=>{ if(BU[d]==null){ add('bu','delete',d); neu.weg.bu.push(d) } });
   T.forEach(t=>{ const v=sT(t); if(S.t[t.id]!==v){ add('punkte','upsert',{id:t.id,baustelle_id:t.p,art:t.art,titel:t.t,von:t.von||'',bis:t.bis||'',faellig:t.faellig||'',verantwortlich:t.v||'',status:t.st,notiz:t.n||''}); neu.t[t.id]=v } });
   Object.keys(S.t).forEach(id=>{ if(!T.some(t=>t.id===id)){ add('punkte','delete',id); neu.weg.t.push(id) } });
+  BES.forEach(b=>{ const v=sBes(b); if(S.bes[b.id]!==v){ add('besprechungen','upsert',{id:b.id,datum:b.datum,teilnehmer:b.tn,notiz:b.notiz,abgeschlossen:b.abg}); neu.bes[b.id]=v } });
+  BPL.forEach(l=>{ const k=l.b+'|'+l.p, v=sBpl(l); if(S.bpl[k]!==v){ add('bp_links','upsert',{besprechung_id:l.b,punkt_id:l.p,zurueckgestellt:l.z}); neu.bpl[k]=v } });
   return {n,P,neu};
 }
+// Verlauf sofort lokal ergänzen (der Server schreibt denselben Verlauf, beim nächsten Laden kommt er von dort)
+function verlaufLokal(P,altT){ const jetzt=new Date().toISOString();
+  ((P.punkte||{}).upsert||[]).forEach(u=>{ const o=altT[u.id]; let txt='angelegt';
+    if(o){ const [,,ti,von,bis,f,v,st]=JSON.parse(o); txt=[st!==u.status&&`Status ${st} → ${u.status}`,(von!==(u.von||'')||bis!==(u.bis||''))&&`Termin ${von?dDE(von):'–'} → ${u.von?dDE(u.von):'–'}`,f!==(u.faellig||'')&&`fällig ${f?dDE(f):'–'} → ${u.faellig?dDE(u.faellig):'–'}`,v!==(u.verantwortlich||'')&&`verantwortlich ${u.verantwortlich||'–'}`,ti!==u.titel&&'Titel geändert'].filter(Boolean).join('; ') }
+    if(txt) (VERL[u.id]=VERL[u.id]||[]).push({ts:jetzt,wer:ME_NAME,text:txt}); }); }
 let speichertGerade=false, nochmal=false, speicherTimer=null;
 function planeSpeichern(){ clearTimeout(speicherTimer); speicherTimer=setTimeout(speichern,350) }
 async function speichern(){
@@ -636,8 +872,10 @@ async function speichern(){
   const {n,P,neu}=aenderungen(); if(!n) return;
   speichertGerade=true; $('#speichert').classList.add('on');
   try{
+    const altT={...SNAP.t};
     await rpc('pl_speichern',{p:P});
-    ['ein','per','bau','bu','t'].forEach(k=>{ Object.assign(SNAP[k],neu[k]); neu.weg[k].forEach(x=>delete SNAP[k][x]) });
+    verlaufLokal(P,altT);
+    ['ein','per','bau','bu','t','bes','bpl'].forEach(k=>{ Object.assign(SNAP[k],neu[k]); neu.weg[k].forEach(x=>delete SNAP[k][x]) });
   }catch(e){
     toast('Nicht gespeichert: '+e.message);
     try{ await laden(); render() }catch(e2){}
@@ -653,10 +891,10 @@ window.addEventListener('beforeunload',e=>{ if(SNAP&&darf.planen()&&(speichertGe
 /* ---------- Laden ---------- */
 const bereichStd=()=>({von:iso(addD(montag(HEUTE),-56)),bis:iso(addD(HEUTE,300))});
 async function laden(){ const b=bereichStd(); const j=await rpc('pl_laden',{p_von:b.von,p_bis:b.bis}); uebernehmen(j,b.von,b.bis); }
-async function nachladen(woche){
-  const a=iso(addD(woche,-14)), e=iso(addD(woche,20));
+const nachladen=woche=>nachladenBereich(iso(addD(woche,-14)),iso(addD(woche,20)));
+async function nachladenBereich(a,e){
   if(a>=GELADEN.von&&e<=GELADEN.bis) return;
-  const von=a<GELADEN.von?iso(addD(woche,-120)):GELADEN.bis, bis=e>GELADEN.bis?iso(addD(woche,180)):GELADEN.von;
+  const von=a<GELADEN.von?iso(addD(new Date(a+'T12:00'),-90)):GELADEN.bis, bis=e>GELADEN.bis?iso(addD(new Date(e+'T12:00'),120)):GELADEN.von;
   try{
     const j=await rpc('pl_laden',{p_von:von,p_bis:bis,p_nur_einsatz:true});
     (j.einsaetze||[]).map(einsatzAus).forEach(([k,ein])=>{ if(!(k in SNAP.ein)&&!EIN[k]){ EIN[k]=ein; SNAP.ein[k]=sEin(ein) } });

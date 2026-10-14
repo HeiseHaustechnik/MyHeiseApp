@@ -812,7 +812,7 @@ function rolInfo(el) {
 let LR = {}, LR_OK = false;
 const LAGER_RECHTE = [['kommission', 'Viessmann Kommission'], ['eigen', 'Eigenes Lager'], ['rest', 'Restelager']];
 /* Zusätzliche Rollen im Kommissionslager (lager_rechte 'lagerist' / 'abrechnung'). Ohne „Lagerist“ nur ansehen. */
-const LAGER_ROLLEN = [['lagerist', 'Lagerist (Kommission buchen)', 'Ausgabe/Einlagerung buchen, Artikel bearbeiten, Inventur, Transaktionen sehen, Löschanfragen freigeben.'],
+const LAGER_ROLLEN = [['lagerist', 'Lagerist (Kommission buchen)', 'Ausgabe/Einlagerung buchen, Artikel bearbeiten, Inventur, Transaktionen sehen, Löschanfragen freigeben. Im Restelager: Reste löschen (ins Archiv) und wiederherstellen.'],
   ['abrechnung', 'Lager-Abrechnung (Preise)', 'Preise, Abrechnung und Verdienst des Kommissionslagers sehen, z. B. Buchhaltung.']];
 function lagerRechteHTML(uid, name, alle) {
   if (!LR_OK) return '';

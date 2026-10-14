@@ -1128,12 +1128,15 @@ const EL_COLS='id,interne_nr,bezeichnung,zusatz,typ,hersteller_nr,lieferant,lief
 async function loadAll(){
   try{const me=await rpc('lager_ich');S.lager=(me&&me.lager)||[];S.rolle={lagerist:!!(me&&me.lagerist),abrechnung:!!(me&&me.abrechnung)}}
   catch(e){S.lager=(await rpc('lager_meine'))||[];S.rolle={}}
+  // Restelager löschen: Lagerist (mit Restelager) oder Admin. Prüfung zusätzlich in der Datenbank (rest_loeschen).
+  S.restArchiv=false; S.rolle.restLoeschen=false;
+  if(S.lager.includes('rest')){ try{ S.rolle.restLoeschen=(await rpc('rest_darf_loeschen'))===true; S.restArchiv=true }catch(e){ S.restArchiv=false } }
   const jobs=[];
   jobs.push(darfL('eigen')?apiAll('el_artikel',`?select=${EL_COLS}&aktiv=eq.true&order=bezeichnung.asc`):Promise.resolve([]));
   jobs.push(darfL('rest')?apiAll('el_reste',`?select=*${S.rAll?'':'&aktiv=eq.true'}&order=created_at.desc`):Promise.resolve([]));
   jobs.push(darfL('kommission')?apiAll('artikel','?select=id,artikelnummer,beschreibung,lagerplatz,bestand,bemerkung,barcode&geloescht_am=is.null&order=artikelnummer.asc'):Promise.resolve([]));
   const [el,re,kom]=await Promise.all(jobs);
-  S.el=el;S.reste=re;S.kom=kom;S.loadedAt=Date.now();
+  S.el=el;S.reste=(re||[]).filter(r=>!r.geloescht_am);S.kom=kom;S.loadedAt=Date.now();
 }
 const elById=id=>S.el.find(a=>a.id===id);
 const restById=id=>S.reste.find(r=>r.id===id);
@@ -1620,7 +1623,7 @@ function viewReste(){
   <button class="hero-go teal" data-act="rNew" style="margin-top:12px"><span class="ico">${ic('camera','lg')}</span><span><small>Rest von der Baustelle, Sonderartikel</small><b>Artikel erfassen (mit Foto)</b></span>${ic('chev','chev')}</button>
   ${stSeg(S.rst,'rSt')}
   <div class="searchbar" style="margin-top:12px">${ic('search')}<input id="rrq" type="search" placeholder="Artikel suchen …" value="${esc(S.rq||'')}" aria-label="Artikel im Restelager suchen"></div>
-  <label class="switchrow" style="margin:12px 2px 0"><input type="checkbox" id="rAll" ${S.rAll?'checked':''}> Verbrauchte auch anzeigen</label>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 2px 0"><label class="switchrow" style="margin:0;flex:1"><input type="checkbox" id="rAll" ${S.rAll?'checked':''}> Verbrauchte auch anzeigen</label>${S.restArchiv&&S.rolle.restLoeschen?`<button class="btn btn-ghost btn-sm" data-act="rArchiv">${ic('trash','sm')} Gelöschte</button>`:''}</div>
   <div id="rRes">${restListHTML(list,rs)}</div>`);
   const i=$('#rrq');i.addEventListener('input',()=>{S.rq=i.value;const l=restSuche(i.value,all);$('#rRes').innerHTML=restListHTML(l,raeume(l));hydratePhotos($('#rRes'))});
   $('#rAll').addEventListener('change',async e=>{S.rAll=e.target.checked;await loadAll();viewReste()});
@@ -1647,24 +1650,61 @@ async function viewRest(id,tk){
   ${(r.fotos||[]).length?`<div class="phgrid" style="margin:12px 0">${r.fotos.map((p,i)=>`<button class="ph" data-act="openF" data-p="${esc(p)}"><img data-photo="${esc(p)}" alt="Foto ${i+1}"></button>`).join('')}</div>`:''}
   <div class="wobox teal"><div>${ic('pin')}</div><div><small>Hier liegt der Rest</small><b>${esc(ST_LANG[r.standort])}</b><span>${esc([raumOf(r),r.platz].filter(Boolean).join(' › '))}</span></div></div>
   <div class="sumtiles" style="margin-top:12px"><div class="sumtile"><small>Menge</small><b>${r.aktiv?esc(nf2(r.menge)):'0'}</b><div class="muted" style="font-size:12px">${esc(r.einheit)}</div></div><div class="sumtile"><small>Erfasst</small><b style="font-size:15px">${esc(fmtD(String(r.created_at).slice(0,10)))}</b><div class="muted" style="font-size:12px">${esc(r.erfasst_von||'')}</div></div></div>
-  <div class="actgrid" style="grid-template-columns:repeat(${BUCHEN.rest?(r.aktiv?3:2):1},1fr)">
+  ${r.geloescht_am?'':`<div class="actgrid" style="grid-template-columns:repeat(${BUCHEN.rest?(r.aktiv?3:2):1},1fr)">
     ${BUCHEN.rest&&r.aktiv?`<button class="act" data-act="rBuch" data-a="entnahme">${ic('minuscircle')}<span>Entnehmen</span></button>`:''}
     ${BUCHEN.rest?`<button class="act" data-act="rBuch" data-a="zugang">${ic('pluscircle')}<span>${r.aktiv?'Dazu':'Wieder da'}</span></button>`:''}
     <button class="act" data-act="rEdit">${ic('edit')}<span>Bearbeiten</span></button>
-  </div>
-  ${!r.aktiv?callout('gray','info','Verbraucht','Dieser Rest ist aufgebraucht und erscheint nicht mehr in der Liste.',true):''}
+  </div>`}
+  ${r.geloescht_am?callout('red','trash','Gelöscht (im Archiv)',`Am ${esc(fmtDT(r.geloescht_am))}${r.geloescht_von?' von '+esc(r.geloescht_von):''}${r.geloescht_grund?'. Grund: '+esc(r.geloescht_grund):''}. Der Eintrag erscheint nicht mehr im Restelager.`,true)
+    :!r.aktiv?callout('gray','info','Verbraucht','Dieser Rest ist aufgebraucht und erscheint nicht mehr in der Liste.',true):''}
   ${r.beschreibung||r.herkunft?`<div class="sec"><h2>Angaben</h2></div><div class="card" style="padding:6px 16px"><div class="dl">${[['Beschreibung',r.beschreibung],['Herkunft',r.herkunft]].filter(x=>x[1]).map(([l,v])=>`<div><dt>${esc(l)}</dt><dd style="white-space:pre-wrap">${esc(v)}</dd></div>`).join('')}</div></div>`:''}
   <div class="sec"><h2>Verlauf</h2></div>
   <div class="card">${verl.length?`<div class="tl">${verl.map(v=>`<div class="tl-i"><b>${esc(verlText(v,r.einheit))}</b><small>${esc(fmtDT(v.created_at))}${v.benutzer_name?' · '+esc(v.benutzer_name):''}</small></div>`).join('')}</div>`:'<p class="muted">Noch keine Einträge.</p>'}</div>
-  ${isAdmin()?`<div style="margin-top:22px"><button class="btn btn-ghost btn-block" data-act="rDelete" style="color:var(--red)">${ic('trash')} Endgültig löschen (Admin)</button></div>`:''}
+  ${r.geloescht_am?`<div style="margin-top:22px;display:grid;gap:8px">${S.rolle.restLoeschen?`<button class="btn btn-primary btn-block" data-act="rRestore" data-id="${r.id}">${ic('pluscircle')} Wiederherstellen</button>`:''}${isAdmin()?`<button class="btn btn-ghost btn-block" data-act="rHard" data-id="${r.id}" style="color:var(--red)">${ic('trash')} Endgültig löschen (Admin)</button>`:''}</div>`
+    :S.restArchiv?(S.rolle.restLoeschen?`<div style="margin-top:22px"><button class="btn btn-ghost btn-block" data-act="rDelete" style="color:var(--red)">${ic('trash')} Rest löschen</button></div>`:'')
+    :isAdmin()?`<div style="margin-top:22px"><button class="btn btn-ghost btn-block" data-act="rHard" data-id="${r.id}" style="color:var(--red)">${ic('trash')} Endgültig löschen (Admin)</button></div>`:''}
   <div style="height:8px"></div>`);
 }
 ACT.openF=el=>openFile(el.dataset.p);
 ACT.rBuch=el=>buchSheet(el.dataset.a,RD,true);
 ACT.rEdit=()=>restForm(RD);
-ACT.rDelete=()=>confirmSheet({title:'Rest löschen?',text:'Der Eintrag wird mit Verlauf und Fotos endgültig gelöscht.',ok:'Löschen',danger:true,onOk:async()=>{
-  const f=RD.fotos||[];await api('DELETE','el_reste',null,`?id=eq.${RD.id}`);f.forEach(delFile);await loadAll();location.hash='#/reste';toast('Gelöscht','ok');
+ACT.rDelete=()=>{
+  if(!S.rolle.restLoeschen)return toast('Dafür fehlt dir die Berechtigung','err');
+  const r=RD,bd=sheet({title:'Rest löschen?',body:`<p class="muted"><b>${esc(r.bezeichnung)}</b> wird aus dem Restelager entfernt und ins Archiv gelegt. Ein Lagerist oder Admin kann den Eintrag dort wiederherstellen. Wer wann gelöscht hat, wird protokolliert.</p>
+    ${field('Grund (optional)',inp('rdG','','placeholder="z. B. doppelt erfasst, entsorgt, verbaut"'))}<div class="err" id="rdErr" role="alert"></div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-danger" id="rdGo">${ic('trash')} Löschen</button>`});
+  $('#rdGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    try{await rpc('rest_loeschen',{p_id:r.id,p_grund:val(bd,'rdG')||null})}catch(e){$('#rdErr',bd).textContent=niceErr(e);return}
+    closeSheet();await loadAll();location.hash='#/reste';toast('Gelöscht. Im Archiv wiederherstellbar.','ok');
+  });
+};
+ACT.rRestore=el=>busy(el,async()=>{
+  await rpc('rest_wiederherstellen',{p_id:el.dataset.id});
+  if(SHEETS.length)closeSheet();await loadAll();toast('Wiederhergestellt','ok');location.hash='#/rest/'+el.dataset.id;route();
+});
+ACT.rHard=el=>confirmSheet({title:'Endgültig löschen?',text:'Der Eintrag wird mit Verlauf und Fotos endgültig gelöscht. Das lässt sich nicht rückgängig machen.',ok:'Endgültig löschen',danger:true,onOk:async()=>{
+  const id=el.dataset.id;let r=restById(id)||(RD&&RD.id===id?RD:null);if(!r){try{[r]=await api('GET','el_reste',null,`?id=eq.${id}&select=*`)}catch(e){}}
+  const f=(r&&r.fotos)||[];const weg=await api('DELETE','el_reste',null,`?id=eq.${id}`);
+  if(!weg.length)throw new Error('Nicht gelöscht. Endgültig löschen darf nur ein Admin.');
+  f.forEach(delFile);while(SHEETS.length)closeSheet();await loadAll();location.hash='#/reste';toast('Endgültig gelöscht','ok');
 }});
+/* Archiv: gelöschte Reste mit Wiederherstellen, dazu das Protokoll */
+ACT.rArchiv=async()=>{
+  let L=[],P=[];
+  try{[L,P]=await Promise.all([api('GET','el_reste',null,'?geloescht_am=not.is.null&select=id,bezeichnung,menge,einheit,standort,raum,geloescht_am,geloescht_von,geloescht_grund&order=geloescht_am.desc&limit=200'),
+    api('GET','el_reste_protokoll',null,'?select=*&order=created_at.desc&limit=50')])}catch(e){return toast(niceErr(e),'err')}
+  const AK={geloescht:'gelöscht',wiederhergestellt:'wiederhergestellt',endgueltig_geloescht:'endgültig gelöscht'};
+  sheet({title:'Restelager: Gelöschte',body:`
+    <p class="muted" style="margin-bottom:10px">Gelöschte Reste bleiben hier, bis ein Admin sie endgültig löscht.</p>
+    ${L.length?`<div class="list">${L.map(r=>`<div class="card" style="padding:12px 14px;margin-bottom:8px"><a href="#/rest/${r.id}" style="color:inherit;text-decoration:none"><b>${esc(r.bezeichnung)}</b></a>
+      <div class="muted" style="font-size:12.5px;margin-top:2px">${esc(mengeTxt(r.menge,r.einheit))} · ${esc([r.standort,r.raum].filter(Boolean).join(' · '))}</div>
+      <div class="muted" style="font-size:12.5px">Gelöscht ${esc(fmtDT(r.geloescht_am))}${r.geloescht_von?' von '+esc(r.geloescht_von):''}${r.geloescht_grund?' · '+esc(r.geloescht_grund):''}</div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-sm btn-primary" data-act="rRestore" data-id="${r.id}">Wiederherstellen</button>${isAdmin()?`<button class="btn btn-sm btn-ghost" data-act="rHard" data-id="${r.id}" style="color:var(--red)">Endgültig löschen</button>`:''}</div></div>`).join('')}</div>`
+      :`<div class="card">${emptyState('carton','Nichts gelöscht','Im Archiv liegen keine Reste.')}</div>`}
+    <div class="sec"><h2>Protokoll</h2><span class="muted">letzte ${P.length}</span></div>
+    <div class="card">${P.length?`<div class="tl">${P.map(p=>`<div class="tl-i"><b>${esc(p.bezeichnung||'')}: ${esc(AK[p.aktion]||p.aktion)}</b><small>${esc(fmtDT(p.created_at))}${p.benutzer_name?' · '+esc(p.benutzer_name):''}${p.grund?' · '+esc(p.grund):''}</small></div>`).join('')}</div>`:'<p class="muted">Noch keine Einträge.</p>'}</div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Schließen</button>`});
+};
 
 function restForm(r){
   const n=!r;r=r||{standort:S.rst,einheit:'Stück',menge:1,fotos:[]};
