@@ -333,6 +333,7 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 .mvor{display:grid;gap:6px}.mvor-r{background:var(--surface-2);border-radius:12px;padding:10px 12px}
 .mvor-r summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none}.mvor-r summary::-webkit-details-marker{display:none}
 .mvor-r ul{margin:8px 0 2px 18px;font-size:14px;color:var(--ink-2)}
+.ulv{display:grid;gap:4px;max-height:50vh;overflow:auto}.ulz{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid #e3e7ee;border-radius:10px;font-size:14px}.ulz.da{opacity:.55}.ulz small{display:block;color:#8491a3;font-size:12.5px}.ulz em{display:block;font-style:normal;font-size:12px;font-weight:600;color:#b54203}.ulz em.ok{color:#15803d}
 .zgst{border-radius:12px;padding:10px 12px;font-size:14px;font-weight:600;margin-bottom:12px}.zgst.ok{background:#e6f6ec;color:#15803d}.zgst.err{background:#fdeceb;color:#c32328}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
@@ -744,7 +745,7 @@ async function showZugriff() {
     ZU = users; ZM = {}; zg.forEach(z => { (ZM[z.benutzer_id] = ZM[z.benutzer_id] || {})[z.app] = z.rolle });
     const offen = zgOffen(), q = ZQ;
     root.innerHTML = `<div class="shell">
-      <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1><a class="iconbtn" href="#/mail" aria-label="E-Mail-Benachrichtigungen" title="E-Mail-Benachrichtigungen" style="margin-left:auto">${ic('mail')}</a><button class="btn btn-primary btn-sm" data-act="uNeu">${ic('plus','sm')} Neu</button></div>
+      <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1><a class="iconbtn" href="#/mail" aria-label="E-Mail-Benachrichtigungen" title="E-Mail-Benachrichtigungen" style="margin-left:auto">${ic('mail')}</a><button class="btn btn-ghost btn-sm" data-act="uListe" title="Mehrere Benutzer aus einer Excel-Liste anlegen">Liste</button><button class="btn btn-primary btn-sm" data-act="uNeu">${ic('plus','sm')} Neu</button></div>
       <div class="callout plain tone-blue">${ic('info')}<div><b>Benutzer verwalten</b><span>Tippe auf einen Benutzer, um Apps freizuschalten und Rollen zu vergeben. Änderungen gelten sofort. Über „⋯“ änderst du E-Mail und Rolle, setzt ein Passwort zurück oder löschst den Benutzer. Neue Benutzer bekommen zunächst Lagerverwaltung und Leiterprüfung.</span></div></div>
       <div class="usuche"><label class="usuche-f">${ic('search', 'sm')}<input class="inp" id="zgSuche" type="search" placeholder="Benutzer suchen" value="${esc(q)}" autocomplete="off" aria-label="Benutzer suchen"></label><span class="faint num" id="zgAnz">${users.length} Benutzer</span></div>
       <div class="ulist">${users.map(u => uRowHTML(u, offen.includes(u.id))).join('')}</div>
@@ -926,6 +927,64 @@ function uNeu() {
   };
   setTimeout(() => nm.focus(), 60);
 }
+/* Mehrere Benutzer auf einmal anlegen: Zeilen aus Excel einfügen (Name; E-Mail), Vorschau prüfen, anlegen.
+   Wer schon da ist (gleiche E-Mail oder gleicher Name), wird übersprungen. Zugangsdaten gehen per E-Mail raus. */
+function uListe() {
+  const bd = sheet('Mehrere Benutzer anlegen', `
+    <p class="muted" style="margin:2px 0 10px">Spalten „Name“ und „E-Mail“ aus Excel markieren, kopieren und hier einfügen. Name als „Nachname, Vorname“ oder „Vorname Nachname“. Wer schon einen Zugang hat, wird übersprungen.</p>
+    <textarea class="inp" id="ulTxt" rows="7" style="width:100%;font-family:inherit" placeholder="Becke, Benjamin&#9;b.becke@heise-haustechnik.de"></textarea>
+    <label class="lrecht" style="margin-top:8px"><input type="checkbox" id="ulSend" checked><span>Zugangsdaten nach dem Anlegen automatisch per E-Mail senden</span></label>
+    <div id="ulVor" style="margin-top:12px"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="ulGo" disabled>Anlegen</button>`);
+  const norm = s => (s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/ß/g, 'ss');
+  const userVon = n => { const p = n.split(/\s+/).filter(Boolean); return norm(p.length > 1 ? p[0][0] + p[p.length - 1] : p[0] || '').replace(/[^a-z0-9._-]/g, '') };
+  let L = [];
+  const lesen = () => {
+    const vorhandeneU = new Set((ZU || []).map(u => norm(u.benutzername)));
+    L = $('#ulTxt', bd).value.split(/\r?\n/).map(z => z.trim()).filter(Boolean).map(z => {
+      const t = z.split(/\t|;/).map(x => x.trim());
+      let name = t[0] || '', mail = (t.find(x => /@/.test(x)) || '').toLowerCase();
+      if (/^(mitarbeiter|name)\b/i.test(name)) return null;
+      if (name.includes(',')) { const [n, v] = name.split(',').map(x => x.trim()); name = (v + ' ' + n).trim() }
+      name = name.replace(/\s+/g, ' ');
+      const hin = [];
+      if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) hin.push('E-Mail ungültig');
+      if (mail && !/@heise-haustechnik\.de$/.test(mail)) hin.push('Domain prüfen');
+      const nach = norm(name.split(' ').pop()), lok = norm(mail.split('@')[0]).replace(/^[a-z]\./, '');
+      if (mail && nach && lok && lok !== nach) hin.push('E-Mail passt nicht zum Namen');
+      const da = (ZU || []).find(u => (mail && norm(u.email) === mail) || norm(u.name) === norm(name));
+      let user = userVon(name); if (!da) { let k = user, i = 2; while (vorhandeneU.has(k)) k = user + i++; user = k; vorhandeneU.add(user) }
+      return { name, mail, user, da, hin, an: !da && !!name && !hin.length };
+    }).filter(Boolean);
+    const neu = L.filter(x => !x.da);
+    $('#ulVor', bd).innerHTML = L.length ? `<div class="faint" style="font-size:13px;margin-bottom:6px">${neu.length} neu, ${L.length - neu.length} schon vorhanden</div>
+      <div class="ulv">${L.map((x, i) => `<label class="ulz${x.da ? ' da' : ''}"><input type="checkbox" data-ul="${i}" ${x.an ? 'checked' : ''} ${x.da ? 'disabled' : ''}><span><b>${esc(x.name)}</b><small>${x.da ? 'hat schon einen Zugang (' + esc(x.da.benutzername || x.da.name) + ')' : esc(x.user) + (x.mail ? ' · ' + esc(x.mail) : ' · ohne E-Mail')}</small>${x.hin.length && !x.da ? `<em>${esc(x.hin.join(', '))}</em>` : ''}</span></label>`).join('')}</div>` : '';
+    $$('[data-ul]', bd).forEach(c => c.onchange = () => { L[+c.dataset.ul].an = c.checked; knopf() });
+    knopf();
+  };
+  const knopf = () => { const n = L.filter(x => x.an && !x.da).length; const b = $('#ulGo', bd); b.disabled = !n; b.textContent = n ? `${n} anlegen` : 'Anlegen' };
+  $('#ulTxt', bd).oninput = lesen;
+  $('#ulGo', bd).onclick = async ev => {
+    const b = ev.currentTarget, A = L.filter(x => x.an && !x.da), send = $('#ulSend', bd).checked, erg = [];
+    b.disabled = true; $('#ulTxt', bd).disabled = true;
+    for (const [i, x] of A.entries()) {
+      b.textContent = `${i + 1} von ${A.length} …`;
+      const pw = pwVorschlag(); const r = { ...x, pw, ok: false, versand: null };
+      try { await adminFn('create_user', { benutzername: x.user, password: pw, name: x.name, email: x.mail, rolle: 'benutzer' }); r.ok = true;
+        if (x.mail && send) { try { await zugangSenden(x.mail, x.name, x.user, pw, true); r.versand = true } catch (e) { r.versand = niceErr(e) } } }
+      catch (e) { r.fehler = niceErr(e) }
+      erg.push(r);
+    }
+    closeSheet();
+    const ok = erg.filter(r => r.ok), txt = ok.map(r => `${r.name}\t${r.user}\t${r.pw}\t${r.versand === true ? 'E-Mail gesendet' : r.mail || 'ohne E-Mail'}`).join('\n');
+    const bd2 = sheet('Benutzer angelegt', `<p class="muted" style="margin:2px 0 10px">${ok.length} von ${erg.length} angelegt. Freigeschaltet sind Lagerverwaltung und Leiterprüfung, Planung und Notdienst sehen alle. Die Startpasswörter werden nur jetzt angezeigt.</p>
+      <div class="ulv">${erg.map(r => `<div class="ulz"><span><b>${esc(r.name)}</b><small>${r.ok ? esc(r.user) + ' · Startpasswort <b style="user-select:all">' + esc(r.pw) + '</b>' : 'Nicht angelegt: ' + esc(r.fehler || '')}</small>${r.ok ? (r.versand === true ? '<em class="ok">E-Mail gesendet</em>' : r.versand ? `<em>E-Mail nicht gesendet: ${esc(r.versand)}</em>` : '<em>keine E-Mail verschickt</em>') : ''}</span></div>`).join('')}</div>`,
+      `<button class="btn btn-ghost" id="ulCopy">Liste kopieren</button><button class="btn btn-primary" data-act="closeSheet">Fertig</button>`);
+    $('#ulCopy', bd2).onclick = async e => { try { await copyText(txt); e.currentTarget.textContent = 'Kopiert ✓' } catch (er) { toast('Kopieren nicht möglich', 'err') } };
+    if (location.hash === '#/zugriff') showZugriff();
+  };
+  setTimeout(() => $('#ulTxt', bd).focus(), 60);
+}
 function uMenu(el) {
   const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
   const self = u.id === ME.id;
@@ -994,7 +1053,7 @@ function uDel(el) {
 
 /* ---------- Klicks ---------- */
 const ACT = {
-  uNeu, uMenu, uMail, uRolle, uPw, uDel, uTog, rolInfo,
+  uNeu, uListe, uMenu, uMail, uRolle, uPw, uDel, uTog, rolInfo,
   pwGen(el) { const t = $('#' + el.dataset.t); if (t) t.value = pwVorschlag() },
   nvR(el) { $$('#nvRolle button').forEach(b => b.classList.toggle('on', b === el)) },
   logout, konto: kontoSheet, pw: () => { closeSheet(); pwSheet() }, closeSheet: () => closeSheet(),
