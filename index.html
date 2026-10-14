@@ -424,8 +424,11 @@ const MODULES = [
     rollen: [
       { k: 'planer', l: 'Planer', d: 'Einsätze im Wochenplan eintragen und verschieben, Termine und Aufgaben pflegen, Besprechungsprotokoll. Ohne Freischaltung: nur ansehen (Mein Einsatz, Wochenplan, Zeitplan).' },
       { k: 'verwalter', l: 'Verwaltung', d: 'Wie Planer, dazu Mitarbeiter, Baustellen, Farben und Betriebsurlaub verwalten.' }] },
-  // Notdienst liegt in planung.html (Reiter „Notdienst“). Für alle sichtbar, Rechte kommen aus der Planung, daher keine eigene Freischaltung.
-  { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', url: 'planung.html#notdienst', icon: 'bell', g: ['#e8742f', '#c94a03'], alle: true, nurKachel: true },
+  // Notdienst: eigener Bereich notdienst.html. Ansehen dürfen alle, ändern nur mit Rolle.
+  { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', url: 'notdienst.html', icon: 'bell', g: ['#e8742f', '#c94a03'], alle: true,
+    rollen: [
+      { k: 'planer', l: 'Planer', d: '1. und 2. Notdienst eintragen und tauschen. Ohne Freischaltung: nur ansehen (Einsatzplan und Infos).' },
+      { k: 'verwalter', l: 'Verwaltung', d: 'Wie Planer, dazu Notdienst-Mitarbeiter mit Handynummern und die Infos (Pauschalen, Stundensätze, Anfahrt, Zeiten, Sperrliste) bearbeiten.' }] },
   { id: 'geraete', name: 'Geräteverwaltung', desc: 'iPads, Handys, Apps, Kosten', url: 'geraete.html', icon: 'tablet', g: ['#6b7a99', '#465573'],
     rollen: [
       { k: 'verwalter', l: 'Verwalter', d: 'Geräte, Apps und Abos anlegen und ändern, Geräte mit Unterschrift ausgeben und zurücknehmen, Kosten und Fristen sehen.' },

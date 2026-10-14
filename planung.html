@@ -130,35 +130,9 @@ table.g.mon{min-width:0}
 .bl{margin:6px 0 4px 18px;font-size:13.5px;color:var(--ink2)}.bl li{margin:3px 0}
 .verl{margin-top:8px}.vz{display:grid;grid-template-columns:112px 1fr;gap:2px 10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}.vz span{color:var(--ink3)}.vz small{grid-column:2;color:var(--ink3)}
 @media(max-width:700px){.bk-f{grid-template-columns:1fr}.seg button{padding:0 9px}}
-/* v3: Notdienst */
-.ndoben{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px}
-.ndheute{padding:16px}.ndh small{color:var(--ink3);font-size:12.5px;display:block}.ndh b{font-size:17px;display:block;margin-bottom:6px}
-.ndp{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}.ndp b{font-size:15px;display:block}.ndp.gross b{font-size:17px}.ndp small{color:var(--ink3);font-size:12.5px}.ndp .ndcall{margin-left:auto;color:var(--ink);text-decoration:none;flex:none}.ndp.leer b{color:var(--red)}
-.ndb{display:inline-grid;place-items:center;min-width:24px;height:22px;border-radius:7px;font-size:12px;font-weight:800;margin-right:5px;padding:0 5px;flex:none}.ndb.n1{background:var(--acc);color:#fff}.ndb.n2{background:var(--blue);color:#fff}.ndb.lang{padding:0 9px;height:24px}
-.ndp .ndb{min-width:36px;height:36px;font-size:15px;border-radius:10px;margin:0}
-.ndich{background:var(--okb);color:var(--ok);font-size:11px;padding:1px 6px;border-radius:6px;margin-left:4px;font-weight:700}
-.ndmorgen{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.ndpaar{display:inline-flex;gap:16px;flex-wrap:wrap}.ndpaar>span{display:inline-flex;align-items:center;font-weight:650}.ndpaar.k{font-size:12.5px;gap:10px}
-.ndfehlt{color:var(--red);font-weight:700}
-.ndplan{display:grid;gap:8px}
-.ndw{background:var(--s);border-radius:14px;box-shadow:var(--sh);padding:10px 14px;display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:start}.ndw.klick{cursor:pointer}.ndw.klick:hover{box-shadow:inset 0 0 0 2px var(--brand),var(--sh)}
-.ndw.dies{box-shadow:inset 0 0 0 2px var(--acc),var(--sh)}.ndw.fehlt{background:#fff8f7}
-.ndwk b{display:block}.ndwk small{color:var(--ink3);font-size:12px}.ndjetzt{display:block;margin-top:2px;font-size:11px;font-weight:700;color:var(--acc)}
-.ndwz{padding-top:4px}.ndtage{display:grid;gap:3px}.ndtg{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;padding:1px 4px}.ndtg.heute{background:#fff3ea;border-radius:6px}.ndtg.fremd{opacity:.5}
-.ndd{min-width:84px;color:var(--ink2);font-weight:650}.ndd em{font-style:normal;color:var(--blue);font-size:11px;margin-left:4px}
-.ndnote{font-size:12px;color:var(--amb);background:var(--ambb);border-radius:6px;padding:1px 7px}.ndnote.gross{display:block;margin-top:8px;font-size:13px;padding:6px 10px}
-.ndinfos{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-items:start}
-.ndcard .pr-h{flex-wrap:wrap}.ndsub{color:var(--ink3);font-size:12px}.ndedit{margin-left:auto;height:30px;font-size:12px}
-.ndi{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:9px 16px;border-bottom:1px solid var(--line)}.ndi:last-child{border-bottom:0}.ndi b{font-size:13.5px}.ndi small{display:block;color:var(--ink3);font-size:12px;margin-top:1px}
-.ndw2{font-weight:750;white-space:nowrap;color:var(--brand);text-decoration:none}.ndw2.rot{color:var(--red);font-size:12px;background:var(--redb);padding:2px 8px;border-radius:8px}
-.nd-sperre{box-shadow:inset 3px 0 0 var(--red),var(--sh)}
-.ndall{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}.ndall .lab{display:flex;align-items:center}
-.ndform{display:grid;gap:6px;margin-top:6px}.ndfz{display:grid;grid-template-columns:100px 1fr 1fr 1.2fr;gap:6px;align-items:center}
-.ndez{display:grid;grid-template-columns:1fr 1.4fr 1fr 38px;gap:6px;margin-top:6px}
-@media(max-width:700px){.ndoben{grid-template-columns:1fr}.ndw{grid-template-columns:1fr;gap:4px}.ndfz{grid-template-columns:1fr 1fr}.ndfz .ndd,.ndfz input{grid-column:1/3}.ndez{grid-template-columns:1fr 38px}.ndez .inp{grid-column:1}.ndez button{grid-column:2;grid-row:1}.ndinfos{grid-template-columns:1fr}}
 </style></head><body>
 <div class="top"><a class="home" href="index.html" title="Zur My Heise Startseite">‹ My Heise</a><div><h1>Planung</h1><small id="wer-bin-ich">Heise Haustechnik</small></div>
-<label class="rolle" id="rolle-box" hidden>Ansicht als <select id="rolle"><option value="monteur">Monteur (nur ansehen)</option><option value="planer">Planer</option><option value="admin">Verwaltung</option></select></label><div class="tabs" id="tabs"><button data-v="woche" class="on">Wochenplan</button><button data-v="zeit">Zeitplan</button><button data-v="bes">Besprechungen</button><button data-v="nd">Notdienst</button><button data-v="me">Mein Einsatz</button></div></div>
+<label class="rolle" id="rolle-box" hidden>Ansicht als <select id="rolle"><option value="monteur">Monteur (nur ansehen)</option><option value="planer">Planer</option><option value="admin">Verwaltung</option></select></label><div class="tabs" id="tabs"><button data-v="woche" class="on">Wochenplan</button><button data-v="zeit">Zeitplan</button><button data-v="bes">Besprechungen</button><button data-v="me">Mein Einsatz</button></div></div>
 <div class="wrap" id="app"><div class="lade">Planung wird geladen …</div></div><div class="speichert" id="speichert">Speichert …</div>
 <div class="ov" id="ov"></div><div class="sh" id="sh"></div><div class="toast" id="toast"></div>
 <script>
@@ -361,7 +335,7 @@ function maEntfernen(p,n){
     toast(p.name+' entfernt',()=>{D.people.splice(i,0,p);Object.assign(EIN,weg);render();maListe()}); };
 }
 $('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;VIEW=b.dataset.v;[...$('#tabs').children].forEach(x=>x.classList.toggle('on',x===b));render()};
-function render(){ ({woche:rWoche,zeit:rZeit,bes:rBes,nd:rNd,me:rMe})[VIEW](); }
+function render(){ ({woche:rWoche,zeit:rZeit,bes:rBes,me:rMe})[VIEW](); }
 /* ---------- Wochenplan ---------- */
 function zelle(p,d,i){
   if(i>=p.tage) return `<div class="cell frei" data-p="${p.id}" data-d="${d}" data-frei="1">frei</div>`;
@@ -712,140 +686,6 @@ function verlaufHTML(id,offen){
     ${B.length?`<div class="sub" style="margin:6px 0 4px">In Besprechung: ${B.map(x=>`KW ${x.b.kw}/${x.b.jahr}${x.z?' (zurückgestellt)':''}`).join(', ')}</div>`:''}
     ${L.map(v=>`<div class="vz"><span>${new Date(v.ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><b>${esc(v.text)}</b><small>${esc(v.wer||'')}</small></div>`).join('')}</details>`;
 }
-/* ---------- Notdienst: 1. und 2. Notdienst je Tag, wichtige Infos ---------- */
-const ND={geladen:false, von:'', bis:'', P:[], D:{}, I:[], rolle:'leser', monat:new Date(HEUTE.getFullYear(),HEUTE.getMonth(),1,12), fehler:''};
-const ND_GR=[['pauschale','Notdienstpauschalen','Je Einsatz'],['stundensatz','Stundensätze im Notdienst','Außerhalb der Geschäftszeiten'],['anfahrt','Anfahrt','Einsatz Montage- und Kundendienstfahrzeug'],['zeiten','Notdienstzeiten',''],['regel','Wichtig im Notdienst',''],['sperre','Sperrliste','Nicht oder nur nach Rücksprache anfahren'],['kontakt','Erreichbarkeit bei Fragen','']];
-const ndDarf={plan:()=>['planer','verwalter','admin'].includes(ND.rolle)&&darf.planen(), verw:()=>['verwalter','admin'].includes(ND.rolle)&&darf.verwalten()};
-const ndP=id=>ND.P.find(p=>p.id===id);
-const ndName=id=>{const p=ndP(id);return p?(p.kurz||p.name):''};
-const ndTel=t=>String(t||'').replace(/[^\d+]/g,'');
-const ndIch=()=>ND.P.find(p=>p.person_id!=null&&p.person_id===ME_ID);
-const ndTag=d=>ND.D[d]||null;
-async function ndLaden(von,bis){
-  const j=await rpc('nd_laden',{p_von:von,p_bis:bis});
-  ND.rolle=j.rolle||'leser'; ND.P=(j.personen||[]).map(p=>({...p,id:+p.id,person_id:p.person_id==null?null:+p.person_id}));
-  (j.dienste||[]).forEach(([d,a,b,n])=>{ ND.D[d]={a:a==null?null:+a,b:b==null?null:+b,n:n||''} });
-  ND.I=j.infos||[]; ND.von=ND.von&&ND.von<von?ND.von:von; ND.bis=ND.bis>bis?ND.bis:bis; ND.geladen=true; ND.fehler='';
-}
-async function ndSichern(von,bis){ if(ND.geladen&&von>=ND.von&&bis<=ND.bis) return; await ndLaden(von<ND.von||!ND.von?von:ND.bis,bis>ND.bis?bis:ND.von) }
-function ndZeit(d){
-  const z=ND.I.filter(i=>i.gruppe==='zeiten'), wt=(new Date(d+'T12:00').getDay()+6)%7, frei=wt>=5||FT[d]||BU[d]===1;
-  const f=re=>(z.find(i=>re.test(i.titel))||{}).wert||'';
-  return frei?f(/wochenende|feiertag/i):wt===4?f(/freitag/i):f(/montag|donnerstag/i);
-}
-function ndPerson(id,nr,gross){
-  const p=ndP(id), ich=p&&ndIch()&&p.id===ndIch().id;
-  if(!p) return `<div class="ndp leer"><span class="ndb n${nr}">${nr}.</span><div><b>${nr}. Notdienst fehlt</b><small>bitte eintragen</small></div></div>`;
-  return `<div class="ndp${gross?' gross':''}"><span class="ndb n${nr}">${nr}.</span><div><b>${esc(p.name)}${ich?' <span class="ndich">du</span>':''}</b><small>${nr}. Notdienst${p.telefon?' · '+esc(p.telefon):''}</small></div>${p.telefon?`<a class="btn ndcall" href="tel:${ndTel(p.telefon)}">Anrufen</a>`:''}</div>`;
-}
-function ndKurz(t,klein){ if(!t) return '<span class="ndfehlt">nicht eingetragen</span>';
-  return `<span class="ndpaar${klein?' k':''}"><span><span class="ndb n1">1.</span>${t.a?esc(ndName(t.a)):'<span class="ndfehlt">fehlt</span>'}</span><span><span class="ndb n2">2.</span>${t.b?esc(ndName(t.b)):'<span class="ndfehlt">fehlt</span>'}</span></span>`; }
-function rNd(){
-  if(!ND.geladen){
-    $('#app').innerHTML=`<div class="lade">${ND.fehler?`<b style="color:var(--ink)">Notdienst konnte nicht geladen werden</b><p style="margin:8px 0 16px">${esc(ND.fehler)}</p><button class="btn pri" onclick="ND.fehler='';rNd()">Erneut versuchen</button>`:'Notdienst wird geladen …'}</div>`;
-    if(!ND.fehler) ndLaden(iso(addD(HEUTE,-200)),iso(addD(HEUTE,460))).then(()=>{ if(VIEW==='nd') rNd() }).catch(e=>{ ND.fehler=/nd_laden|function/i.test(e.message)?'Die Datenbank-Erweiterung (notdienst.sql) ist noch nicht eingespielt.':e.message; if(VIEW==='nd') rNd() });
-    return;
-  }
-  const h=iso(HEUTE), t=ndTag(h), mo=iso(addD(HEUTE,1)), tm=ndTag(mo), ich=ndIch();
-  const meine=ich?Object.keys(ND.D).filter(d=>d>=h&&(ND.D[d].a===ich.id||ND.D[d].b===ich.id)).sort():[];
-  const meineW=[]; meine.forEach(d=>{ const nr=ND.D[d].a===ich.id?1:2, w=iso(montag(new Date(d+'T12:00'))), l=meineW[meineW.length-1]; if(l&&l.w===w&&l.nr===nr&&iso(addD(new Date(l.bis+'T12:00'),1))===d) l.bis=d; else meineW.push({w,nr,von:d,bis:d}) });
-  const m=ND.monat, erster=montag(m), letzter=addD(new Date(m.getFullYear(),m.getMonth()+1,0,12),0), wochen=[];
-  for(let w=erster; w<=letzter; w=addD(w,7)) wochen.push(w);
-  const woche=w=>{ const tage=[...Array(7)].map((_,i)=>iso(addD(w,i))), T7=tage.map(ndTag), gleich=T7.every(x=>x&&T7[0]&&x.a===T7[0].a&&x.b===T7[0].b&&!x.n), dies=tage.includes(h);
-    const kopf=`<div class="ndwk"><b>KW ${kwOf(w)}</b><small>${dDE(tage[0])} – ${dDE(tage[6])}</small>${dies?'<span class="ndjetzt">diese Woche</span>':''}</div>`;
-    const inhalt=gleich?`<div class="ndwz">${ndKurz(T7[0])}</div>`:`<div class="ndtage">${tage.map((d,i)=>{const x=T7[i];return `<div class="ndtg${d===h?' heute':''}${d.slice(5,7)!==String(m.getMonth()+1).padStart(2,'0')?' fremd':''}"><span class="ndd">${['Mo','Di','Mi','Do','Fr','Sa','So'][i]} ${dDE(d)}${FT[d]?`<em>${esc(FT[d])}</em>`:''}</span>${ndKurz(x,true)}${x&&x.n?`<span class="ndnote">${esc(x.n)}</span>`:''}</div>`}).join('')}</div>`;
-    const fehlt=T7.some(x=>!x||!x.a||!x.b);
-    return `<div class="ndw${dies?' dies':''}${fehlt?' fehlt':''}${ndDarf.plan()?' klick':''}" data-ndw="${iso(w)}">${kopf}${inhalt}</div>`; };
-  const info=g=>{ const L=ND.I.filter(i=>i.gruppe===g[0]); if(!L.length&&!ndDarf.verw()) return '';
-    const zeile=i=>g[0]==='regel'?`<div class="ndi"><div><b>${esc(i.titel)}</b>${i.detail?`<small>${esc(i.detail)}</small>`:''}</div></div>`
-      :`<div class="ndi"><div><b>${esc(i.titel)}</b>${i.detail?`<small>${esc(i.detail)}</small>`:''}</div>${i.wert?(g[0]==='kontakt'?`<a class="ndw2" href="tel:${ndTel(i.wert)}">${esc(i.wert)}</a>`:`<span class="ndw2${g[0]==='sperre'?' rot':''}">${esc(i.wert)}</span>`):''}</div>`;
-    return `<div class="card ndcard nd-${g[0]}"><div class="pr-h"><b>${g[1]}</b>${g[2]?`<span class="ndsub">${g[2]}</span>`:''}${ndDarf.verw()?`<button class="btn ndedit" data-ndi="${g[0]}">Bearbeiten</button>`:''}</div>${L.map(zeile).join('')||'<p class="sub" style="padding:10px 16px">Noch nichts eingetragen.</p>'}</div>`; };
-  $('#app').innerHTML=`<div class="nd">
-   <div class="ndoben">
-    <div class="card ndheute"><div class="ndh"><small>Heute, ${HEUTE.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'})}${FT[h]?' · '+esc(FT[h]):''}</small><b>Notdienst ${esc(ndZeit(h)||'')}</b></div>
-      ${ndPerson(t&&t.a,1,true)}${ndPerson(t&&t.b,2,true)}${t&&t.n?`<div class="ndnote gross">${esc(t.n)}</div>`:''}
-      <div class="ndmorgen">Morgen${FT[mo]?' ('+esc(FT[mo])+')':''}: ${ndKurz(tm,true)}</div></div>
-    <div class="card ndmeine"><div class="pr-h"><b>${ich?'Meine nächsten Dienste':'Notdienst'}</b></div>
-      ${ich?(meineW.length?meineW.slice(0,6).map(x=>`<div class="ndi"><div><b>KW ${kwOf(new Date(x.von+'T12:00'))}</b><small>${dDE(x.von)}${x.bis!==x.von?' – '+dDE(x.bis):''}</small></div><span class="ndb n${x.nr} lang">${x.nr}. Notdienst</span></div>`).join(''):'<p class="sub" style="padding:10px 16px">Keine Dienste eingetragen.</p>')
-        :`<p class="sub" style="padding:10px 16px">${ME_ID==null?'Dein Konto ist noch mit keinem Mitarbeiter verknüpft.':'Du bist nicht im Notdienst eingeteilt.'} Urlaub ist im Plan nicht berücksichtigt: Vertretung selbst regeln und J. Schmidt Bescheid geben.</p>`}</div>
-   </div>
-   <div class="bar" style="margin-top:16px"><b style="font-size:15px">Notdienstplan</b><button class="btn ic" id="ndprev">‹</button><div class="kw" style="min-width:150px">${m.toLocaleDateString('de-DE',{month:'long',year:'numeric'})}</div><button class="btn ic" id="ndnext">›</button><button class="btn" id="ndheute">Heute</button>
-    <span class="leg" style="margin:0"><span><span class="ndb n1">1.</span>1. Notdienst</span><span><span class="ndb n2">2.</span>2. Notdienst (Rückfall)</span></span>
-    ${ndDarf.verw()?'<button class="btn" id="ndpers" style="margin-left:auto">Notdienst-Mitarbeiter</button>':''}${ndDarf.plan()?'<span class="sub" style="margin:0">Woche antippen zum Ändern</span>':''}</div>
-   <div class="ndplan">${wochen.map(woche).join('')}</div>
-   <div class="bar" style="margin-top:20px"><b style="font-size:15px">Wichtige Infos</b><span class="sub" style="margin:0">Preise zzgl. MwSt.</span></div>
-   <div class="ndinfos">${ND_GR.map(info).join('')}</div></div>`;
-  const blaettern=r=>{ ND.monat=new Date(ND.monat.getFullYear(),ND.monat.getMonth()+r,1,12); const a=iso(addD(montag(ND.monat),-7)), e=iso(addD(ND.monat,45)); ndSichern(a,e).then(rNd).catch(e2=>toast(e2.message)) };
-  $('#ndprev').onclick=()=>blaettern(-1); $('#ndnext').onclick=()=>blaettern(1); $('#ndheute').onclick=()=>{ ND.monat=new Date(HEUTE.getFullYear(),HEUTE.getMonth(),1,12); rNd() };
-  if(ndDarf.plan()) document.querySelectorAll('[data-ndw]').forEach(w=>w.onclick=()=>ndWoche(w.dataset.ndw));
-  document.querySelectorAll('[data-ndi]').forEach(b=>b.onclick=()=>ndInfoBearbeiten(b.dataset.ndi));
-  if($('#ndpers')) $('#ndpers').onclick=ndPersonen;
-}
-async function ndSpeichern(p){ $('#speichert').classList.add('on'); try{ return await rpc('nd_speichern',{p}) } finally{ $('#speichert').classList.remove('on') } }
-function ndWoche(w0){
-  const tage=[...Array(7)].map((_,i)=>iso(addD(new Date(w0+'T12:00'),i))), alt=Object.fromEntries(tage.map(d=>[d,ND.D[d]?{...ND.D[d]}:null]));
-  const X=Object.fromEntries(tage.map(d=>[d,ND.D[d]?{...ND.D[d]}:{a:null,b:null,n:''}]));
-  const akt=ND.P.filter(p=>p.aktiv||tage.some(d=>X[d].a===p.id||X[d].b===p.id));
-  const opt=(sel)=>`<option value="">–</option>${akt.map(p=>`<option value="${p.id}"${p.id===sel?' selected':''}>${esc(p.kurz||p.name)}</option>`).join('')}`;
-  const draw=()=>{ sheet(`<h3>Notdienst KW ${kwOf(new Date(w0+'T12:00'))}</h3><div class="sub">${dDE(tage[0])} – ${dDE(tage[6])}${tage[6].slice(0,4)}</div>
-    <div class="ndall"><label><span class="lab"><span class="ndb n1">1.</span> ganze Woche</span><select class="inp" id="nda">${opt(null)}</select></label><label><span class="lab"><span class="ndb n2">2.</span> ganze Woche</span><select class="inp" id="ndb">${opt(null)}</select></label></div>
-    <div class="ndform">${tage.map((d,i)=>`<div class="ndfz"><span class="ndd">${['Mo','Di','Mi','Do','Fr','Sa','So'][i]} ${dDE(d)}${FT[d]?`<em>${esc(FT[d])}</em>`:''}</span><select class="inp" data-a="${d}">${opt(X[d].a)}</select><select class="inp" data-b="${d}">${opt(X[d].b)}</select><input class="inp" data-n="${d}" value="${esc(X[d].n)}" placeholder="Notiz, z. B. Tausch"></div>`).join('')}</div>
-    <div class="row"><button class="btn" id="ndzu">Abbrechen</button><button class="btn" id="ndtausch" title="1. und 2. Notdienst in dieser Woche tauschen">1. ↔ 2. tauschen</button><button class="btn pri" id="ndok">Speichern</button></div>`);
-    const lesen=()=>tage.forEach(d=>{ X[d].a=+$(`[data-a="${d}"]`).value||null; X[d].b=+$(`[data-b="${d}"]`).value||null; X[d].n=$(`[data-n="${d}"]`).value.trim() });
-    $('#nda').onchange=e=>{ lesen(); tage.forEach(d=>X[d].a=+e.target.value||null); draw() };
-    $('#ndb').onchange=e=>{ lesen(); tage.forEach(d=>X[d].b=+e.target.value||null); draw() };
-    $('#ndtausch').onclick=()=>{ lesen(); tage.forEach(d=>{ const a=X[d].a; X[d].a=X[d].b; X[d].b=a }); draw() };
-    $('#ndzu').onclick=closeSh;
-    $('#ndok').onclick=async()=>{ lesen();
-      const dop=tage.find(d=>X[d].a&&X[d].a===X[d].b); if(dop) return toast(`Am ${dDE(dop)} ist dieselbe Person 1. und 2. Notdienst`);
-      const up=[], del=[]; tage.forEach(d=>{ const x=X[d], o=alt[d]; const gleich=o&&o.a===x.a&&o.b===x.b&&o.n===x.n; if(gleich||(!o&&!x.a&&!x.b&&!x.n)) return;
-        if(!x.a&&!x.b&&!x.n) del.push(d); else up.push({datum:d,erster:x.a||'',zweiter:x.b||'',notiz:x.n}) });
-      if(!up.length&&!del.length) return closeSh();
-      try{ await ndSpeichern({dienste:{upsert:up,delete:del}}); tage.forEach(d=>{ const x=X[d]; if(!x.a&&!x.b&&!x.n) delete ND.D[d]; else ND.D[d]={...x} }); closeSh(); rNd();
-        toast('Notdienst KW '+kwOf(new Date(w0+'T12:00'))+' gespeichert',async()=>{ const u2=[],d2=[]; tage.forEach(d=>{ const o=alt[d]; if(o) u2.push({datum:d,erster:o.a||'',zweiter:o.b||'',notiz:o.n}); else d2.push(d) });
-          try{ await ndSpeichern({dienste:{upsert:u2,delete:d2}}); tage.forEach(d=>{ if(alt[d]) ND.D[d]=alt[d]; else delete ND.D[d] }); rNd() }catch(e){ toast('Rückgängig fehlgeschlagen: '+e.message) } });
-      }catch(e){ toast('Nicht gespeichert: '+e.message) } }; };
-  draw();
-}
-function ndInfoBearbeiten(g){
-  const gr=ND_GR.find(x=>x[0]===g); let R=ND.I.filter(i=>i.gruppe===g).map(i=>({titel:i.titel,detail:i.detail,wert:i.wert}));
-  const ph={pauschale:['z. B. Mit Wartungsvertrag','Zusatz','40,00 € + MwSt.'],stundensatz:['z. B. Samstag','z. B. 6 bis 20 Uhr','99,50 € + MwSt.'],anfahrt:['z. B. Zone I','Orte','19,95 € + MwSt.'],zeiten:['z. B. Freitag','','13 bis 22 Uhr'],regel:['Kurz, worum es geht','Erklärung',''],sperre:['Name / Firma','Adresse','nicht anfahren'],kontakt:['Name','Funktion','Telefon']}[g];
-  const draw=()=>{ sheet(`<h3>${gr[1]}</h3><div class="sub">Gilt sofort für alle. Leere Zeilen werden nicht gespeichert.</div>
-    <div class="ndedz">${R.map((r,i)=>`<div class="ndez"><input class="inp" data-f="titel" data-i="${i}" value="${esc(r.titel)}" placeholder="${ph[0]}"><input class="inp" data-f="detail" data-i="${i}" value="${esc(r.detail)}" placeholder="${ph[1]||'optional'}">${g==='regel'?'':`<input class="inp" data-f="wert" data-i="${i}" value="${esc(r.wert)}" placeholder="${ph[2]}">`}<button class="btn ic" data-weg="${i}" title="Zeile entfernen">×</button></div>`).join('')}</div>
-    <button class="btn" id="ndplus" style="margin-top:8px">+ Zeile</button>
-    <div class="row"><button class="btn" id="ndzu">Abbrechen</button><button class="btn pri" id="ndok">Speichern</button></div>`);
-    const lesen=()=>document.querySelectorAll('#sh [data-f]').forEach(e=>R[+e.dataset.i][e.dataset.f]=e.value);
-    $('#ndplus').onclick=()=>{ lesen(); R.push({titel:'',detail:'',wert:''}); draw() };
-    document.querySelectorAll('#sh [data-weg]').forEach(b=>b.onclick=()=>{ lesen(); R.splice(+b.dataset.weg,1); draw() });
-    $('#ndzu').onclick=closeSh;
-    $('#ndok').onclick=async()=>{ lesen(); try{ await ndSpeichern({infos:{gruppe:g,rows:R}}); ND.I=ND.I.filter(i=>i.gruppe!==g).concat(R.filter(r=>r.titel.trim()||r.wert.trim()).map((r,i)=>({gruppe:g,...r,sort:i+1}))); closeSh(); rNd(); toast(gr[1]+' gespeichert') }catch(e){ toast('Nicht gespeichert: '+e.message) } }; };
-  draw();
-}
-function ndPersonen(){
-  const L=ND.P.slice().sort((a,b)=>(b.aktiv-a.aktiv)||a.sort-b.sort||a.name.localeCompare(b.name,'de'));
-  sheet(`<h3>Notdienst-Mitarbeiter</h3><div class="sub">Kurzname erscheint im Plan, die Nummer zum Anrufen. Verknüpfung mit der Planung zeigt „Meine nächsten Dienste“.</div>
-    ${L.map(p=>`<div class="marow${p.aktiv?'':' weg'}"><button class="maname" data-ndp="${p.id}"><b>${esc(p.name)}</b><small>${esc(p.kurz)}${p.telefon?' · '+esc(p.telefon):' · keine Nummer'}${p.person_id&&D.people.find(x=>x.id===p.person_id)?'':' · nicht verknüpft'}${p.aktiv?'':' · nicht im Notdienst'}</small></button></div>`).join('')}
-    <div class="row"><button class="btn" onclick="closeSh()">Schließen</button><button class="btn pri" id="ndneu">+ Mitarbeiter</button></div>`);
-  document.querySelectorAll('#sh [data-ndp]').forEach(b=>b.onclick=()=>ndPersonBearbeiten(ND.P.find(p=>p.id===+b.dataset.ndp)));
-  $('#ndneu').onclick=()=>ndPersonBearbeiten(null);
-}
-function ndPersonBearbeiten(p){
-  const neu=!p, x=neu?{name:'',kurz:'',telefon:'',person_id:null,aktiv:true,sort:ND.P.length}:{...p};
-  sheet(`<h3>${neu?'Notdienst-Mitarbeiter hinzufügen':esc(x.name)}</h3>
-    <div class="lab">Mitarbeiter aus der Planung</div><select class="inp" id="npv"><option value="">nicht verknüpft</option>${D.people.filter(q=>!q.aus||q.id===x.person_id).sort((a,b)=>a.name.localeCompare(b.name,'de')).map(q=>`<option value="${q.id}"${q.id===x.person_id?' selected':''}>${esc(q.name)}</option>`).join('')}</select>
-    <div class="lab">Name</div><input class="inp" id="npn" value="${esc(x.name)}" placeholder="Vorname Nachname">
-    <div class="lab">Kurzname im Plan</div><input class="inp" id="npk" value="${esc(x.kurz)}" placeholder="z. B. N. Frister">
-    <div class="lab">Handynummer im Notdienst</div><input class="inp" id="npt" type="tel" value="${esc(x.telefon)}" placeholder="+49 …">
-    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="npa"${x.aktiv?' checked':''}> Im Notdienst (zur Auswahl im Plan)</label>
-    <div class="row"><button class="btn" id="npz">Zurück</button><button class="btn pri" id="npok">Speichern</button></div>`);
-  $('#npv').onchange=e=>{ const q=D.people.find(y=>y.id===+e.target.value); if(q&&!$('#npn').value.trim()) $('#npn').value=q.name; if(q&&!$('#npk').value.trim()){ const t=q.name.split(' '); $('#npk').value=t.length>1?t[0][0]+'. '+t.slice(1).join(' '):q.name } };
-  $('#npz').onclick=ndPersonen;
-  $('#npok').onclick=async()=>{ x.name=$('#npn').value.trim(); x.kurz=$('#npk').value.trim(); x.telefon=$('#npt').value.trim(); x.person_id=+$('#npv').value||null; x.aktiv=$('#npa').checked;
-    if(!x.name) return toast('Bitte einen Namen eingeben');
-    try{ const r=await ndSpeichern({personen:{upsert:[{id:neu?'':x.id,name:x.name,kurz:x.kurz,telefon:x.telefon,person_id:x.person_id||'',aktiv:x.aktiv,sort:x.sort}]}});
-      if(neu){ x.id=+((r&&r.neue_personen)||[])[0]; ND.P.push(x) } else Object.assign(p,x); ndPersonen(); rNd(); toast('Gespeichert') }catch(e){ toast('Nicht gespeichert: '+e.message) } };
-}
-
 /* ---------- Mein Einsatz ---------- */
 function rMe(){
   const wahl=D.people.filter(x=>!x.aus&&dabei(x,iso(HEUTE))).sort((a,b)=>a.name.localeCompare(b.name,'de'));
@@ -1076,7 +916,6 @@ document.addEventListener('visibilitychange',async()=>{
     ROLLE=SERVER_ROLLE==='leser'?'monteur':SERVER_ROLLE==='planer'?'planer':'admin';
     if(ROLLE==='admin') $('#rolle-box').hidden=false;
     if(ROLLE==='monteur'){ VIEW='me'; [...$('#tabs').children].forEach(x=>x.classList.toggle('on',x.dataset.v==='me')) }
-    if(location.hash==='#notdienst'){ VIEW='nd'; [...$('#tabs').children].forEach(x=>x.classList.toggle('on',x.dataset.v==='nd')) }
     rolleSetzen(ROLLE);
   }catch(e){
     $('#app').innerHTML=`<div class="lade"><b style="color:var(--ink)">Planung konnte nicht geladen werden</b><p style="margin:8px 0 16px">${esc(e.message)}</p><button class="btn pri" onclick="location.reload()">Erneut versuchen</button></div>`;

@@ -1,0 +1,396 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Notdienst – My Heise App</title><meta name="theme-color" content="#2f3b53"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon.png">
+<style>
+:root{--bg:#f4f5f8;--s:#fff;--s2:#eef0f4;--ink:#0d1524;--ink2:#485468;--ink3:#8491a3;--line:#e3e7ee;--brand:#2f3b53;--acc:#e25304;--ok:#15803d;--okb:#e6f6ec;--red:#c32328;--redb:#fdeceb;--amb:#b54203;--ambb:#fdeee5;--blue:#2c60a7;--blueb:#e8effe;--sh:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16)}
+*{box-sizing:border-box;margin:0;padding:0}body{font:14px/1.45 Montserrat,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}input,select,textarea{font:inherit}
+.top{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1{font-size:17px;letter-spacing:-.01em}.top small{opacity:.7;font-size:12px;display:block;font-weight:500}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.1);padding:4px;border-radius:12px;margin-left:auto}
+.tabs button{padding:7px 14px;border-radius:9px;font-weight:650;font-size:13.5px;color:#dfe4ee}.tabs button.on{background:#fff;color:var(--brand)}
+.wrap{padding:14px 16px 60px;max-width:1500px;margin:0 auto}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:11px;background:var(--s);box-shadow:var(--sh);font-weight:650;font-size:13.5px}
+.btn.pri{background:var(--acc);color:#fff}.btn.ic{width:38px;padding:0;justify-content:center;font-size:18px}
+.kw{font-weight:750;font-size:16px;min-width:200px;text-align:center}.kw small{display:block;font-weight:500;color:var(--ink3);font-size:12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{height:30px;padding:0 12px;border-radius:15px;background:var(--s);box-shadow:inset 0 0 0 1px var(--line);font-size:12.5px;font-weight:650;color:var(--ink2)}.chip.on{background:var(--brand);color:#fff;box-shadow:none}
+.card{background:var(--s);border-radius:16px;box-shadow:var(--sh);overflow:hidden}
+.note{background:var(--ambb);color:var(--amb);border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:12px}
+/* Wochenplan */
+.wp{overflow:auto;max-height:calc(100vh - 190px)}
+table.g{border-collapse:separate;border-spacing:0;width:100%;min-width:760px}
+.g th,.g td{border-bottom:1px solid var(--line);padding:4px}
+.g thead th{position:sticky;top:0;background:var(--s);z-index:3;font-size:12px;color:var(--ink3);font-weight:700;text-align:left;padding:8px 6px}
+.g thead th.today{color:var(--acc)}
+.g .nm{position:sticky;left:0;background:var(--s);z-index:2;min-width:170px;max-width:190px;padding:6px 10px;border-right:1px solid var(--line)}
+.g thead .nm{z-index:4}
+.nm b{display:block;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nm small{color:var(--ink3);font-size:11.5px}
+.g tr.gr td{background:var(--s2);font-size:11px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);padding:6px 10px;position:sticky;left:0}
+.cell{height:40px;border-radius:9px;display:flex;flex-direction:column;justify-content:center;padding:0 8px;font-size:12px;font-weight:700;line-height:1.15;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:transform .08s}
+.cell:hover{transform:scale(1.02)}.cell small{font-weight:500;font-size:10.5px;opacity:.85;overflow:hidden;text-overflow:ellipsis}
+.cell.leer{background:transparent;box-shadow:inset 0 0 0 1px dashed var(--line);border:1px dashed var(--line);color:var(--ink3);font-weight:500;align-items:center}
+.cell.frei{background:repeating-linear-gradient(45deg,#f1f2f5,#f1f2f5 6px,#e9ebf0 6px,#e9ebf0 12px);cursor:default;color:var(--ink3);font-weight:500;align-items:center}
+.cell.unk{background:#fff;box-shadow:inset 0 0 0 2px var(--red);color:var(--red)}
+.cell.zwei{background-image:linear-gradient(135deg,transparent 50%,var(--c2) 50%)}
+.g td.today{background:#fff8f3}
+.sum td{font-size:11.5px;color:var(--ink2)}
+/* Zeitplan */
+.gantt{overflow:auto;max-height:calc(100vh - 190px)}
+.gt{display:grid;position:relative}
+.gh{position:sticky;top:0;z-index:5;background:var(--s);font-size:11px;color:var(--ink3);font-weight:700;border-bottom:1px solid var(--line);height:44px}
+.gn{position:sticky;left:0;z-index:4;background:var(--s);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 10px;display:flex;flex-direction:column;justify-content:center}
+.gn b{font-size:13px;display:flex;align-items:center;gap:6px}.gn b i{width:10px;height:10px;border-radius:3px;flex:none}.gn small{font-size:11px;color:var(--ink3)}
+.gr2{position:relative;border-bottom:1px solid var(--line);height:52px}.ist{position:absolute;top:35px;height:13px;border-radius:4px;background:#e8ecf2;color:#2F3B53;font-size:9.5px;font-weight:750;display:flex;align-items:center;justify-content:center;line-height:1}.ist.aus{background:#fdeceb;color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
+.gb{position:absolute;top:6px;height:26px;border-radius:7px;font-size:11.5px;font-weight:700;color:#0d1524;padding:0 8px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.gb.abg{opacity:.45}
+.ms{position:absolute;top:9px;width:18px;height:18px;transform:rotate(45deg);border-radius:3px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer;z-index:2}
+.ms.offen{background:var(--acc)}.ms.ok{background:var(--ok)}.ms.ent{background:#9aa3b2}
+.today-line{position:absolute;top:0;bottom:0;width:2px;background:var(--acc);z-index:3;pointer-events:none}
+.kwc{position:absolute;top:0;height:100%;border-left:1px solid var(--line);font-size:10.5px;padding:4px 0 0 4px}
+.load{font-size:11px;font-weight:750;text-align:center;border-radius:6px;position:absolute;top:10px;height:26px;display:flex;align-items:center;justify-content:center}
+/* Besprechung */
+.bes{display:grid;gap:12px}.pr-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}.pr-h i{width:12px;height:12px;border-radius:4px}.pr-h b{font-size:15px}
+.it{display:grid;grid-template-columns:28px 1fr auto;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);align-items:start}.it:last-child{border-bottom:0}
+.it .ty{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:14px;background:var(--s2)}
+.it b{font-weight:700}.it p{color:var(--ink2);font-size:13px;margin-top:2px}.it .meta{font-size:12px;color:var(--ink3);margin-top:3px}
+.st{height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:700;white-space:nowrap}
+.st.offen{background:var(--ambb);color:var(--amb)}.st.eingeplant{background:var(--blueb);color:var(--blue)}.st.erledigt{background:var(--okb);color:var(--ok)}.st.entfaellt{background:var(--s2);color:var(--ink3)}
+/* Mein Einsatz */
+.me{max-width:460px;margin:0 auto;display:grid;gap:12px}
+.today{border-radius:18px;padding:18px;color:#fff;background:var(--brand)}.today small{opacity:.8}.today h2{font-size:22px;margin:4px 0}
+.dl{display:grid}.dl>div{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}.dl>div:last-child{border-bottom:0}
+.dl .d{width:46px;text-align:center;font-weight:750}.dl .d small{display:block;font-weight:500;color:var(--ink3);font-size:11px}
+.dot{width:12px;height:12px;border-radius:4px;flex:none}
+/* Sheet */
+.ov{position:fixed;inset:0;background:rgba(13,21,36,.4);z-index:50;display:none}.ov.on{display:block}
+.sh{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:min(560px,100%);max-height:86vh;overflow:auto;background:var(--s);border-radius:20px 20px 0 0;z-index:51;padding:18px 18px 24px;transition:transform .2s}.sh.on{transform:translate(-50%,0)}
+.sh h3{font-size:17px;margin-bottom:4px}.sh .sub{color:var(--ink3);font-size:13px;margin-bottom:12px}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin:8px 0 12px}
+.pick button{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;background:var(--s2);font-weight:650;font-size:12.5px;text-align:left}.pick button.on{box-shadow:inset 0 0 0 2px var(--brand);background:#fff}
+.lab{font-size:11.5px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
+.inp{width:100%;height:40px;border-radius:10px;border:1px solid var(--line);padding:0 12px;background:#fff}
+textarea.inp{height:64px;padding:8px 12px}
+.row{display:flex;gap:8px;margin-top:12px}.row .btn{flex:1;justify-content:center}
+.leg{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-top:10px}.leg span{display:flex;align-items:center;gap:5px}
+.ghost{position:fixed;z-index:70;pointer-events:none;opacity:.92;box-shadow:0 12px 28px -8px rgba(13,21,36,.45);transform:rotate(-2deg)}
+.cell.drop{box-shadow:inset 0 0 0 3px var(--acc)!important}.cell.dragsrc{opacity:.35}
+.gb{touch-action:none;user-select:none}.gb .rz{position:absolute;right:0;top:0;bottom:0;width:9px;cursor:ew-resize;background:rgba(0,0,0,.12)}
+.ms{touch-action:none}.cell{touch-action:pan-x pan-y;user-select:none;-webkit-user-select:none}
+.toast button{color:#ffc79a;font-weight:750;margin-left:12px;text-decoration:underline}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 16px;border-radius:12px;font-weight:650;z-index:60;display:none}
+@media(max-width:700px){.tabs{margin-left:0;width:100%;overflow:auto}.tabs button{padding:7px 10px;font-size:12.5px}.kw{min-width:0}}
+.marow{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}.marow.weg{opacity:.5}.maname{flex:1;text-align:left;background:none;border:0;padding:9px 2px;font:inherit;cursor:pointer;color:inherit}.maname small{display:block;color:var(--ink3);font-size:12px}td.nm[data-nm]{cursor:pointer}td.nm[data-nm]:hover b{text-decoration:underline}
+.rolle{display:flex;align-items:center;gap:6px;color:#c9d0dc;font-size:12.5px;margin-left:auto;margin-right:10px}.rolle select{border-radius:8px;border:0;padding:6px 8px;font:inherit;font-weight:650;color:#2F3B53}
+.bsrow{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:2px 0}.bsrow .maname{display:flex;align-items:center;gap:10px}.bsrow .maname span{flex:1}
+.bsdot{width:18px;height:18px;border-radius:5px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.pal{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:6px 0}.pal button{aspect-ratio:1;border-radius:8px;border:2px solid transparent;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}.pal button.on{border-color:#2F3B53;box-shadow:0 0 0 2px #fff inset}.pal button{position:relative}.pal button.belegt::after{content:"";position:absolute;right:4px;top:4px;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #2F3B53}
+.warn{background:#fff4e5;color:#8a4b00;border-radius:10px;padding:8px 10px;font-size:13px;margin-top:6px}
+.lesend .cell{cursor:default}
+.bubadge{display:block;font-size:10.5px;font-weight:700;color:#8a3b00;background:#F8CBAD;border-radius:6px;padding:1px 6px;margin-top:3px;width:max-content}th.buk{cursor:pointer}th.buk:hover{text-decoration:underline}
+.wpwrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;align-items:start}
+.leiste{position:sticky;top:66px;background:var(--s);border-radius:16px;box-shadow:var(--sh);padding:10px;max-height:calc(100vh - 190px);overflow:auto}
+.lkopf b{font-size:12.5px;display:block;margin:2px 2px 6px;color:var(--ink2)}
+.lgr{font-size:11px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin:12px 2px 4px}
+.lchip{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y;font-size:12.5px;line-height:1.2}
+.lchip:hover{background:var(--s2)}.lchip.on{background:#fff3ea;box-shadow:inset 0 0 0 2px var(--acc)}
+.lchip i{width:14px;height:14px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.lchip small{display:block;color:var(--ink3);font-weight:500;font-size:11px}
+.stempel{background:#fff3ea;color:#8a3b00;border-radius:9px;padding:7px 9px;font-size:12px;margin-top:8px;line-height:1.35}.stempel button{text-decoration:underline;font-weight:700;color:inherit}
+.lghost{position:fixed;z-index:70;pointer-events:none;pointer-events:none;background:var(--s);border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:700;box-shadow:0 12px 28px -8px rgba(13,21,36,.45);display:flex;gap:8px;align-items:center}.lghost i{width:14px;height:14px;border-radius:4px}
+@media(max-width:900px){.wpwrap{grid-template-columns:1fr}.leiste{position:static;max-height:none;display:flex;gap:6px;overflow-x:auto;padding:8px;align-items:center}.leiste .lkopf,.leiste .lgr{display:none}.lchip{flex:none;background:var(--s2);touch-action:pan-x}.lchip small{display:none}.stempel{flex:none;margin:0}}
+.home{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-weight:650;font-size:13px;background:rgba(255,255,255,.12);padding:7px 11px;border-radius:10px}
+.lade{padding:60px 16px;text-align:center;color:var(--ink3)}
+.it b.klick{cursor:pointer}.it b.klick:hover{text-decoration:underline}
+.speichert{position:fixed;right:14px;bottom:14px;background:var(--brand);color:#fff;font-size:12px;font-weight:650;padding:6px 10px;border-radius:9px;opacity:0;transition:opacity .2s;z-index:55}.speichert.on{opacity:.85}
+textarea.inp{min-height:70px;resize:vertical}
+@media(max-width:700px){.top .rolle{display:none}}
+
+.seg{display:inline-flex;background:var(--s);box-shadow:var(--sh);border-radius:11px;padding:3px;gap:2px}.seg button{height:32px;padding:0 12px;border-radius:9px;font-weight:650;font-size:13px;color:var(--ink2)}.seg button.on{background:var(--brand);color:#fff}
+.ndoben{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px}
+.ndheute{padding:16px}.ndh small{color:var(--ink3);font-size:12.5px;display:block}.ndh b{font-size:17px;display:block;margin-bottom:6px}
+.ndp{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}.ndp b{font-size:15px;display:block}.ndp.gross b{font-size:17px}.ndp small{color:var(--ink3);font-size:12.5px}.ndp .ndcall{margin-left:auto;color:var(--ink);text-decoration:none;flex:none}.ndp.leer b{color:var(--red)}
+.ndb{display:inline-grid;place-items:center;min-width:24px;height:22px;border-radius:7px;font-size:12px;font-weight:800;margin-right:5px;padding:0 5px;flex:none}.ndb.n1{background:var(--acc);color:#fff}.ndb.n2{background:var(--blue);color:#fff}.ndb.lang{padding:0 9px;height:24px}
+.ndp .ndb{min-width:36px;height:36px;font-size:15px;border-radius:10px;margin:0}
+.ndich{background:var(--okb);color:var(--ok);font-size:11px;padding:1px 6px;border-radius:6px;margin-left:4px;font-weight:700}
+.ndmorgen{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ndpaar{display:inline-flex;gap:16px;flex-wrap:wrap}.ndpaar>span{display:inline-flex;align-items:center;font-weight:650}.ndpaar.k{font-size:12.5px;gap:10px}
+.ndfehlt{color:var(--red);font-weight:700}
+.ndplan{display:grid;gap:8px}
+.ndw{background:var(--s);border-radius:14px;box-shadow:var(--sh);padding:10px 14px;display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:start}.ndw.klick{cursor:pointer}.ndw.klick:hover{box-shadow:inset 0 0 0 2px var(--brand),var(--sh)}
+.ndw.dies{box-shadow:inset 0 0 0 2px var(--acc),var(--sh)}.ndw.fehlt{background:#fff8f7}
+.ndwk b{display:block}.ndwk small{color:var(--ink3);font-size:12px}.ndjetzt{display:block;margin-top:2px;font-size:11px;font-weight:700;color:var(--acc)}
+.ndwz{padding-top:4px}.ndtage{display:grid;gap:3px}.ndtg{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;padding:1px 4px}.ndtg.heute{background:#fff3ea;border-radius:6px}.ndtg.fremd{opacity:.5}
+.ndd{min-width:84px;color:var(--ink2);font-weight:650}.ndd em{font-style:normal;color:var(--blue);font-size:11px;margin-left:4px}
+.ndnote{font-size:12px;color:var(--amb);background:var(--ambb);border-radius:6px;padding:1px 7px}.ndnote.gross{display:block;margin-top:8px;font-size:13px;padding:6px 10px}
+.ndinfos{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-items:start}
+.ndcard .pr-h{flex-wrap:wrap}.ndsub{color:var(--ink3);font-size:12px}.ndedit{margin-left:auto;height:30px;font-size:12px}
+.ndi{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:9px 16px;border-bottom:1px solid var(--line)}.ndi:last-child{border-bottom:0}.ndi b{font-size:13.5px}.ndi small{display:block;color:var(--ink3);font-size:12px;margin-top:1px}
+.ndw2{font-weight:750;white-space:nowrap;color:var(--brand);text-decoration:none}.ndw2.rot{color:var(--red);font-size:12px;background:var(--redb);padding:2px 8px;border-radius:8px}
+.nd-sperre{box-shadow:inset 3px 0 0 var(--red),var(--sh)}
+.ndall{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}.ndall .lab{display:flex;align-items:center}
+.ndform{display:grid;gap:6px;margin-top:6px}.ndfz{display:grid;grid-template-columns:100px 1fr 1fr 1.2fr;gap:6px;align-items:center}
+.ndez{display:grid;grid-template-columns:1fr 1.4fr 1fr 38px;gap:6px;margin-top:6px}
+@media(max-width:700px){.ndoben{grid-template-columns:1fr}.ndw{grid-template-columns:1fr;gap:4px}.ndfz{grid-template-columns:1fr 1fr}.ndfz .ndd,.ndfz input{grid-column:1/3}.ndez{grid-template-columns:1fr 38px}.ndez .inp{grid-column:1}.ndez button{grid-column:2;grid-row:1}.ndinfos{grid-template-columns:1fr}}
+/* Notdienst-Bereich: Woche, Monat, Jahr */
+.ndwoche{display:grid}.ndwz2{display:grid;grid-template-columns:170px 1fr;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:center}.ndwz2:last-child{border-bottom:0}.ndwz2.heute{background:#fff8f3;box-shadow:inset 4px 0 0 var(--acc)}.ndwz2.fehlt{background:#fff8f7}
+.ndwd b{display:block}.ndwd small{color:var(--ink3);font-size:12px}.ndwp{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:center}.ndwpp{display:flex;align-items:center;gap:6px}.ndwpp b{display:block;font-size:14.5px}.ndwpp a{font-size:12px;color:var(--ink3);text-decoration:none}
+.ndmonat{display:grid}.ndmk,.ndmw{display:grid;grid-template-columns:44px repeat(7,minmax(0,1fr))}.ndmk span{padding:8px 6px;font-size:12px;font-weight:700;color:var(--ink3);text-align:center;border-bottom:1px solid var(--line)}
+.ndmw{border-bottom:1px solid var(--line)}.ndmw:last-child{border-bottom:0}.ndmw.klick{cursor:pointer}.ndmw.klick:hover{background:#f7f8fb}.ndmw.dies{box-shadow:inset 0 0 0 2px var(--acc)}
+.ndkw{font-size:11px;font-weight:750;color:var(--ink3);padding:8px 4px;text-align:center}
+.ndmt{min-height:76px;padding:6px 6px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:3px;min-width:0;position:relative}.ndmt.fremd{opacity:.4}.ndmt.heute{background:#fff3ea}.ndmt.notiz::after{content:"";position:absolute;right:5px;top:6px;width:7px;height:7px;border-radius:50%;background:var(--amb)}
+.ndmd{font-size:12px;font-weight:700;color:var(--ink2)}.ndmd em{font-style:normal;color:var(--blue);margin-left:4px;font-size:10.5px}
+.ndm1,.ndm2{font-size:12px;font-weight:650;border-radius:6px;padding:2px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ndm1{background:#fdeee5;color:#9a3b03}.ndm2{background:var(--blueb);color:var(--blue)}
+.ndmt.fehlt .ndm1:empty,.ndmt.fehlt{box-shadow:inset 0 -3px 0 var(--red)}
+.ndmark{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--amb);margin-left:4px}
+.ndjahr{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}.ndjm .pr-h{padding:10px 14px}
+.ndjw{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--line);font-size:12.5px;cursor:pointer}.ndjw:last-child{border-bottom:0}.ndjw:hover{background:#f7f8fb}.ndjw.dies{background:#fff3ea}.ndjw.fehlt{box-shadow:inset 3px 0 0 var(--red)}
+.ndjw .ndkw{padding:0;min-width:40px;text-align:left}.ndjd{color:var(--ink3);min-width:40px}.ndjp{display:inline-flex;align-items:center;font-weight:650;min-width:0;overflow:hidden;white-space:nowrap}.ndjp .ndb{min-width:20px;height:18px;font-size:10.5px}
+.ndezb{display:flex;gap:4px}
+@media(max-width:700px){.ndwz2{grid-template-columns:1fr;gap:6px}.ndmk,.ndmw{grid-template-columns:26px repeat(7,minmax(0,1fr))}.ndmt{min-height:64px;padding:4px 2px}.ndm1,.ndm2{font-size:10px;padding:1px 2px}.ndkw{font-size:9.5px;padding:6px 0}.tabs{margin-left:0}}
+</style></head><body>
+<div class="top"><a class="home" href="index.html" title="Zur My Heise Startseite">‹ My Heise</a><div><h1>Notdienst</h1><small id="wer-bin-ich">Heise Haustechnik</small></div>
+<div class="tabs" id="tabs"><button data-v="plan" class="on">Einsatzplan</button><button data-v="infos">Infos</button></div></div>
+<div class="wrap" id="app"></div><div class="speichert" id="speichert">Speichert …</div>
+<div class="ov" id="ov"></div><div class="sh" id="sh"></div><div class="toast" id="toast"></div>
+<script>
+const HEUTE=(()=>{const d=new Date();d.setHours(12,0,0,0);return d})();
+const $=s=>document.querySelector(s), esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const iso=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}, addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const kwOf=d=>{const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const dn=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-dn);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y)/864e5+1)/7)};
+const montag=d=>{const x=new Date(d);x.setHours(12);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+const dDE=d=>new Date(d+'T12:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+const dJ=d=>new Date(d+'T12:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});
+function feiertage(j){ const a=j%19,b=Math.floor(j/100),c=j%100,dd=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-dd-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),ta=((h+l-7*m+114)%31)+1;
+  const O=new Date(j,mo-1,ta,12), o=n=>iso(addD(O,n));
+  return {[j+'-01-01']:'Neujahr',[o(-2)]:'Karfreitag',[o(1)]:'Ostermontag',[j+'-05-01']:'Tag der Arbeit',[o(39)]:'Christi Himmelfahrt',[o(50)]:'Pfingstmontag',[j+'-10-03']:'Tag der Deutschen Einheit',[j+'-10-31']:'Reformationstag',[j+'-12-25']:'1. Weihnachtstag',[j+'-12-26']:'2. Weihnachtstag'}; }
+const FT=Object.assign({},...[-1,0,1,2].map(n=>feiertage(HEUTE.getFullYear()+n)));
+const toast=(t,undo)=>{const e=$('#toast');e.innerHTML=esc(t)+(undo?'<button id="undo">Rückgängig</button>':'');e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',undo?5000:2200);if(undo)$('#undo').onclick=()=>{undo();e.style.display='none'}};
+const sheet=h=>{$('#sh').innerHTML=h;$('#ov').classList.add('on');$('#sh').classList.add('on')};
+const closeSh=()=>{$('#ov').classList.remove('on');$('#sh').classList.remove('on')};
+$('#ov').onclick=closeSh;
+const SB='https://bbjzfoirefcsqqgztjpt.supabase.co', KEY='sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H', SESS_KEY='heiseSession';
+const AUTH={access:null,refresh:null,exp:0}; let refreshP=null;
+const storedRefresh=()=>{ try{ return (JSON.parse(localStorage.getItem(SESS_KEY)||'null')||{}).r||null }catch(e){ return null } };
+function authSave(j){ AUTH.access=j.access_token; AUTH.refresh=j.refresh_token; AUTH.exp=j.expires_at?j.expires_at*1000:Date.now()+(j.expires_in||3600)*1000; try{ localStorage.setItem(SESS_KEY,JSON.stringify({r:AUTH.refresh})) }catch(e){} }
+function toLogin(){ location.replace('index.html?next='+encodeURIComponent('notdienst.html')) }
+async function refreshTok(){
+  let r; try{ r=await fetch(`${SB}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify({refresh_token:AUTH.refresh})}) }catch(e){ throw new Error('Keine Verbindung – bitte Netz prüfen') }
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){ try{ localStorage.removeItem(SESS_KEY) }catch(e){} toLogin(); throw new Error('Sitzung abgelaufen – bitte neu anmelden') }
+  authSave(j);
+}
+async function ensureToken(){
+  if(AUTH.access&&AUTH.exp-Date.now()>60000) return AUTH.access;
+  const r=storedRefresh()||AUTH.refresh; if(!r){ toLogin(); throw new Error('Nicht angemeldet') }
+  AUTH.refresh=r; if(!refreshP) refreshP=refreshTok().finally(()=>{refreshP=null}); await refreshP; return AUTH.access;
+}
+async function rpc(name,args){
+  const tok=await ensureToken(); let r;
+  try{ r=await fetch(`${SB}/rest/v1/rpc/${name}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+tok},body:JSON.stringify(args||{})}) }catch(e){ throw new Error('Keine Verbindung – bitte Netz prüfen') }
+  const j=await r.json().catch(()=>null);
+  if(!r.ok){ const m=(j&&j.message)||r.statusText||'Fehler'; if(r.status===401) AUTH.access=null; throw new Error(/permission denied|42501/i.test(m)&&!/[äöü]/.test(m)?'Dafür fehlt dir die Berechtigung':m) }
+  return j;
+}
+
+
+/* =====================================================================
+   Notdienst – eigener Bereich der My Heise App
+   Reiter „Einsatzplan“ (Woche, Monat, Jahr) und „Infos“.
+   Rechte (app_zugriff app='notdienst'): ohne = ansehen, planer = Dienste ändern,
+   verwalter = dazu Mitarbeiter und Infos, Admin = alles. Geprüft in nd_speichern.
+   ===================================================================== */
+const ND={geladen:false, von:'', bis:'', P:[], D:{}, I:[], BU:{}, PL:[], rolle:'leser', ich:null, fehler:''};
+const lsGet=(k,d)=>{ try{ const v=JSON.parse(localStorage.getItem('nd.'+k)); return v==null?d:v }catch(e){ return d } };
+const lsSet=(k,v)=>{ try{ localStorage.setItem('nd.'+k,JSON.stringify(v)) }catch(e){} };
+let VIEW=location.hash==='#infos'?'infos':'plan', SICHT=['woche','monat','jahr'].includes(lsGet('sicht','monat'))?lsGet('sicht','monat'):'monat', CUR=new Date(HEUTE);
+const ND_GR=[['pauschale','Notdienstpauschalen','Je Einsatz'],['stundensatz','Stundensätze im Notdienst','Außerhalb der Geschäftszeiten'],['anfahrt','Anfahrt','Einsatz Montage- und Kundendienstfahrzeug'],['zeiten','Notdienstzeiten',''],['regel','Wichtig im Notdienst',''],['sperre','Sperrliste','Nicht oder nur nach Rücksprache anfahren'],['kontakt','Erreichbarkeit bei Fragen','']];
+const WT7=['Mo','Di','Mi','Do','Fr','Sa','So'];
+const darf={plan:()=>['planer','verwalter','admin'].includes(ND.rolle), verw:()=>['verwalter','admin'].includes(ND.rolle)};
+const ndP=id=>ND.P.find(p=>p.id===id);
+const ndName=id=>{const p=ndP(id);return p?(p.kurz||p.name):''};
+const ndNach=id=>{const n=ndName(id);return n.split(/\s+/).pop()};
+const ndTel=t=>String(t||'').replace(/[^\d+]/g,'');
+const ndIch=()=>ND.ich!=null?ndP(ND.ich):null;
+const ndTag=d=>ND.D[d]||null;
+const tage7=m=>[...Array(7)].map((_,i)=>iso(addD(m,i)));
+
+async function ndLaden(von,bis){
+  const j=await rpc('nd_laden',{p_von:von,p_bis:bis});
+  ND.rolle=j.rolle||'leser'; ND.ich=j.ich==null?null:+j.ich;
+  ND.P=(j.personen||[]).map(p=>({...p,id:+p.id,person_id:p.person_id==null?null:+p.person_id}));
+  (j.dienste||[]).forEach(([d,a,b,n])=>{ ND.D[d]={a:a==null?null:+a,b:b==null?null:+b,n:n||''} });
+  ND.I=j.infos||[]; ND.BU={}; (j.bu||[]).forEach(u=>ND.BU[u.datum]=+u.anteil); ND.PL=(j.planung||[]).map(p=>({id:+p.id,name:p.name}));
+  ND.von=ND.von&&ND.von<von?ND.von:von; ND.bis=ND.bis>bis?ND.bis:bis; ND.geladen=true; ND.fehler='';
+}
+async function ndSichern(von,bis){ if(ND.geladen&&von>=ND.von&&bis<=ND.bis) return; await ndLaden(von<ND.von||!ND.von?von:ND.bis,bis>ND.bis?bis:ND.von) }
+function ndZeit(d){
+  const z=ND.I.filter(i=>i.gruppe==='zeiten'), wt=(new Date(d+'T12:00').getDay()+6)%7, frei=wt>=5||FT[d]||ND.BU[d]===1;
+  const f=re=>(z.find(i=>re.test(i.titel))||{}).wert||'';
+  return frei?f(/wochenende|feiertag/i):wt===4?f(/freitag/i):f(/montag|donnerstag/i);
+}
+function ndPerson(id,nr){
+  const p=ndP(id), ich=p&&ndIch()&&p.id===ndIch().id;
+  if(!p) return `<div class="ndp leer"><span class="ndb n${nr}">${nr}.</span><div><b>${nr}. Notdienst fehlt</b><small>bitte eintragen</small></div></div>`;
+  return `<div class="ndp"><span class="ndb n${nr}">${nr}.</span><div><b>${esc(p.name)}${ich?' <span class="ndich">du</span>':''}</b><small>${nr}. Notdienst${p.telefon?' · '+esc(p.telefon):''}</small></div>${p.telefon?`<a class="btn ndcall" href="tel:${ndTel(p.telefon)}">Anrufen</a>`:''}</div>`;
+}
+function ndPaar(t,klein){ if(!t) return '<span class="ndfehlt">nicht eingetragen</span>';
+  return `<span class="ndpaar${klein?' k':''}"><span><span class="ndb n1">1.</span>${t.a?esc(ndName(t.a)):'<span class="ndfehlt">fehlt</span>'}</span><span><span class="ndb n2">2.</span>${t.b?esc(ndName(t.b)):'<span class="ndfehlt">fehlt</span>'}</span></span>`; }
+const wocheGleich=T7=>T7.every(x=>x&&T7[0]&&x.a===T7[0].a&&x.b===T7[0].b&&!x.n);
+
+/* ---------- Oben: heute und meine Dienste ---------- */
+function oben(){
+  const h=iso(HEUTE), t=ndTag(h), mo=iso(addD(HEUTE,1)), tm=ndTag(mo), ich=ndIch();
+  const meine=ich?Object.keys(ND.D).filter(d=>d>=h&&(ND.D[d].a===ich.id||ND.D[d].b===ich.id)).sort():[];
+  const W=[]; meine.forEach(d=>{ const nr=ND.D[d].a===ich.id?1:2, l=W[W.length-1]; if(l&&l.nr===nr&&iso(addD(new Date(l.bis+'T12:00'),1))===d) l.bis=d; else W.push({nr,von:d,bis:d}) });
+  return `<div class="ndoben">
+    <div class="card ndheute"><div class="ndh"><small>Heute, ${HEUTE.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'})}${FT[h]?' · '+esc(FT[h]):''}</small><b>Notdienst ${esc(ndZeit(h)||'')}</b></div>
+      ${ndPerson(t&&t.a,1)}${ndPerson(t&&t.b,2)}${t&&t.n?`<div class="ndnote gross">${esc(t.n)}</div>`:''}
+      <div class="ndmorgen">Morgen${FT[mo]?' ('+esc(FT[mo])+')':''}: ${ndPaar(tm,true)}</div></div>
+    <div class="card ndmeine"><div class="pr-h"><b>${ich?'Meine nächsten Dienste':'Notdienst'}</b></div>
+      ${ich?(W.length?W.slice(0,6).map(x=>`<div class="ndi"><div><b>KW ${kwOf(new Date(x.von+'T12:00'))}</b><small>${dDE(x.von)}${x.bis!==x.von?' – '+dDE(x.bis):''}</small></div><span class="ndb n${x.nr} lang">${x.nr}. Notdienst</span></div>`).join(''):'<p class="sub" style="padding:10px 16px">Keine Dienste eingetragen.</p>')
+        :`<p class="sub" style="padding:10px 16px">Du bist nicht im Notdienst eingeteilt oder dein Konto ist noch nicht verknüpft. Urlaub ist im Plan nicht berücksichtigt: Vertretung selbst regeln und J. Schmidt Bescheid geben.</p>`}</div></div>`;
+}
+
+/* ---------- Einsatzplan ---------- */
+function rPlan(){
+  const h=iso(HEUTE);
+  let titel='', inhalt='';
+  if(SICHT==='woche'){
+    const m=montag(CUR), T=tage7(m);
+    titel=`KW ${kwOf(m)}<small>${dDE(T[0])} – ${dDE(T[6])}${T[6].slice(0,4)}</small>`;
+    inhalt=`<div class="card ndwoche">${T.map((d,i)=>{const x=ndTag(d);return `<div class="ndwz2${d===h?' heute':''}${!x||!x.a||!x.b?' fehlt':''}"><div class="ndwd"><b>${WT7[i]} ${dDE(d)}</b><small>${FT[d]?esc(FT[d])+' · ':''}${esc(ndZeit(d))}</small></div>
+      <div class="ndwp">${[1,2].map(nr=>{const id=x&&(nr===1?x.a:x.b), p=ndP(id);return `<div class="ndwpp"><span class="ndb n${nr}">${nr}.</span>${p?`<span><b>${esc(p.kurz||p.name)}</b>${p.telefon?`<a href="tel:${ndTel(p.telefon)}">${esc(p.telefon)}</a>`:''}</span>`:'<span class="ndfehlt">fehlt</span>'}</div>`}).join('')}${x&&x.n?`<span class="ndnote">${esc(x.n)}</span>`:''}</div></div>`}).join('')}</div>
+      ${darf.plan()?`<div class="row" style="max-width:320px"><button class="btn pri" data-ndw="${iso(m)}">Woche bearbeiten</button></div>`:''}`;
+  } else if(SICHT==='monat'){
+    const m1=new Date(CUR.getFullYear(),CUR.getMonth(),1,12), ende=new Date(CUR.getFullYear(),CUR.getMonth()+1,0,12), W=[];
+    for(let w=montag(m1); w<=ende; w=addD(w,7)) W.push(w);
+    titel=`${m1.toLocaleDateString('de-DE',{month:'long',year:'numeric'})}<small>KW ${kwOf(W[0])} bis KW ${kwOf(W[W.length-1])}</small>`;
+    inhalt=`<div class="card ndmonat"><div class="ndmk"><span>KW</span>${WT7.map(t=>`<span>${t}</span>`).join('')}</div>
+      ${W.map(w=>{const T=tage7(w); return `<div class="ndmw${darf.plan()?' klick':''}${T.includes(h)?' dies':''}" data-ndw="${iso(w)}"><span class="ndkw">${kwOf(w)}</span>${T.map(d=>{const x=ndTag(d), fremd=new Date(d+'T12:00').getMonth()!==m1.getMonth();
+        return `<div class="ndmt${d===h?' heute':''}${fremd?' fremd':''}${!x||!x.a||!x.b?' fehlt':''}${x&&x.n?' notiz':''}" title="${esc(dDE(d)+(FT[d]?' '+FT[d]:'')+': 1. '+(x&&ndName(x.a)||'–')+', 2. '+(x&&ndName(x.b)||'–')+(x&&x.n?' · '+x.n:''))}"><span class="ndmd">${+d.slice(8)}${FT[d]?'<em>F</em>':''}</span><span class="ndm1">${x&&x.a?esc(ndNach(x.a)):'–'}</span><span class="ndm2">${x&&x.b?esc(ndNach(x.b)):'–'}</span></div>`}).join('')}</div>`}).join('')}</div>
+      <div class="leg"><span><span class="ndb n1">1.</span>oben 1. Notdienst</span><span><span class="ndb n2">2.</span>unten 2. Notdienst</span><span><i class="ndmark"></i>Notiz oder Tausch</span><span class="ndfehlt">rot = fehlt</span></div>`;
+  } else {
+    const j=CUR.getFullYear();
+    titel=`${j}<small>Jahresübersicht</small>`;
+    inhalt=`<div class="ndjahr">${[...Array(12)].map((_,mi)=>{const m1=new Date(j,mi,1,12), W=[]; for(let w=montag(m1); w.getMonth()===mi||w<m1; w=addD(w,7)){ if(addD(w,3).getMonth()===mi&&addD(w,3).getFullYear()===j) W.push(w) }
+      return `<div class="card ndjm"><div class="pr-h"><b>${m1.toLocaleDateString('de-DE',{month:'long'})}</b></div>${W.map(w=>{const T=tage7(w), T7=T.map(ndTag), g=wocheGleich(T7), t=T7.find(Boolean);
+        return `<div class="ndjw${T.includes(h)?' dies':''}${T7.some(x=>!x||!x.a||!x.b)?' fehlt':''}" data-ndw="${iso(w)}"><span class="ndkw">KW ${kwOf(w)}</span><span class="ndjd">${dDE(T[0])}</span>${t?`<span class="ndjp"><span class="ndb n1">1.</span>${esc(ndNach(t.a))}</span><span class="ndjp"><span class="ndb n2">2.</span>${esc(ndNach(t.b))}</span>`:'<span class="ndfehlt">nicht eingetragen</span>'}${g?'':'<i class="ndmark" title="In dieser Woche gibt es Tausch-Tage oder Notizen"></i>'}</div>`}).join('')}</div>`}).join('')}</div>`;
+  }
+  $('#app').innerHTML=`${oben()}
+    <div class="bar" style="margin-top:16px"><div class="seg" id="sicht">${[['woche','Woche'],['monat','Monat'],['jahr','Jahr']].map(([k,l])=>`<button data-s="${k}" class="${SICHT===k?'on':''}">${l}</button>`).join('')}</div>
+      <button class="btn ic" id="prev">‹</button><div class="kw">${titel}</div><button class="btn ic" id="next">›</button><button class="btn" id="heute">Heute</button>
+      ${darf.plan()?'<span class="sub" style="margin:0 0 0 auto">Woche antippen zum Ändern</span>':''}</div>
+    ${inhalt}`;
+  const schritt=r=>{ if(SICHT==='woche') CUR=addD(CUR,7*r); else if(SICHT==='monat') CUR=new Date(CUR.getFullYear(),CUR.getMonth()+r,1,12); else CUR=new Date(CUR.getFullYear()+r,0,1,12);
+    const a=SICHT==='jahr'?CUR.getFullYear()+'-01-01':iso(addD(montag(CUR),-7)), e=SICHT==='jahr'?CUR.getFullYear()+'-12-31':iso(addD(CUR,45));
+    ndSichern(a,e).then(rPlan).catch(er=>toast(er.message)) };
+  $('#prev').onclick=()=>schritt(-1); $('#next').onclick=()=>schritt(1); $('#heute').onclick=()=>{ CUR=new Date(HEUTE); rPlan() };
+  document.querySelectorAll('#sicht [data-s]').forEach(b=>b.onclick=()=>{ SICHT=b.dataset.s; lsSet('sicht',SICHT); schritt(0) });
+  document.querySelectorAll('#app [data-ndw]').forEach(w=>w.onclick=()=>{ if(darf.plan()) ndWoche(w.dataset.ndw); else if(SICHT!=='woche'){ CUR=new Date(w.dataset.ndw+'T12:00'); SICHT='woche'; rPlan() } });
+}
+
+/* ---------- Infos ---------- */
+function rInfos(){
+  const info=g=>{ const L=ND.I.filter(i=>i.gruppe===g[0]); if(!L.length&&!darf.verw()) return '';
+    const zeile=i=>g[0]==='regel'?`<div class="ndi"><div><b>${esc(i.titel)}</b>${i.detail?`<small>${esc(i.detail)}</small>`:''}</div></div>`
+      :`<div class="ndi"><div><b>${esc(i.titel)}</b>${i.detail?`<small>${esc(i.detail)}</small>`:''}</div>${i.wert?(g[0]==='kontakt'?`<a class="ndw2" href="tel:${ndTel(i.wert)}">${esc(i.wert)}</a>`:`<span class="ndw2${g[0]==='sperre'?' rot':''}">${esc(i.wert)}</span>`):''}</div>`;
+    return `<div class="card ndcard nd-${g[0]}"><div class="pr-h"><b>${g[1]}</b>${g[2]?`<span class="ndsub">${g[2]}</span>`:''}${darf.verw()?`<button class="btn ndedit" data-ndi="${g[0]}">Bearbeiten</button>`:''}</div>${L.map(zeile).join('')||'<p class="sub" style="padding:10px 16px">Noch nichts eingetragen.</p>'}</div>`; };
+  const akt=ND.P.filter(p=>p.aktiv);
+  $('#app').innerHTML=`<div class="bar"><b style="font-size:15px">Wichtige Infos zum Notdienst</b><span class="sub" style="margin:0">Preise zzgl. MwSt.</span>${darf.verw()?'<span class="sub" style="margin:0 0 0 auto">„Bearbeiten“ ändert die Infos sofort für alle</span>':''}</div>
+    <div class="ndinfos">${ND_GR.map(info).join('')}
+      <div class="card ndcard"><div class="pr-h"><b>Notdienst-Mitarbeiter</b><span class="ndsub">${akt.length} im Notdienst</span>${darf.verw()?'<button class="btn ndedit" id="ndpers">Bearbeiten</button>':''}</div>
+        ${akt.map(p=>`<div class="ndi"><div><b>${esc(p.name)}</b></div>${p.telefon?`<a class="ndw2" href="tel:${ndTel(p.telefon)}">${esc(p.telefon)}</a>`:'<span class="sub" style="margin:0">keine Nummer</span>'}</div>`).join('')}</div></div>`;
+  document.querySelectorAll('[data-ndi]').forEach(b=>b.onclick=()=>ndInfoBearbeiten(b.dataset.ndi));
+  if($('#ndpers')) $('#ndpers').onclick=ndPersonen;
+}
+
+/* ---------- Rahmen ---------- */
+function render(){
+  document.querySelectorAll('#tabs [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===VIEW));
+  if(!ND.geladen){ $('#app').innerHTML=`<div class="lade">${ND.fehler?`<b style="color:var(--ink)">Notdienst konnte nicht geladen werden</b><p style="margin:8px 0 16px">${esc(ND.fehler)}</p><button class="btn pri" onclick="location.reload()">Erneut versuchen</button>`:'Notdienst wird geladen …'}</div>`; return }
+  (VIEW==='infos'?rInfos:rPlan)();
+}
+$('#tabs').onclick=e=>{ const b=e.target.closest('[data-v]'); if(!b) return; VIEW=b.dataset.v; history.replaceState(null,'',VIEW==='infos'?'#infos':'#plan'); render() };
+async function ndSpeichern(p){ $('#speichert').classList.add('on'); try{ return await rpc('nd_speichern',{p}) } finally{ $('#speichert').classList.remove('on') } }
+
+/* ---------- Woche bearbeiten ---------- */
+function ndWoche(w0){
+  const tage=tage7(new Date(w0+'T12:00')), alt=Object.fromEntries(tage.map(d=>[d,ND.D[d]?{...ND.D[d]}:null]));
+  const X=Object.fromEntries(tage.map(d=>[d,ND.D[d]?{...ND.D[d]}:{a:null,b:null,n:''}]));
+  const akt=ND.P.filter(p=>p.aktiv||tage.some(d=>X[d].a===p.id||X[d].b===p.id));
+  const opt=sel=>`<option value="">–</option>${akt.map(p=>`<option value="${p.id}"${p.id===sel?' selected':''}>${esc(p.kurz||p.name)}</option>`).join('')}`;
+  const draw=()=>{ sheet(`<h3>Notdienst KW ${kwOf(new Date(w0+'T12:00'))}</h3><div class="sub">${dDE(tage[0])} – ${dDE(tage[6])}${tage[6].slice(0,4)}</div>
+    <div class="ndall"><label><span class="lab"><span class="ndb n1">1.</span> ganze Woche</span><select class="inp" id="nda">${opt(null)}</select></label><label><span class="lab"><span class="ndb n2">2.</span> ganze Woche</span><select class="inp" id="ndb">${opt(null)}</select></label></div>
+    <div class="ndform">${tage.map((d,i)=>`<div class="ndfz"><span class="ndd">${WT7[i]} ${dDE(d)}${FT[d]?`<em>${esc(FT[d])}</em>`:''}</span><select class="inp" data-a="${d}">${opt(X[d].a)}</select><select class="inp" data-b="${d}">${opt(X[d].b)}</select><input class="inp" data-n="${d}" value="${esc(X[d].n)}" placeholder="Notiz, z. B. Tausch"></div>`).join('')}</div>
+    <div class="row"><button class="btn" id="ndzu">Abbrechen</button><button class="btn" id="ndtausch" title="1. und 2. Notdienst in dieser Woche tauschen">1. ↔ 2. tauschen</button><button class="btn pri" id="ndok">Speichern</button></div>`);
+    const lesen=()=>tage.forEach(d=>{ X[d].a=+$(`[data-a="${d}"]`).value||null; X[d].b=+$(`[data-b="${d}"]`).value||null; X[d].n=$(`[data-n="${d}"]`).value.trim() });
+    $('#nda').onchange=e=>{ lesen(); tage.forEach(d=>X[d].a=+e.target.value||null); draw() };
+    $('#ndb').onchange=e=>{ lesen(); tage.forEach(d=>X[d].b=+e.target.value||null); draw() };
+    $('#ndtausch').onclick=()=>{ lesen(); tage.forEach(d=>{ const a=X[d].a; X[d].a=X[d].b; X[d].b=a }); draw() };
+    $('#ndzu').onclick=closeSh;
+    $('#ndok').onclick=async()=>{ lesen();
+      const dop=tage.find(d=>X[d].a&&X[d].a===X[d].b); if(dop) return toast(`Am ${dDE(dop)} ist dieselbe Person 1. und 2. Notdienst`);
+      const up=[], del=[]; tage.forEach(d=>{ const x=X[d], o=alt[d]; const gleich=o&&o.a===x.a&&o.b===x.b&&o.n===x.n; if(gleich||(!o&&!x.a&&!x.b&&!x.n)) return;
+        if(!x.a&&!x.b&&!x.n) del.push(d); else up.push({datum:d,erster:x.a||'',zweiter:x.b||'',notiz:x.n}) });
+      if(!up.length&&!del.length) return closeSh();
+      try{ await ndSpeichern({dienste:{upsert:up,delete:del}}); tage.forEach(d=>{ const x=X[d]; if(!x.a&&!x.b&&!x.n) delete ND.D[d]; else ND.D[d]={...x} }); closeSh(); render();
+        toast('Notdienst KW '+kwOf(new Date(w0+'T12:00'))+' gespeichert',async()=>{ const u2=[],d2=[]; tage.forEach(d=>{ const o=alt[d]; if(o) u2.push({datum:d,erster:o.a||'',zweiter:o.b||'',notiz:o.n}); else d2.push(d) });
+          try{ await ndSpeichern({dienste:{upsert:u2,delete:d2}}); tage.forEach(d=>{ if(alt[d]) ND.D[d]=alt[d]; else delete ND.D[d] }); render() }catch(e){ toast('Rückgängig fehlgeschlagen: '+e.message) } });
+      }catch(e){ toast('Nicht gespeichert: '+e.message) } }; };
+  draw();
+}
+/* ---------- Infos bearbeiten (Verwaltung) ---------- */
+function ndInfoBearbeiten(g){
+  const gr=ND_GR.find(x=>x[0]===g); let R=ND.I.filter(i=>i.gruppe===g).map(i=>({titel:i.titel,detail:i.detail,wert:i.wert}));
+  const ph={pauschale:['z. B. Mit Wartungsvertrag','Zusatz','40,00 € + MwSt.'],stundensatz:['z. B. Samstag','z. B. 6 bis 20 Uhr','99,50 € + MwSt.'],anfahrt:['z. B. Zone I','Orte','19,95 € + MwSt.'],zeiten:['z. B. Freitag','','13 bis 22 Uhr'],regel:['Kurz, worum es geht','Erklärung',''],sperre:['Name / Firma','Adresse','nicht anfahren'],kontakt:['Name','Funktion','Telefon']}[g];
+  const draw=()=>{ sheet(`<h3>${gr[1]}</h3><div class="sub">Gilt sofort für alle. Leere Zeilen werden nicht gespeichert. Mit ↑ ↓ änderst du die Reihenfolge.</div>
+    <div class="ndedz">${R.map((r,i)=>`<div class="ndez"><input class="inp" data-f="titel" data-i="${i}" value="${esc(r.titel)}" placeholder="${ph[0]}"><input class="inp" data-f="detail" data-i="${i}" value="${esc(r.detail)}" placeholder="${ph[1]||'optional'}">${g==='regel'?'':`<input class="inp" data-f="wert" data-i="${i}" value="${esc(r.wert)}" placeholder="${ph[2]}">`}<span class="ndezb"><button class="btn ic" data-hoch="${i}" title="nach oben"${i?'':' disabled'}>↑</button><button class="btn ic" data-weg="${i}" title="Zeile entfernen">×</button></span></div>`).join('')}</div>
+    <button class="btn" id="ndplus" style="margin-top:8px">+ Zeile</button>
+    <div class="row"><button class="btn" id="ndzu">Abbrechen</button><button class="btn pri" id="ndok">Speichern</button></div>`);
+    const lesen=()=>document.querySelectorAll('#sh [data-f]').forEach(e=>R[+e.dataset.i][e.dataset.f]=e.value);
+    $('#ndplus').onclick=()=>{ lesen(); R.push({titel:'',detail:'',wert:''}); draw() };
+    document.querySelectorAll('#sh [data-weg]').forEach(b=>b.onclick=()=>{ lesen(); R.splice(+b.dataset.weg,1); draw() });
+    document.querySelectorAll('#sh [data-hoch]').forEach(b=>b.onclick=()=>{ lesen(); const i=+b.dataset.hoch; [R[i-1],R[i]]=[R[i],R[i-1]]; draw() });
+    $('#ndzu').onclick=closeSh;
+    $('#ndok').onclick=async()=>{ lesen(); try{ await ndSpeichern({infos:{gruppe:g,rows:R}}); ND.I=ND.I.filter(i=>i.gruppe!==g).concat(R.filter(r=>r.titel.trim()||r.wert.trim()).map((r,i)=>({gruppe:g,...r,sort:i+1}))); closeSh(); render(); toast(gr[1]+' gespeichert') }catch(e){ toast('Nicht gespeichert: '+e.message) } }; };
+  draw();
+}
+/* ---------- Notdienst-Mitarbeiter (Verwaltung) ---------- */
+function ndPersonen(){
+  const L=ND.P.slice().sort((a,b)=>(b.aktiv-a.aktiv)||a.sort-b.sort||a.name.localeCompare(b.name,'de'));
+  sheet(`<h3>Notdienst-Mitarbeiter</h3><div class="sub">Kurzname erscheint im Plan, die Nummer zum Anrufen. Die Verknüpfung mit dem Mitarbeiter aus der Planung zeigt jedem „Meine nächsten Dienste“.</div>
+    ${L.map(p=>`<div class="marow${p.aktiv?'':' weg'}"><button class="maname" data-ndp="${p.id}"><b>${esc(p.name)}</b><small>${esc(p.kurz)}${p.telefon?' · '+esc(p.telefon):' · keine Nummer'}${p.person_id?'':' · nicht verknüpft'}${p.aktiv?'':' · nicht im Notdienst'}</small></button></div>`).join('')}
+    <div class="row"><button class="btn" onclick="closeSh()">Schließen</button><button class="btn pri" id="ndneu">+ Mitarbeiter</button></div>`);
+  document.querySelectorAll('#sh [data-ndp]').forEach(b=>b.onclick=()=>ndPersonBearbeiten(ND.P.find(p=>p.id===+b.dataset.ndp)));
+  $('#ndneu').onclick=()=>ndPersonBearbeiten(null);
+}
+function ndPersonBearbeiten(p){
+  const neu=!p, x=neu?{name:'',kurz:'',telefon:'',person_id:null,aktiv:true,sort:ND.P.length}:{...p};
+  sheet(`<h3>${neu?'Notdienst-Mitarbeiter hinzufügen':esc(x.name)}</h3>
+    <div class="lab">Mitarbeiter aus der Planung</div><select class="inp" id="npv"><option value="">nicht verknüpft</option>${ND.PL.map(q=>`<option value="${q.id}"${q.id===x.person_id?' selected':''}>${esc(q.name)}</option>`).join('')}</select>
+    <div class="lab">Name</div><input class="inp" id="npn" value="${esc(x.name)}" placeholder="Vorname Nachname">
+    <div class="lab">Kurzname im Plan</div><input class="inp" id="npk" value="${esc(x.kurz)}" placeholder="z. B. N. Frister">
+    <div class="lab">Handynummer im Notdienst</div><input class="inp" id="npt" type="tel" value="${esc(x.telefon)}" placeholder="+49 …">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="npa"${x.aktiv?' checked':''}> Im Notdienst (zur Auswahl im Plan)</label>
+    <div class="row"><button class="btn" id="npz">Zurück</button><button class="btn pri" id="npok">Speichern</button></div>`);
+  $('#npv').onchange=e=>{ const q=ND.PL.find(y=>y.id===+e.target.value); if(q&&!$('#npn').value.trim()) $('#npn').value=q.name; if(q&&!$('#npk').value.trim()){ const t=q.name.split(' '); $('#npk').value=t.length>1?t[0][0]+'. '+t.slice(1).join(' '):q.name } };
+  $('#npz').onclick=ndPersonen;
+  $('#npok').onclick=async()=>{ x.name=$('#npn').value.trim(); x.kurz=$('#npk').value.trim(); x.telefon=$('#npt').value.trim(); x.person_id=+$('#npv').value||null; x.aktiv=$('#npa').checked;
+    if(!x.name) return toast('Bitte einen Namen eingeben');
+    try{ const r=await ndSpeichern({personen:{upsert:[{id:neu?'':x.id,name:x.name,kurz:x.kurz,telefon:x.telefon,person_id:x.person_id||'',aktiv:x.aktiv,sort:x.sort}]}});
+      if(neu){ x.id=+((r&&r.neue_personen)||[])[0]; ND.P.push(x) } else Object.assign(p,x); ndPersonen(); render(); toast('Gespeichert') }catch(e){ toast('Nicht gespeichert: '+e.message) } };
+}
+
+/* ---------- Start ---------- */
+(async()=>{
+  render();
+  try{
+    if(!storedRefresh()) return toLogin();
+    await ndLaden(iso(addD(montag(HEUTE),-200)),iso(addD(HEUTE,460)));
+    $('#wer-bin-ich').textContent=({leser:'Ansehen',planer:'Planer',verwalter:'Verwaltung',admin:'Admin'})[ND.rolle]||'';
+  }catch(e){ ND.fehler=/nd_laden|nd_rolle|function/i.test(e.message)?'Die Datenbank-Erweiterung (notdienst_v2.sql) ist noch nicht eingespielt.':e.message }
+  render();
+})();
+document.addEventListener('visibilitychange',async()=>{ if(document.hidden||!ND.geladen||$('#sh').classList.contains('on')) return; try{ await ndLaden(ND.von,ND.bis); render() }catch(e){} });
+
+</script></body></html>
