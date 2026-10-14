@@ -172,7 +172,7 @@ const closeSh=()=>{$('#ov').classList.remove('on');$('#sh').classList.remove('on
 $('#ov').onclick=closeSh;
 /* ---------- Kategorien, Filter, gespeicherte Ansicht ---------- */
 const GROESSE={gross:'Großbaustelle',klein:'Kleinprojekt',sammel:'Sammelblock'};
-const GEWERK={bad:'Bad',heizung:'Heizungserneuerung',waermepumpe:'Heizungsanlage / Wärmepumpe',pv:'Elektro / PV',lueftung:'Lüftung',sanitaer:'Sanitär'};
+const GEWERK={heizung_allg:'Heizung',bad:'Bad',heizung:'Heizungserneuerung',waermepumpe:'Heizungsanlage / Wärmepumpe',pv:'Elektro / PV',lueftung:'Lüftung',sanitaer:'Sanitär',industrie:'Industrie'};
 const lsGet=(k,d)=>{ try{ const v=JSON.parse(localStorage.getItem('pl.'+k)); return v==null?d:v }catch(e){ return d } };
 const lsSet=(k,v)=>{ try{ localStorage.setItem('pl.'+k,JSON.stringify(v)) }catch(e){} };
 let MODUS=lsGet('modus','woche')==='monat'?'monat':'woche', MONAT=new Date(HEUTE.getFullYear(),HEUTE.getMonth(),1,12);
