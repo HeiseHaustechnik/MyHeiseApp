@@ -333,6 +333,7 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 .mvor{display:grid;gap:6px}.mvor-r{background:var(--surface-2);border-radius:12px;padding:10px 12px}
 .mvor-r summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none}.mvor-r summary::-webkit-details-marker{display:none}
 .mvor-r ul{margin:8px 0 2px 18px;font-size:14px;color:var(--ink-2)}
+.bgchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.bgchip{height:34px;padding:0 12px;border-radius:17px;border:1px solid #e3e7ee;background:#fff;font:inherit;font-weight:650;font-size:14px;cursor:pointer}.bgchip small{color:#8491a3;font-weight:600;margin-left:3px}.bgchip.on{background:#2f3b53;color:#fff;border-color:#2f3b53}.bgchip.on small{color:#c9d0dc}.bgsec{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 6px}.bgliste{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px;max-height:34vh;overflow:auto}.bgm{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border:1px solid #e3e7ee;border-radius:10px;font-size:14px;cursor:pointer}.bgm.adm{opacity:.55}.bgm small{display:block;color:#8491a3;font-size:12px}.bgapps{display:grid;gap:4px}.bgapp{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:6px 8px;border:1px solid #e3e7ee;border-radius:10px}.bgapp .mi{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2));flex:none}.bgapp .mi svg{width:17px;height:17px}.bgan{flex:1;font-weight:650;font-size:14px}.bgan small{display:block;font-weight:500;color:#8491a3;font-size:12px}.bgrol{width:auto;min-width:130px;height:34px}.bglager{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px 14px;padding:4px 0 2px 40px}.ubadge.grp{background:#eef0f4;color:#485468}
 .ulv{display:grid;gap:4px;max-height:50vh;overflow:auto}.ulz{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid #e3e7ee;border-radius:10px;font-size:14px}.ulz.da{opacity:.55}.ulz small{display:block;color:#8491a3;font-size:12.5px}.ulz em{display:block;font-style:normal;font-size:12px;font-weight:600;color:#b54203}.ulz em.ok{color:#15803d}
 .zgst{border-radius:12px;padding:10px 12px;font-size:14px;font-weight:600;margin-bottom:12px}.zgst.ok{background:#e6f6ec;color:#15803d}.zgst.err{background:#fdeceb;color:#c32328}
 </style>
@@ -739,13 +740,13 @@ function roleSelect(uid, m, cur, uname) {
 async function showZugriff() {
   root.innerHTML = `<div class="shell"><div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1></div><div class="empty"><div class="spinner" style="margin:6px auto"></div></div></div>`;
   try {
-    const [users, zg, lr] = await Promise.all([api('GET', 'benutzer', null, '?select=id,name,benutzername,email,rolle&order=name.asc'), api('GET', 'app_zugriff', null, '?select=benutzer_id,app,rolle'), api('GET', 'lager_rechte', null, '?select=benutzer_id,lager').catch(() => null)]);
+    const [users, zg, lr] = await Promise.all([api('GET', 'benutzer', null, '?select=id,name,benutzername,email,rolle,gruppe&order=name.asc').catch(() => api('GET', 'benutzer', null, '?select=id,name,benutzername,email,rolle&order=name.asc')), api('GET', 'app_zugriff', null, '?select=benutzer_id,app,rolle'), api('GET', 'lager_rechte', null, '?select=benutzer_id,lager').catch(() => null)]);
     LR = {}; (lr || []).forEach(r => { (LR[r.benutzer_id] = LR[r.benutzer_id] || {})[r.lager] = true }); LR_OK = !!lr;
     if (location.hash !== '#/zugriff') return;
     ZU = users; ZM = {}; zg.forEach(z => { (ZM[z.benutzer_id] = ZM[z.benutzer_id] || {})[z.app] = z.rolle });
     const offen = zgOffen(), q = ZQ;
     root.innerHTML = `<div class="shell">
-      <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1><a class="iconbtn" href="#/mail" aria-label="E-Mail-Benachrichtigungen" title="E-Mail-Benachrichtigungen" style="margin-left:auto">${ic('mail')}</a><button class="btn btn-ghost btn-sm" data-act="uListe" title="Mehrere Benutzer aus einer Excel-Liste anlegen">Liste</button><button class="btn btn-primary btn-sm" data-act="uNeu">${ic('plus','sm')} Neu</button></div>
+      <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Benutzer &amp; Zugriff</h1><a class="iconbtn" href="#/mail" aria-label="E-Mail-Benachrichtigungen" title="E-Mail-Benachrichtigungen" style="margin-left:auto">${ic('mail')}</a><button class="btn btn-ghost btn-sm" data-act="uGruppen" title="Gleiche Rechte für ganze Gruppen">Gruppen</button><button class="btn btn-ghost btn-sm" data-act="uListe" title="Mehrere Benutzer aus einer Excel-Liste anlegen">Liste</button><button class="btn btn-primary btn-sm" data-act="uNeu">${ic('plus','sm')} Neu</button></div>
       <div class="callout plain tone-blue">${ic('info')}<div><b>Benutzer verwalten</b><span>Tippe auf einen Benutzer, um Apps freizuschalten und Rollen zu vergeben. Änderungen gelten sofort. Über „⋯“ änderst du E-Mail und Rolle, setzt ein Passwort zurück oder löschst den Benutzer. Neue Benutzer bekommen zunächst Lagerverwaltung und Leiterprüfung.</span></div></div>
       <div class="usuche"><label class="usuche-f">${ic('search', 'sm')}<input class="inp" id="zgSuche" type="search" placeholder="Benutzer suchen" value="${esc(q)}" autocomplete="off" aria-label="Benutzer suchen"></label><span class="faint num" id="zgAnz">${users.length} Benutzer</span></div>
       <div class="ulist">${users.map(u => uRowHTML(u, offen.includes(u.id))).join('')}</div>
@@ -771,10 +772,10 @@ function uAppsHTML(u) {
 }
 function uRowHTML(u, auf) {
   const isAdm = u.rolle === 'admin';
-  return `<div class="urow${auf ? ' open' : ''}" data-uid="${u.id}" data-such="${esc(((u.name || '') + ' ' + (u.benutzername || '') + ' ' + (u.email || '')).toLowerCase())}">
+  return `<div class="urow${auf ? ' open' : ''}" data-uid="${u.id}" data-such="${esc(((u.name || '') + ' ' + (u.benutzername || '') + ' ' + (u.email || '') + ' ' + (u.gruppe || '')).toLowerCase())}">
     <div class="uhead" data-act="uTog" role="button" tabindex="0" aria-expanded="${auf}" aria-controls="ub-${u.id}">
       <div class="avatar">${esc((u.name || '?').charAt(0).toUpperCase())}</div>
-      <div class="uinfo"><div class="uname"><b>${esc(u.name)}</b>${isAdm ? '<span class="ubadge">Admin</span>' : ''}${u.email ? '' : '<span class="ubadge warn">keine E-Mail</span>'}</div>
+      <div class="uinfo"><div class="uname"><b>${esc(u.name)}</b>${isAdm ? '<span class="ubadge">Admin</span>' : ''}${u.gruppe ? `<span class="ubadge grp">${esc(u.gruppe)}</span>` : ''}${u.email ? '' : '<span class="ubadge warn">keine E-Mail</span>'}</div>
         <small>${esc(u.benutzername || '')}</small><div class="uapps" aria-label="Freigeschaltete Apps">${uAppsHTML(u)}</div></div>
       <button class="iconbtn flat umenu" data-act="uMenu" data-u="${u.id}" aria-label="${esc(u.name)} verwalten">⋯</button>
       <span class="uchev" aria-hidden="true">${ic('chev')}</span>
@@ -985,6 +986,80 @@ function uListe() {
   };
   setTimeout(() => $('#ulTxt', bd).focus(), 60);
 }
+/* ---------- Gruppen: gleiche Rechte für alle Monteure, Obermonteure, Büro … ----------
+   Jeder Benutzer gehört zu höchstens einer Gruppe (benutzer.gruppe). Je Gruppe gibt es eine Vorlage
+   (benutzer_gruppen: Apps mit Rolle, Lager-Rechte). „Anwenden“ setzt die Rechte aller Mitglieder auf die Vorlage.
+   Admins werden nie verändert, sie haben ohnehin überall Zugriff. */
+let BG = null, BG_SEL = null;
+const BG_STD = ['Obermonteur', 'Monteur', 'Kundendienst', 'Azubi', 'Projektleitung', 'Büro', 'Lager', 'Geschäftsführung'];
+const bgMods = () => zugriffGruppen().flatMap(g => g.mods);
+async function bgLaden() {
+  try { BG = await api('GET', 'benutzer_gruppen', null, '?select=*&order=sort.asc,name.asc') } catch (e) { BG = null }
+  return BG;
+}
+async function uGruppen() {
+  if (!(await bgLaden())) { sheet('Gruppen', `<p class="muted">Die Datenbank-Erweiterung <b>benutzer_gruppen.sql</b> ist noch nicht eingespielt. Bitte zuerst im Supabase SQL-Editor ausführen.</p>`, `<button class="btn btn-primary" data-act="closeSheet">OK</button>`); return }
+  if (!BG_SEL || !BG.some(g => g.name === BG_SEL)) BG_SEL = (BG[0] || {}).name;
+  bgZeichnen();
+}
+function bgZeichnen() {
+  const g = BG.find(x => x.name === BG_SEL); if (!g) return;
+  const apps = { ...(g.apps || {}) }, lager = new Set(g.lager || []), mit = new Set(ZU.filter(u => u.gruppe === g.name).map(u => u.id));
+  const anz = n => ZU.filter(u => u.gruppe === n).length;
+  const bd = sheet('Gruppen und Rechte', `
+    <p class="muted" style="margin:2px 0 10px">Gruppe wählen, Mitglieder ankreuzen, Rechte festlegen und auf alle Mitglieder anwenden. Admins bleiben unverändert.</p>
+    <div class="bgchips">${BG.map(x => `<button type="button" class="bgchip${x.name === g.name ? ' on' : ''}" data-bg="${esc(x.name)}">${esc(x.name)} <small>${anz(x.name)}</small></button>`).join('')}</div>
+    <div class="bgsec"><b>Mitglieder</b><span class="faint" id="bgN"></span></div>
+    <input class="inp" id="bgSuch" type="search" placeholder="Name suchen" autocomplete="off" style="margin-bottom:6px">
+    <div class="bgliste">${ZU.slice().sort((a, b) => (mit.has(b.id) - mit.has(a.id)) || a.name.localeCompare(b.name, 'de')).map(u => `<label class="bgm${u.rolle === 'admin' ? ' adm' : ''}" data-such="${esc((u.name || '').toLowerCase())}"><input type="checkbox" data-bgu="${u.id}" ${mit.has(u.id) ? 'checked' : ''}><span><b>${esc(u.name)}</b><small>${u.rolle === 'admin' ? 'Admin, Rechte bleiben unverändert' : u.gruppe && u.gruppe !== g.name ? 'bisher ' + esc(u.gruppe) : u.gruppe ? '' : 'ohne Gruppe'}</small></span></label>`).join('')}</div>
+    <div class="bgsec"><b>Rechte der Gruppe ${esc(g.name)}</b></div>
+    <div class="bgapps">${bgMods().map(m => `<div class="bgapp"><span class="mi" style="--g1:${m.g[0]};--g2:${m.g[1]}">${ic(m.icon)}</span><span class="bgan">${esc(m.name)}${m.alle ? '<small>sehen alle</small>' : ''}</span>
+      ${m.rollen ? `<select class="inp bgrol" data-bgr="${m.id}" ${apps[m.id] === undefined ? 'disabled' : ''}>${m.rollen.map(r => `<option value="${r.k}" ${apps[m.id] === r.k ? 'selected' : ''}>${esc(r.l)}</option>`).join('')}</select>` : ''}
+      <button type="button" class="switch ${apps[m.id] !== undefined ? 'on' : ''}" data-bga="${m.id}" role="switch" aria-checked="${apps[m.id] !== undefined}" aria-label="${esc(m.name)} für ${esc(g.name)}"></button>
+      ${m.id === 'lager' ? `<div class="bglager"${apps.lager === undefined ? ' hidden' : ''}>${[...LAGER_RECHTE, ...LAGER_ROLLEN].map(([k, l]) => `<label class="lrecht"><input type="checkbox" data-bgl="${k}" ${lager.has(k) ? 'checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>` : ''}</div>`).join('')}</div>
+    <label class="lrecht" style="margin-top:10px"><input type="checkbox" id="bgWeg" checked><span>Apps, die nicht in der Vorlage stehen, bei den Mitgliedern entfernen (alle bekommen genau diese Rechte)</span></label>
+    <div class="err" id="bgErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Schließen</button><button class="btn btn-soft" id="bgSave">Speichern</button><button class="btn btn-primary" id="bgGo">Anwenden</button>`);
+  const zaehl = () => { const n = $$('[data-bgu]:checked', bd).filter(c => (ZU.find(u => u.id === c.dataset.bgu) || {}).rolle !== 'admin').length; $('#bgN', bd).textContent = `${$$('[data-bgu]:checked', bd).length} ausgewählt`; $('#bgGo', bd).textContent = n ? `Auf ${n} anwenden` : 'Anwenden'; $('#bgGo', bd).disabled = !n };
+  const lesen = () => {
+    const a = {}; $$('[data-bga].on', bd).forEach(s => { const sel = $(`[data-bgr="${s.dataset.bga}"]`, bd); const m = MODULES.find(x => x.id === s.dataset.bga); a[s.dataset.bga] = sel ? sel.value : (m && m.rollen ? m.rollen[0].k : 'benutzer') });
+    return { apps: a, lager: a.lager !== undefined ? $$('[data-bgl]:checked', bd).map(c => c.dataset.bgl) : [], mitglieder: $$('[data-bgu]:checked', bd).map(c => c.dataset.bgu) };
+  };
+  $$('[data-bg]', bd).forEach(b => b.onclick = () => { BG_SEL = b.dataset.bg; closeSheet(); bgZeichnen() });
+  $$('[data-bgu]', bd).forEach(c => c.onchange = zaehl);
+  $('#bgSuch', bd).oninput = e => { const q = e.target.value.trim().toLowerCase(); $$('.bgm', bd).forEach(l => l.hidden = q && !l.dataset.such.includes(q)) };
+  $$('[data-bga]', bd).forEach(s => s.onclick = () => { const on = !s.classList.contains('on'); s.classList.toggle('on', on); s.setAttribute('aria-checked', on); const sel = $(`[data-bgr="${s.dataset.bga}"]`, bd); if (sel) sel.disabled = !on; if (s.dataset.bga === 'lager') { const lx = $('.bglager', bd); lx.hidden = !on; if (on && !$$('[data-bgl]:checked', bd).length) $$('[data-bgl]', bd).forEach(c => c.checked = ['kommission', 'eigen', 'rest'].includes(c.dataset.bgl)) } });
+  const speichern = async x => {
+    await api('PATCH', 'benutzer_gruppen', { apps: x.apps, lager: x.lager }, `?name=eq.${encodeURIComponent(g.name)}`);
+    g.apps = x.apps; g.lager = x.lager;
+    const neu = new Set(x.mitglieder), raus = ZU.filter(u => u.gruppe === g.name && !neu.has(u.id)), rein = ZU.filter(u => neu.has(u.id) && u.gruppe !== g.name);
+    for (const u of raus) { await api('PATCH', 'benutzer', { gruppe: null }, `?id=eq.${u.id}`); u.gruppe = null }
+    for (const u of rein) { await api('PATCH', 'benutzer', { gruppe: g.name }, `?id=eq.${u.id}`); u.gruppe = g.name }
+  };
+  $('#bgSave', bd).onclick = ev => busyBtn(ev.currentTarget, async () => { await speichern(lesen()); toast(`Gruppe ${g.name} gespeichert`, 'ok'); closeSheet(); bgZeichnen() });
+  $('#bgGo', bd).onclick = ev => busyBtn(ev.currentTarget, async () => {
+    const x = lesen(), weg = $('#bgWeg', bd).checked;
+    const ziel = ZU.filter(u => x.mitglieder.includes(u.id) && u.rolle !== 'admin');
+    // Änderungen vorab zählen
+    const plan = ziel.map(u => { const cur = ZM[u.id] || {}, add = [], del = [];
+      bgMods().forEach(m => { const soll = x.apps[m.id], ist = cur[m.id]; if (soll !== undefined && soll !== ist) add.push(m); else if (soll === undefined && ist !== undefined && weg) del.push(m) });
+      return { u, add, del } });
+    const n = plan.reduce((s, p) => s + p.add.length + p.del.length, 0);
+    if (!confirm(`${g.name}: Rechte von ${ziel.length} Benutzern angleichen?\n\n${n} App-Freischaltungen werden gesetzt oder entfernt${x.apps.lager !== undefined ? ', dazu die Lager-Rechte' : ''}.`)) return;
+    await speichern(x);
+    let fehler = 0;
+    for (const p of plan) {
+      for (const m of p.add) { try { await setZugriff(p.u.id, m.id, true, x.apps[m.id]); (ZM[p.u.id] = ZM[p.u.id] || {})[m.id] = x.apps[m.id] } catch (e) { fehler++ } }
+      for (const m of p.del) { try { await setZugriff(p.u.id, m.id, false); delete (ZM[p.u.id] || {})[m.id] } catch (e) { fehler++ } }
+      if (x.apps.lager !== undefined && LR_OK) for (const [k] of [...LAGER_RECHTE, ...LAGER_ROLLEN]) { const soll = x.lager.includes(k), ist = !!(LR[p.u.id] || {})[k]; if (soll !== ist) { try { await setLagerRecht(p.u.id, k, soll) } catch (e) { fehler++ } } }
+    }
+    closeSheet();
+    toast(fehler ? `${g.name}: angewendet, ${fehler} Änderungen fehlgeschlagen` : `${g.name}: Rechte für ${ziel.length} Benutzer angeglichen`, fehler ? 'err' : 'ok');
+    if (location.hash === '#/zugriff') showZugriff();
+  });
+  zaehl();
+}
+async function busyBtn(b, fn) { if (b.disabled) return; const t = b.textContent; b.disabled = true; try { await fn() } catch (e) { toast(niceErr(e), 'err') } finally { if (b.isConnected) { b.disabled = false; b.textContent = t } } }
 function uMenu(el) {
   const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
   const self = u.id === ME.id;
@@ -1053,7 +1128,7 @@ function uDel(el) {
 
 /* ---------- Klicks ---------- */
 const ACT = {
-  uNeu, uListe, uMenu, uMail, uRolle, uPw, uDel, uTog, rolInfo,
+  uNeu, uListe, uGruppen, uMenu, uMail, uRolle, uPw, uDel, uTog, rolInfo,
   pwGen(el) { const t = $('#' + el.dataset.t); if (t) t.value = pwVorschlag() },
   nvR(el) { $$('#nvRolle button').forEach(b => b.classList.toggle('on', b === el)) },
   logout, konto: kontoSheet, pw: () => { closeSheet(); pwSheet() }, closeSheet: () => closeSheet(),
