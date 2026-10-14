@@ -422,6 +422,8 @@ const MODULES = [
     rollen: [
       { k: 'planer', l: 'Planer', d: 'Einsätze im Wochenplan eintragen und verschieben, Termine und Aufgaben pflegen, Besprechungsprotokoll. Ohne Freischaltung: nur ansehen (Mein Einsatz, Wochenplan, Zeitplan).' },
       { k: 'verwalter', l: 'Verwaltung', d: 'Wie Planer, dazu Mitarbeiter, Baustellen, Farben und Betriebsurlaub verwalten.' }] },
+  // Notdienst liegt in planung.html (Reiter „Notdienst“). Für alle sichtbar, Rechte kommen aus der Planung, daher keine eigene Freischaltung.
+  { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', url: 'planung.html#notdienst', icon: 'bell', g: ['#e8742f', '#c94a03'], alle: true, nurKachel: true },
   { id: 'geraete', name: 'Geräteverwaltung', desc: 'iPads, Handys, Apps, Kosten', url: 'geraete.html', icon: 'tablet', g: ['#6b7a99', '#465573'],
     rollen: [
       { k: 'verwalter', l: 'Verwalter', d: 'Geräte, Apps und Abos anlegen und ändern, Geräte mit Unterschrift ausgeben und zurücknehmen, Kosten und Fristen sehen.' },
@@ -439,6 +441,8 @@ const BEREICHE = [
     apps: ['projekte', 'objekt', 'gefaehrdung'], zaehlt: ['projekte', 'objekt', 'gefaehrdung'] },
   { id: 'planung', name: 'Planung', desc: 'Wochenplan, Zeitplan, Mein Einsatz', icon: 'calendar', g: ['#5b6b8c', '#2f3b53'],
     apps: ['planung'], zaehlt: [] },
+  { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', icon: 'bell', g: ['#e8742f', '#c94a03'],
+    apps: ['notdienst'], zaehlt: [] },
   { id: 'lager', name: 'Lager & Material', desc: 'Kommission, eigenes Lager, Reste', icon: 'box', g: ['#4a5a7a', '#2f3b53'],
     apps: ['lager'], zaehlt: ['lager', 'lager_kom'] },
   { id: 'betriebsmittel', name: 'Fahrzeuge & Betriebsmittel', desc: 'Fuhrpark, Leiterprüfung, Geräte', icon: 'car', g: ['#4a7fc4', '#2c60a7'],
@@ -828,8 +832,8 @@ async function setLagerRecht(uid, lager, on) {
 /* Benutzer & Zugriff nach Bereichen gruppiert. Jede App steht nur einmal, im ersten Bereich, der sie führt
    (Gefährdungsbeurteilung also unter Baustelle). Apps ohne Bereich landen unter „Weitere Apps“. */
 function zugriffGruppen() {
-  const seen = new Set(), out = BEREICHE.map(b => ({ id: b.id, name: b.name, mods: b.apps.filter(id => !seen.has(id) && seen.add(id)).map(id => MODULES.find(m => m.id === id)).filter(Boolean) }));
-  const rest = MODULES.filter(m => !seen.has(m.id)); if (rest.length) out.push({ id: 'weitere', name: 'Weitere Apps', mods: rest });
+  const seen = new Set(), out = BEREICHE.map(b => ({ id: b.id, name: b.name, mods: b.apps.filter(id => !seen.has(id) && seen.add(id)).map(id => MODULES.find(m => m.id === id)).filter(m => m && !m.nurKachel) }));
+  const rest = MODULES.filter(m => !seen.has(m.id) && !m.nurKachel); if (rest.length) out.push({ id: 'weitere', name: 'Weitere Apps', mods: rest });
   return out.filter(g => g.mods.length);
 }
 async function setZugriff(uid, mid, on, rolle) {
