@@ -336,6 +336,34 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 .bgchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.bgchip{height:34px;padding:0 12px;border-radius:17px;border:1px solid #e3e7ee;background:#fff;font:inherit;font-weight:650;font-size:14px;cursor:pointer}.bgchip small{color:#8491a3;font-weight:600;margin-left:3px}.bgchip.on{background:#2f3b53;color:#fff;border-color:#2f3b53}.bgchip.on small{color:#c9d0dc}.bgsec{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 6px}.bgliste{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px;max-height:34vh;overflow:auto}.bgm{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border:1px solid #e3e7ee;border-radius:10px;font-size:14px;cursor:pointer}.bgm.adm{opacity:.55}.bgm small{display:block;color:#8491a3;font-size:12px}.bgapps{display:grid;gap:4px}.bgapp{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:6px 8px;border:1px solid #e3e7ee;border-radius:10px}.bgapp .mi{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2));flex:none}.bgapp .mi svg{width:17px;height:17px}.bgan{flex:1;font-weight:650;font-size:14px}.bgan small{display:block;font-weight:500;color:#8491a3;font-size:12px}.bgrol{width:auto;min-width:130px;height:34px}.bglager{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px 14px;padding:4px 0 2px 40px}.ubadge.grp{background:#eef0f4;color:#485468}
 .ulv{display:grid;gap:4px;max-height:50vh;overflow:auto}.ulz{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid #e3e7ee;border-radius:10px;font-size:14px}.ulz.da{opacity:.55}.ulz small{display:block;color:#8491a3;font-size:12.5px}.ulz em{display:block;font-style:normal;font-size:12px;font-weight:600;color:#b54203}.ulz em.ok{color:#15803d}
 .zgst{border-radius:12px;padding:10px 12px;font-size:14px;font-weight:600;margin-bottom:12px}.zgst.ok{background:#e6f6ec;color:#15803d}.zgst.err{background:#fdeceb;color:#c32328}
+/* Ideen */
+.ideecard .mi{background:var(--amber-bg);color:var(--amber)}
+.ideecard{margin-top:10px}
+.id-intro{display:flex;gap:12px;align-items:flex-start;background:var(--amber-bg);color:var(--ink);border-radius:18px;padding:12px 14px;margin:0 0 14px}
+.id-intro .ic{color:var(--amber);flex:none;margin-top:2px}.id-intro p{margin:0;font-size:14px;line-height:1.45}
+.id-bar{align-items:flex-start}.id-bar .seg small{color:var(--ink-3);font-weight:600}
+.id-sel{display:flex;gap:8px}.id-sel .inp{min-height:36px;padding:4px 10px;font-size:13.5px;width:auto}
+.idee{display:flex;gap:12px;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+.idee-l{flex:none}
+.id-daumen{width:52px;min-height:58px;border-radius:14px;border:1.5px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink-2);background:var(--surface)}
+.id-daumen b{font-size:15px}.id-daumen:active{transform:scale(.96)}
+.id-daumen.on{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
+.idee-r{min-width:0;flex:1}
+.idee h3{font-size:16px;font-weight:750;margin:6px 0 4px;overflow-wrap:anywhere}
+.id-text{margin:0 0 6px;font-size:14px;color:var(--ink-2);white-space:pre-line;overflow-wrap:anywhere}
+.id-tags{display:flex;gap:6px;flex-wrap:wrap}
+.id-tag{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--gray-bg);color:var(--gray)}
+.id-tag.st-blue{background:var(--blue-bg);color:var(--blue)}.id-tag.st-amber{background:var(--amber-bg);color:var(--amber)}
+.id-tag.st-violet{background:var(--violet-bg);color:var(--violet)}.id-tag.st-ok{background:var(--ok-bg);color:var(--ok)}.id-tag.st-red{background:var(--red-bg);color:var(--red)}
+.id-meta{font-size:12.5px;color:var(--ink-3)}
+.id-foto{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:var(--blue);margin:0 0 6px}
+.id-antwort{margin-top:10px;background:var(--surface-2);border-radius:14px;padding:10px 12px;font-size:14px}
+.id-antwort b{font-size:12.5px;color:var(--ink-3)}.id-antwort p{margin:2px 0 0;white-space:pre-line}
+.id-act{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.id-fv{margin-top:8px}.id-fv img{max-width:100%;max-height:220px;border-radius:12px;display:block;margin-bottom:6px}
+.id-fv .lnk{font-size:13px;font-weight:700;color:var(--red)}
+.id-stseg{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+@media(max-width:560px){.id-sel{width:100%}.id-sel .inp{flex:1}}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -371,6 +399,8 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19zM12 10v4.5M12 17.5v.1"/></symbol>
 <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
 <symbol id="i-tablet" viewBox="0 0 24 24"><rect x="4.5" y="2.5" width="15" height="19" rx="2.4"/><path d="M11 18.5h2"/></symbol><symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="17" rx="2.4"/><path d="M8 2.5v4M16 2.5v4M3 10h18M8 14h2M14 14h2M8 17.5h2"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 10v11M7 10l4-7c1.3 0 2.3 1.1 2.1 2.4L12.6 9H19a2 2 0 0 1 2 2.3l-1.2 7.4A2.5 2.5 0 0 1 17.3 21H7M7 10H4.5A1.5 1.5 0 0 0 3 11.5v8A1.5 1.5 0 0 0 4.5 21H7"/></symbol>
 </defs></svg>
 <div id="boot" class="boot"><div class="spinner"></div></div>
 <div id="root"></div>
@@ -583,6 +613,7 @@ function route() {
   else if (h === '#/mail' && ME.rolle === 'admin') showMail();
   else if (/^#\/bereich\/[\w-]+$/.test(h) && BEREICHE.some(b => b.id === h.split('/')[2])) showBereich(h.split('/')[2]);
   else if (/^#\/nachrichten(\/(inbox|gesendet|meldungen))?$/.test(h)) showNachrichten(h.split('/')[2]);
+  else if (/^#\/ideen(\/neu(\/[\w-]+)?)?$/.test(h)) showIdeen(h);
   else showHome();
   window.scrollTo(0, 0);
 }
@@ -704,13 +735,14 @@ function showHome() {
     <header class="topbar"><div class="brand"><img src="icon.png?v=5" alt="" onerror="this.remove()"><div>${APP_NAME}<small>${esc(FIRMA)}</small></div></div><div class="top-r"><a class="bell" href="#/nachrichten" data-bell aria-label="Nachrichten">${ic('bell')}<span class="bell-n" hidden></span></a><button class="avatar" data-act="konto" aria-label="Konto">${esc((ME.name || '?').charAt(0).toUpperCase())}</button></div></header>
     <section class="hero"><div class="hero-t"><div class="ey">${esc(heute())}</div><h1>${esc(greet())}, ${esc(first)}</h1></div><div class="logo-tile" id="heroLogo"></div><p class="hero-p">Willkommen bei Heise Haustechnik. Was möchtest du heute erledigen?</p></section>
     <a class="msgcard" id="msgcard" href="#/nachrichten">${'<div class="mi">' + ic('mail', 'lg') + '</div>'}<div class="mt"><b>Nachrichten</b><span class="s">${esc(zaehlerText())}</span></div><span class="cnt" hidden></span>${ic('chev', 'chev')}</a>
+    ${ideeCard()}
     ${!mods.length ? `<div class="sec-title">Deine Apps</div><div class="empty">${ic('lock')}<h3>Noch keine App freigeschaltet</h3><p class="muted" style="margin-top:4px">Bitte melde dich beim Administrator.</p></div>`
       : bers.length === 1 ? `<div class="sec-title">${esc(bers[0].name)}</div><div class="apps">${bereichApps(bers[0]).map(appTile).join('')}</div>`
       : `<div class="sec-title">Deine Bereiche</div><div class="apps">${bers.map(bereichTile).join('')}</div>`}
     ${adm ? `<div class="sec-title">Verwaltung</div><div class="apps"><a class="app plain" href="#/zugriff" style="--g1:#14b8a6;--g2:#0f766e"><div class="app-ico">${ic('users')}</div><div class="app-t"><b>Benutzer &amp; Zugriff</b><span>Benutzer anlegen, Apps und Rollen</span></div>${ic('chev', 'chev')}</a></div>` : ''}
     <div class="foot">${APP_NAME} · ${esc(FIRMA)}</div></div>`;
   loadLogo($('#heroLogo'), LOGO_WILLKOMMEN);
-  paintZaehler(); refreshZaehler();
+  paintZaehler(); refreshZaehler(); idZaehler();
 }
 
 function bereichTile(b) {
@@ -1675,6 +1707,172 @@ Object.assign(ACT, {
 });
 document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.msg-h[role="button"]')) { e.preventDefault(); ACT.msgToggle(e.target) }
+});
+
+/* =====================================================================
+   Ideen und Verbesserungsvorschläge (#/ideen, Datenbank: ideen.sql)
+   - Alle reichen Ideen ein (immer mit Namen), zu einer App oder allgemein, optional mit Foto
+   - Alle sehen alle Ideen und können mit Daumen hoch zustimmen
+   - Admins setzen Status und antworten, die Antwort kommt als Nachricht
+   - Aus den Apps: Link index.html#/ideen/neu/<app> öffnet das Formular mit vorausgewählter App
+   ===================================================================== */
+const ID = { list: [], admin: false, ich: null, filter: 'offen', sort: 'neu', app: '', neuAdmin: 0 };
+const ID_ST = { neu: ['Neu', 'blue'], pruefung: ['Wird geprüft', 'amber'], geplant: ['Geplant', 'violet'], umgesetzt: ['Umgesetzt', 'ok'], abgelehnt: ['Abgelehnt', 'gray'] };
+const ID_ART = { idee: 'Idee', verbesserung: 'Verbesserung', fehler: 'Fehler' };
+const ID_APP_X = { allgemein: 'Allgemein', neu: 'Neue App' };
+const idAppName = k => ID_APP_X[k] || ((MODULES.find(m => m.id === k) || {}).name || k).replace(/­/g, '');
+const idOffen = i => ['neu', 'pruefung', 'geplant'].includes(i.status);
+
+async function idLaden() {
+  const d = await rpc('ideen_laden');
+  ID.list = d.ideen || []; ID.admin = !!d.admin; ID.ich = d.ich;
+  ID.neuAdmin = ID.admin ? ID.list.filter(i => i.status === 'neu').length : 0;
+}
+/* Zähler auf der Startseite (nur Admin: neue, noch nicht bearbeitete Ideen) */
+async function idZaehler() {
+  if (!ME || ME.rolle !== 'admin') return;
+  try { await idLaden() } catch (e) { return }
+  $$('[data-ideen-n]').forEach(s => { s.textContent = ID.neuAdmin; s.hidden = !ID.neuAdmin });
+  const s = $('#ideecard .s'); if (s && ID.neuAdmin) s.textContent = `${ID.neuAdmin} ${ID.neuAdmin === 1 ? 'neue Idee' : 'neue Ideen'} zum Ansehen`;
+}
+function ideeCard() {
+  return `<a class="msgcard ideecard" id="ideecard" href="#/ideen"><div class="mi">${ic('bulb', 'lg')}</div><div class="mt"><b>Ideen und Verbesserungen</b><span class="s">Was können wir an der App besser machen?</span></div><span class="cnt" data-ideen-n hidden></span>${ic('chev', 'chev')}</a>`;
+}
+
+async function showIdeen(h) {
+  const m = /^#\/ideen\/neu(?:\/([\w-]+))?$/.exec(h || '');
+  const head = `<div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Ideen</h1><button class="btn btn-primary btn-sm head-act" data-act="idNeu">${ic('plus', 'sm')} Idee</button></div>`;
+  if (!ID.list.length) root.innerHTML = `<div class="shell">${head}<div class="empty"><div class="spinner" style="margin:6px auto"></div></div></div>`;
+  try { await idLaden() }
+  catch (e) {
+    const fehlt = /ideen_laden|function|schema cache/i.test(e.message || '');
+    root.innerHTML = `<div class="shell">${head}<div class="empty">${ic(fehlt ? 'info' : 'wifi')}<h3>${fehlt ? 'Noch nicht eingerichtet' : 'Konnte nicht geladen werden'}</h3><p class="muted" style="margin:4px 0 14px">${fehlt ? 'Die Datenbank-Erweiterung <b>ideen.sql</b> ist noch nicht eingespielt.' : esc(niceErr(e))}</p></div></div>`;
+    return;
+  }
+  if (!/^#\/ideen/.test(location.hash)) return;
+  idZeichnen();
+  if (m) { history.replaceState(null, '', '#/ideen'); idNeu(m[1] || '') }
+}
+function idZeichnen() {
+  const all = ID.list;
+  let list = ID.filter === 'offen' ? all.filter(idOffen) : ID.filter === 'umgesetzt' ? all.filter(i => i.status === 'umgesetzt') : ID.filter === 'meine' ? all.filter(i => i.benutzer_id === ID.ich) : all;
+  if (ID.app) list = list.filter(i => i.app === ID.app);
+  if (ID.sort === 'top') list = list.slice().sort((a, b) => b.stimmen - a.stimmen || (a.created_at < b.created_at ? 1 : -1));
+  const apps = [...new Set(all.map(i => i.app))].sort((a, b) => idAppName(a).localeCompare(idAppName(b), 'de'));
+  const n = f => f === 'offen' ? all.filter(idOffen).length : f === 'umgesetzt' ? all.filter(i => i.status === 'umgesetzt').length : f === 'meine' ? all.filter(i => i.benutzer_id === ID.ich).length : all.length;
+  root.innerHTML = `<div class="shell">
+    <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Ideen</h1><button class="btn btn-primary btn-sm head-act" data-act="idNeu">${ic('plus', 'sm')} Idee</button></div>
+    <div class="id-intro">${ic('bulb')}<p>Dir fällt etwas auf, das besser gehen könnte, oder du hast eine Idee für eine neue Funktion? Schreib es hier rein. Mit dem Daumen zeigst du, welche Ideen dir auch wichtig sind.</p></div>
+    <div class="nx-bar id-bar"><div class="seg sm" role="group" aria-label="Filter">${[['offen', 'Offen'], ['umgesetzt', 'Umgesetzt'], ['meine', 'Meine'], ['alle', 'Alle']].map(([k, l]) => `<button class="${ID.filter === k ? 'on' : ''}" data-act="idFilter" data-f="${k}">${l} <small>${n(k)}</small></button>`).join('')}</div>
+      <div class="id-sel"><select class="inp" id="idApp" aria-label="Nach App filtern"><option value="">Alle Apps</option>${apps.map(a => `<option value="${esc(a)}" ${ID.app === a ? 'selected' : ''}>${esc(idAppName(a))}</option>`).join('')}</select>
+      <select class="inp" id="idSort" aria-label="Sortierung"><option value="neu" ${ID.sort === 'neu' ? 'selected' : ''}>Neueste zuerst</option><option value="top" ${ID.sort === 'top' ? 'selected' : ''}>Meiste Daumen</option></select></div></div>
+    ${list.length ? list.map(idCard).join('') : `<div class="empty">${ic('bulb')}<h3>${all.length ? 'Keine Ideen in dieser Auswahl' : 'Noch keine Ideen'}</h3><p class="muted" style="margin:4px 0 14px">${all.length ? 'Wähle oben einen anderen Filter.' : 'Sei die oder der Erste.'}</p><button class="btn btn-primary" data-act="idNeu">${ic('plus', 'sm')} Idee einreichen</button></div>`}
+  </div>`;
+  $('#idApp').onchange = e => { ID.app = e.target.value; idZeichnen() };
+  $('#idSort').onchange = e => { ID.sort = e.target.value; idZeichnen() };
+}
+function idCard(i) {
+  const [sl, sc] = ID_ST[i.status] || [i.status, 'gray'], eigen = i.benutzer_id === ID.ich;
+  return `<article class="idee" data-id="${i.id}">
+    <div class="idee-l"><button class="id-daumen ${i.meine ? 'on' : ''}" data-act="idDaumen" data-id="${i.id}" aria-pressed="${i.meine}" aria-label="${i.meine ? 'Zustimmung zurücknehmen' : 'Finde ich auch'}" title="${i.meine ? 'Zustimmung zurücknehmen' : 'Finde ich auch'}">${ic('thumb')}<b>${i.stimmen}</b></button></div>
+    <div class="idee-r">
+      <div class="id-tags"><span class="id-tag st-${sc}">${esc(sl)}</span><span class="id-tag">${esc(idAppName(i.app))}</span>${i.art !== 'idee' ? `<span class="id-tag ${i.art === 'fehler' ? 'st-red' : ''}">${esc(ID_ART[i.art] || i.art)}</span>` : ''}</div>
+      <h3>${esc(i.titel)}</h3>
+      ${i.text ? `<p class="id-text">${linkify(i.text)}</p>` : ''}
+      ${i.bild ? `<button class="lnk id-foto" data-act="idFoto" data-id="${i.id}">${ic('search', 'sm')} Foto ansehen</button>` : ''}
+      <div class="id-meta">${esc(i.name || 'Gelöscht')} · ${esc(zeit(i.created_at))}</div>
+      ${i.antwort ? `<div class="id-antwort"><b>Antwort${i.beantwortet_von ? ' von ' + esc(i.beantwortet_von) : ''}</b><p>${linkify(i.antwort)}</p></div>` : ''}
+      ${ID.admin || (eigen && i.status === 'neu') ? `<div class="id-act">${ID.admin ? `<button class="btn btn-soft btn-sm" data-act="idBearb" data-id="${i.id}">Status und Antwort</button>` : ''}${ID.admin || (eigen && i.status === 'neu') ? `<button class="btn btn-ghost btn-sm" style="color:var(--red)" data-act="idDel" data-id="${i.id}">${ic('trash', 'sm')} Löschen</button>` : ''}</div>` : ''}
+    </div></article>`;
+}
+function idNeu(app) {
+  const mods = MODULES.filter(m => APPS[m.id]);
+  const bd = sheet('Idee einreichen', `
+    <div class="field"><label for="idA">Wozu?</label><select class="inp" id="idA">
+      <option value="allgemein">Allgemein, die ganze App</option>
+      ${mods.map(m => `<option value="${m.id}" ${m.id === app ? 'selected' : ''}>${esc(m.name.replace(/­/g, ''))}</option>`).join('')}
+      <option value="neu" ${app === 'neu' ? 'selected' : ''}>Idee für eine neue App</option></select></div>
+    <div class="field"><label>Was ist es?</label><div class="seg" id="idArt">${Object.entries(ID_ART).map(([k, l], n) => `<button type="button" class="${n ? '' : 'on'}" data-act="idArt" data-a="${k}">${l}</button>`).join('')}</div></div>
+    <div class="field"><label for="idT">Kurz in einem Satz *</label><input class="inp" id="idT" maxlength="120" placeholder="z. B. Lagerplatz direkt beim Scannen anzeigen"></div>
+    <div class="field"><label for="idX">Beschreibung</label><textarea class="inp" id="idX" rows="4" maxlength="3000" placeholder="Was soll anders werden? Wobei würde es dir helfen?"></textarea></div>
+    <div class="field"><label for="idF">Foto oder Screenshot (optional)</label><input class="inp" id="idF" type="file" accept="image/*"><div id="idFv" class="id-fv" hidden></div></div>
+    <p class="faint" style="margin:0">Deine Idee ist für alle Kolleginnen und Kollegen mit deinem Namen sichtbar. Die Antwort bekommst du als Nachricht in My Heise.</p>
+    <div class="err" id="idErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="idGo">${ic('send', 'sm')} Absenden</button>`);
+  let bild = null;
+  $('#idF', bd).onchange = async e => {
+    const f = e.target.files[0]; bild = null; $('#idFv', bd).hidden = true; if (!f) return;
+    try { bild = await idBildKlein(f); $('#idFv', bd).innerHTML = `<img src="${bild}" alt="Vorschau"><button type="button" class="lnk" id="idFx">Foto entfernen</button>`; $('#idFv', bd).hidden = false;
+      $('#idFx', bd).onclick = () => { bild = null; $('#idF', bd).value = ''; $('#idFv', bd).hidden = true } }
+    catch (x) { $('#idErr', bd).textContent = 'Das Bild konnte nicht gelesen werden.' }
+  };
+  setTimeout(() => $('#idT', bd) && $('#idT', bd).focus(), 250);
+  $('#idGo', bd).onclick = async ev => {
+    const b = ev.currentTarget, t = $('#idT', bd).value.trim();
+    if (t.length < 3) { $('#idErr', bd).textContent = 'Bitte schreib kurz in einem Satz, worum es geht.'; $('#idT', bd).focus(); return }
+    b.disabled = true;
+    try {
+      await rpc('idee_einreichen', { p_app: $('#idA', bd).value, p_art: ($('#idArt .on', bd) || {}).dataset?.a || 'idee', p_titel: t, p_text: $('#idX', bd).value.trim(), p_bild: bild });
+      closeSheet(); toast('Danke! Deine Idee ist angekommen.', 'ok'); ID.filter = 'offen'; ID.app = ''; ID.sort = 'neu';
+      if (/^#\/ideen/.test(location.hash)) showIdeen(location.hash); else location.hash = '#/ideen';
+    } catch (e) { $('#idErr', bd).textContent = niceErr(e); b.disabled = false }
+  };
+}
+/* Foto verkleinern: längste Seite 1280 px, JPEG, damit es klein bleibt */
+function idBildKlein(f) {
+  return new Promise((ok, no) => {
+    const r = new FileReader();
+    r.onerror = no;
+    r.onload = () => { const img = new Image(); img.onerror = no; img.onload = () => {
+      let q = 0.8, s = Math.min(1, 1280 / Math.max(img.width, img.height)), out;
+      for (let n = 0; n < 5; n++) {
+        const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); out = c.toDataURL('image/jpeg', q);
+        if (out.length < 650000) return ok(out); q -= 0.12; s *= 0.8;
+      }
+      no(new Error('zu groß'));
+    }; img.src = r.result };
+    r.readAsDataURL(f);
+  });
+}
+function idBearb(id) {
+  const i = ID.list.find(x => x.id === id); if (!i) return;
+  const bd = sheet('Status und Antwort', `
+    <div class="kv"><b>${esc(i.titel)}</b><span>von ${esc(i.name || '–')} · ${esc(idAppName(i.app))}</span></div>
+    <div class="field"><label>Status</label><div class="seg id-stseg" id="idSt">${Object.entries(ID_ST).map(([k, [l]]) => `<button type="button" class="${i.status === k ? 'on' : ''}" data-act="idSt" data-s="${k}">${l}</button>`).join('')}</div></div>
+    <div class="field"><label for="idAw">Antwort (optional)</label><textarea class="inp" id="idAw" rows="4" maxlength="3000" placeholder="z. B. Gute Idee, bauen wir im November ein.">${esc(i.antwort || '')}</textarea></div>
+    <p class="faint" style="margin:0">${esc(i.name || 'Die Person')} bekommt eine Nachricht, wenn sich Status oder Antwort ändern.</p>
+    <div class="err" id="idErr2" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="idSv">Speichern</button>`);
+  $('#idSv', bd).onclick = async ev => {
+    ev.currentTarget.disabled = true;
+    try { await rpc('idee_bearbeiten', { p_id: id, p_status: $('#idSt .on', bd).dataset.s, p_antwort: $('#idAw', bd).value.trim() }); closeSheet(); toast('Gespeichert', 'ok'); await idLaden(); idZeichnen() }
+    catch (e) { $('#idErr2', bd).textContent = niceErr(e); ev.currentTarget.disabled = false }
+  };
+}
+Object.assign(ACT, {
+  idNeu: () => idNeu(''),
+  idBearb: el => idBearb(el.dataset.id),
+  idFilter(el) { ID.filter = el.dataset.f; idZeichnen() },
+  idArt(el) { $$('#idArt button').forEach(b => b.classList.toggle('on', b === el)) },
+  idSt(el) { $$('#idSt button').forEach(b => b.classList.toggle('on', b === el)) },
+  async idDaumen(el) {
+    const i = ID.list.find(x => x.id === el.dataset.id); if (!i || el.disabled) return;
+    el.disabled = true;
+    try { const r = await rpc('idee_stimme', { p_id: i.id }); i.meine = r.meine; i.stimmen = r.stimmen; el.classList.toggle('on', i.meine); el.setAttribute('aria-pressed', i.meine); el.querySelector('b').textContent = i.stimmen }
+    catch (e) { toast(niceErr(e), 'err') }
+    el.disabled = false;
+  },
+  async idFoto(el) {
+    el.disabled = true;
+    try { const b = await rpc('idee_bild', { p_id: el.dataset.id }); if (b) sheet('Foto', `<img src="${esc(b)}" alt="Foto zur Idee" style="width:100%;border-radius:14px">`, `<button class="btn btn-primary" data-act="closeSheet">Schließen</button>`) }
+    catch (e) { toast(niceErr(e), 'err') }
+    el.disabled = false;
+  },
+  idDel(el) {
+    const i = ID.list.find(x => x.id === el.dataset.id); if (!i) return;
+    confirmSheet('Idee löschen?', `„${i.titel}“ wird mit allen Daumen endgültig entfernt.`, 'Löschen', async () => { await rpc('idee_loeschen', { p_id: i.id }); toast('Gelöscht', 'ok'); await idLaden(); idZeichnen() });
+  },
 });
 
 

@@ -60,6 +60,7 @@ body.pjs-tabs .toast{bottom:calc(150px + var(--safe-b,0px))}
   // Icons, die heise-icons.js nicht kennt
   const EXTRA = {
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+    bulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/>',
     apps: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     folder: '<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>'
@@ -107,6 +108,7 @@ body.pjs-tabs .toast{bottom:calc(150px + var(--safe-b,0px))}
       `</nav>` +
       `<div class="pjs-foot">` +
       `<a class="pjs-item" href="${portal()}#/nachrichten">${ic('bell')}Nachrichten${nzb}</a>` +
+      `<a class="pjs-item" href="${portal()}#/ideen/neu/projekte">${ic('bulb')}Idee einreichen</a>` +
       `<a class="pjs-item" href="${portal()}">${ic('apps')}My Heise Startseite</a>` +
       `<div class="pjs-user"><div class="pjs-av">${esc(ini)}</div><div style="min-width:0;flex:1"><b>${esc(name || 'Angemeldet')}</b><small>${esc(rolleName(PJ().rolle))}</small></div>` +
       `<button class="pjs-out" type="button" data-pjs-logout aria-label="Abmelden" title="Abmelden">${ic('logout')}</button></div></div>`;
@@ -124,7 +126,7 @@ body.pjs-tabs .toast{bottom:calc(150px + var(--safe-b,0px))}
 
   // Leiste „My Heise · Nachrichten“ oben auf der Startseite des Moduls (nur Handy, wie in den anderen Modulen)
   function pills() {
-    return `<div class="pjs-pills"><a class="pjs-pill" href="${portal()}">${ic('apps')} My Heise</a><a class="pjs-pill" href="${portal()}#/nachrichten">${ic('bell')} Nachrichten<span class="pjs-nzb" data-pjs-nz ${NZ ? '' : 'hidden'}>${NZ > 99 ? '99+' : NZ}</span></a></div>`;
+    return `<div class="pjs-pills"><a class="pjs-pill" href="${portal()}">${ic('apps')} My Heise</a><a class="pjs-pill" href="${portal()}#/nachrichten">${ic('bell')} Nachrichten<span class="pjs-nzb" data-pjs-nz ${NZ ? '' : 'hidden'}>${NZ > 99 ? '99+' : NZ}</span></a><a class="pjs-pill" href="${portal()}#/ideen/neu/projekte" title="Idee oder Verbesserung einreichen">${ic('bulb')} Idee</a></div>`;
   }
 
   function paintNz() { document.querySelectorAll('[data-pjs-nz]').forEach(e => { e.textContent = NZ > 99 ? '99+' : NZ; e.hidden = !NZ; }); }
