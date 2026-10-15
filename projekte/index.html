@@ -30,6 +30,18 @@ input[type=file].inp{padding:12px 14px}
 .btn.danger{color:var(--red)}
 .btn.danger:active{background:var(--red-bg)}
 .fold-b .sep{border-top:1px solid var(--line);margin:16px 0 12px}
+.mpq{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.mpq .hint{margin:4px 0 0}
+.mpl{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.mrow{display:grid;grid-template-columns:28px 130px 1.3fr 1fr 190px 40px;gap:8px;align-items:end;background:var(--surface,#fff);border:1px solid var(--line);border-radius:14px;padding:10px}
+.mrow.aus{opacity:.5}
+.mrow .field{margin:0}
+.mrow .field label{font-size:11.5px}
+.mchk{align-self:center;display:grid;place-items:center}
+.mchk input{width:22px;height:22px;accent-color:var(--accent)}
+.mhint{grid-column:2/-1;display:flex;gap:6px;flex-wrap:wrap}
+.sec-title .lnk{float:right;font-size:13px;font-weight:650;color:var(--accent);background:none;border:0;cursor:pointer}
+@media(max-width:720px){.mrow{grid-template-columns:28px 1fr 40px}.mrow .field{grid-column:2/3}.mrow .delbtn{grid-column:3;grid-row:1}.mhint{grid-column:2/3}}
 </style>
 </head>
 <body>
@@ -49,6 +61,7 @@ function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); 
 const api=(path,opt={})=>PJ.api(path,opt);
 function route(){ const m=location.hash.match(/^#p=(.+)$/); window.scrollTo(0,0);
   if(m){ PJS.set({seite:'projekt',pid:decodeURIComponent(m[1]),erfassen:false}); showProjekt(m[1]); }
+  else if(location.hash==='#mehrere'){ PJS.set({seite:'liste',pid:null,pname:''}); showMehrere(); }
   else { PJS.set({seite:'liste',pid:null,pname:''}); showListe().then(()=>{ if(location.hash==='#neu'){ const d=$('#np_name')&&$('#np_name').closest('details'); if(d){ d.open=true; d.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>$('#np_name').focus(),300); } } }); } }
 window.addEventListener('hashchange',route);
 const plural=(n,a,b)=>n+' '+(n==1?a:b);
@@ -86,6 +99,7 @@ async function showListe(){
       <div class="field"><label>Adresse</label><input class="inp" id="np_adr"></div>
       <button class="btn cta block" id="np_ok">Projekt anlegen</button>
       <p class="hint" style="margin-top:10px">Das LV wird danach im Projekt aus der Kalkulations-Excel importiert.</p></div></details>
+    <a class="row-card nur-leitung" href="#mehrere"><div class="mi tone-brand">${IC('plus')}</div><div class="mt"><b>Mehrere Projekte auf einmal anlegen</b><small>Baustellen aus der Planung übernehmen oder eine Liste aus Excel einfügen</small></div><span class="chev">${IC('chev')}</span></a>
     <details class="fold nur-leitung"><summary>${IC('upload')}Projekt aus Importdatei anlegen</summary><div class="fold-b">
       <p class="hint" style="margin-bottom:10px">Für vorbereitete Projektdateien mit LV, Bereichen und Vorschlägen (.json).</p>
       <div class="field"><input type="file" class="inp" id="imp_f" accept=".json,application/json"></div>
@@ -101,12 +115,95 @@ async function showListe(){
     try{ await api('projekte/'+b.dataset.eye+'/ansicht',{method:'PUT',body:JSON.stringify({sichtbar:an})}); toast(an?'Projekt eingeblendet':'Projekt ausgeblendet'); showListe(); }
     catch(e){ toast(e.message); b.disabled=false; } });
   $('#mig_ok').onclick=migration;
+  ['#np_nr','#np_name','#np_adr'].forEach(s=>{ const e=$(s); if(e) e.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); $('#np_ok').click(); } }; });
   $('#np_ok').onclick=async()=>{ const name=$('#np_name').value.trim(); if(!name) return toast('Bitte einen Namen eintragen');
     try{ const r=await api('projekte',{method:'POST',body:JSON.stringify({nr:$('#np_nr').value.trim(),name,adresse:$('#np_adr').value.trim()})}); location.hash='#p='+r.id; }catch(e){ toast(e.message); } };
   $('#imp_ok').onclick=async()=>{ const f=$('#imp_f').files[0]; if(!f) return toast('Bitte eine Datei wählen');
     const b=$('#imp_ok'); b.disabled=true; b.textContent='Importiere …';
     try{ const d=JSON.parse(await f.text()); const r=await api('import',{method:'POST',body:JSON.stringify(d)}); location.hash='#p='+r.projekt_id; }
     catch(e){ $('#imp_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; b.disabled=false; b.textContent='Importieren'; } };
+}
+
+/* ---------- Mehrere Projekte auf einmal anlegen (supabase/projekte_schnell.sql) ---------- */
+let MP={rows:[],pl:[],pj:[],geladen:false,fertig:false};
+const mpNorm=s=>String(s||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,' ').trim();
+const mpNrOk=n=>!n||/^\d{8}$/.test(n)||/^\d{7}-\d{4}$/.test(n);
+function mpPlanVorschlag(name,wunsch){ const frei=MP.pl.filter(b=>!MP.rows.some(r=>r.baustelle===b.id));
+  if(wunsch){ const w=mpNorm(wunsch); const t=frei.find(b=>mpNorm(b.name)===w); if(t) return t.id; }
+  const n=mpNorm(name); if(!n) return '';
+  const t=frei.find(b=>mpNorm(b.name)===n)||frei.find(b=>{ const m=mpNorm(b.name); return m.length>=4&&(n.includes(m)||m.includes(n)); });
+  return t?t.id:''; }
+function mpHinweis(r){ const h=[];
+  const vorh=r.nr?MP.pj.find(p=>p.nr===r.nr):MP.pj.find(p=>mpNorm(p.name)===mpNorm(r.name));
+  if(vorh) h.push(['gray',`gibt es schon („${vorh.name}“)${vorh.planung?', bereits in der Planung':r.baustelle?', wird nur verknüpft':''}`]);
+  if(!r.nr) h.push(['warn','ohne Projekt-Nr.']);
+  else if(!mpNrOk(r.nr)) h.push(['warn','Nr. prüfen (Form 32600972 oder 3261000-0004)']);
+  if(MP.rows.filter(x=>x.nr&&x.nr===r.nr).length>1) h.push(['warn','Nr. doppelt in der Liste']);
+  return h; }
+async function showMehrere(){
+  const app=$('#app');
+  if(!PJ.leitung()){ app.innerHTML=`<div class="err">Nur die Bauleitung kann Projekte anlegen.</div><a class="btn ghost" href="#">Zurück</a>`; return; }
+  if(!MP.geladen){ app.innerHTML='<div class="empty">Lädt …</div>';
+    try{ const d=await PJ.rpc('pj_schnell_laden',{}); MP.pl=d.planung||[]; MP.pj=d.projekte||[]; MP.geladen=true; }
+    catch(e){ app.innerHTML=`<div class="err">${esc(/pj_schnell_laden|function/i.test(e.message)?'Die Datenbank-Erweiterung projekte_schnell.sql ist noch nicht eingespielt. Bitte zuerst im Supabase SQL-Editor ausführen.':e.message)}</div><a class="btn ghost" href="#">Zurück</a>`; return; } }
+  mpZeichnen();
+}
+function mpZeichnen(){
+  const app=$('#app'), offen=MP.pl.filter(b=>!b.fertig&&!MP.rows.some(r=>r.baustelle===b.id));
+  const opt=sel=>`<option value="">nicht verknüpfen</option>${MP.pl.map(b=>`<option value="${esc(b.id)}" ${b.id===sel?'selected':''} ${b.id!==sel&&MP.rows.some(r=>r.baustelle===b.id)?'disabled':''}>${esc(b.name)}${b.fertig?' (abgeschl.)':''}</option>`).join('')}`;
+  const anz=MP.rows.filter(r=>r.an&&r.name.trim()).length;
+  app.innerHTML=`
+    <div class="pagehead"><a class="iconbtn" href="#" aria-label="Zurück">${IC('back')}</a><div style="min-width:0"><h1>Mehrere Projekte anlegen</h1><small>Aus der Planung übernehmen oder eine Liste einfügen</small></div></div>
+    <div class="card mpq"><div><b>Aus der Planung</b><p class="hint">${offen.length?`${plural(offen.length,'Baustelle','Baustellen')} aus der Planung haben noch kein App-Projekt.`:'Alle laufenden Baustellen der Planung haben schon ein App-Projekt.'}</p></div>
+      <button class="btn" id="mp_pl" ${offen.length?'':'disabled'}>${IC('plus')}Übernehmen</button></div>
+    <div class="card"><b>Liste einfügen</b>
+      <p class="hint" style="margin:4px 0 8px">Eine Zeile je Projekt: <b>Projekt-Nr.; Name; Adresse; Baustelle in der Planung</b>. Direkt aus Excel kopieren geht auch. Nur der Name ist Pflicht.</p>
+      <textarea class="inp" id="mp_txt" rows="4" placeholder="32500554; WvS Bad Harzburg 2. BA; Bad Harzburg; WvS&#10;32601090; Sonnenberg Ramblers Lodge"></textarea>
+      <button class="btn block" id="mp_ein" style="margin-top:8px">In die Liste übernehmen</button></div>
+    ${MP.rows.length?`<div class="sec-title">Liste (${MP.rows.length})<button class="lnk" id="mp_leer">Liste leeren</button></div>
+    <div class="mpl">${MP.rows.map((r,i)=>{ const h=mpHinweis(r); return `<div class="mrow${r.an?'':' aus'}" data-i="${i}">
+        <label class="mchk"><input type="checkbox" data-k="an" ${r.an?'checked':''} aria-label="anlegen"></label>
+        <div class="field"><label>Projekt-Nr.</label><input class="inp" data-k="nr" value="${esc(r.nr)}" inputmode="numeric"></div>
+        <div class="field"><label>Name *</label><input class="inp" data-k="name" value="${esc(r.name)}"></div>
+        <div class="field"><label>Adresse</label><input class="inp" data-k="adresse" value="${esc(r.adresse)}"></div>
+        <div class="field"><label>Planung</label><select class="inp" data-k="baustelle">${opt(r.baustelle)}</select></div>
+        <button class="delbtn" data-del="${i}" aria-label="Zeile entfernen">${IC('x')}</button>
+        ${h.length?`<div class="mhint">${h.map(([t,s])=>`<span class="pill tone-${t==='warn'?'orange':'gray'}">${esc(s)}</span>`).join('')}</div>`:''}</div>`; }).join('')}</div>
+    <button class="btn cta block" id="mp_go" ${anz?'':'disabled'}>${anz?plural(anz,'Projekt','Projekte')+' anlegen':'Projekte anlegen'}</button>
+    <p class="hint" style="margin-top:8px">Projekte, deren Nummer es schon gibt, werden nicht doppelt angelegt, sondern nur mit der Planung verknüpft. Die Baustelle in der Planung bekommt die Projekt-Nr., wenn sie noch keine hat.</p>`
+    :'<div class="empty">'+IC('building')+'<div>Noch keine Projekte in der Liste.</div></div>'}
+    <div id="mp_res"></div>`;
+  $('#mp_pl').onclick=()=>{ offen.forEach(b=>MP.rows.push({an:!!b.nr,nr:b.nr||'',name:b.name,adresse:b.ort||'',baustelle:b.id})); mpZeichnen(); };
+  $('#mp_ein').onclick=()=>{ const n=mpEinfuegen($('#mp_txt').value); if(!n) return toast('Keine Zeilen erkannt'); toast(plural(n,'Zeile','Zeilen')+' übernommen'); mpZeichnen(); };
+  const leer=$('#mp_leer'); if(leer) leer.onclick=()=>{ MP.rows=[]; mpZeichnen(); };
+  document.querySelectorAll('.mrow').forEach(z=>{ const r=MP.rows[+z.dataset.i];
+    z.querySelectorAll('[data-k]').forEach(el=>{ const k=el.dataset.k;
+      el.onchange=()=>{ r[k]=k==='an'?el.checked:el.value.trim(); mpZeichnen(); }; }); });
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ MP.rows.splice(+b.dataset.del,1); mpZeichnen(); });
+  const go=$('#mp_go'); if(go) go.onclick=mpAnlegen;
+}
+function mpEinfuegen(txt){ let n=0;
+  String(txt||'').split(/\r?\n/).forEach(z=>{ if(!z.trim()) return;
+    let f=z.split(z.includes('\t')?'\t':';').map(s=>s.trim());
+    if(/name/i.test(z)&&/nr|nummer/i.test(z)&&n===0) return; // Kopfzeile
+    let nr=''; if(f.length>1&&/^\d[\d\s\-\/]*$/.test(f[0]||'')){ nr=f.shift().replace(/\s/g,''); }
+    const name=f[0]||''; if(!name) return;
+    if(MP.rows.some(r=>(nr&&r.nr===nr&&mpNorm(r.name)===mpNorm(name))||(!nr&&!r.nr&&mpNorm(r.name)===mpNorm(name)))) return;
+    MP.rows.push({an:true,nr,name,adresse:f[1]||'',baustelle:''});
+    const r=MP.rows[MP.rows.length-1]; r.baustelle=mpPlanVorschlag(name,f[2]); n++; });
+  return n; }
+async function mpAnlegen(){
+  const zeilen=MP.rows.filter(r=>r.an&&r.name.trim()).map(r=>({nr:r.nr,name:r.name.trim(),adresse:r.adresse,baustelle:r.baustelle}));
+  if(!zeilen.length) return;
+  if(!confirm(`${plural(zeilen.length,'Projekt','Projekte')} anlegen bzw. verknüpfen?`)) return;
+  const b=$('#mp_go'); b.disabled=true; b.textContent='Lege an …';
+  try{ const x=await PJ.rpc('pj_schnell_anlegen',{p:{zeilen}});
+    const z=x.zeilen||[], neu=z.filter(s=>s.status.startsWith('neu')).length, vk=z.filter(s=>s.status.includes('verknuepft')).length;
+    MP.rows=MP.rows.filter(r=>!(r.an&&r.name.trim())); MP.geladen=false; await showMehrere();
+    $('#mp_res').innerHTML=`<div class="card"><b>Fertig: ${plural(neu,'Projekt','Projekte')} neu angelegt, ${vk} mit der Planung verknüpft</b>
+      ${z.map(s=>`<a class="row-card" href="#p=${esc(s.id)}"><div class="mi tone-brand">${IC('building')}</div><div class="mt"><b>${esc(s.name)}</b><small>${esc([s.nr,s.status.startsWith('neu')?'neu angelegt':'gab es schon',s.status.includes('verknuepft')?'mit Planung verknüpft':''].filter(Boolean).join(' · '))}</small></div><span class="chev">${IC('chev')}</span></a>`).join('')}</div>`;
+    $('#mp_res').scrollIntoView({behavior:'smooth'});
+  }catch(e){ toast(e.message); b.disabled=false; b.textContent='Erneut versuchen'; }
 }
 
 /* ---------- Einmalige Datenübernahme (nur Admin) ---------- */

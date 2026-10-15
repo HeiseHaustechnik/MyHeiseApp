@@ -1174,11 +1174,12 @@ document.addEventListener('change', async e => {
 /* ---------- E-Mail-Benachrichtigungen (Admin, #/mail) ----------
    Einstellungen in mail_einstellungen (nur Admin), Protokoll in mail_protokoll.
    Versand über die Edge Function „mail-senden“ (Microsoft Graph, Postfach myheise@). */
-const MAIL_IMPL = new Set(['unterweisung', 'pruefung', 'fuhrpark', 'nachricht', 'btb_unterschrift', 'aufmass_unterschrift', 'zusammenfassung']); // Benachrichtigungen, deren Versand schon eingebaut ist
+const MAIL_IMPL = new Set(['unterweisung', 'pruefung', 'fuhrpark', 'fuehrerschein', 'nachricht', 'btb_unterschrift', 'aufmass_unterschrift', 'zusammenfassung']); // Benachrichtigungen, deren Versand schon eingebaut ist
 const MAIL_INFO = {
   unterweisung: 'Jede Person bekommt ihre offenen Unterweisungen mit Link in die App.',
   pruefung: 'Fällige Prüfungen von Leitern und Geräten der nächsten 30 Tage an die Verantwortlichen.',
   fuhrpark: 'TÜV, Inspektion und Führerscheinkontrolle der nächsten 30 Tage.',
+  fuehrerschein: 'An den Fahrer selbst: 3 Wochen vor der nächsten Führerscheinkontrolle und noch einmal, wenn sie fällig ist. Jeweils nur einmal, dazu eine Nachricht in der App.',
   nachricht: 'Wenn du in der App eine Nachricht schreibst, bekommen die Empfänger sie zusätzlich per E-Mail.',
   btb_unterschrift: 'Mit PDF: Bautagebuch, sobald Monteur und Auftraggeber unterschrieben haben oder der Monteur „Niemand vor Ort“ meldet. Protokolle, sobald der Monteur abgeschlossen hat. Zusatzauftrag und Stundennachweis, sobald Auftraggeber bzw. Kunde unterschrieben haben.',
   aufmass_unterschrift: 'Mit PDF, sobald beide unterschrieben haben. Oder wenn der Monteur meldet, dass niemand vor Ort war: dann mit der Bitte, die Unterschrift einzuholen.',
