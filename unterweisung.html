@@ -699,6 +699,24 @@ textarea.inp{height:auto;min-height:96px;padding:12px 14px;line-height:1.45;resi
 .sec h2 .ic{vertical-align:-3px;margin-right:4px;color:var(--brand-strong)}
 .zbtns{flex-wrap:wrap}.zbtns>:first-child{flex:1 1 100%}@media (min-width:640px){.zbtns>:first-child{flex:2 1 auto}}
 .zgcard,.zrow,.trow{max-width:100%}
+
+/* ===== v3 (15.10.2026): Fragen, Unterschriftenliste ===== */
+.stack-14{display:flex;flex-direction:column;gap:12px}
+.askcard{display:flex;align-items:center;gap:14px;width:100%;margin-top:14px;padding:16px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);text-align:left}
+.askcard .ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--blue-bg);color:var(--blue);flex:none}
+.askcard b{display:block;font-size:15px}.askcard small{display:block;color:var(--ink-2);font-size:13px;margin-top:2px}.askcard .chev{margin-left:auto;color:var(--ink-3)}
+.anf-h{display:flex;align-items:center;gap:10px}.anf-h .m{flex:1;min-width:0}.anf-h b{display:block;font-size:15px}.anf-h small{display:block;color:var(--ink-3);font-size:12.5px}
+.anf-q{margin:10px 0 0;font-size:15px;line-height:1.5;white-space:pre-wrap}
+.anf-a{display:flex;gap:10px;margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--surface-2)}
+.anf-a .ic{color:var(--ok);flex:none;margin-top:2px}.anf-a small{display:block;color:var(--ink-3);font-size:12px;font-weight:650}.anf-a p{margin:3px 0 0;white-space:pre-wrap;line-height:1.5}
+.card.anf.offen{box-shadow:var(--shadow),inset 4px 0 0 var(--accent)}
+.anf-src{padding:12px 14px;border-radius:14px;background:var(--surface-2);margin-bottom:14px}.anf-src small{color:var(--ink-3);font-size:12px;font-weight:650}.anf-src p{margin:4px 0 0;white-space:pre-wrap}
+.swrow-u{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.swrow-u b{display:block;font-size:14.5px}.swrow-u small{display:block;color:var(--ink-3);font-size:12.5px}
+.wiz-top .wiz-ask{margin-left:auto;color:var(--blue)}
+.chipbtn b{margin-left:4px;font-weight:750}
+.anf .btnrow{flex-wrap:wrap}.anf .btnrow>*{flex:1 1 auto;min-width:0}
+.rail-item .dot{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center;font-style:normal}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -760,7 +778,7 @@ textarea.inp{height:auto;min-height:96px;padding:12px 14px;line-height:1.45;resi
 <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.500v15l12-7.500z"/></symbol>
 <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
 <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
-<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.500 10.900c.6.500 1 1.200 1 2V16h5v-.1c0-.8.400-1.500 1-2A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.1-2.4 3.8M12 17.2v.1"/></symbol><symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></symbol><symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.500 10.900c.6.500 1 1.200 1 2V16h5v-.1c0-.8.400-1.500 1-2A6 6 0 0 0 12 3z"/></symbol>
 <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4.500" width="18" height="12.500" rx="2"/><path d="M8.500 20.500h7M12 17v3.500"/></symbol>
 </defs>
 </svg>
@@ -1110,6 +1128,7 @@ async function loadAll(){
   ]);
   setBereiche(be);
   S.gruppe=g||'gewerblich';S.themen=t||[];S.nw=nw||[];S.users=us||[];S.loadedAt=Date.now();
+  await loadAnf();
 }
 async function refreshNw(){S.nw=await api('GET','unt_nachweise',null,`?benutzer_id=eq.${S.me.id}&select=${NWCOLS}&order=datum.desc,created_at.desc&limit=500`)}
 async function refreshThemen(){
@@ -1138,6 +1157,7 @@ function renderShell(){
     `<nav class="rail-nav">`+
       `<a class="rail-item" data-nav="start" href="#/">${ic('home')} Start</a>`+
       `<a class="rail-item" data-nav="nachweise" href="#/nachweise">${ic('clip')} Meine Nachweise</a>`+
+      (S.anfOk?`<a class="rail-item" data-nav="fragen" href="#/fragen">${ic('help')} ${isAdmin()?'Fragen':'Frage stellen'}${isAdmin()&&anfOffen()?`<i class="dot">${anfOffen()}</i>`:''}</a>`:'')+
       (isAdmin()?`<a class="rail-item" data-nav="team" href="#/team">${ic('users')} Team-Stand</a><a class="rail-item" data-nav="zuordnung" href="#/zuordnung">${ic('tasks')} Wer bekommt was</a><a class="rail-item" data-nav="inhalte" href="#/inhalte">${ic('sliders')} Inhalte verwalten</a>`:'')+
     `</nav>`+
     `<div class="rail-foot">`+
@@ -1149,7 +1169,7 @@ function renderShell(){
 function setNav(seg){
   const wide=window.matchMedia('(min-width:960px)').matches;
   let key=seg||'start';
-  if((key==='inhalte'||key==='zuordnung')&&!wide)key='mehr';
+  if((key==='inhalte'||key==='zuordnung'||key==='fragen')&&!wide)key='mehr';
   $$('[data-nav]').forEach(a=>{a.classList.toggle('on',a.dataset.nav===key);a.setAttribute('aria-current',a.dataset.nav===key?'page':'false')});
 }
 function paint(html){
@@ -1165,7 +1185,7 @@ function route(){
   window.scrollTo(0,0);
   if(!isAdmin()&&['team','inhalte','zuordnung'].includes(seg))seg='start';
   setNav(seg);
-  const V={start:viewStart,nachweise:viewNachweise,team:()=>parts[1]?viewPerson(parts[1],token):viewTeam(token),inhalte:()=>parts[1]?viewEditor(parts[1],token):viewInhalte(),zuordnung:()=>viewZuordnung(parts[1]),mehr:viewMehr};
+  const V={start:viewStart,nachweise:viewNachweise,team:()=>parts[1]?viewPerson(parts[1],token):viewTeam(token),inhalte:()=>parts[1]?viewEditor(parts[1],token):viewInhalte(),zuordnung:()=>viewZuordnung(parts[1]),mehr:viewMehr,fragen:()=>viewFragen(token)};
   (V[seg]||viewStart)();
 }
 window.addEventListener('hashchange',route);
@@ -1223,6 +1243,7 @@ function viewStart(){
   <div class="pills"><a class="hubpill" href="${PORTAL}">${ic('apps','sm')} My Heise</a><a class="hubpill" href="${PORTAL}#/nachrichten">${ic('bell','sm')} Nachrichten<span class="nzb" data-nz hidden></span></a></div>
   <div class="head"><div><div class="eyebrow">Sicherheitsunterweisung ${y}</div><h1>${first?`Hallo ${esc(first)}`:'Unterweisungen'}</h1></div><div class="avatar" style="width:46px;height:46px;font-size:18px">${esc((S.me.name||'?').charAt(0).toUpperCase())}</div></div>
   ${body}
+  ${S.anfOk?(isAdmin()?(anfOffen()?`<a class="alert-row tone-amber" href="#/fragen" style="margin-top:14px">${ic('help')}<div><b>${anfOffen()} ${anfOffen()===1?'offene Frage':'offene Fragen'} von Mitarbeitern</b><small>Zum Beantworten tippen</small></div>${ic('chev','chev')}</a>`:''):`<button class="askcard" data-act="frageNeu"><span class="ico">${ic('help')}</span><span><b>Frage an den Sicherheitsbeauftragten</b><small>Unklar, wie etwas sicher geht, oder Gefahr entdeckt? Frag einfach.</small></span>${ic('chev','chev')}</button>`):''}
   ${isAdmin()?`<div id="teamCard"></div>`:''}`);
   if(isAdmin()&&req.length)teamCard(TOKEN);
 }
@@ -1258,6 +1279,7 @@ function viewMehr(){
   <div class="card" style="display:flex;gap:14px;align-items:center;margin-bottom:14px"><div class="avatar" style="width:52px;height:52px;font-size:20px">${esc((S.me.name||'?').charAt(0).toUpperCase())}</div><div><b style="font-size:17px">${esc(S.me.name)}</b><div class="muted" style="margin-top:3px">${grpChip(S.gruppe)}${isAdmin()?' <span class="grpchip">Admin</span>':''}</div></div></div>
   <div class="menu-list">
     ${item('clip','Meine Nachweise','Abgeschlossene Unterweisungen und PDFs','goNachweise')}
+    ${S.anfOk?item('help',isAdmin()?`Fragen von Mitarbeitern${anfOffen()?` (${anfOffen()} offen)`:''}`:'Frage an den Sicherheitsbeauftragten',isAdmin()?'Fragen beantworten':'Unklar oder Gefahr entdeckt? Frag einfach.','goFragen'):''}
     ${isAdmin()?item('tasks','Wer bekommt was','Gruppen und ihre Pflicht-Unterweisungen','goZuordnung'):''}
     ${isAdmin()?item('sliders','Inhalte verwalten','Themen, Folien, Bilder und Prüfungsfragen','goInhalte'):''}
     ${item('bell','Nachrichten','Mitteilungen &amp; Meldungen in My Heise','goMsg')}
@@ -1436,7 +1458,7 @@ function pSub(){
 function drawPlayer(){
   const p=PL;if(!p)return;
   wizEl().innerHTML=`<div class="wiz" role="dialog" aria-modal="true" aria-label="Unterweisung">
-    <div class="wiz-top"><button class="iconbtn flat" data-act="pClose" aria-label="Schließen">${ic('x')}</button><div class="t"><b>${esc(p.t.titel)}</b><small>${pSub()}</small></div></div>
+    <div class="wiz-top"><button class="iconbtn flat" data-act="pClose" aria-label="Schließen">${ic('x')}</button><div class="t"><b>${esc(p.t.titel)}</b><small>${pSub()}</small></div>${S.anfOk&&!p.trial&&p.t.id?`<button class="iconbtn flat wiz-ask" data-act="frageNeu" data-id="${p.t.id}" aria-label="Frage stellen" title="Frage an den Sicherheitsbeauftragten">${ic('help')}</button>`:''}</div>
     <div class="wiz-bar"><i style="width:${pProgress()}%"></i></div>
     ${p.review?'':`<div class="wiz-steps">${stepsHTML({slides:0,quiz:1,result:1,sign:2,done:3}[p.mode])}</div>`}
     <div class="wiz-body" id="wizScroll"><div class="wiz-inner" id="wizBody"></div></div>
@@ -1639,7 +1661,7 @@ function teamStats(team){
   const c=k=>rows.filter(r=>r.state===k).length;
   return{rows,komplett:c('komplett'),teil:c('teil'),nichts:c('nichts'),offen:rows.length-c('komplett'),pct:sumT?Math.round(sumD/sumT*100):0};
 }
-const teamYears=()=>{const y=thisYear();return[y,y-1,y-2]};
+const teamYears=()=>{const a=[];for(let y=Math.max(thisYear(),2027);y>=2026;y--)a.push(y);return a};
 
 async function viewTeam(tk){
   if(!TY)TY=thisYear();
@@ -1658,6 +1680,7 @@ function drawTeam(){
   if(TF==='teil')F.splice(3,0,['teil','In Arbeit']);if(TF==='nichts')F.splice(3,0,['nichts','Nicht begonnen']);
   paint(`
   <div class="head"><div><div class="eyebrow">Unterweisungen ${TY}</div><h1>Team-Stand</h1></div><a class="hubpill" href="#/inhalte" style="margin:0">${ic('sliders','sm')} Inhalte</a></div>
+  ${S.anfOk&&anfOffen()?`<a class="alert-row tone-amber" href="#/fragen" style="margin-bottom:14px">${ic('help')}<div><b>${anfOffen()} ${anfOffen()===1?'offene Frage':'offene Fragen'} von Mitarbeitern</b><small>Fragen an den Sicherheitsbeauftragten beantworten</small></div>${ic('chev','chev')}</a>`:''}
   ${yearChips(TY,teamYears(),'tYear')}
   <div class="tiles" style="margin-bottom:14px">
     ${tile('komplett','ok','check',st.komplett,'Komplett')}
@@ -1671,7 +1694,8 @@ function drawTeam(){
     <div class="pct" style="color:${r.state==='komplett'?'var(--ok)':r.state==='nichts'?'var(--red)':'var(--ink)'}">${r.pct}%</div>${ic('chev','chev')}</a>`).join(''):`<div class="card">${emptyState('users','Niemand in dieser Auswahl','Ändere den Filter oben.')}</div>`}</div>
   <div class="sec"><h2>Aktionen</h2></div>
   <div class="menu-list">
-    <button class="menu-item" data-act="remindAll" ${TY!==cy||!st.offen?'disabled style="opacity:.5"':''}><span class="ico">${ic('bell')}</span><span>Erinnerung an alle Offenen<small>${TY!==cy?'Nur für das laufende Jahr':st.offen?`${st.offen} ${st.offen===1?'Mitarbeiter bekommt':'Mitarbeiter bekommen'} eine Nachricht in My Heise`:'Niemand hat etwas offen'}</small></span>${ic('chev','chev')}</button>
+    <button class="menu-item" data-act="remindAll" ${TY!==cy||!st.offen?'disabled style="opacity:.5"':''}><span class="ico">${ic('bell')}</span><span>Erinnerung an alle Offenen<small>${TY!==cy?'Nur für das laufende Jahr':st.offen?`${st.offen} ${st.offen===1?'Mitarbeiter bekommt':'Mitarbeiter bekommen'} Nachricht in My Heise (+ E-Mail)`:'Niemand hat etwas offen'}</small></span>${ic('chev','chev')}</button>
+    <button class="menu-item" data-act="signList"><span class="ico">${ic('print')}</span><span>Unterschriftenliste ${TY} zum Ausdrucken<small>PDF je Mitarbeiter oder je Unterweisung, zum Unterschreiben auf Papier</small></span>${ic('chev','chev')}</button>
     <button class="menu-item" data-act="teamPdf"><span class="ico">${ic('doc')}</span><span>Team-Stand als PDF<small>Übersicht aller Mitarbeiter ${TY}</small></span>${ic('chev','chev')}</button>
     <button class="menu-item" data-act="teamCsv"><span class="ico">${ic('download')}</span><span>Einzelstände als CSV<small>Jede Unterweisung je Mitarbeiter (Excel)</small></span>${ic('chev','chev')}</button>
   </div>`);
@@ -1686,7 +1710,7 @@ ACT.tf=el=>{TF=el.dataset.f;drawTeam()};
 ACT.remindAll=el=>{
   const st=teamStats(S.team),ids=st.rows.filter(r=>r.state!=='komplett').map(r=>r.u.id);
   if(!ids.length)return;
-  confirmSheet({title:'Erinnerung senden?',text:`${ids.length} ${ids.length===1?'Mitarbeiter bekommt':'Mitarbeiter bekommen'} eine Nachricht in My Heise: „Bitte erledige deine offenen Unterweisungen.“`,ok:'Erinnern',onOk:async()=>{const n=await rpc('unt_erinnern',{p_benutzer:ids});toast(`${n} ${n===1?'Erinnerung':'Erinnerungen'} gesendet`,'ok')}});
+  confirmSheet({title:'Erinnerung senden?',text:`${ids.length} ${ids.length===1?'Mitarbeiter bekommt':'Mitarbeiter bekommen'} eine Nachricht in My Heise und – wenn eingeschaltet – eine E-Mail: „Bitte erledige deine offenen Unterweisungen.“`,ok:'Erinnern',onOk:async()=>{const r=await erinnern(ids);toast(`${r.n} ${r.n===1?'Erinnerung':'Erinnerungen'} in My Heise${r.mail}`,'ok')}});
 };
 
 /* ---------- Person ---------- */
@@ -1719,7 +1743,7 @@ ACT.setGrp=el=>{
       if(/^#\/team\//.test(location.hash))viewPerson(u.id,TOKEN);else route();toast('Gruppe geändert','ok');
     }});
 };
-ACT.remindOne=el=>busy(el,async()=>{const n=await rpc('unt_erinnern',{p_benutzer:[el.dataset.id]});toast(n?'Erinnerung gesendet':'Nichts gesendet','ok')});
+ACT.remindOne=el=>busy(el,async()=>{const r=await erinnern([el.dataset.id]);toast(r.n?`Erinnerung gesendet${r.mail}`:'Nichts gesendet','ok')});
 ACT.jahresPdfU=el=>{const u=S.users.find(x=>x.id===el.dataset.id);if(u)return busy(el,()=>pdfJahr({benutzer_id:u.id,name:u.name,gruppe:u.gruppe,jahr:TY}))};
 ACT.delNw=el=>{
   const id=el.dataset.id,n=(S.team&&S.team.nw.find(x=>x.id===id))||S.nw.find(x=>x.id===id);if(!n)return;
@@ -2001,14 +2025,12 @@ ACT.qEdit=el=>{
    ===================================================================== */
 const JSPDF_URL='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
 const AUTOTABLE_URL='https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
-const NAVY=[29,58,99],GREY=[100,110,125],LINE=[220,225,232];
+const NAVY=[47,59,83],GREY=[100,110,125],LINE=[220,225,232];
 const P_ERG={ok:[21,128,61],mangel:[185,28,28],na:[110,118,130]};
 async function pdfNew(title,sub){
   await loadLib(JSPDF_URL);await loadLib(AUTOTABLE_URL);
   const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'});
-  doc.setFillColor(...NAVY);doc.rect(0,0,210,16,'F');
-  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.text('HEISE HAUSTECHNIK',15,10.2);
-  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.text('Unterweisungen',195,10.2,{align:'right'});
+  pdfHeadBand(doc);
   doc.setTextColor(13,21,36);doc.setFont('helvetica','bold');doc.setFontSize(19);doc.text(title,15,30);
   let y=30;
   if(sub){doc.setFont('helvetica','normal');doc.setFontSize(10.5);doc.setTextColor(...GREY);doc.text(sub,15,37);y=37}
@@ -2095,6 +2117,183 @@ async function pdfJahr({benutzer_id,name,gruppe,jahr}){
   y=pdfPara(P,'Die Unterweisungen wurden digital in der My Heise App durchgeführt (Folienvortrag mit anschließender Wissensprüfung). Jede Unterweisung wurde vom Mitarbeiter einzeln unterschrieben; die Einzelnachweise sind separat abrufbar.',y+2,9,GREY);
   return pdfDeliver(P,`Jahresnachweis_Unterweisungen_${jahr}_${fname(name)}.pdf`);
 }
+/* =====================================================================
+   v3 (15.10.2026): Fragen an den Sicherheitsbeauftragten, Erinnerung auch per E-Mail,
+   Unterschriftenliste (PDF) zum Ausdrucken
+   ===================================================================== */
+const ANF_ST={offen:['Offen','amber'],beantwortet:['Beantwortet','ok'],erledigt:['Erledigt','gray']};
+let AF='offen';
+async function loadAnf(){
+  try{S.anf=await api('GET','unt_anfragen',null,`?select=*&order=created_at.desc&limit=400${isAdmin()?'':`&benutzer_id=eq.${S.me.id}`}`);S.anfOk=true}
+  catch(e){S.anf=[];S.anfOk=false}
+}
+const anfOffen=()=>(S.anf||[]).filter(a=>a.status==='offen').length;
+
+/* ---------- Frage stellen ---------- */
+ACT.frageNeu=el=>openFrage(el&&el.dataset?el.dataset.id:null);
+function openFrage(themaId){
+  if(!S.anfOk)return toast('Die Fragen-Funktion ist noch nicht eingerichtet.','err');
+  const req=themaReq(S.gruppe);
+  const bd=sheet({title:'Frage an den Sicherheitsbeauftragten',body:`
+    <p class="muted" style="margin-bottom:14px">Dir ist etwas unklar oder dir ist eine Gefahr aufgefallen? Schreib es hier. Deine Frage geht an den Sicherheitsbeauftragten, die Antwort bekommst du als Nachricht in My Heise.</p>
+    ${field('Zu welcher Unterweisung?',`<select class="inp" id="afT"><option value="">Allgemeine Frage</option>${req.map(t=>`<option value="${t.id}" ${t.id===themaId?'selected':''}>${esc(t.titel)}</option>`).join('')}</select>`)}
+    ${field('Deine Frage',`<textarea class="inp" id="afQ" rows="5" maxlength="2000" placeholder="z. B. Welche Handschuhe nehme ich beim Rohrreiniger?"></textarea>`,'<span id="afN">0</span> / 2000 Zeichen')}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="afGo">${ic('send')} Absenden</button>`});
+  const q=$('#afQ',bd);q.oninput=()=>{$('#afN',bd).textContent=q.value.length};setTimeout(()=>q.focus(),80);
+  $('#afGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const txt=q.value.trim();if(txt.length<5)return toast('Bitte schreib deine Frage etwas ausführlicher.','err');
+    await rpc('unt_frage_stellen',{p_frage:txt,p_thema:$('#afT',bd).value||null});
+    await loadAnf();closeSheet();toast('Frage gesendet. Die Antwort kommt als Nachricht in My Heise.','ok');
+    renderShell();if(/^#\/fragen/.test(location.hash))drawFragen();
+  });
+}
+
+/* ---------- Ansicht Fragen ---------- */
+async function viewFragen(tk){
+  paint(`<div class="head"><div><div class="eyebrow">Arbeitssicherheit</div><h1>${isAdmin()?'Fragen von Mitarbeitern':'Meine Fragen'}</h1></div></div><div style="display:grid;place-items:center;padding:60px 0"><div class="spinner"></div></div>`);
+  await loadAnf();if(tk!==TOKEN)return;drawFragen();
+}
+function anfCard(a,adm){
+  const st=ANF_ST[a.status]||ANF_ST.offen;
+  return`<div class="card anf ${a.status}">
+    <div class="anf-h">${adm?`<div class="avatar" style="width:38px;height:38px;font-size:15px">${esc((a.benutzer_name||'?').charAt(0).toUpperCase())}</div>`:''}<div class="m"><b>${adm?esc(a.benutzer_name||'Unbekannt'):esc(fmtDT(a.created_at))}</b><small>${adm?esc(fmtDT(a.created_at))+' · ':''}${a.thema_titel?esc(a.thema_titel):'Allgemeine Frage'}</small></div>${chip(st[1],st[0])}</div>
+    <p class="anf-q">${esc(a.frage)}</p>
+    ${a.antwort?`<div class="anf-a">${ic('check','sm')}<div><small>Antwort${a.beantwortet_von?' von '+esc(a.beantwortet_von):''}${a.beantwortet_am?' · '+esc(fmtDT(a.beantwortet_am)):''}</small><p>${esc(a.antwort)}</p></div></div>`:''}
+    ${adm?`<div class="btnrow" style="margin-top:10px">${a.status==='offen'?`<button class="btn btn-soft btn-sm" data-act="anfDone" data-id="${a.id}">${ic('check','sm')} Ohne Antwort erledigt</button><button class="btn btn-primary btn-sm" data-act="anfAnswer" data-id="${a.id}">${ic('send','sm')} Antworten</button>`:`<button class="btn btn-soft btn-sm" data-act="anfAnswer" data-id="${a.id}">${ic('edit','sm')} ${a.antwort?'Antwort ändern':'Antworten'}</button>`}</div>`:''}
+  </div>`;
+}
+function drawFragen(){
+  const adm=isAdmin(),all=S.anf||[];
+  if(!S.anfOk){paint(`<div class="head"><div><div class="eyebrow">Arbeitssicherheit</div><h1>Fragen</h1></div></div><div class="card">${emptyState('info','Noch nicht eingerichtet','Die Fragen-Funktion braucht ein Update der Datenbank (unt_v3_fragen_erinnerung.sql).')}</div>`);return}
+  if(!adm){
+    paint(`<div class="head"><div><div class="eyebrow">Arbeitssicherheit</div><h1>Meine Fragen</h1></div><button class="btn btn-primary btn-sm" data-act="frageNeu">${ic('plus','sm')} Neue Frage</button></div>
+      ${callout('blue','help','Frage an den Sicherheitsbeauftragten','Unklar, wie etwas sicher geht? Gefahr entdeckt? Frag einfach. Die Antwort kommt als Nachricht in My Heise und steht auch hier.')}
+      <div class="stack-14">${all.length?all.map(a=>anfCard(a,false)).join(''):`<div class="card">${emptyState('help','Noch keine Fragen','Du hast noch keine Frage gestellt.',`<button class="btn btn-primary" data-act="frageNeu">${ic('plus')} Frage stellen</button>`)}</div>`}</div>`);
+    return;
+  }
+  const n={offen:all.filter(a=>a.status==='offen').length,beantwortet:all.filter(a=>a.status==='beantwortet').length,erledigt:all.filter(a=>a.status==='erledigt').length};
+  const list=AF==='alle'?all:all.filter(a=>a.status===AF);
+  paint(`<div class="head"><div><div class="eyebrow">Arbeitssicherheit</div><h1>Fragen von Mitarbeitern</h1></div></div>
+    <div class="chips" style="margin-bottom:14px">${[['offen','Offen'],['beantwortet','Beantwortet'],['erledigt','Erledigt'],['alle','Alle']].map(([k,l])=>`<button class="chipbtn ${AF===k?'on':''}" data-act="afTab" data-f="${k}">${l}${k!=='alle'?` <b>${n[k]}</b>`:''}</button>`).join('')}</div>
+    <div class="stack-14">${list.length?list.map(a=>anfCard(a,true)).join(''):`<div class="card">${emptyState('help',AF==='offen'?'Keine offenen Fragen':'Keine Fragen','Fragen der Mitarbeiter erscheinen hier und zusätzlich als Nachricht in My Heise.')}</div>`}</div>`);
+}
+ACT.afTab=el=>{AF=el.dataset.f;drawFragen()};
+ACT.anfAnswer=el=>{
+  const a=(S.anf||[]).find(x=>x.id===el.dataset.id);if(!a)return;
+  const bd=sheet({title:'Frage beantworten',body:`
+    <div class="anf-src"><small>${esc(a.benutzer_name||'')} · ${esc(fmtDT(a.created_at))}${a.thema_titel?' · '+esc(a.thema_titel):''}</small><p>${esc(a.frage)}</p></div>
+    ${field('Deine Antwort',`<textarea class="inp" id="anA" rows="6" maxlength="4000">${esc(a.antwort||'')}</textarea>`,'Die Antwort geht als Nachricht an '+esc(a.benutzer_name||'den Mitarbeiter')+'.')}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="anGo">${ic('send')} Antwort senden</button>`});
+  setTimeout(()=>$('#anA',bd).focus(),80);
+  $('#anGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const t=$('#anA',bd).value.trim();if(!t)return toast('Bitte eine Antwort eingeben.','err');
+    await rpc('unt_frage_beantworten',{p_id:a.id,p_antwort:t,p_status:'beantwortet'});
+    await loadAnf();closeSheet();renderShell();drawFragen();toast('Antwort gesendet','ok');
+  });
+};
+ACT.anfDone=el=>busy(el,async()=>{await rpc('unt_frage_beantworten',{p_id:el.dataset.id,p_antwort:null,p_status:'erledigt'});await loadAnf();renderShell();drawFragen();toast('Als erledigt markiert','ok')});
+ACT.goFragen=()=>{location.hash='#/fragen'};
+
+/* ---------- Erinnern (Nachricht + E-Mail) ---------- */
+async function mailFn(action,payload={}){
+  const tok=await ensureToken();
+  const r=await fetch(`${SB}/functions/v1/mail-senden`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,'x-user-token':tok||''},body:JSON.stringify({action,...payload})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||j.error)throw new Error(j.error||'Fehler '+r.status);
+  return j;
+}
+async function erinnern(ids){
+  let n=0,gid=null;
+  try{const r=await rpc('unt_erinnern_v2',{p_benutzer:ids});n=r.anzahl;gid=r.gruppe_id}
+  catch(e){n=await rpc('unt_erinnern',{p_benutzer:ids})}
+  let mail='';
+  if(gid){try{const m=await mailFn('nachricht',{gruppe_id:gid});mail=m.aus?' · E-Mail ist ausgeschaltet (My Heise → E-Mail-Benachrichtigungen → „Neue Nachricht in der App“)':m.gesendet?` · ${m.gesendet} zusätzlich per E-Mail`:' · keine E-Mail-Adresse hinterlegt'}catch(e){mail=' · E-Mail konnte nicht gesendet werden'}}
+  return{n,mail};
+}
+
+/* ---------- Unterschriftenliste zum Ausdrucken ---------- */
+ACT.signList=()=>{
+  const st=teamStats(S.team),y=S.team.year,flt=TF!=='alle';
+  let fmt='person',wer='alle',offen=true,uebersicht=true;
+  const bd=sheet({title:`Unterschriftenliste ${y}`,body:`
+    <p class="muted" style="margin-bottom:14px">PDF zum Ausdrucken und Unterschreiben auf Papier – mit allen digital erledigten Unterweisungen ${y}.</p>
+    <div class="field"><label>Aufbau</label><div class="seg" id="slF"><button type="button" class="on" data-s="person">Je Mitarbeiter</button><button type="button" data-s="thema">Je Unterweisung</button></div>
+      <div class="hint" id="slFh">Eine Seite pro Person: Liste der Unterweisungen und Feld für die Unterschrift.</div></div>
+    ${flt?`<div class="field"><label>Wer</label><div class="seg" id="slW"><button type="button" class="on" data-s="alle">Alle (${st.rows.length})</button><button type="button" data-s="filter">Aktuelle Auswahl</button></div></div>`:''}
+    <div class="swrow-u"><div><b>Offene Unterweisungen mit aufführen</b><small>Mit Hinweis „noch offen“</small></div><button type="button" class="switch on" id="slO" role="switch" aria-checked="true"></button></div>
+    <div class="swrow-u"><div><b>Übersicht als erste Seite</b><small>Stand aller Mitarbeiter auf einen Blick</small></div><button type="button" class="switch on" id="slU" role="switch" aria-checked="true"></button></div>`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="slGo">${ic('doc')} PDF erstellen</button>`});
+  const seg=(id,cb)=>{const el=$('#'+id,bd);if(el)el.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;$$('button',el).forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.s)})};
+  seg('slF',v=>{fmt=v;$('#slFh',bd).textContent=v==='person'?'Eine Seite pro Person: Liste der Unterweisungen und Feld für die Unterschrift.':'Eine Seite pro Unterweisung: Teilnehmerliste mit Unterschriftenspalte.'});
+  seg('slW',v=>{wer=v});
+  const sw=(id,cb)=>{const b=$('#'+id,bd);b.onclick=()=>{const on=!b.classList.contains('on');b.classList.toggle('on',on);b.setAttribute('aria-checked',on);cb(on)}};
+  sw('slO',v=>offen=v);sw('slU',v=>uebersicht=v);
+  $('#slGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const fl={offen:r=>r.state!=='komplett',komplett:r=>r.state==='komplett',teil:r=>r.state==='teil',nichts:r=>r.state==='nichts'};
+    BEREICHE.forEach(b=>{fl['g:'+b.id]=r=>r.u.gruppe===b.id});
+    let rows=st.rows.slice();if(wer==='filter'&&fl[TF])rows=rows.filter(fl[TF]);
+    rows.sort((a,b)=>String(a.u.name).localeCompare(String(b.u.name),'de'));
+    if(!rows.length)return toast('Niemand in der Auswahl','err');
+    closeSheet();await pdfSignList({rows,y,fmt,offen,uebersicht});
+  });
+};
+function pdfHeadBand(doc){
+  doc.setFillColor(...NAVY);doc.rect(0,0,210,16,'F');
+  const C=[[195,35,40],[245,212,35],[44,96,167],[226,83,4]];C.forEach((c,i)=>{doc.setFillColor(...c);doc.rect(i*52.5,16,52.5,1.2,'F')});
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.text('HEISE HAUSTECHNIK',15,10.2);
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.text('Sicherheitsunterweisungen',195,10.2,{align:'right'});doc.setTextColor(13,21,36);
+}
+function pdfPageTitle(P,title,sub,newPage){
+  const d=P.doc;if(newPage){d.addPage();pdfHeadBand(d)}
+  d.setTextColor(13,21,36);d.setFont('helvetica','bold');d.setFontSize(17);d.text(title,15,30);
+  let y=30;if(sub){d.setFont('helvetica','normal');d.setFontSize(10.5);d.setTextColor(...GREY);d.text(sub,15,37);y=37;d.setTextColor(13,21,36)}
+  return y+7;
+}
+function pdfSignBoxes(P,y,labels){
+  const d=P.doc;if(y>238){d.addPage();pdfHeadBand(d);y=26}
+  const w=(180-10*(labels.length-1))/labels.length;
+  labels.forEach((l,i)=>{const x=15+i*(w+10);d.setDrawColor(13,21,36);d.setLineWidth(.3);d.line(x,y+20,x+w,y+20);d.setFont('helvetica','normal');d.setFontSize(8.5);d.setTextColor(...GREY);d.text(d.splitTextToSize(l,w),x,y+24.5)});
+  d.setTextColor(13,21,36);return y+34;
+}
+async function pdfSignList({rows,y,fmt,offen,uebersicht}){
+  const P=await pdfNew(`Unterweisungen ${y}`,fmt==='person'?'Unterschriftenliste je Mitarbeiter':'Teilnehmerlisten je Unterweisung');
+  pdfHeadBand(P.doc);
+  const stTxt={komplett:'komplett',teil:'in Arbeit',nichts:'nicht begonnen'};
+  let first=true;
+  if(uebersicht){
+    let yy=pdfKV(P,[['Jahr',y],['Mitarbeiter',rows.length],['Komplett',rows.filter(r=>r.state==='komplett').length],['Stand',fmtD(berlinToday())]],P.y);
+    yy=pdfH(P,'Übersicht',yy);
+    pdfTable(P,['Mitarbeiter','Gruppe','Erledigt','Status','Letzte'],rows.map(r=>[r.u.name,GRP[r.u.gruppe]||r.u.gruppe,`${r.n} von ${r.total}`,stTxt[r.state],r.last?fmtD(r.last):'–']),yy,
+      {didParseCell:d=>{if(d.section==='body'&&d.column.index===3){const s=rows[d.row.index].state;d.cell.styles.textColor=s==='komplett'?P_ERG.ok:s==='nichts'?P_ERG.mangel:[180,83,9];d.cell.styles.fontStyle='bold'}}});
+    first=false;
+  }
+  if(fmt==='person'){
+    rows.forEach(r=>{
+      let yy=pdfPageTitle(P,`Unterweisungsnachweis ${y}`,`${r.u.name} · ${GRP[r.u.gruppe]||r.u.gruppe}`,!first);first=false;
+      const list=r.req.map(t=>({t,n:r.nws.find(x=>x.thema_id===t.id)})).filter(x=>x.n||offen);
+      r.nws.filter(n=>!r.req.some(t=>t.id===n.thema_id)).forEach(n=>list.push({t:{titel:n.thema_titel},n}));
+      yy=pdfKV(P,[['Mitarbeiter/in',r.u.name],['Gruppe',GRP[r.u.gruppe]||r.u.gruppe],['Jahr',y],['Stand',`${r.n} von ${r.total} Pflicht-Unterweisungen erledigt`]],yy);
+      yy=pdfTable(P,['Nr.','Unterweisung','Datum','Ergebnis','In der App'],list.length?list.map((x,i)=>[String(i+1),x.t.titel,x.n?fmtD(x.n.datum):'–',x.n?`${x.n.prozent} %`:'',x.n?'erledigt':'noch offen']):[['','Keine Unterweisung im Jahr '+y,'','','']],yy,
+        {columnStyles:{0:{cellWidth:10},2:{cellWidth:24},3:{cellWidth:20},4:{cellWidth:26}},
+         didParseCell:d=>{if(d.section==='body'&&d.column.index===4&&list[d.row.index]){d.cell.styles.textColor=list[d.row.index].n?P_ERG.ok:[180,83,9];d.cell.styles.fontStyle='bold'}}});
+      yy=pdfPara(P,`Ich bestätige mit meiner Unterschrift, dass ich im Jahr ${y} an den oben als erledigt aufgeführten Sicherheitsunterweisungen teilgenommen, die Inhalte verstanden und die Wissensprüfung bestanden habe. Die Unterweisungen wurden digital in der My Heise App durchgeführt und dort zusätzlich einzeln unterschrieben.`,yy+2,9,GREY);
+      pdfSignBoxes(P,yy+4,['Ort, Datum','Unterschrift Mitarbeiter/in','Unterschrift Unterweisende/r (Arbeitgeber / Sicherheitsbeauftragte/r)']);
+    });
+  }else{
+    const themen=[];rows.forEach(r=>r.req.forEach(t=>{if(!themen.includes(t))themen.push(t)}));themen.sort(byNr);
+    themen.forEach(t=>{
+      let yy=pdfPageTitle(P,t.titel,`Teilnehmerliste Sicherheitsunterweisung ${y}`,!first);first=false;
+      const ppl=rows.filter(r=>r.req.includes(t)).map(r=>({r,n:r.nws.find(x=>x.thema_id===t.id)})).filter(x=>x.n||offen);
+      yy=pdfKV(P,[['Unterweisung',t.titel],['Dauer',`ca. ${t.dauer_min||6} Minuten`],['Form','Digital: Folienvortrag, Wissensprüfung, Unterschrift in der App'],['Teilnehmer',`${ppl.filter(x=>x.n).length} von ${ppl.length} erledigt`]],yy);
+      yy=pdfTable(P,['Nr.','Name','Gruppe','Erledigt am','Unterschrift'],ppl.length?ppl.map((x,i)=>[String(i+1),x.r.u.name,GRP[x.r.u.gruppe]||x.r.u.gruppe,x.n?fmtD(x.n.datum):'noch offen','']):[['','Niemand in der Auswahl','','','']],yy,
+        {columnStyles:{0:{cellWidth:10},2:{cellWidth:36},3:{cellWidth:26},4:{cellWidth:52}},bodyStyles:{minCellHeight:11,valign:'middle'},
+         didParseCell:d=>{if(d.section==='body'&&d.column.index===3&&ppl[d.row.index]&&!ppl[d.row.index].n){d.cell.styles.textColor=[180,83,9];d.cell.styles.fontStyle='bold'}}});
+      pdfSignBoxes(P,yy+4,['Ort, Datum','Unterschrift Unterweisende/r (Arbeitgeber / Sicherheitsbeauftragte/r)']);
+    });
+  }
+  return pdfDeliver(P,`Unterschriftenliste_Unterweisungen_${y}_${fmt==='person'?'je_Mitarbeiter':'je_Unterweisung'}.pdf`);
+}
+
 /* =====================================================================
    Start der App
    ===================================================================== */
