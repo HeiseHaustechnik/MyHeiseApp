@@ -342,7 +342,7 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 .id-intro{display:flex;gap:12px;align-items:flex-start;background:var(--amber-bg);color:var(--ink);border-radius:18px;padding:12px 14px;margin:0 0 14px}
 .id-intro .ic{color:var(--amber);flex:none;margin-top:2px}.id-intro p{margin:0;font-size:14px;line-height:1.45}
 .id-bar{align-items:flex-start}.id-bar .seg small{color:var(--ink-3);font-weight:600}
-.id-sel{display:flex;gap:8px}.id-sel .inp{min-height:36px;padding:4px 10px;font-size:13.5px;width:auto}
+.id-sel{display:flex;gap:8px}.id-sel .inp{min-height:36px;padding:4px 30px 4px 10px;font-size:13.5px;width:auto}
 .idee{display:flex;gap:12px;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
 .idee-l{flex:none}
 .id-daumen{width:52px;min-height:58px;border-radius:14px;border:1.5px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink-2);background:var(--surface)}
@@ -364,6 +364,9 @@ textarea.inp{height:auto;min-height:120px;padding:12px 14px;resize:vertical;line
 .id-fv .lnk{font-size:13px;font-weight:700;color:var(--red)}
 .id-stseg{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
 @media(max-width:560px){.id-sel{width:100%}.id-sel .inp{flex:1}}
+.id-erin{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:10px 14px;margin:0 0 14px}
+.id-erin b{display:block;font-size:14px}.id-erin span{display:block;font-size:13px;color:var(--ink-2)}
+@media(max-width:560px){.id-erin{flex-direction:column;align-items:stretch}}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -765,6 +768,7 @@ function showBereich(id) {
   root.innerHTML = `<div class="shell">
     <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><div style="min-width:0"><h1>${esc(b.name)}</h1></div></div>
     <div class="apps">${apps.map(appTile).join('')}</div>
+    ${ideeBereichCard(apps)}
     <div class="foot">${APP_NAME} · ${esc(FIRMA)}</div></div>`;
   paintZaehler(); refreshZaehler();
 }
@@ -1716,7 +1720,7 @@ document.addEventListener('keydown', e => {
    - Admins setzen Status und antworten, die Antwort kommt als Nachricht
    - Aus den Apps: Link index.html#/ideen/neu/<app> öffnet das Formular mit vorausgewählter App
    ===================================================================== */
-const ID = { list: [], admin: false, ich: null, filter: 'offen', sort: 'neu', app: '', neuAdmin: 0 };
+const ID = { list: [], admin: false, ich: null, filter: 'offen', sort: 'neu', app: '', neuAdmin: 0, erin: undefined };
 const ID_ST = { neu: ['Neu', 'blue'], pruefung: ['Wird geprüft', 'amber'], geplant: ['Geplant', 'violet'], umgesetzt: ['Umgesetzt', 'ok'], abgelehnt: ['Abgelehnt', 'gray'] };
 const ID_ART = { idee: 'Idee', verbesserung: 'Verbesserung', fehler: 'Fehler' };
 const ID_APP_X = { allgemein: 'Allgemein', neu: 'Neue App' };
@@ -1727,6 +1731,7 @@ async function idLaden() {
   const d = await rpc('ideen_laden');
   ID.list = d.ideen || []; ID.admin = !!d.admin; ID.ich = d.ich;
   ID.neuAdmin = ID.admin ? ID.list.filter(i => i.status === 'neu').length : 0;
+  if (ID.admin) { try { ID.erin = await rpc('ideen_erinnerung_status') } catch (e) { ID.erin = undefined } }
 }
 /* Zähler auf der Startseite (nur Admin: neue, noch nicht bearbeitete Ideen) */
 async function idZaehler() {
@@ -1734,6 +1739,18 @@ async function idZaehler() {
   try { await idLaden() } catch (e) { return }
   $$('[data-ideen-n]').forEach(s => { s.textContent = ID.neuAdmin; s.hidden = !ID.neuAdmin });
   const s = $('#ideecard .s'); if (s && ID.neuAdmin) s.textContent = `${ID.neuAdmin} ${ID.neuAdmin === 1 ? 'neue Idee' : 'neue Ideen'} zum Ansehen`;
+}
+/* Kleine Karte auf den Bereichsseiten (z. B. Baustelle): App ist im Formular schon gewählt */
+function ideeBereichCard(apps) {
+  const app = apps.length === 1 ? apps[0].id : 'allgemein';
+  return `<a class="msgcard ideecard" href="#/ideen/neu/${esc(app)}"><div class="mi">${ic('bulb', 'lg')}</div><div class="mt"><b>Idee oder Verbesserung?</b><span class="s">Was können wir an ${apps.length === 1 ? esc(apps[0].name.replace(/\u00ad/g, '')) : 'diesen Apps'} besser machen?</span></div>${ic('chev', 'chev')}</a>`;
+}
+function idErinBox() {
+  if (!ID.admin) return '';
+  const e = ID.erin;
+  if (e === undefined) return `<div class="id-erin"><div><b>Monatliche Erinnerung</b><span>Noch nicht eingerichtet: ideen_erinnerung.sql im Supabase SQL-Editor ausführen.</span></div></div>`;
+  const l = e && e.letzte ? `Zuletzt ${zeit(e.letzte.am)}${e.letzte.von && e.letzte.von !== 'automatisch' ? ' von ' + e.letzte.von : ' automatisch'}.` : 'Noch keine gesendet.';
+  return `<div class="id-erin"><div><b>Erinnerung an alle</b><span>${e && e.plan ? 'Automatisch am 1. jedes Monats.' : 'Automatisch: noch nicht eingeplant (pg_cron in Supabase einschalten).'} ${esc(l)}</span></div><button class="btn btn-soft btn-sm" data-act="idErin">${ic('send', 'sm')} Jetzt senden</button></div>`;
 }
 function ideeCard() {
   return `<a class="msgcard ideecard" id="ideecard" href="#/ideen"><div class="mi">${ic('bulb', 'lg')}</div><div class="mt"><b>Ideen und Verbesserungen</b><span class="s">Was können wir an der App besser machen?</span></div><span class="cnt" data-ideen-n hidden></span>${ic('chev', 'chev')}</a>`;
@@ -1763,6 +1780,7 @@ function idZeichnen() {
   root.innerHTML = `<div class="shell">
     <div class="pagehead"><a class="iconbtn" href="#/" aria-label="Zurück">${ic('back')}</a><h1>Ideen</h1><button class="btn btn-primary btn-sm head-act" data-act="idNeu">${ic('plus', 'sm')} Idee</button></div>
     <div class="id-intro">${ic('bulb')}<p>Dir fällt etwas auf, das besser gehen könnte, oder du hast eine Idee für eine neue Funktion? Schreib es hier rein. Mit dem Daumen zeigst du, welche Ideen dir auch wichtig sind.</p></div>
+    ${idErinBox()}
     <div class="nx-bar id-bar"><div class="seg sm" role="group" aria-label="Filter">${[['offen', 'Offen'], ['umgesetzt', 'Umgesetzt'], ['meine', 'Meine'], ['alle', 'Alle']].map(([k, l]) => `<button class="${ID.filter === k ? 'on' : ''}" data-act="idFilter" data-f="${k}">${l} <small>${n(k)}</small></button>`).join('')}</div>
       <div class="id-sel"><select class="inp" id="idApp" aria-label="Nach App filtern"><option value="">Alle Apps</option>${apps.map(a => `<option value="${esc(a)}" ${ID.app === a ? 'selected' : ''}>${esc(idAppName(a))}</option>`).join('')}</select>
       <select class="inp" id="idSort" aria-label="Sortierung"><option value="neu" ${ID.sort === 'neu' ? 'selected' : ''}>Neueste zuerst</option><option value="top" ${ID.sort === 'top' ? 'selected' : ''}>Meiste Daumen</option></select></div></div>
@@ -1868,6 +1886,14 @@ Object.assign(ACT, {
     try { const b = await rpc('idee_bild', { p_id: el.dataset.id }); if (b) sheet('Foto', `<img src="${esc(b)}" alt="Foto zur Idee" style="width:100%;border-radius:14px">`, `<button class="btn btn-primary" data-act="closeSheet">Schließen</button>`) }
     catch (e) { toast(niceErr(e), 'err') }
     el.disabled = false;
+  },
+  idErin() {
+    confirmSheet('Erinnerung an alle senden?', 'Alle bekommen eine Nachricht: Ideen einreichen und Daumen hoch geben, dazu die beliebtesten offenen Ideen. Wenn eingeschaltet, zusätzlich per E-Mail.', 'Senden', async () => {
+      const r = await rpc('ideen_erinnerung_senden');
+      let mail = '';
+      try { const m = await mailFn('nachricht', { gruppe_id: r.gruppe_id }); if (m && m.gesendet) mail = `, per E-Mail an ${m.gesendet}` } catch (e) { }
+      toast('Erinnerung gesendet' + mail, 'ok'); await idLaden(); idZeichnen();
+    });
   },
   idDel(el) {
     const i = ID.list.find(x => x.id === el.dataset.id); if (!i) return;
