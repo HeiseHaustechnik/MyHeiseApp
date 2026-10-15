@@ -540,6 +540,19 @@ table.kl{width:100%;border-collapse:collapse;font-size:14px}
 @media(max-width:640px){.ab-t .show-s{display:table-cell}.ab-v{min-width:0;max-width:52vw}.ab-v>span:not(.ab-tag):not(.plate){display:none}.ab-t td{padding:9px 6px}}
 .ab-ds{display:none}
 @media(max-width:640px){.ab-dl{display:none}.ab-ds{display:inline}.ab-t th{letter-spacing:.02em}.kl-card .kl-scroll{margin:0 -4px}}
+
+/* ---------- Führerscheinkontrolle: Erinnern (15.10.2026) ---------- */
+.fs-hbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.fs-actions{display:flex;gap:10px;flex-wrap:wrap}
+.fs-actions .btn{flex:1 1 200px}
+.fs-erinnert{display:flex;align-items:center;gap:6px;margin:10px 0 0;font-size:14px}
+.fs-vorschau{background:var(--surface-2);border-left:4px solid #e25304;border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.5}
+.fs-namen{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+@media (max-width:520px){.head:has(.fs-hbtns){flex-wrap:wrap}.fs-hbtns{width:100%;justify-content:flex-start}}
+/* Fahrerliste: auf dem Handy nicht breiter als der Bildschirm */
+.list>.drv{min-width:0}
+.drv .m b,.drv .m small{overflow-wrap:anywhere}
+@media (max-width:520px){.drv{gap:10px;padding:12px}.drv>.chip{font-size:12px;padding:4px 9px;max-width:46%;white-space:normal;text-align:center;line-height:1.25}.drv>.chev{display:none}}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -687,6 +700,8 @@ const fzById=id=>S.fz.find(x=>x.id===id);
 const ROLLEN={fahrer:'Fahrer',fuhrpark:'Fuhrpark',admin:'Admin'};
 const RANK={fahrer:1,fuhrpark:2,admin:3};
 const can={verw:()=>(RANK[S.role]||0)>=2,admin:()=>S.role==='admin'};
+// Führerscheinkontrolle: Fuhrpark, Admin und die eingetragenen Lageristen (S.ab.darf kommt aus fuhr_adblue_status)
+can.fs=()=>can.verw()||!!(S.ab&&S.ab.darf);
 const TYPEN=['PKW','Kastenwagen','Transporter','Pickup','Anhaenger','Sonstige'];
 const KRAFT=['Diesel','Benzin','Elektro','Hybrid','Sonstige'];
 
@@ -1058,6 +1073,9 @@ const userName=id=>(S.users.find(u=>u.id===id)||{}).name||'?';
 const openMeldCount=()=>S.mg.filter(m=>m.status==='offen').length;
 const myOpenMeld=()=>S.mg.filter(m=>m.gemeldet_von_id===S.me.id&&['offen','in_bearbeitung'].includes(m.status));
 const fsRow=uid=>(S.fahrer||[]).find(x=>x.benutzer_id===uid);
+// fällige oder bald fällige Kontrollen (für Verwaltung und Lager)
+const fsFaellig=()=>S.users.filter(u=>{const i=fsInfo(u.id);return i.k!=='ok'&&(u.rolle==='fahrer'||fsRow(u.id))}).map(u=>({u,i:fsInfo(u.id)})).sort((a,b)=>a.i.d-b.i.d);
+const fsSatz=i=>i.k==='never'?'Dein Führerschein wurde noch nicht kontrolliert.':i.k==='over'?`Deine Kontrolle ist ${i.l}.`:i.d===0?'Deine Kontrolle ist heute fällig.':i.k==='soon'?`Deine Kontrolle ist ${i.l} fällig.`:`Deine nächste Kontrolle ist am ${i.l.replace('gültig bis ','')}.`;
 function fsInfo(uid){
   const r=fsRow(uid);
   if(!r||!r.naechste_kontrolle)return{k:'never',t:'red',l:'Noch nie kontrolliert',d:-9999};
@@ -1082,7 +1100,7 @@ function renderShell(){
       `<a class="rail-item" data-nav="fz" href="#/fz">${ic('car')} Fahrzeuge</a>`+
       `<a class="rail-item" data-nav="meldungen" href="#/meldungen">${ic('tasks')} Meldungen${dot}</a>`+
       `<a class="rail-item" data-nav="buchungen" href="#/buchungen">${ic('cal')} Buchungen</a>`+
-      `<a class="rail-item" data-nav="fahrer" href="#/fahrer">${ic('card')} ${can.verw()?'Fahrer &amp; Führerschein':'Mein Führerschein'}</a>`+
+      `<a class="rail-item" data-nav="fahrer" href="#/fahrer">${ic('card')} ${can.fs()?'Fahrer &amp; Führerschein':'Mein Führerschein'}</a>`+
       (can.verw()?`<a class="rail-item" data-nav="kosten" href="#/kosten">${ic('receipt')} Kostenübersicht</a><a class="rail-item" data-nav="auswertung" href="#/auswertung">${ic('chart')} Auswertung</a><a class="rail-item" data-nav="admin" href="#/admin">${ic('sliders')} Verwaltung</a>`:'')+
       (can.adblue()?`<a class="rail-item" data-nav="adblue" href="#/adblue">${ic('drop')} AdBlue-Verwaltung${abLow()?'<i class="dot">!</i>':''}</a>`:'')+
     `</nav>`+
@@ -1159,7 +1177,7 @@ function viewStart(){
     const om=S.mg.filter(m=>m.status==='offen'),nS=om.filter(m=>m.art==='schaden').length;
     const rows=[];
     F.forEach(f=>fzDueBad(f).forEach(t=>rows.push({f,t})));rows.sort((a,b)=>a.t.i.d-b.t.i.d);
-    const fs=S.users.filter(u=>{const i=fsInfo(u.id);return i.k!=='ok'&&(u.rolle==='fahrer'||fsRow(u.id))}).map(u=>({u,i:fsInfo(u.id)})).sort((a,b)=>a.i.d-b.i.d);
+    const fs=fsFaellig();
     const abRow=abLow()?`<a class="alert-row tone-${S.ab.bestand<=0?'red':'amber'}" href="#/adblue"><span class="ico">${ic('drop')}</span><div><b>AdBlue nachbestellen</b><small>Nur noch ${S.ab.bestand} Kanister im Lager (Mindestbestand ${S.ab.mindest})</small></div>${ic('chev','chev')}</a>`:'';
     att=`${om.length||rows.length||fs.length||abRow?`<div class="sec"><h2>Braucht Aufmerksamkeit</h2></div><div class="list">
       ${abRow}
@@ -1173,7 +1191,7 @@ function viewStart(){
   paint(`
   <div class="pills"><a class="hubpill" href="${PORTAL}">${ic('apps','sm')} My Heise</a><a class="hubpill" href="${PORTAL}#/nachrichten">${ic('bell','sm')} Nachrichten<span class="nzb" data-nz hidden></span></a></div>
   <div class="head"><div><div class="eyebrow">${esc(greet())}</div><h1>${esc(first)}</h1></div><div class="avatar" style="width:46px;height:46px;font-size:18px">${esc((S.me.name||'?').charAt(0).toUpperCase())}</div></div>
-  ${!can.verw()&&fsMe.k!=='ok'?callout('amber','card','Führerscheinkontrolle',fsMe.k==='never'?'Bitte den Führerschein beim Fuhrpark vorlegen – er wurde noch nicht kontrolliert.':`Fällig ${esc(fsMe.l)} – bitte den Führerschein beim Fuhrpark vorlegen.`):''}
+  ${!can.verw()&&fsMe.k!=='ok'?callout('amber','card','Führerscheinkontrolle',esc(fsSatz(fsMe))+' Bitte melde dich mit deinem Führerschein im Lager oder bei den Admins im Büro.'):''}
   ${mine.map(f=>`<div class="mycar" style="margin-bottom:12px"><a class="top" href="#/fz/${f.id}"><div class="hero-veh tone-${FST[f.status].t}">${miniVeh(f.typ)}</div><div class="mid">${plate(f.kennzeichen)}<div class="nm">${esc(f.bezeichnung||TYPNAME[f.typ])}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${chip(FST[f.status].t,FST[f.status].l)}${(()=>{const b=fzDueBad(f)[0];return b?chip(b.i.t,dueShort(b)):''})()}<span class="chip tone-${fixedIds.has(f.id)?'blue':'gray'}">${fixedIds.has(f.id)?'Festes Fahrzeug':'Zusätzlich'}</span></div></div>${ic('chev','chev')}</a>
     ${fixedIds.has(f.id)?'':`<button class="mc-rm" data-act="mineRm" data-id="${f.id}" aria-label="Von meiner Startseite entfernen" title="Von meiner Startseite entfernen">${ic('x','sm')}</button>`}
     <div class="btns"><button data-act="meldeForm" data-id="${f.id}" data-art="schaden" class="warn">${ic('alert')}Schaden</button><button data-act="artPick" data-id="${f.id}">${ic('wrench')}Anfrage</button><button data-act="kontrolle" data-id="${f.id}">${ic('clip')}Kontrolle</button></div></div>`).join('')}
@@ -1186,6 +1204,7 @@ function viewStart(){
   </div>`:''}
   <button class="hero-scan${mine.length?' slim':''}" data-act="buchen">${'<span class="ic-wrap">'+ic('key','lg')+'</span>'}<span><b>Fahrzeug buchen</b><small>Anderes Auto genommen? Hier eintragen</small></span>${ic('chev','chev')}</button>
   ${!F.length?`<div class="card" style="margin-top:14px">${emptyState('car','Noch keine Fahrzeuge',can.verw()?'Lege das erste Fahrzeug an – Kennzeichen, Typ und Termine genügen.':'Sobald der Fuhrpark Fahrzeuge angelegt hat, siehst du sie hier.',can.verw()?`<button class="btn btn-primary" data-act="newFz">${ic('plus')} Erstes Fahrzeug anlegen</button>`:'')}</div>`:''}
+  ${can.fs()&&!can.verw()?(()=>{const l=fsFaellig();return l.length?`<a class="alert-row tone-${l[0].i.t}" href="#/fahrer" style="margin-top:14px"><span class="ico">${ic('card')}</span><div><b>${l.length} ${l.length===1?'Führerscheinkontrolle':'Führerscheinkontrollen'} fällig</b><small>${esc(l.slice(0,3).map(x=>x.u.name).join(', '))}${l.length>3?' …':''}</small></div>${ic('chev','chev')}</a>`:''})():''}
   ${can.adblue()&&!can.verw()?`<a class="alert-row tone-${abLow()?'amber':'blue'}" href="#/adblue" style="margin-top:14px"><span class="ico">${ic('drop')}</span><div><b>AdBlue-Verwaltung</b><small>${S.ab.bestand} Kanister im Lager${abLow()?' · bitte nachbestellen':''}</small></div>${ic('chev','chev')}</a>`:''}
   ${myB.length?`<div class="sec"><h2>Meine Buchungen</h2><a href="#/buchungen">Alle</a></div><div>${myB.slice(0,4).map(b=>bkRow(b,true)).join('')}</div>`:''}
   ${!can.verw()&&myM.length?`<div class="sec"><h2>Meine offenen Meldungen</h2><a href="#/meldungen">Alle</a></div><div class="list">${myM.slice(0,3).map(m=>meldCard(m)).join('')}</div>`:''}
@@ -1390,7 +1409,7 @@ function viewMehr(){
   <div class="card" style="display:flex;gap:14px;align-items:center;margin-bottom:14px"><div class="avatar" style="width:52px;height:52px;font-size:20px">${esc((S.me.name||'?').charAt(0).toUpperCase())}</div><div><b style="font-size:17px">${esc(S.me.name)}</b><div class="muted">${esc(ROLLEN[S.role]||S.role)}</div></div></div>
   <div class="menu-list">
     ${item('cal','Buchungen','Wer fährt wann welches Fahrzeug','goBuchungen')}
-    ${item('card',can.verw()?'Fahrer &amp; Führerschein':'Mein Führerschein',can.verw()?'Führerscheinkontrolle dokumentieren':'Stand deiner Führerscheinkontrolle','goFahrer')}
+    ${item('card',can.fs()?'Fahrer &amp; Führerschein':'Mein Führerschein',can.fs()?'Führerscheinkontrolle dokumentieren, Fahrer erinnern':'Letzte und nächste Kontrolle','goFahrer')}
     ${can.verw()?item('receipt','Kostenübersicht','Alle Fahrzeuge: Tanken, Werkstatt, Raten, € je km','goKosten'):''}
     ${can.verw()?item('chart','Auswertung','Belege filtern, Export als PDF','goAuswertung'):''}
     ${can.verw()?item('sliders','Verwaltung','Checklisten, Fahrzeuge, Berichte','goAdmin'):''}
@@ -1947,42 +1966,76 @@ ACT.kontInfo=async el=>{
 const KLASSEN=['AM','A1','A2','A','B','BE','C1','C1E','C','CE','L','T'];
 const FSERG={in_ordnung:['ok','In Ordnung'],nicht_in_ordnung:['red','Nicht in Ordnung']};
 async function viewFahrer(uid){
-  if(!can.verw())uid=S.me.id;
+  if(!can.fs())uid=S.me.id;
   if(uid)return viewFahrerDetail(uid);
   const rows=S.users.map(u=>({u,i:fsInfo(u.id),r:fsRow(u.id)})).sort((a,b)=>a.i.d-b.i.d);
-  const bad=rows.filter(x=>x.i.k!=='ok').length;
+  const offen=rows.filter(x=>x.i.k!=='ok');
+  const erinnerbar=offen.filter(x=>x.u.id!==S.me.id);
   paint(`
-  <div class="head"><div><div class="eyebrow">Regelmäßige Kontrolle</div><h1>Führerschein</h1></div><button class="btn btn-soft btn-sm" data-act="pdfFahrerListe">${ic('doc','sm')} PDF</button></div>
-  ${callout(bad?'amber':'ok',bad?'card':'shield',bad?`${bad} ${bad===1?'Kontrolle':'Kontrollen'} fällig`:'Alles aktuell',bad?'Bitte die Originalführerscheine vorlegen lassen und die Kontrolle hier dokumentieren.':'Alle Führerscheinkontrollen sind aktuell.',true)}
-  <div class="list">${rows.map(({u,i,r})=>`<a class="drv tone-${i.t}" href="#/fahrer/${u.id}"><div class="avatar">${esc((u.name||'?').charAt(0).toUpperCase())}</div><div class="m"><b>${esc(u.name)}</b><small>${r&&r.klassen?'Klassen '+esc(r.klassen)+' · ':''}${r&&r.letzte_kontrolle?'zuletzt '+esc(fmtD(r.letzte_kontrolle)):'noch nicht kontrolliert'}</small></div>${chip(i.t,i.l)}${ic('chev','chev')}</a>`).join('')||emptyState('users','Keine Fahrer','Gib Benutzern in My Heise unter „Benutzer &amp; Zugriff“ Zugriff auf den Fuhrpark.')}</div>`);
+  <div class="head"><div><div class="eyebrow">Regelmäßige Kontrolle</div><h1>Führerschein</h1></div><div class="fs-hbtns">${erinnerbar.length?`<button class="btn btn-soft btn-sm" data-act="fsErinnern" data-ids="${erinnerbar.map(x=>x.u.id).join(',')}">${ic('bell','sm')} Fällige erinnern</button>`:''}<button class="btn btn-soft btn-sm" data-act="pdfFahrerListe">${ic('doc','sm')} PDF</button></div></div>
+  ${callout(offen.length?'amber':'ok',offen.length?'card':'shield',offen.length?`${offen.length} ${offen.length===1?'Kontrolle':'Kontrollen'} fällig`:'Alles aktuell',offen.length?'Original-Führerschein vorlegen lassen und die Kontrolle hier dokumentieren. Mit „Fällige erinnern“ bekommen alle eine Nachricht und eine E-Mail. 3 Wochen vor Ablauf erinnert die App außerdem automatisch.':'Alle Führerscheinkontrollen sind aktuell.',true)}
+  <div class="list">${rows.map(({u,i,r})=>`<a class="drv tone-${i.t}" href="#/fahrer/${u.id}"><div class="avatar">${esc((u.name||'?').charAt(0).toUpperCase())}</div><div class="m"><b>${esc(u.name)}</b><small>${r&&r.klassen?'Klassen '+esc(r.klassen)+' · ':''}${r&&r.letzte_kontrolle?'zuletzt '+esc(fmtD(r.letzte_kontrolle)):'noch nicht kontrolliert'}${i.k!=='ok'&&r&&r.erinnert_am?' · erinnert '+esc(fmtD(r.erinnert_am.slice(0,10))):''}</small></div>${chip(i.t,i.l)}${ic('chev','chev')}</a>`).join('')||emptyState('users','Keine Fahrer','Gib Benutzern in My Heise unter „Benutzer &amp; Zugriff“ Zugriff auf den Fuhrpark.')}</div>`);
 }
 async function viewFahrerDetail(uid){
   const u=S.users.find(x=>x.id===uid)||(uid===S.me.id?{id:S.me.id,name:S.me.name}:null);
   if(!u){paint(`<div class="topbar"><a class="iconbtn" href="#/fahrer" aria-label="Zurück">${ic('back')}</a></div>${emptyState('search','Person nicht gefunden','')}`);return}
   const r=fsRow(uid),i=fsInfo(uid),token=TOKEN;
-  const mine=uid===S.me.id;
+  const mine=uid===S.me.id,fs=can.fs();
+  const darfKontrolle=fs&&(!mine||can.admin());
+  const erinnert=r&&r.erinnert_am?`Zuletzt erinnert am ${fmtD(r.erinnert_am.slice(0,10))}${r.erinnert_von?' von '+r.erinnert_von:''}`:'';
   paint(`
-  <div class="topbar">${can.verw()?`<a class="iconbtn" href="#/fahrer" aria-label="Zurück">${ic('back')}</a>`:'<span style="width:44px"></span>'}<span class="eyebrow" style="margin:0">Führerscheinkontrolle</span><span style="width:44px"></span></div>
+  <div class="topbar">${fs?`<a class="iconbtn" href="#/fahrer" aria-label="Zurück">${ic('back')}</a>`:'<span style="width:44px"></span>'}<span class="eyebrow" style="margin:0">Führerscheinkontrolle</span><span style="width:44px"></span></div>
   <div class="detail-grid"><div class="stack">
     <div class="card hero">
       <div class="hero-top"><div class="avatar" style="width:64px;height:64px;font-size:26px">${esc((u.name||'?').charAt(0).toUpperCase())}</div><div style="min-width:0"><h1>${esc(u.name)}</h1><div class="sub">${esc(ROLLEN[u.rolle]||'')}</div></div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${chip(i.t,i.l,'lg')}</div>
       <div class="facts">
-        <div class="fact"><small>Klassen</small><b>${esc(r&&r.klassen||'–')}</b></div>
-        <div class="fact"><small>Führerschein gültig bis</small><b>${esc(r&&r.gueltig_bis?fmtD(r.gueltig_bis):'–')}</b></div>
         <div class="fact"><small>Letzte Kontrolle</small><b>${esc(r&&r.letzte_kontrolle?fmtD(r.letzte_kontrolle):'–')}</b></div>
         <div class="fact"><small>Nächste Kontrolle</small><b>${esc(r&&r.naechste_kontrolle?fmtD(r.naechste_kontrolle):'–')}</b></div>
+        <div class="fact"><small>Klassen</small><b>${esc(r&&r.klassen||'–')}</b></div>
+        <div class="fact"><small>Führerschein gültig bis</small><b>${esc(r&&r.gueltig_bis?fmtD(r.gueltig_bis):'–')}</b></div>
       </div>
-      ${can.verw()?`<div class="actions"><button class="btn btn-primary" data-act="fsNeu" data-id="${uid}">${ic('card')} Kontrolle durchführen</button></div>`:i.k!=='ok'?callout('amber','card','Bitte vorlegen','Zeige deinen Führerschein beim Fuhrpark vor. Die Kontrolle wird dann hier dokumentiert.',true):''}
+      ${darfKontrolle?`<div class="actions fs-actions"><button class="btn btn-primary" data-act="fsNeu" data-id="${uid}">${ic('card')} Kontrolle durchführen</button>${mine?'':`<button class="btn btn-soft" data-act="fsErinnern" data-ids="${uid}">${ic('bell')} Erinnerung senden</button>`}</div>${erinnert?`<p class="faint fs-erinnert">${ic('bell','sm')} ${esc(erinnert)}</p>`:''}`
+        :mine?callout(i.k==='ok'?'blue':'amber','card',i.k==='ok'?'So läuft die Kontrolle':'Bitte Führerschein vorlegen',esc(fsSatz(i))+(i.k==='ok'?' 3 Wochen vorher bekommst du eine Erinnerung.':'')+' Melde dich mit deinem Führerschein im Lager oder bei den Admins im Büro. Dort wird die Kontrolle dokumentiert.',true):''}
     </div></div>
-    <div class="stack"><div class="card"><h3>Dokumentierte Kontrollen</h3><div id="fsList"><div class="faint">Lädt …</div></div></div>
-      ${mine?'':`<div class="card"><h3>Fahrzeuge</h3>${S.fz.filter(f=>f.aktiv&&f.hauptfahrer_id===uid).map(f=>`<a class="link-row" href="#/fz/${f.id}"><div><b>${esc(f.kennzeichen)}</b><small>${esc(f.bezeichnung||TYPNAME[f.typ])}</small></div>${ic('chev','chev')}</a>`).join('')||'<p class="faint">Kein Hauptfahrzeug zugeordnet.</p>'}</div>`}</div></div>`);
+    ${fs?`<div class="stack"><div class="card"><h3>Dokumentierte Kontrollen</h3><div id="fsList"><div class="faint">Lädt …</div></div></div>
+      ${mine?'':`<div class="card"><h3>Fahrzeuge</h3>${S.fz.filter(f=>f.aktiv&&f.hauptfahrer_id===uid).map(f=>`<a class="link-row" href="#/fz/${f.id}"><div><b>${esc(f.kennzeichen)}</b><small>${esc(f.bezeichnung||TYPNAME[f.typ])}</small></div>${ic('chev','chev')}</a>`).join('')||'<p class="faint">Kein Hauptfahrzeug zugeordnet.</p>'}</div>`}</div>`:''}</div>`);
+  if(!fs)return;
   try{
     const list=await api('GET','fuhr_fs_kontrollen',null,`?benutzer_id=eq.${uid}&select=id,datum,ergebnis,klassen,gueltig_bis,kontrolleur_name,naechste_kontrolle,created_at&order=datum.desc,created_at.desc&limit=30`);
     if(token!==TOKEN)return;
     $('#fsList').innerHTML=list.length?list.map(k=>`<button class="link-row" data-act="fsInfo" data-id="${k.id}" data-uid="${uid}"><div><b>${esc(fmtD(k.datum))} · ${esc(k.kontrolleur_name)}</b><small>${k.klassen?'Klassen '+esc(k.klassen):'Führerscheinkontrolle'}</small></div>${chip(FSERG[k.ergebnis][0],FSERG[k.ergebnis][1])}</button>`).join(''):`<p class="faint">Noch keine Kontrolle dokumentiert.</p>`;
   }catch(e){const b=$('#fsList');if(b)b.innerHTML='<div class="faint">Konnte nicht geladen werden.</div>'}
 }
+/* Erinnerung an einen oder mehrere Fahrer: Nachricht in My Heise (fuhr_fs_erinnern) + E-Mail (Edge Function mail-senden) */
+async function fsMailFn(action,payload){
+  const tok=await ensureToken();
+  const r=await fetch(`${SB}/functions/v1/mail-senden`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,'x-user-token':tok||''},body:JSON.stringify({action,...payload})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||j.error)throw new Error(j.error||'Fehler '+r.status);
+  return j;
+}
+ACT.fsErinnern=el=>{
+  const ids=String(el.dataset.ids||'').split(',').filter(Boolean);if(!ids.length)return;
+  const leute=ids.map(id=>S.users.find(u=>u.id===id)).filter(Boolean);
+  const eins=leute.length===1;
+  const bd=sheet({title:'Erinnerung senden',body:`
+    <p class="muted" style="margin:0 0 12px">${eins?`<b>${esc(leute[0].name)}</b> bekommt`:`${leute.length} Personen bekommen`} eine Nachricht in My Heise und eine E-Mail:</p>
+    <div class="fs-vorschau">„${esc(eins?(()=>{const r=fsRow(leute[0].id);return !r||!r.naechste_kontrolle?'Dein Führerschein wurde noch nicht kontrolliert.':dayDiff(r.naechste_kontrolle)<=0?`Deine Führerscheinkontrolle ist seit ${fmtD(r.naechste_kontrolle)} fällig.`:`Deine Führerscheinkontrolle läuft am ${fmtD(r.naechste_kontrolle)} ab.`})():'Deine Führerscheinkontrolle läuft ab bzw. ist fällig.')} Bitte melde dich mit deinem Führerschein im Lager oder bei den Admins im Büro zur Kontrolle.“</div>
+    ${eins?'':`<div class="fs-namen">${leute.map(u=>`<span class="chip tone-${fsInfo(u.id).t}"><i></i>${esc(u.name)}</span>`).join('')}</div>`}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="fsErGo">${ic('bell')} Senden</button>`});
+  $('#fsErGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const r=await rpc('fuhr_fs_erinnern',{p_benutzer:ids});
+    let msg=`${r.anzahl} ${r.anzahl===1?'Erinnerung':'Erinnerungen'} in der App verschickt`,tone='ok';
+    try{
+      const m=await fsMailFn('fs_erinnern',{gruppe_id:r.gruppe_id});
+      if(m.gesendet)msg=`${m.gesendet} ${m.gesendet===1?'E-Mail':'E-Mails'} und Nachricht in der App verschickt`;
+      if(m.ohne_mail&&m.ohne_mail.length){msg+=` · ohne E-Mail: ${m.ohne_mail.join(', ')}`;tone=''}
+    }catch(e){msg+=' · E-Mail nicht möglich ('+niceErr(e)+')';tone=''}
+    try{S.fahrer=await api('GET','fuhr_fahrer',null,'')}catch(e){}
+    closeSheet();toast(msg,tone);rerender();
+  });
+};
 ACT.fsNeu=el=>{const u=S.users.find(x=>x.id===el.dataset.id);if(u)openFsKontrolle(u)};
 function openFsKontrolle(u){
   const r=fsRow(u.id);let erg='in_ordnung',kl=new Set(((r&&r.klassen)||'B').split(/[,\s]+/).filter(Boolean)),iv=r?r.intervall_monate:6;
@@ -2649,7 +2702,7 @@ ACT.abSettings=()=>{
   const bd=sheet({title:'AdBlue-Einstellungen',body:`
     <div class="row2">${field('Preis je Kanister (€)',`<input class="inp" id="asP" inputmode="decimal" value="${esc(String(st.preis).replace('.',','))}">`,'Wird als Fahrzeugkosten gebucht')}${field('Inhalt je Kanister (l)',`<input class="inp" id="asL" inputmode="decimal" value="${esc(String(st.liter).replace('.',','))}">`)}</div>
     ${field('Mindestbestand',`<input class="inp" id="asM" inputmode="numeric" value="${esc(st.mindest)}">`,'Darunter erscheint „Bitte nachbestellen“')}
-    <div class="field"><label>Lageristen (dürfen AdBlue buchen)</label><div class="hint" style="margin-bottom:8px">Fuhrpark und Admin dürfen immer. Hier zusätzlich z. B. den Lageristen eintragen.</div>
+    <div class="field"><label>Lageristen</label><div class="hint" style="margin-bottom:8px">Dürfen AdBlue buchen und Führerscheine kontrollieren. Fuhrpark und Admin dürfen das immer.</div>
       <div class="ab-users">${cand.length?cand.map(u=>`<label class="ab-u"><input type="checkbox" value="${u.id}" ${ids.has(u.id)?'checked':''}> ${esc(u.name)}</label>`).join(''):'<p class="faint">Keine weiteren Nutzer mit Fuhrpark-Zugang.</p>'}</div></div>`,
     footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="asGo">${ic('check')} Speichern</button>`});
   $('#asGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
