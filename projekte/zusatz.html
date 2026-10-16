@@ -102,7 +102,7 @@ fieldset:disabled .inp{background:var(--surface-2);color:var(--ink-2)}
    Zusätzliche Arbeiten: Auftrag (ZA-001 …) und Stundennachweis (SN-001 …)
    Daten über die RPC pj_za (supabase/zusatz.sql). Offline wird lokal gespeichert
    und später übertragen. Nach der Unterschrift des Auftraggebers bzw. Kunden ist
-   das Dokument gesperrt, nur die Bauleitung kann entsperren.
+   das Dokument gesperrt, nur die Projektleitung kann entsperren.
    ===================================================================== */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -330,7 +330,7 @@ function renderZa(){
     <div class="card"><h2>Unterschriften</h2>
       <fieldset ${lk?'disabled':''}><div class="row2"><div class="field"><label for="f_ort">Ort</label><input class="inp" id="f_ort" value="${esc(d.ort||'')}" placeholder="${esc((PROJ?.adresse||'').split(',').pop().trim())}"></div><div></div></div></fieldset>
       <div class="grid2">
-        <div><fieldset ${lk?'disabled':''}><div class="field"><label for="f_nh">Heise Haustechnik (BL/OM/M), Name in Druckbuchstaben</label><input class="inp" id="f_nh" value="${esc(d.name_heise||'')}"></div></fieldset>
+        <div><fieldset ${lk?'disabled':''}><div class="field"><label for="f_nh">Heise Haustechnik (PL/OM/M), Name in Druckbuchstaben</label><input class="inp" id="f_nh" value="${esc(d.name_heise||'')}"></div></fieldset>
           <canvas class="sig${lk?' lock':''}" id="sig_heise"></canvas><div class="sigbar"><span id="sig_heiset"></span>${lk?'':'<button class="lnk" data-clr="sig_heise">Löschen</button>'}</div></div>
         <div><fieldset ${lk?'disabled':''}><div class="field"><label for="f_na">Auftraggeber oder Bauleitung, Name in Druckbuchstaben</label><input class="inp" id="f_na" value="${esc(d.name_ag||'')}"></div></fieldset>
           <canvas class="sig${lk?' lock':''}" id="sig_ag"></canvas><div class="sigbar"><span id="sig_agt"></span>${lk?'':'<button class="lnk" data-clr="sig_ag">Löschen</button>'}</div>
@@ -653,7 +653,7 @@ async function pdfZa(){
   }
   y+=4; if(y>222){ doc.addPage(); y=24; }
   doc.text('Datum, Ort: '+dDE(d.datum)+(d.ort?', '+d.ort:''),M,y); y+=4;
-  y=pdfSig(doc,y,[[d.sig_heise,'Heise Haustechnik GmbH & Co. KG (BL/OM/M)',d.name_heise],[d.sig_ag,'Auftraggeber oder Bauleitung',d.name_ag]],d.sig_ts);
+  y=pdfSig(doc,y,[[d.sig_heise,'Heise Haustechnik GmbH & Co. KG (PL/OM/M)',d.name_heise],[d.sig_ag,'Auftraggeber oder Bauleitung',d.name_ag]],d.sig_ts);
   doc.setFontSize(7.5); doc.setTextColor(110);
   doc.text(doc.splitTextToSize('Der Unterzeichner (Auftraggeber oder Bauleitung) versichert, dass er zur Anordnung von zusätzlichen Leistungen gemäß VOB/B § 2 Nr. 6 und zur Vereinbarung und Anordnung von Stundenlohnleistungen lt. § 2 Nr. 10 ermächtigt ist.',W-2*M),M,y+2);
   pdfFuss(doc,'Auftrag für zusätzliche Arbeiten '+zaNr(d.nr)+' · '+(PROJ?.name||''));
@@ -696,7 +696,7 @@ function sendDialog(build,name,subject,text){
   const em=empfaenger(), share=canShareFiles();
   openSheet(`<h2>PDF senden</h2>
     ${em.length?`<label style="font-size:13px;font-weight:700;color:var(--ink-3)">Empfänger</label>`+em.map((r,i)=>`<label class="chk"><input type="checkbox" data-em="${i}" checked><span><b>${esc(r.name||r.email)}</b><small>${esc([r.rolle,r.email].filter(Boolean).join(' · '))}</small></span></label>`).join('')
-      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Bauleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
+      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Projektleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
     <div class="field" style="margin-top:12px"><label for="em_x">Weitere Adresse (optional)</label><input class="inp" id="em_x" type="email" inputmode="email" placeholder="name@firma.de"></div>
     <p class="hint" id="em_st">PDF wird erstellt …</p>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">

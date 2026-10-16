@@ -74,7 +74,7 @@ body.pjs-tabs .toast{bottom:calc(150px + var(--safe-b,0px))}
   const PJ = () => window.PJ || {};
   const portal = () => PJ().portal || '../index.html';
   const leitung = () => typeof PJ().leitung === 'function' && PJ().leitung();
-  const rolleName = r => ({ admin: 'Admin', bauleitung: 'Bauleitung', monteur: 'Monteur' }[r] || '');
+  const rolleName = r => ({ admin: 'Admin', bauleitung: 'Projektleitung', monteur: 'Monteur' }[r] || '');
 
   function mount() {
     if (rail) return;

@@ -171,16 +171,16 @@ async function mailVersuch(){
   mailLauf=false;
 }
 setTimeout(mailVersuch,6000);
-/* „Niemand vor Ort“: Monteur schließt mit eigener Unterschrift ab, PDF geht an die Bauleitung */
+/* „Niemand vor Ort“: Monteur schließt mit eigener Unterschrift ab, PDF geht an die Projektleitung */
 function renderOhne(){
   const el=$('#ohneAg'); if(!el||!E) return;
   const am=ls.get(MAILOHNE,{})[E.id], wartet=Object.values(ls.get(MAILQ,{})).some(x=>x.id===E.id&&x.ohne);
   if(E.sig2||!E.sig1){ el.innerHTML=''; return; }
-  el.innerHTML=am?`<div class="ohne ok">${IC('check')}<div><b>An die Bauleitung gesendet ${tsDE(am)}</b><span>Die Unterschrift des Auftraggebers wird nachgeholt. Unterschreibt er später hier, geht das PDF noch einmal mit beiden Unterschriften raus.</span></div></div>`
-    :wartet?`<div class="ohne">${IC('cloudoff')}<div><b>Wird an die Bauleitung gesendet, sobald Netz da ist</b></div></div>`
-    :`<button class="btn block ohne-btn" id="bOhne">${IC('mail')} Niemand vor Ort – an Bauleitung senden</button>`;
-  const b=$('#bOhne'); if(b) b.onclick=()=>openSheet(`<h2>Niemand vor Ort</h2><p class="hint" style="margin:0 0 12px">${'Vor Ort war niemand, der für den Auftraggeber unterschreiben kann? Dann schließt du hier mit deiner Unterschrift ab. Die Bauleitung bekommt das PDF per E-Mail, leitet es an den Auftraggeber weiter und holt die Unterschrift nach.'}</p>
-    <div class="field"><label for="ohneN">Hinweis für die Bauleitung (optional)</label><textarea class="inp" id="ohneN" rows="3" placeholder="z. B. Bauleiter erst ab Montag wieder vor Ort"></textarea></div>
+  el.innerHTML=am?`<div class="ohne ok">${IC('check')}<div><b>An die Projektleitung gesendet ${tsDE(am)}</b><span>Die Unterschrift des Auftraggebers wird nachgeholt. Unterschreibt er später hier, geht das PDF noch einmal mit beiden Unterschriften raus.</span></div></div>`
+    :wartet?`<div class="ohne">${IC('cloudoff')}<div><b>Wird an die Projektleitung gesendet, sobald Netz da ist</b></div></div>`
+    :`<button class="btn block ohne-btn" id="bOhne">${IC('mail')} Niemand vor Ort – an Projektleitung senden</button>`;
+  const b=$('#bOhne'); if(b) b.onclick=()=>openSheet(`<h2>Niemand vor Ort</h2><p class="hint" style="margin:0 0 12px">${'Vor Ort war niemand, der für den Auftraggeber unterschreiben kann? Dann schließt du hier mit deiner Unterschrift ab. Die Projektleitung bekommt das PDF per E-Mail, leitet es an den Auftraggeber weiter und holt die Unterschrift nach.'}</p>
+    <div class="field"><label for="ohneN">Hinweis für die Projektleitung (optional)</label><textarea class="inp" id="ohneN" rows="3" placeholder="z. B. Bauleiter erst ab Montag wieder vor Ort"></textarea></div>
     <button class="btn cta block" id="ohneOk">${IC('mail')} Abschließen und senden</button>`,()=>{
     $('#ohneOk').onclick=async()=>{
       if(!(E.taetigkeit||'').trim()){ closeSheet(); toast('Bitte zuerst eintragen, was gemacht wurde'); return; }
@@ -616,14 +616,14 @@ async function sendPdf(){
   const text=`Guten Tag,\n\nanbei das Bautagebuch vom ${dLong(E.datum)} für das Bauvorhaben ${PROJ?.name||''}.\n\nMit freundlichen Grüßen\n${E.verfasser||''}\nHeise Haustechnik GmbH & Co. KG`;
   sendDialog(()=>makePdf(),fileName(),subject,text);
 }
-/* Voreingestellte Empfänger des Projekts (pflegt die Bauleitung in der Projektübersicht) */
+/* Voreingestellte Empfänger des Projekts (pflegt die Projektleitung in der Projektübersicht) */
 function empfaenger(){ try{ const a=JSON.parse(PROJ?.empfaenger||'[]'); return Array.isArray(a)?a.filter(x=>x&&x.email):[]; }catch(e){ return []; } }
 const canShareFiles=()=>{ try{ return !!(navigator.canShare&&navigator.canShare({files:[new File(['x'],'x.pdf',{type:'application/pdf'})]})); }catch(e){ return false; } };
 function sendDialog(build,name,subject,text){
   const em=empfaenger(), share=canShareFiles();
   openSheet(`<h2>PDF senden</h2>
     ${em.length?`<label style="font-size:13px;font-weight:700;color:var(--ink-3)">Empfänger</label>`+em.map((r,i)=>`<label class="chk"><input type="checkbox" data-em="${i}" checked><span><b>${esc(r.name||r.email)}</b><small>${esc([r.rolle,r.email].filter(Boolean).join(' · '))}</small></span></label>`).join('')
-      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Bauleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
+      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Projektleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
     <div class="field" style="margin-top:12px"><label for="em_x">Weitere Adresse (optional)</label><input class="inp" id="em_x" type="email" inputmode="email" placeholder="name@firma.de"></div>
     <p class="hint" id="em_st">PDF wird erstellt …</p>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">

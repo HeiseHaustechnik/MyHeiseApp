@@ -147,9 +147,60 @@ textarea.inp{min-height:70px;resize:vertical}
 .ndjw .ndkw{padding:0;min-width:40px;text-align:left}.ndjd{color:var(--ink3);min-width:40px}.ndjp{display:inline-flex;align-items:center;font-weight:650;min-width:0;overflow:hidden;white-space:nowrap}.ndjp .ndb{min-width:20px;height:18px;font-size:10.5px}
 .ndezb{display:flex;gap:4px}
 @media(max-width:700px){.ndwz2{grid-template-columns:1fr;gap:6px}.ndmk,.ndmw{grid-template-columns:26px repeat(7,minmax(0,1fr))}.ndmt{min-height:64px;padding:4px 2px}.ndm1,.ndm2{font-size:10px;padding:1px 2px}.ndkw{font-size:9.5px;padding:6px 0}.tabs{margin-left:0}}
+/* v3: Farben je Mitarbeiter. 1. = voll eingefärbt, 2. = hell mit Rand. Ziffer immer sichtbar. */
+.ndc{display:inline-flex;align-items:center;gap:4px;border-radius:7px;padding:2px 7px 2px 3px;font-size:12.5px;font-weight:650;min-width:0;max-width:100%;line-height:1.25;vertical-align:middle}
+.ndc b{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ndc i{font-style:normal;font-size:10.5px;font-weight:800;min-width:16px;height:16px;border-radius:50%;display:inline-grid;place-items:center;flex:none}
+.ndc.r1{background:var(--c);color:var(--t)}.ndc.r1 i{background:rgba(255,255,255,.92);color:#111827}
+.ndc.r2{background:var(--l);color:var(--ink);box-shadow:inset 0 0 0 2px var(--c)}.ndc.r2 i{background:var(--c);color:var(--t)}
+.ndc.leer{background:var(--redb);color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red)}.ndc.leer i{background:var(--red);color:#fff}
+.ndc.muster.r1{--c:#5b6678;--t:#fff}.ndc.muster.r2{--c:#5b6678;--l:#dfe3ea;--t:#fff}
+.ndbig{display:inline-grid;place-items:center;min-width:36px;height:36px;border-radius:10px;font-size:15px;font-weight:800;flex:none;background:var(--s2);color:var(--ink2)}
+.ndbig.r1{background:var(--c,#5b6678);color:var(--t,#fff)}.ndbig.r2{background:var(--l,#dfe3ea);color:var(--ink);box-shadow:inset 0 0 0 2.5px var(--c,#5b6678)}
+.ndall .lab .ndbig{min-width:24px;height:24px;font-size:12px;border-radius:7px;margin-right:6px}
+.ndmt .ndc{font-size:11.5px;padding:1px 5px 1px 2px}.ndmt .ndc i{min-width:14px;height:14px;font-size:9.5px}
+.ndjw .ndc{font-size:11.5px;max-width:42%}
+.ndwpp .ndc{font-size:14px;padding:3px 9px 3px 4px}.ndwpp .ndc i{min-width:19px;height:19px;font-size:11.5px}
+.ndsw{display:inline-block;width:14px;height:14px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.ndleg{margin-top:12px}.ndleg-h{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}.ndleg-r{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.ndleg-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px;padding:6px}
+.ndleg-p{display:grid;grid-template-columns:14px 1fr;column-gap:8px;align-items:center;text-align:left;padding:6px 8px;border-radius:9px}.ndleg-p:hover{background:var(--s2)}.ndleg-p.on{background:var(--s2);box-shadow:inset 0 0 0 2px var(--ink)}
+.ndleg-p b{font-size:13px}.ndleg-p small{grid-column:2;color:var(--ink3);font-size:11.5px}
+.ndtb{width:100%;text-align:left;cursor:pointer}.ndtb:hover{background:var(--s2)}.ndtausch-l{font-size:12px;color:var(--brand);font-weight:700;white-space:nowrap}
+.btn.klein{height:28px;font-size:12px;padding:0 10px}
+.ndwp .ndtb.klein{width:auto;margin-left:auto}
+.ndtabn{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--acc);color:#fff;font-size:11px;padding:0 5px;margin-left:4px}
+.ndpal{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}.ndpf{width:30px;height:30px;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);position:relative}
+.ndpf.on{box-shadow:0 0 0 2px var(--s),0 0 0 4px var(--ink)}.ndpf.frei{display:grid;place-items:center;background:var(--s2);font-weight:800;color:var(--ink2);overflow:hidden;cursor:pointer}.ndpf.frei input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.ndpvor{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.ndwarn{width:100%;margin-top:8px;padding:8px 10px;border-radius:9px;background:var(--ambb);color:var(--amb);font-size:12.5px;font-weight:600}
+.marow .maname{display:flex;gap:10px;align-items:center}
+/* Tausch */
+.ndh4{font-size:13px;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 8px}
+.ndtk{padding:12px 14px;margin-bottom:10px}.ndtk-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.ndst{font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--s2);color:var(--ink2)}.ndst.amb{background:var(--ambb);color:var(--amb)}.ndst.ok{background:var(--okb);color:var(--ok)}.ndst.red{background:var(--redb);color:var(--red)}
+.ndtk-z{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0}.ndpf-arr{font-weight:800;color:var(--ink3)}.ndtk-d{font-size:13px;color:var(--ink2);font-weight:600}
+.ndtk-b{margin-top:8px;padding:8px 10px;border-radius:9px;background:var(--s2);font-size:13px}.ndtk-b small{display:block;color:var(--ink3);font-size:11.5px}.ndtk-b.rot{background:var(--redb)}
+.ndtk-m{margin-top:8px;font-size:12px;color:var(--ink3)}.ndtk-a{margin-top:10px}
+.ndtl{display:grid;gap:4px;max-height:240px;overflow:auto;padding:4px;border-radius:10px;background:var(--s2)}
+.ndtz{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:var(--s);cursor:pointer;font-size:13px}.ndtz input{width:18px;height:18px;accent-color:var(--brand)}.ndtz.aus{opacity:.5}.ndtz small{color:var(--red);margin-left:auto}
+.ndtok{display:flex;gap:8px;align-items:center;margin-top:12px;font-weight:650}.ndtok input{width:18px;height:18px}
+#sh .seg{display:flex}#sh .seg button{flex:1}
+/* Auswertung */
+.ndaw-f{flex-wrap:wrap;gap:8px}.ndaw-f .inp{width:auto;height:34px}
+.ndaw-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}.ndaw-k .card{padding:12px 14px}.ndaw-k small{display:block;color:var(--ink3);font-size:12px}.ndaw-k b{font-size:18px;display:block}
+.ndaw-t{margin-bottom:12px}.ndaw-scroll{overflow-x:auto}
+table.ndaw{width:100%;border-collapse:collapse;font-size:13px}table.ndaw th{text-align:left;font-size:11.5px;color:var(--ink3);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ndaw td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}table.ndaw tfoot td{font-weight:800;border-bottom:0}
+table.ndaw td small{color:var(--ink3)}table.ndaw .plus{color:var(--amb);font-weight:700}table.ndaw .minus{color:var(--blue);font-weight:700}
+table.ndaw tr.auff td{background:#fff8f2}.ndauff{display:inline-block;margin-left:6px;font-size:11px;font-weight:800;color:var(--amb);background:var(--ambb);padding:1px 6px;border-radius:6px}
+table.ndaw .bal{min-width:140px;width:28%}.ndbal{display:block;height:9px;border-radius:5px;margin:2px 0}.ndbal.o{background:#c9ced8;height:5px}
+@media(max-width:700px){.ndleg-r{margin-left:0}.ndaw-f .inp{flex:1 1 140px}.ndwp .ndtb.klein{margin-left:0}}
+.ndpn{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px}.ndauff.grau{color:var(--ink3);background:var(--s2)}
+@media(max-width:700px){.ndmt .ndc{gap:2px;padding:1px 3px 1px 1px;font-size:10px;border-radius:5px}.ndmt .ndc i{min-width:11px;height:11px;font-size:8px}.ndmt{gap:2px}}
 </style></head><body>
 <div class="top"><a class="home" href="index.html" title="Zur My Heise Startseite">‹ My Heise</a><div><h1>Notdienst</h1><small id="wer-bin-ich">Heise Haustechnik</small></div>
-<div class="tabs" id="tabs"><button data-v="plan" class="on">Einsatzplan</button><button data-v="infos">Infos</button></div></div>
+<div class="tabs" id="tabs"><button data-v="plan" class="on">Einsatzplan</button><button data-v="infos">Infos</button><button data-v="tausch" hidden>Tausch</button><button data-v="auswertung" hidden>Auswertung</button></div></div>
 <div class="wrap" id="app"></div><div class="speichert" id="speichert">Speichert …</div>
 <div class="ov" id="ov"></div><div class="sh" id="sh"></div><div class="toast" id="toast"></div>
 <script>
@@ -194,15 +245,19 @@ async function rpc(name,args){
 
 
 /* =====================================================================
-   Notdienst – eigener Bereich der My Heise App
-   Reiter „Einsatzplan“ (Woche, Monat, Jahr) und „Infos“.
+   Notdienst – eigener Bereich der My Heise App (v3, 16.10.2026)
+   Reiter „Einsatzplan“ (Woche, Monat, Jahr), „Infos“, „Tausch“, „Auswertung“.
    Rechte (app_zugriff app='notdienst'): ohne = ansehen, planer = Dienste ändern,
-   verwalter = dazu Mitarbeiter und Infos, Admin = alles. Geprüft in nd_speichern.
+   verwalter = „Notdienst verwalten und auswerten“ (Mitarbeiter, Infos, Tausch genehmigen,
+   Auswertung), Admin = alles. Geprüft in den Datenbankfunktionen (notdienst_v3.sql).
+   Farben: jede Person eigene Farbe (nd_personen.farbe, sonst Palette).
+   1. Notdienst = voll eingefärbt mit „1“, 2. Notdienst = hell mit Rand und „2“.
    ===================================================================== */
-const ND={geladen:false, von:'', bis:'', P:[], D:{}, I:[], BU:{}, PL:[], rolle:'leser', ich:null, fehler:''};
+const ND={geladen:false, von:'', bis:'', P:[], D:{}, I:[], BU:{}, PL:[], rolle:'leser', ich:null, fehler:'', offen:0, T:null};
 const lsGet=(k,d)=>{ try{ const v=JSON.parse(localStorage.getItem('nd.'+k)); return v==null?d:v }catch(e){ return d } };
 const lsSet=(k,v)=>{ try{ localStorage.setItem('nd.'+k,JSON.stringify(v)) }catch(e){} };
-let VIEW=location.hash==='#infos'?'infos':'plan', SICHT=['woche','monat','jahr'].includes(lsGet('sicht','monat'))?lsGet('sicht','monat'):'monat', CUR=new Date(HEUTE);
+const VIEWS=['plan','infos','tausch','auswertung'];
+let VIEW=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'plan', SICHT=['woche','monat','jahr'].includes(lsGet('sicht','monat'))?lsGet('sicht','monat'):'monat', CUR=new Date(HEUTE), HL=null;
 const ND_GR=[['pauschale','Notdienstpauschalen','Je Einsatz'],['stundensatz','Stundensätze im Notdienst','Außerhalb der Geschäftszeiten'],['anfahrt','Anfahrt','Einsatz Montage- und Kundendienstfahrzeug'],['zeiten','Notdienstzeiten',''],['regel','Wichtig im Notdienst',''],['sperre','Sperrliste','Nicht oder nur nach Rücksprache anfahren'],['kontakt','Erreichbarkeit bei Fragen','']];
 const WT7=['Mo','Di','Mi','Do','Fr','Sa','So'];
 const darf={plan:()=>['planer','verwalter','admin'].includes(ND.rolle), verw:()=>['verwalter','admin'].includes(ND.rolle)};
@@ -213,10 +268,42 @@ const ndTel=t=>String(t||'').replace(/[^\d+]/g,'');
 const ndIch=()=>ND.ich!=null?ndP(ND.ich):null;
 const ndTag=d=>ND.D[d]||null;
 const tage7=m=>[...Array(7)].map((_,i)=>iso(addD(m,i)));
+const istWE=d=>{ const wt=(new Date(d+'T12:00').getDay()+6)%7; return wt>=5||!!ndFT(d) };
+const ndFT=d=>{ const y=+d.slice(0,4); if(!ndFT.j[y]){ Object.assign(FT,feiertage(y)); ndFT.j[y]=1 } return FT[d] }; ndFT.j={};
+
+/* ---------- Farben ---------- */
+const ND_PAL=['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf','#393b79','#637939','#8c6d31','#843c39','#7b4173','#0f766e'];
+const hexRgb=h=>{ const n=parseInt(h.slice(1),16); return [n>>16&255,n>>8&255,n&255] };
+const rgbHex=a=>'#'+a.map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('');
+const lum=h=>{ const c=hexRgb(h).map(v=>{ v/=255; return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4) }); return .2126*c[0]+.7152*c[1]+.0722*c[2] };
+const kontrast=(a,b)=>{ const x=lum(a),y=lum(b); return (Math.max(x,y)+.05)/(Math.min(x,y)+.05) };
+const mischen=(h,w,t)=>{ const a=hexRgb(h),b=hexRgb(w); return rgbHex(a.map((v,i)=>v*(1-t)+b[i]*t)) };
+const textAuf=h=>kontrast(h,'#ffffff')>=4.5?'#ffffff':'#111827';
+const farbAbstand=(a,b)=>{ const x=hexRgb(a),y=hexRgb(b),r=(x[0]+y[0])/2; return Math.sqrt((2+r/256)*(x[0]-y[0])**2+4*(x[1]-y[1])**2+(2+(255-r)/256)*(x[2]-y[2])**2) };
+function ndStandardFarbe(id){ const L=ND.P.slice().sort((a,b)=>a.sort-b.sort||a.id-b.id); const i=L.findIndex(p=>p.id===id); return ND_PAL[(i<0?id:i)%ND_PAL.length] }
+const ndFarbe=id=>{ const p=ndP(id); return p&&/^#[0-9a-f]{6}$/i.test(p.farbe||'')?p.farbe.toLowerCase():ndStandardFarbe(id) };
+const ndVars=id=>{ const f=ndFarbe(id); return `--c:${f};--t:${textAuf(f)};--l:${mischen(f,'#ffffff',.8)}` };
+/* Eintrag eines Mitarbeiters: Farbe + Rolle + Name (Rolle nie nur über Farbe) */
+function ndChip(id,nr,txt){
+  if(!id) return `<span class="ndc leer r${nr}" title="${nr}. Notdienst fehlt"><i>${nr}</i>fehlt</span>`;
+  const n=txt!=null?txt:ndName(id);
+  return `<span class="ndc r${nr}" data-p="${id}" style="${ndVars(id)}" title="${nr}. Notdienst: ${esc(ndP(id)?ndP(id).name:n)}" aria-label="${nr}. Notdienst: ${esc(n)}"><i aria-hidden="true">${nr}</i><b>${esc(n)}</b></span>`;
+}
+/* Person ohne Rolle (Tauschanträge, Auswertung): Farbfeld + Name */
+const ndPersChip=id=>`<span class="ndpn"><span class="ndsw" style="background:${ndFarbe(id)}"></span>${esc(ndP(id)?ndP(id).name:'#'+id)}</span>`;
+function ndRolleBig(id,nr){ return `<span class="ndbig r${nr}" style="${id?ndVars(id):''}" aria-hidden="true">${nr}.</span>` }
+
+/* Legende: Farbe, Name und Häufigkeit im angezeigten Zeitraum */
+function legende(tage,titel){
+  const z={}; tage.forEach(d=>{ const x=ndTag(d); if(!x) return; [[x.a,1],[x.b,2]].forEach(([id,nr])=>{ if(!id) return; (z[id]=z[id]||{1:0,2:0})[nr]++ }) });
+  const L=Object.keys(z).map(Number).sort((a,b)=>(z[b][1]+z[b][2])-(z[a][1]+z[a][2])||ndName(a).localeCompare(ndName(b),'de'));
+  return `<div class="card ndleg"><div class="ndleg-h"><b>Legende ${esc(titel)}</b><span class="ndleg-r"><span class="ndc r1 muster"><i>1</i><b>1. Notdienst: voll</b></span><span class="ndc r2 muster"><i>2</i><b>2. Notdienst: hell mit Rand</b></span></span></div>
+    ${L.length?`<div class="ndleg-l">${L.map(id=>`<button class="ndleg-p${HL===id?' on':''}" data-hl="${id}" aria-pressed="${HL===id}" title="Im Plan hervorheben"><span class="ndsw" style="background:${ndFarbe(id)}"></span><b>${esc(ndName(id))}</b><small>${z[id][1]+z[id][2]} ${z[id][1]+z[id][2]===1?'Tag':'Tage'} · ${z[id][1]}× 1. · ${z[id][2]}× 2.</small></button>`).join('')}</div>`:'<p class="sub" style="padding:8px 14px">Keine Dienste im Zeitraum.</p>'}</div>`;
+}
 
 async function ndLaden(von,bis){
   const j=await rpc('nd_laden',{p_von:von,p_bis:bis});
-  ND.rolle=j.rolle||'leser'; ND.ich=j.ich==null?null:+j.ich;
+  ND.rolle=j.rolle||'leser'; ND.ich=j.ich==null?null:+j.ich; ND.offen=+j.tausch_offen||0;
   ND.P=(j.personen||[]).map(p=>({...p,id:+p.id,person_id:p.person_id==null?null:+p.person_id}));
   (j.dienste||[]).forEach(([d,a,b,n])=>{ ND.D[d]={a:a==null?null:+a,b:b==null?null:+b,n:n||''} });
   ND.I=j.infos||[]; ND.BU={}; (j.bu||[]).forEach(u=>ND.BU[u.datum]=+u.anteil); ND.PL=(j.planung||[]).map(p=>({id:+p.id,name:p.name}));
@@ -230,64 +317,78 @@ function ndZeit(d){
 }
 function ndPerson(id,nr){
   const p=ndP(id), ich=p&&ndIch()&&p.id===ndIch().id;
-  if(!p) return `<div class="ndp leer"><span class="ndb n${nr}">${nr}.</span><div><b>${nr}. Notdienst fehlt</b><small>bitte eintragen</small></div></div>`;
-  return `<div class="ndp"><span class="ndb n${nr}">${nr}.</span><div><b>${esc(p.name)}${ich?' <span class="ndich">du</span>':''}</b><small>${nr}. Notdienst${p.telefon?' · '+esc(p.telefon):''}</small></div>${p.telefon?`<a class="btn ndcall" href="tel:${ndTel(p.telefon)}">Anrufen</a>`:''}</div>`;
+  if(!p) return `<div class="ndp leer">${ndRolleBig(null,nr)}<div><b>${nr}. Notdienst fehlt</b><small>bitte eintragen</small></div></div>`;
+  return `<div class="ndp">${ndRolleBig(id,nr)}<div><b>${esc(p.name)}${ich?' <span class="ndich">du</span>':''}</b><small>${nr}. Notdienst${p.telefon?' · '+esc(p.telefon):''}</small></div>${p.telefon?`<a class="btn ndcall" href="tel:${ndTel(p.telefon)}">Anrufen</a>`:''}</div>`;
 }
 function ndPaar(t,klein){ if(!t) return '<span class="ndfehlt">nicht eingetragen</span>';
-  return `<span class="ndpaar${klein?' k':''}"><span><span class="ndb n1">1.</span>${t.a?esc(ndName(t.a)):'<span class="ndfehlt">fehlt</span>'}</span><span><span class="ndb n2">2.</span>${t.b?esc(ndName(t.b)):'<span class="ndfehlt">fehlt</span>'}</span></span>`; }
+  return `<span class="ndpaar${klein?' k':''}">${ndChip(t.a,1)}${ndChip(t.b,2)}</span>`; }
 const wocheGleich=T7=>T7.every(x=>x&&T7[0]&&x.a===T7[0].a&&x.b===T7[0].b&&!x.n);
+/* Eigene Dienste ab heute, zu Blöcken zusammengefasst (gleiche Rolle, aufeinanderfolgende Tage) */
+function meineBloecke(pid,abDatum){
+  const h=abDatum||iso(HEUTE), D=Object.keys(ND.D).filter(d=>d>=h&&(ND.D[d].a===pid||ND.D[d].b===pid)).sort(), W=[];
+  D.forEach(d=>{ const nr=ND.D[d].a===pid?1:2, l=W[W.length-1]; if(l&&l.nr===nr&&iso(addD(new Date(l.bis+'T12:00'),1))===d){ l.bis=d; l.tage.push(d) } else W.push({nr,von:d,bis:d,tage:[d]}) });
+  return W;
+}
 
 /* ---------- Oben: heute und meine Dienste ---------- */
 function oben(){
   const h=iso(HEUTE), t=ndTag(h), mo=iso(addD(HEUTE,1)), tm=ndTag(mo), ich=ndIch();
-  const meine=ich?Object.keys(ND.D).filter(d=>d>=h&&(ND.D[d].a===ich.id||ND.D[d].b===ich.id)).sort():[];
-  const W=[]; meine.forEach(d=>{ const nr=ND.D[d].a===ich.id?1:2, l=W[W.length-1]; if(l&&l.nr===nr&&iso(addD(new Date(l.bis+'T12:00'),1))===d) l.bis=d; else W.push({nr,von:d,bis:d}) });
+  const W=ich?meineBloecke(ich.id):[];
   return `<div class="ndoben">
     <div class="card ndheute"><div class="ndh"><small>Heute, ${HEUTE.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'})}${FT[h]?' · '+esc(FT[h]):''}</small><b>Notdienst ${esc(ndZeit(h)||'')}</b></div>
       ${ndPerson(t&&t.a,1)}${ndPerson(t&&t.b,2)}${t&&t.n?`<div class="ndnote gross">${esc(t.n)}</div>`:''}
       <div class="ndmorgen">Morgen${FT[mo]?' ('+esc(FT[mo])+')':''}: ${ndPaar(tm,true)}</div></div>
-    <div class="card ndmeine"><div class="pr-h"><b>${ich?'Meine nächsten Dienste':'Notdienst'}</b></div>
-      ${ich?(W.length?W.slice(0,6).map(x=>`<div class="ndi"><div><b>KW ${kwOf(new Date(x.von+'T12:00'))}</b><small>${dDE(x.von)}${x.bis!==x.von?' – '+dDE(x.bis):''}</small></div><span class="ndb n${x.nr} lang">${x.nr}. Notdienst</span></div>`).join(''):'<p class="sub" style="padding:10px 16px">Keine Dienste eingetragen.</p>')
+    <div class="card ndmeine"><div class="pr-h"><b>${ich?'Meine nächsten Dienste':'Notdienst'}</b>${ich&&W.length?'<span class="ndsub" style="margin-left:auto">Antippen zum Tauschen</span>':''}</div>
+      ${ich?(W.length?W.slice(0,6).map(x=>`<button class="ndi ndtb" data-tausch="${x.von}" title="Notdienst tauschen"><div><b>KW ${kwOf(new Date(x.von+'T12:00'))}</b><small>${dDE(x.von)}${x.bis!==x.von?' – '+dDE(x.bis):''}</small></div>${ndChip(ich.id,x.nr,x.nr+'. Notdienst')}<span class="ndtausch-l">Tauschen ›</span></button>`).join(''):'<p class="sub" style="padding:10px 16px">Keine Dienste eingetragen.</p>')
         :`<p class="sub" style="padding:10px 16px">Du bist nicht im Notdienst eingeteilt oder dein Konto ist noch nicht verknüpft. Urlaub ist im Plan nicht berücksichtigt: Vertretung selbst regeln und J. Schmidt Bescheid geben.</p>`}</div></div>`;
 }
 
 /* ---------- Einsatzplan ---------- */
 function rPlan(){
-  const h=iso(HEUTE);
-  let titel='', inhalt='';
+  const h=iso(HEUTE), ich=ndIch();
+  let titel='', inhalt='', tage=[], legT='';
   if(SICHT==='woche'){
-    const m=montag(CUR), T=tage7(m);
+    const m=montag(CUR), T=tage7(m); tage=T; legT='KW '+kwOf(m);
     titel=`KW ${kwOf(m)}<small>${dDE(T[0])} – ${dDE(T[6])}${T[6].slice(0,4)}</small>`;
-    inhalt=`<div class="card ndwoche">${T.map((d,i)=>{const x=ndTag(d);return `<div class="ndwz2${d===h?' heute':''}${!x||!x.a||!x.b?' fehlt':''}"><div class="ndwd"><b>${WT7[i]} ${dDE(d)}</b><small>${FT[d]?esc(FT[d])+' · ':''}${esc(ndZeit(d))}</small></div>
-      <div class="ndwp">${[1,2].map(nr=>{const id=x&&(nr===1?x.a:x.b), p=ndP(id);return `<div class="ndwpp"><span class="ndb n${nr}">${nr}.</span>${p?`<span><b>${esc(p.kurz||p.name)}</b>${p.telefon?`<a href="tel:${ndTel(p.telefon)}">${esc(p.telefon)}</a>`:''}</span>`:'<span class="ndfehlt">fehlt</span>'}</div>`}).join('')}${x&&x.n?`<span class="ndnote">${esc(x.n)}</span>`:''}</div></div>`}).join('')}</div>
+    inhalt=`<div class="card ndwoche">${T.map((d,i)=>{const x=ndTag(d), meins=ich&&x&&(x.a===ich.id||x.b===ich.id)&&d>=h;return `<div class="ndwz2${d===h?' heute':''}${!x||!x.a||!x.b?' fehlt':''}"><div class="ndwd"><b>${WT7[i]} ${dDE(d)}</b><small>${FT[d]?esc(FT[d])+' · ':''}${esc(ndZeit(d))}</small></div>
+      <div class="ndwp">${[1,2].map(nr=>{const id=x&&(nr===1?x.a:x.b), p=ndP(id);return `<div class="ndwpp">${ndChip(id,nr,p?(p.kurz||p.name):null)}${p&&p.telefon?`<a href="tel:${ndTel(p.telefon)}">${esc(p.telefon)}</a>`:''}</div>`}).join('')}${x&&x.n?`<span class="ndnote">${esc(x.n)}</span>`:''}${meins?`<button class="btn ndtb klein" data-tausch="${d}">Tauschen</button>`:''}</div></div>`}).join('')}</div>
       ${darf.plan()?`<div class="row" style="max-width:320px"><button class="btn pri" data-ndw="${iso(m)}">Woche bearbeiten</button></div>`:''}`;
   } else if(SICHT==='monat'){
     const m1=new Date(CUR.getFullYear(),CUR.getMonth(),1,12), ende=new Date(CUR.getFullYear(),CUR.getMonth()+1,0,12), W=[];
     for(let w=montag(m1); w<=ende; w=addD(w,7)) W.push(w);
+    for(let d=new Date(m1); d<=ende; d=addD(d,1)) tage.push(iso(d));
+    legT=m1.toLocaleDateString('de-DE',{month:'long',year:'numeric'});
     titel=`${m1.toLocaleDateString('de-DE',{month:'long',year:'numeric'})}<small>KW ${kwOf(W[0])} bis KW ${kwOf(W[W.length-1])}</small>`;
     inhalt=`<div class="card ndmonat"><div class="ndmk"><span>KW</span>${WT7.map(t=>`<span>${t}</span>`).join('')}</div>
       ${W.map(w=>{const T=tage7(w); return `<div class="ndmw${darf.plan()?' klick':''}${T.includes(h)?' dies':''}" data-ndw="${iso(w)}"><span class="ndkw">${kwOf(w)}</span>${T.map(d=>{const x=ndTag(d), fremd=new Date(d+'T12:00').getMonth()!==m1.getMonth();
-        return `<div class="ndmt${d===h?' heute':''}${fremd?' fremd':''}${!x||!x.a||!x.b?' fehlt':''}${x&&x.n?' notiz':''}" title="${esc(dDE(d)+(FT[d]?' '+FT[d]:'')+': 1. '+(x&&ndName(x.a)||'–')+', 2. '+(x&&ndName(x.b)||'–')+(x&&x.n?' · '+x.n:''))}"><span class="ndmd">${+d.slice(8)}${FT[d]?'<em>F</em>':''}</span><span class="ndm1">${x&&x.a?esc(ndNach(x.a)):'–'}</span><span class="ndm2">${x&&x.b?esc(ndNach(x.b)):'–'}</span></div>`}).join('')}</div>`}).join('')}</div>
-      <div class="leg"><span><span class="ndb n1">1.</span>oben 1. Notdienst</span><span><span class="ndb n2">2.</span>unten 2. Notdienst</span><span><i class="ndmark"></i>Notiz oder Tausch</span><span class="ndfehlt">rot = fehlt</span></div>`;
+        return `<div class="ndmt${d===h?' heute':''}${fremd?' fremd':''}${!x||!x.a||!x.b?' fehlt':''}${x&&x.n?' notiz':''}" title="${esc(dDE(d)+(FT[d]?' '+FT[d]:'')+': 1. '+(x&&ndName(x.a)||'–')+', 2. '+(x&&ndName(x.b)||'–')+(x&&x.n?' · '+x.n:''))}"><span class="ndmd">${+d.slice(8)}${FT[d]?'<em>F</em>':''}</span>${ndChip(x&&x.a,1,x&&x.a?ndNach(x.a):null)}${ndChip(x&&x.b,2,x&&x.b?ndNach(x.b):null)}</div>`}).join('')}</div>`}).join('')}</div>`;
   } else {
-    const j=CUR.getFullYear();
+    const j=CUR.getFullYear(); legT=String(j);
+    for(let d=new Date(j,0,1,12); d.getFullYear()===j; d=addD(d,1)) tage.push(iso(d));
     titel=`${j}<small>Jahresübersicht</small>`;
     inhalt=`<div class="ndjahr">${[...Array(12)].map((_,mi)=>{const m1=new Date(j,mi,1,12), W=[]; for(let w=montag(m1); w.getMonth()===mi||w<m1; w=addD(w,7)){ if(addD(w,3).getMonth()===mi&&addD(w,3).getFullYear()===j) W.push(w) }
       return `<div class="card ndjm"><div class="pr-h"><b>${m1.toLocaleDateString('de-DE',{month:'long'})}</b></div>${W.map(w=>{const T=tage7(w), T7=T.map(ndTag), g=wocheGleich(T7), t=T7.find(Boolean);
-        return `<div class="ndjw${T.includes(h)?' dies':''}${T7.some(x=>!x||!x.a||!x.b)?' fehlt':''}" data-ndw="${iso(w)}"><span class="ndkw">KW ${kwOf(w)}</span><span class="ndjd">${dDE(T[0])}</span>${t?`<span class="ndjp"><span class="ndb n1">1.</span>${esc(ndNach(t.a))}</span><span class="ndjp"><span class="ndb n2">2.</span>${esc(ndNach(t.b))}</span>`:'<span class="ndfehlt">nicht eingetragen</span>'}${g?'':'<i class="ndmark" title="In dieser Woche gibt es Tausch-Tage oder Notizen"></i>'}</div>`}).join('')}</div>`}).join('')}</div>`;
+        return `<div class="ndjw${T.includes(h)?' dies':''}${T7.some(x=>!x||!x.a||!x.b)?' fehlt':''}" data-ndw="${iso(w)}"><span class="ndkw">KW ${kwOf(w)}</span><span class="ndjd">${dDE(T[0])}</span>${t?`${ndChip(t.a,1,t.a?ndNach(t.a):null)}${ndChip(t.b,2,t.b?ndNach(t.b):null)}`:'<span class="ndfehlt">nicht eingetragen</span>'}${g?'':'<i class="ndmark" title="In dieser Woche gibt es Tausch-Tage oder Notizen"></i>'}</div>`}).join('')}</div>`}).join('')}</div>`;
   }
   $('#app').innerHTML=`${oben()}
     <div class="bar" style="margin-top:16px"><div class="seg" id="sicht">${[['woche','Woche'],['monat','Monat'],['jahr','Jahr']].map(([k,l])=>`<button data-s="${k}" class="${SICHT===k?'on':''}">${l}</button>`).join('')}</div>
-      <button class="btn ic" id="prev">‹</button><div class="kw">${titel}</div><button class="btn ic" id="next">›</button><button class="btn" id="heute">Heute</button>
+      <button class="btn ic" id="prev" aria-label="zurück">‹</button><div class="kw">${titel}</div><button class="btn ic" id="next" aria-label="weiter">›</button><button class="btn" id="heute">Heute</button>
       ${darf.plan()?'<span class="sub" style="margin:0 0 0 auto">Woche antippen zum Ändern</span>':''}</div>
-    ${inhalt}`;
+    <div id="ndplan"${HL?` class="hl" data-hl="${HL}"`:''}>${inhalt}</div>
+    ${legende(tage,legT)}
+    ${SICHT!=='jahr'?'<div class="leg"><span><i class="ndmark"></i>Notiz oder Tausch</span><span class="ndfehlt">rot = fehlt</span></div>':''}`;
+  hlStil();
   const schritt=r=>{ if(SICHT==='woche') CUR=addD(CUR,7*r); else if(SICHT==='monat') CUR=new Date(CUR.getFullYear(),CUR.getMonth()+r,1,12); else CUR=new Date(CUR.getFullYear()+r,0,1,12);
     const a=SICHT==='jahr'?CUR.getFullYear()+'-01-01':iso(addD(montag(CUR),-7)), e=SICHT==='jahr'?CUR.getFullYear()+'-12-31':iso(addD(CUR,45));
     ndSichern(a,e).then(rPlan).catch(er=>toast(er.message)) };
   $('#prev').onclick=()=>schritt(-1); $('#next').onclick=()=>schritt(1); $('#heute').onclick=()=>{ CUR=new Date(HEUTE); rPlan() };
   document.querySelectorAll('#sicht [data-s]').forEach(b=>b.onclick=()=>{ SICHT=b.dataset.s; lsSet('sicht',SICHT); schritt(0) });
-  document.querySelectorAll('#app [data-ndw]').forEach(w=>w.onclick=()=>{ if(darf.plan()) ndWoche(w.dataset.ndw); else if(SICHT!=='woche'){ CUR=new Date(w.dataset.ndw+'T12:00'); SICHT='woche'; rPlan() } });
+  document.querySelectorAll('#app [data-ndw]').forEach(w=>w.onclick=e=>{ if(e.target.closest('[data-tausch]')) return; if(darf.plan()) ndWoche(w.dataset.ndw); else if(SICHT!=='woche'){ CUR=new Date(w.dataset.ndw+'T12:00'); SICHT='woche'; rPlan() } });
+  document.querySelectorAll('#app [data-tausch]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); ndTauschNeu(b.dataset.tausch) });
+  document.querySelectorAll('#app [data-hl]').forEach(b=>{ if(b.id==='ndplan') return; b.onclick=()=>{ const id=+b.dataset.hl; HL=HL===id?null:id; rPlan() } });
 }
+function hlStil(){ let s=$('#ndhlstil'); if(!s){ s=document.createElement('style'); s.id='ndhlstil'; document.head.appendChild(s) }
+  s.textContent=HL?`#ndplan.hl .ndc:not([data-p="${HL}"]){opacity:.28}#ndplan.hl .ndc[data-p="${HL}"]{outline:2px solid var(--ink);outline-offset:1px}`:'' }
 
 /* ---------- Infos ---------- */
 function rInfos(){
@@ -299,29 +400,36 @@ function rInfos(){
   $('#app').innerHTML=`<div class="bar"><b style="font-size:15px">Wichtige Infos zum Notdienst</b><span class="sub" style="margin:0">Preise zzgl. MwSt.</span>${darf.verw()?'<span class="sub" style="margin:0 0 0 auto">„Bearbeiten“ ändert die Infos sofort für alle</span>':''}</div>
     <div class="ndinfos">${ND_GR.map(info).join('')}
       <div class="card ndcard"><div class="pr-h"><b>Notdienst-Mitarbeiter</b><span class="ndsub">${akt.length} im Notdienst</span>${darf.verw()?'<button class="btn ndedit" id="ndpers">Bearbeiten</button>':''}</div>
-        ${akt.map(p=>`<div class="ndi"><div><b>${esc(p.name)}</b></div>${p.telefon?`<a class="ndw2" href="tel:${ndTel(p.telefon)}">${esc(p.telefon)}</a>`:'<span class="sub" style="margin:0">keine Nummer</span>'}</div>`).join('')}</div></div>`;
+        ${akt.map(p=>`<div class="ndi"><div style="display:flex;align-items:center;gap:8px"><span class="ndsw" style="background:${ndFarbe(p.id)}"></span><b>${esc(p.name)}</b></div>${p.telefon?`<a class="ndw2" href="tel:${ndTel(p.telefon)}">${esc(p.telefon)}</a>`:'<span class="sub" style="margin:0">keine Nummer</span>'}</div>`).join('')}</div></div>`;
   document.querySelectorAll('[data-ndi]').forEach(b=>b.onclick=()=>ndInfoBearbeiten(b.dataset.ndi));
   if($('#ndpers')) $('#ndpers').onclick=ndPersonen;
 }
 
 /* ---------- Rahmen ---------- */
+function tabsZeigen(){
+  const t=$('#tabs [data-v="tausch"]'), a=$('#tabs [data-v="auswertung"]');
+  if(t){ t.hidden=!(ND.ich!=null||darf.verw()); t.innerHTML='Tausch'+(ND.offen?` <span class="ndtabn">${ND.offen}</span>`:'') }
+  if(a) a.hidden=!darf.verw();
+  if((VIEW==='tausch'&&t&&t.hidden)||(VIEW==='auswertung'&&a&&a.hidden)) VIEW='plan';
+}
 function render(){
+  if(ND.geladen) tabsZeigen();
   document.querySelectorAll('#tabs [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===VIEW));
   if(!ND.geladen){ $('#app').innerHTML=`<div class="lade">${ND.fehler?`<b style="color:var(--ink)">Notdienst konnte nicht geladen werden</b><p style="margin:8px 0 16px">${esc(ND.fehler)}</p><button class="btn pri" onclick="location.reload()">Erneut versuchen</button>`:'Notdienst wird geladen …'}</div>`; return }
-  (VIEW==='infos'?rInfos:rPlan)();
+  ({plan:rPlan,infos:rInfos,tausch:rTausch,auswertung:rAuswertung}[VIEW]||rPlan)();
 }
-$('#tabs').onclick=e=>{ const b=e.target.closest('[data-v]'); if(!b) return; VIEW=b.dataset.v; history.replaceState(null,'',VIEW==='infos'?'#infos':'#plan'); render() };
+$('#tabs').onclick=e=>{ const b=e.target.closest('[data-v]'); if(!b) return; VIEW=b.dataset.v; history.replaceState(null,'','#'+VIEW); render() };
 async function ndSpeichern(p){ $('#speichert').classList.add('on'); try{ return await rpc('nd_speichern',{p}) } finally{ $('#speichert').classList.remove('on') } }
 
-/* ---------- Woche bearbeiten ---------- */
+/* ---------- Woche bearbeiten (Planer) ---------- */
 function ndWoche(w0){
   const tage=tage7(new Date(w0+'T12:00')), alt=Object.fromEntries(tage.map(d=>[d,ND.D[d]?{...ND.D[d]}:null]));
   const X=Object.fromEntries(tage.map(d=>[d,ND.D[d]?{...ND.D[d]}:{a:null,b:null,n:''}]));
   const akt=ND.P.filter(p=>p.aktiv||tage.some(d=>X[d].a===p.id||X[d].b===p.id));
   const opt=sel=>`<option value="">–</option>${akt.map(p=>`<option value="${p.id}"${p.id===sel?' selected':''}>${esc(p.kurz||p.name)}</option>`).join('')}`;
   const draw=()=>{ sheet(`<h3>Notdienst KW ${kwOf(new Date(w0+'T12:00'))}</h3><div class="sub">${dDE(tage[0])} – ${dDE(tage[6])}${tage[6].slice(0,4)}</div>
-    <div class="ndall"><label><span class="lab"><span class="ndb n1">1.</span> ganze Woche</span><select class="inp" id="nda">${opt(null)}</select></label><label><span class="lab"><span class="ndb n2">2.</span> ganze Woche</span><select class="inp" id="ndb">${opt(null)}</select></label></div>
-    <div class="ndform">${tage.map((d,i)=>`<div class="ndfz"><span class="ndd">${WT7[i]} ${dDE(d)}${FT[d]?`<em>${esc(FT[d])}</em>`:''}</span><select class="inp" data-a="${d}">${opt(X[d].a)}</select><select class="inp" data-b="${d}">${opt(X[d].b)}</select><input class="inp" data-n="${d}" value="${esc(X[d].n)}" placeholder="Notiz, z. B. Tausch"></div>`).join('')}</div>
+    <div class="ndall"><label><span class="lab">${ndRolleBig(null,1)} ganze Woche</span><select class="inp" id="nda">${opt(null)}</select></label><label><span class="lab">${ndRolleBig(null,2)} ganze Woche</span><select class="inp" id="ndb">${opt(null)}</select></label></div>
+    <div class="ndform">${tage.map((d,i)=>`<div class="ndfz"><span class="ndd">${WT7[i]} ${dDE(d)}${FT[d]?`<em>${esc(FT[d])}</em>`:''}</span><select class="inp" data-a="${d}" aria-label="1. Notdienst ${dDE(d)}" style="${X[d].a?'box-shadow:inset 4px 0 0 '+ndFarbe(X[d].a):''}">${opt(X[d].a)}</select><select class="inp" data-b="${d}" aria-label="2. Notdienst ${dDE(d)}" style="${X[d].b?'box-shadow:inset 4px 0 0 '+ndFarbe(X[d].b):''}">${opt(X[d].b)}</select><input class="inp" data-n="${d}" value="${esc(X[d].n)}" placeholder="Notiz, z. B. Tausch"></div>`).join('')}</div>
     <div class="row"><button class="btn" id="ndzu">Abbrechen</button><button class="btn" id="ndtausch" title="1. und 2. Notdienst in dieser Woche tauschen">1. ↔ 2. tauschen</button><button class="btn pri" id="ndok">Speichern</button></div>`);
     const lesen=()=>tage.forEach(d=>{ X[d].a=+$(`[data-a="${d}"]`).value||null; X[d].b=+$(`[data-b="${d}"]`).value||null; X[d].n=$(`[data-n="${d}"]`).value.trim() });
     $('#nda').onchange=e=>{ lesen(); tage.forEach(d=>X[d].a=+e.target.value||null); draw() };
@@ -358,27 +466,220 @@ function ndInfoBearbeiten(g){
 /* ---------- Notdienst-Mitarbeiter (Verwaltung) ---------- */
 function ndPersonen(){
   const L=ND.P.slice().sort((a,b)=>(b.aktiv-a.aktiv)||a.sort-b.sort||a.name.localeCompare(b.name,'de'));
-  sheet(`<h3>Notdienst-Mitarbeiter</h3><div class="sub">Kurzname erscheint im Plan, die Nummer zum Anrufen. Die Verknüpfung mit dem Mitarbeiter aus der Planung zeigt jedem „Meine nächsten Dienste“.</div>
-    ${L.map(p=>`<div class="marow${p.aktiv?'':' weg'}"><button class="maname" data-ndp="${p.id}"><b>${esc(p.name)}</b><small>${esc(p.kurz)}${p.telefon?' · '+esc(p.telefon):' · keine Nummer'}${p.person_id?'':' · nicht verknüpft'}${p.aktiv?'':' · nicht im Notdienst'}</small></button></div>`).join('')}
+  sheet(`<h3>Notdienst-Mitarbeiter</h3><div class="sub">Kurzname und Farbe erscheinen im Plan, die Nummer zum Anrufen. Die Verknüpfung mit dem Mitarbeiter aus der Planung zeigt jedem „Meine nächsten Dienste“ und erlaubt Tauschwünsche.</div>
+    ${L.map(p=>`<div class="marow${p.aktiv?'':' weg'}"><button class="maname" data-ndp="${p.id}"><span class="ndsw" style="background:${ndFarbe(p.id)}"></span><span><b>${esc(p.name)}</b><small>${esc(p.kurz)}${p.telefon?' · '+esc(p.telefon):' · keine Nummer'}${p.person_id?'':' · nicht verknüpft'}${p.aktiv?'':' · nicht im Notdienst'}${p.farbe?'':' · Standardfarbe'}</small></span></button></div>`).join('')}
     <div class="row"><button class="btn" onclick="closeSh()">Schließen</button><button class="btn pri" id="ndneu">+ Mitarbeiter</button></div>`);
   document.querySelectorAll('#sh [data-ndp]').forEach(b=>b.onclick=()=>ndPersonBearbeiten(ND.P.find(p=>p.id===+b.dataset.ndp)));
   $('#ndneu').onclick=()=>ndPersonBearbeiten(null);
 }
 function ndPersonBearbeiten(p){
-  const neu=!p, x=neu?{name:'',kurz:'',telefon:'',person_id:null,aktiv:true,sort:ND.P.length}:{...p};
+  const neu=!p, x=neu?{name:'',kurz:'',telefon:'',person_id:null,aktiv:true,sort:ND.P.length,farbe:null}:{...p};
+  let farbe=x.farbe||'';
+  const std=neu?ND_PAL[ND.P.length%ND_PAL.length]:ndStandardFarbe(x.id);
   sheet(`<h3>${neu?'Notdienst-Mitarbeiter hinzufügen':esc(x.name)}</h3>
     <div class="lab">Mitarbeiter aus der Planung</div><select class="inp" id="npv"><option value="">nicht verknüpft</option>${ND.PL.map(q=>`<option value="${q.id}"${q.id===x.person_id?' selected':''}>${esc(q.name)}</option>`).join('')}</select>
     <div class="lab">Name</div><input class="inp" id="npn" value="${esc(x.name)}" placeholder="Vorname Nachname">
     <div class="lab">Kurzname im Plan</div><input class="inp" id="npk" value="${esc(x.kurz)}" placeholder="z. B. N. Frister">
     <div class="lab">Handynummer im Notdienst</div><input class="inp" id="npt" type="tel" value="${esc(x.telefon)}" placeholder="+49 …">
+    <div class="lab">Farbe im Plan</div>
+    <div class="ndpal" role="radiogroup" aria-label="Farbe">${ND_PAL.map(f=>`<button type="button" class="ndpf" data-f="${f}" style="background:${f}" role="radio" aria-label="Farbe ${f}"></button>`).join('')}
+      <label class="ndpf frei" title="Eigene Farbe"><input type="color" id="npc" value="${farbe||std}" aria-label="Eigene Farbe wählen">+</label>
+      <button type="button" class="btn klein" id="npstd">Standard</button></div>
+    <div id="npvor" class="ndpvor"></div>
     <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="npa"${x.aktiv?' checked':''}> Im Notdienst (zur Auswahl im Plan)</label>
     <div class="row"><button class="btn" id="npz">Zurück</button><button class="btn pri" id="npok">Speichern</button></div>`);
-  $('#npv').onchange=e=>{ const q=ND.PL.find(y=>y.id===+e.target.value); if(q&&!$('#npn').value.trim()) $('#npn').value=q.name; if(q&&!$('#npk').value.trim()){ const t=q.name.split(' '); $('#npk').value=t.length>1?t[0][0]+'. '+t.slice(1).join(' '):q.name } };
+  const vorschau=()=>{ const f=farbe||std, nm=$('#npk').value.trim()||$('#npn').value.trim()||'Name';
+    document.querySelectorAll('#sh .ndpf[data-f]').forEach(b=>{ const on=b.dataset.f===farbe; b.classList.toggle('on',on); b.setAttribute('aria-checked',on) });
+    const nah=ND.P.filter(q=>q.aktiv&&q.id!==x.id).map(q=>({q,d:farbAbstand(f,ndFarbe(q.id))})).filter(o=>o.d<90).sort((a,b)=>a.d-b.d);
+    $('#npvor').innerHTML=`<span class="sub" style="margin:0">Vorschau:</span><span class="ndc r1" style="--c:${f};--t:${textAuf(f)};--l:${mischen(f,'#ffffff',.8)}"><i>1</i><b>${esc(nm)}</b></span><span class="ndc r2" style="--c:${f};--t:${textAuf(f)};--l:${mischen(f,'#ffffff',.8)}"><i>2</i><b>${esc(nm)}</b></span>${farbe?'':'<span class="sub" style="margin:0">(Standardfarbe)</span>'}
+      ${nah.length?`<div class="ndwarn">Sehr ähnlich wie ${nah.slice(0,3).map(o=>esc(o.q.kurz||o.q.name)).join(', ')}. Besser eine andere Farbe wählen.</div>`:''}` };
+  document.querySelectorAll('#sh .ndpf[data-f]').forEach(b=>b.onclick=()=>{ farbe=b.dataset.f; $('#npc').value=farbe; vorschau() });
+  $('#npc').oninput=e=>{ farbe=e.target.value.toLowerCase(); vorschau() };
+  $('#npstd').onclick=()=>{ farbe=''; vorschau() };
+  $('#npn').oninput=vorschau; $('#npk').oninput=vorschau;
+  $('#npv').onchange=e=>{ const q=ND.PL.find(y=>y.id===+e.target.value); if(q&&!$('#npn').value.trim()) $('#npn').value=q.name; if(q&&!$('#npk').value.trim()){ const t=q.name.split(' '); $('#npk').value=t.length>1?t[0][0]+'. '+t.slice(1).join(' '):q.name } vorschau() };
   $('#npz').onclick=ndPersonen;
-  $('#npok').onclick=async()=>{ x.name=$('#npn').value.trim(); x.kurz=$('#npk').value.trim(); x.telefon=$('#npt').value.trim(); x.person_id=+$('#npv').value||null; x.aktiv=$('#npa').checked;
+  vorschau();
+  $('#npok').onclick=async()=>{ x.name=$('#npn').value.trim(); x.kurz=$('#npk').value.trim(); x.telefon=$('#npt').value.trim(); x.person_id=+$('#npv').value||null; x.aktiv=$('#npa').checked; x.farbe=farbe||null;
     if(!x.name) return toast('Bitte einen Namen eingeben');
-    try{ const r=await ndSpeichern({personen:{upsert:[{id:neu?'':x.id,name:x.name,kurz:x.kurz,telefon:x.telefon,person_id:x.person_id||'',aktiv:x.aktiv,sort:x.sort}]}});
+    try{ const r=await ndSpeichern({personen:{upsert:[{id:neu?'':x.id,name:x.name,kurz:x.kurz,telefon:x.telefon,person_id:x.person_id||'',aktiv:x.aktiv,sort:x.sort,farbe:x.farbe||''}]}});
       if(neu){ x.id=+((r&&r.neue_personen)||[])[0]; ND.P.push(x) } else Object.assign(p,x); ndPersonen(); render(); toast('Gespeichert') }catch(e){ toast('Nicht gespeichert: '+e.message) } };
+}
+
+/* =====================================================================
+   Tausch
+   ===================================================================== */
+const T_ST={offen:['Offen','amb'],genehmigt:['Genehmigt','ok'],abgelehnt:['Abgelehnt','red'],zurueckgezogen:['Zurückgenommen','grau']};
+const T_FILTER=['alle','offen','genehmigt','abgelehnt','zurueckgezogen'];
+let TF=lsGet('tf','alle');
+async function tauschLaden(){ ND.T=await rpc('nd_tausch_liste',{}); ND.offen=ND.T.filter(t=>t.status==='offen'&&(darf.verw()||t.antragsteller===ND.ich||t.partner===ND.ich)).length }
+function posText(t,von){ const L=(t.pos||[]).filter(q=>+q.von===von); if(!L.length) return '';
+  const B=[]; L.forEach(q=>{ const l=B[B.length-1]; if(l&&l.r===q.rolle&&iso(addD(new Date(l.bis+'T12:00'),1))===q.datum) l.bis=q.datum; else B.push({r:q.rolle,von:q.datum,bis:q.datum}) });
+  return B.map(b=>`${dDE(b.von)}${b.bis!==b.von?' – '+dDE(b.bis):''} (${b.r}.)`).join(', ') }
+function tauschKarte(t){
+  const [sl,sc]=T_ST[t.status]||[t.status,'grau'], a=+t.antragsteller, p=+t.partner, ich=ND.ich;
+  const kannEnt=darf.verw()&&t.status==='offen', kannZur=t.status==='offen'&&a===ich, kannEin=t.status==='offen'&&p===ich&&!t.einwand;
+  const vergangen=(t.pos||[]).some(q=>q.datum<iso(HEUTE));
+  return `<div class="card ndtk" data-t="${t.id}">
+    <div class="ndtk-h"><span class="ndst ${sc}">${sl}</span><b>${t.art==='tausch'?'Tausch':'Übernahme'}</b><span class="sub" style="margin:0 0 0 auto">Nr. ${t.id} · ${new Date(t.erstellt_am).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'})}</span></div>
+    <div class="ndtk-z">${ndPersChip(a)}<span class="ndpf-arr" aria-label="gibt ab an">→</span>${ndPersChip(p)}<span class="ndtk-d">${esc(posText(t,a))}</span></div>
+    ${t.art==='tausch'?`<div class="ndtk-z">${ndPersChip(p)}<span class="ndpf-arr" aria-label="gibt ab an">→</span>${ndPersChip(a)}<span class="ndtk-d">${esc(posText(t,p))}</span></div>`:''}
+    ${t.bemerkung?`<div class="ndtk-b"><small>Bemerkung</small>${esc(t.bemerkung)}</div>`:''}
+    ${t.einwand?`<div class="ndtk-b rot"><small>Einwand von ${esc(ndName(p))}</small>${esc(t.einwand)}</div>`:''}
+    ${t.entschieden_am?`<div class="ndtk-b"><small>${t.status==='zurueckgezogen'?'Zurückgenommen':'Entschieden'} von ${esc(t.entschieden_von||'–')} am ${new Date(t.entschieden_am).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'})}</small>${t.grund?esc(t.grund):''}</div>`:''}
+    <div class="ndtk-m">Beantragt von ${esc(t.erstellt_von||ndName(a))} · mit Kollege abgesprochen${vergangen&&t.status==='offen'?' · <b style="color:var(--red)">enthält vergangene Tage</b>':''}</div>
+    ${kannEnt||kannZur||kannEin?`<div class="row ndtk-a">${kannZur?`<button class="btn" data-tz="${t.id}">Zurücknehmen</button>`:''}${kannEin?`<button class="btn" data-te="${t.id}">Widersprechen</button>`:''}${kannEnt?`<button class="btn" data-tab="${t.id}">Ablehnen</button><button class="btn pri" data-tok="${t.id}">Genehmigen</button>`:''}</div>`:''}
+  </div>`;
+}
+async function rTausch(){
+  if(!ND.T){ $('#app').innerHTML='<div class="lade">Tauschwünsche werden geladen …</div>'; try{ await tauschLaden() }catch(e){ $('#app').innerHTML=`<div class="lade"><b>Konnte nicht geladen werden</b><p>${esc(/nd_tausch|function/i.test(e.message)?'Die Datenbank-Erweiterung notdienst_v3.sql ist noch nicht eingespielt.':e.message)}</p></div>`; return } tabsZeigen() }
+  const L=ND.T, offenV=darf.verw()?L.filter(t=>t.status==='offen'):[], rest=L.filter(t=>!offenV.includes(t)).filter(t=>TF==='alle'||t.status===TF);
+  $('#app').innerHTML=`<div class="bar"><b style="font-size:15px">${darf.verw()?'Tauschwünsche':'Meine Tauschwünsche'}</b>${ND.ich!=null?'<button class="btn pri" id="tneu" style="margin-left:auto">+ Tauschwunsch</button>':''}</div>
+    <p class="sub" style="margin:0 0 12px">Den Tausch vorher mit dem Kollegen absprechen. Die Notdienst-Verwaltung genehmigt, dann ändert sich der Plan automatisch.${ND.ich==null&&!darf.verw()?' Dein Konto ist nicht mit dem Notdienst verknüpft.':''}</p>
+    ${darf.verw()?`<h4 class="ndh4">Zu entscheiden (${offenV.length})</h4>${offenV.map(tauschKarte).join('')||'<p class="sub">Keine offenen Anträge.</p>'}<h4 class="ndh4">Verlauf</h4>`:''}
+    <div class="chips" style="margin-bottom:10px">${T_FILTER.map(f=>`<button class="chip${TF===f?' on':''}" data-tf="${f}">${f==='alle'?'Alle':T_ST[f][0]}</button>`).join('')}</div>
+    ${rest.map(tauschKarte).join('')||'<p class="sub">Keine Anträge.</p>'}`;
+  if($('#tneu')) $('#tneu').onclick=()=>ndTauschNeu(null);
+  document.querySelectorAll('[data-tf]').forEach(b=>b.onclick=()=>{ TF=b.dataset.tf; lsSet('tf',TF); rTausch() });
+  document.querySelectorAll('[data-tz]').forEach(b=>b.onclick=()=>tauschAktion('zurueck',+b.dataset.tz));
+  document.querySelectorAll('[data-te]').forEach(b=>b.onclick=()=>tauschAktion('einwand',+b.dataset.te));
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tauschAktion('ab',+b.dataset.tab));
+  document.querySelectorAll('[data-tok]').forEach(b=>b.onclick=()=>tauschAktion('ok',+b.dataset.tok));
+}
+function tauschAktion(was,id){
+  const t=ND.T.find(x=>x.id===id); if(!t) return;
+  const txt={zurueck:['Tauschwunsch zurücknehmen?','Der Plan bleibt unverändert.','Zurücknehmen',false],einwand:['Widersprechen','Kurz begründen, die Notdienst-Verwaltung und der Antragsteller bekommen eine Nachricht.','Widerspruch senden',true],ab:['Tauschwunsch ablehnen','Grund (optional), geht an beide Beteiligten.','Ablehnen',true],ok:['Tauschwunsch genehmigen','Der Plan wird sofort geändert, beide bekommen eine Nachricht.','Genehmigen',false]}[was];
+  sheet(`<h3>${txt[0]}</h3><div class="sub">${txt[1]}</div>${tauschKarte({...t,status:t.status}).replace(/<div class="row ndtk-a">[\s\S]*?<\/div>\s*<\/div>$/,'</div>')}
+    ${txt[3]?`<textarea class="inp" id="tgr" rows="3" maxlength="1000" placeholder="${was==='einwand'?'z. B. Das war nicht abgesprochen.':'z. B. Konflikt mit Urlaub'}"></textarea>`:''}
+    <div class="row"><button class="btn" onclick="closeSh()">Abbrechen</button><button class="btn pri" id="tgo">${txt[2]}</button></div>`);
+  $('#tgo').onclick=async()=>{ const b=$('#tgo'); b.disabled=true; const g=$('#tgr')?$('#tgr').value.trim():'';
+    try{
+      if(was==='zurueck') await rpc('nd_tausch_zuruecknehmen',{p_id:id});
+      else if(was==='einwand'){ if(!g){ b.disabled=false; return toast('Bitte kurz begründen') } await rpc('nd_tausch_einwand',{p_id:id,p_text:g}) }
+      else await rpc('nd_tausch_entscheiden',{p_id:id,p_genehmigt:was==='ok',p_grund:g||null});
+      closeSh(); if(was==='ok'){ ND.D={}; ND.von=''; ND.bis=''; await ndLaden(iso(addD(montag(HEUTE),-200)),iso(addD(HEUTE,460))) }
+      await tauschLaden(); render(); toast({zurueck:'Zurückgenommen',einwand:'Widerspruch gesendet',ab:'Abgelehnt',ok:'Genehmigt, Plan ist geändert'}[was]);
+    }catch(e){ b.disabled=false; toast(e.message) } };
+}
+/* Neuer Tauschwunsch: eigene Tage, Kollege, Art, ggf. Gegentage */
+function ndTauschNeu(startDatum){
+  const ich=ndIch(); if(!ich) return toast('Dein Konto ist nicht mit dem Notdienst verknüpft.');
+  const h=iso(HEUTE), offenTage=new Set((ND.T||[]).filter(t=>t.status==='offen').flatMap(t=>(t.pos||[]).map(q=>q.datum+'|'+q.rolle)));
+  const meine=meineBloecke(ich.id);
+  const S={ab:new Set(), par:null, art:'uebernahme', gegen:new Set(), bem:'', ok:false};
+  const blk=meine.find(b=>startDatum&&startDatum>=b.von&&startDatum<=b.bis)||(startDatum?null:meine[0]);
+  if(blk) blk.tage.forEach(d=>S.ab.add(d+'|'+blk.nr));
+  const kollegen=ND.P.filter(p=>p.aktiv&&p.id!==ich.id).sort((a,b)=>a.name.localeCompare(b.name,'de'));
+  const tagZeile=(d,nr,set,pid)=>{ const k=d+'|'+nr, belegt=offenTage.has(k), wt=WT7[(new Date(d+'T12:00').getDay()+6)%7];
+    return `<label class="ndtz${belegt?' aus':''}"><input type="checkbox" data-k="${k}" data-set="${set}"${S[set].has(k)?' checked':''}${belegt?' disabled':''}><span>${wt} ${dDE(d)}${FT[d]?' · '+esc(FT[d]):''}</span>${ndChip(pid,nr,nr+'.')}${belegt?'<small>schon in offenem Antrag</small>':''}</label>` };
+  const pruefen=()=>{ const neu={}; const setz=(k,an)=>{ const [d,nr]=k.split('|'); (neu[d]=neu[d]||{...(ND.D[d]||{})})[nr==='1'?'a':'b']=an };
+    S.ab.forEach(k=>setz(k,S.par)); if(S.art==='tausch') S.gegen.forEach(k=>setz(k,ich.id));
+    const k=Object.keys(neu).find(d=>neu[d].a&&neu[d].a===neu[d].b); return k?`Konflikt am ${dDE(k)}: dieselbe Person wäre 1. und 2. Notdienst.`:'' };
+  const draw=()=>{
+    const pB=S.par?meineBloecke(S.par):[];
+    const konf=S.par?pruefen():'';
+    sheet(`<h3>Notdienst tauschen</h3><div class="sub">Erst mit dem Kollegen absprechen. Die Notdienst-Verwaltung genehmigt den Antrag.</div>
+      <div class="lab">1. Meine Dienste, die ich abgebe</div>
+      <div class="ndtl">${meine.length?meine.map(b=>b.tage.map(d=>tagZeile(d,b.nr,'ab',ich.id)).join('')).join(''):'<p class="sub">Keine kommenden Dienste.</p>'}</div>
+      <div class="lab">2. Kollege</div>
+      <select class="inp" id="tpar"><option value="">bitte wählen</option>${kollegen.map(p=>`<option value="${p.id}"${S.par===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}</select>
+      <div class="lab">3. Art</div>
+      <div class="seg" id="tart"><button type="button" data-a="uebernahme" class="${S.art==='uebernahme'?'on':''}">Kollege übernimmt</button><button type="button" data-a="tausch" class="${S.art==='tausch'?'on':''}">Wir tauschen</button></div>
+      ${S.art==='tausch'?`<div class="lab">4. Dafür übernehme ich vom Kollegen</div><div class="ndtl">${!S.par?'<p class="sub">Erst den Kollegen wählen.</p>':pB.length?pB.map(b=>b.tage.map(d=>tagZeile(d,b.nr,'gegen',S.par)).join('')).join(''):'<p class="sub">Der Kollege hat keine kommenden Dienste.</p>'}</div>`:''}
+      <div class="lab">Bemerkung (optional)</div><textarea class="inp" id="tbem" rows="2" maxlength="1000" placeholder="z. B. Familienfeier">${esc(S.bem)}</textarea>
+      <label class="ndtok"><input type="checkbox" id="tok"${S.ok?' checked':''}> Der Tausch ist mit dem Kollegen abgesprochen.</label>
+      ${konf?`<div class="ndwarn">${esc(konf)}</div>`:''}
+      <div class="row"><button class="btn" onclick="closeSh()">Abbrechen</button><button class="btn pri" id="tgo"${konf?' disabled':''}>Antrag stellen</button></div>`);
+    document.querySelectorAll('#sh [data-k]').forEach(c=>c.onchange=()=>{ S[c.dataset.set][c.checked?'add':'delete'](c.dataset.k); S.bem=$('#tbem').value; draw() });
+    $('#tpar').onchange=e=>{ S.par=+e.target.value||null; S.gegen.clear(); S.bem=$('#tbem').value; draw() };
+    document.querySelectorAll('#tart [data-a]').forEach(b=>b.onclick=()=>{ S.art=b.dataset.a; S.bem=$('#tbem').value; draw() });
+    $('#tok').onchange=e=>{ S.ok=e.target.checked };
+    $('#tgo').onclick=async()=>{ S.bem=$('#tbem').value.trim();
+      if(!S.ab.size) return toast('Bitte mindestens einen eigenen Dienst auswählen');
+      if(!S.par) return toast('Bitte den Kollegen auswählen');
+      if(S.art==='tausch'&&!S.gegen.size) return toast('Bitte die Tage des Kollegen auswählen');
+      if(!S.ok) return toast('Bitte bestätigen, dass der Tausch abgesprochen ist');
+      const pos=s=>[...s].map(k=>{ const [d,r]=k.split('|'); return {datum:d,rolle:+r} });
+      $('#tgo').disabled=true;
+      try{ await rpc('nd_tausch_beantragen',{p:{partner:S.par,art:S.art,abgeben:pos(S.ab),gegen:S.art==='tausch'?pos(S.gegen):[],bemerkung:S.bem,abgesprochen:true}});
+        closeSh(); await tauschLaden(); VIEW='tausch'; history.replaceState(null,'','#tausch'); render(); toast('Tauschwunsch gestellt. Die Notdienst-Verwaltung wurde benachrichtigt.') }
+      catch(e){ $('#tgo').disabled=false; toast(e.message) } };
+  };
+  draw();
+}
+
+/* =====================================================================
+   Auswertung (nur Verwaltung/Admin; nd_auswertung prüft das auch in der Datenbank)
+   ===================================================================== */
+const AW={von:'',bis:'',person:'',status:'alle',daten:null,preset:lsGet('awp','jahr')};
+function awZeitraum(p){ const y=HEUTE.getFullYear(), m=HEUTE.getMonth(), f=(a,b)=>[iso(a),iso(b)];
+  if(p==='monat') return f(new Date(y,m,1,12),new Date(y,m+1,0,12));
+  if(p==='vormonat') return f(new Date(y,m-1,1,12),new Date(y,m,0,12));
+  if(p==='quartal'){ const q=Math.floor(m/3)*3; return f(new Date(y,q,1,12),new Date(y,q+3,0,12)) }
+  if(p==='vorjahr') return f(new Date(y-1,0,1,12),new Date(y-1,11,31,12));
+  return f(new Date(y,0,1,12),new Date(y,11,31,12)) }
+function awRechnen(){
+  const D=AW.daten, h=D.heute, Z={};
+  const z=id=>Z[id]=Z[id]||{id,o1:0,o2:0,i1:0,i2:0,g:0,we:0};
+  (D.tage||[]).forEach(([d,i1,i2,o1,o2])=>{ if(o1) z(+o1).o1++; if(o2) z(+o2).o2++; [[i1,'i1'],[i2,'i2']].forEach(([id,k])=>{ if(!id) return; const r=z(+id); r[k]++; if(d<h) r.g++; if(istWE(d)) r.we++ }) });
+  let L=Object.values(Z).map(r=>({...r,o:r.o1+r.o2,i:r.i1+r.i2,diff:(r.i1+r.i2)-(r.o1+r.o2)}));
+  const sum=L.reduce((s,r)=>s+r.i,0), aktiv=L.filter(r=>r.i>0&&ndP(r.id)&&ndP(r.id).aktiv), schnitt=aktiv.length?aktiv.reduce((s,r)=>s+r.i,0)/aktiv.length:0;
+  L.forEach(r=>{ const akt=ndP(r.id)&&ndP(r.id).aktiv; r.anteil=sum?r.i/sum:0; r.abw=schnitt?(r.i-schnitt)/schnitt:0; r.auff=akt&&schnitt>=4&&Math.abs(r.abw)>.25 });
+  if(AW.person) L=L.filter(r=>r.id===+AW.person);
+  L.sort((a,b)=>b.i-a.i||ndName(a.id).localeCompare(ndName(b.id),'de'));
+  const T=(D.tausche||[]).filter(t=>(AW.status==='alle'||t.status===AW.status)&&(!AW.person||+t.antragsteller===+AW.person||+t.partner===+AW.person));
+  return {L,sum,schnitt,T,tage:(D.tage||[]).length,leer:(D.tage||[]).filter(x=>!x[1]||!x[2]).length};
+}
+async function rAuswertung(){
+  if(!darf.verw()){ VIEW='plan'; return render() }
+  if(!AW.von){ [AW.von,AW.bis]=awZeitraum(AW.preset) }
+  const kopf=`<div class="bar ndaw-f"><b style="font-size:15px">Auswertung</b>
+    <select class="inp" id="awp" aria-label="Zeitraum">${[['monat','Dieser Monat'],['vormonat','Letzter Monat'],['quartal','Dieses Quartal'],['jahr','Dieses Jahr'],['vorjahr','Letztes Jahr'],['frei','Frei wählen']].map(([k,l])=>`<option value="${k}"${AW.preset===k?' selected':''}>${l}</option>`).join('')}</select>
+    <input class="inp" type="date" id="awv" value="${AW.von}" aria-label="von"><input class="inp" type="date" id="awb" value="${AW.bis}" aria-label="bis">
+    <select class="inp" id="awm" aria-label="Mitarbeiter"><option value="">Alle Mitarbeiter</option>${ND.P.slice().sort((a,b)=>a.name.localeCompare(b.name,'de')).map(p=>`<option value="${p.id}"${+AW.person===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}</select>
+    <select class="inp" id="aws" aria-label="Status der Anträge">${T_FILTER.map(f=>`<option value="${f}"${AW.status===f?' selected':''}>${f==='alle'?'Alle Anträge':'Anträge: '+T_ST[f][0]}</option>`).join('')}</select></div>`;
+  if(!AW.daten||AW.daten._k!==AW.von+AW.bis){
+    $('#app').innerHTML=kopf+'<div class="lade">Auswertung wird berechnet …</div>'; awFilter();
+    try{ AW.daten=await rpc('nd_auswertung',{p_von:AW.von,p_bis:AW.bis}); AW.daten._k=AW.von+AW.bis }
+    catch(e){ $('#app').innerHTML=kopf+`<div class="lade"><b>Konnte nicht geladen werden</b><p>${esc(e.message)}</p></div>`; awFilter(); return }
+  }
+  const R=awRechnen(), max=Math.max(1,...R.L.map(r=>Math.max(r.i,r.o)));
+  const gen=(AW.daten.tausche||[]).filter(t=>t.status==='genehmigt').length, off=(AW.daten.tausche||[]).filter(t=>t.status==='offen').length, abg=(AW.daten.tausche||[]).filter(t=>t.status==='abgelehnt').length;
+  $('#app').innerHTML=kopf+`
+    <div class="ndaw-k">
+      <div class="card"><small>Zeitraum</small><b>${dDE(AW.von)}${AW.von.slice(0,4)} – ${dDE(AW.bis)}${AW.bis.slice(0,4)}</b></div>
+      <div class="card"><small>Dienste gesamt (1. + 2.)</small><b>${R.sum}</b><span class="sub" style="margin:0">${R.leer?R.leer+' Tage unvollständig':'alle besetzt'}</span></div>
+      <div class="card"><small>Schnitt je aktiver Person</small><b>${R.schnitt.toFixed(1).replace('.',',')}</b></div>
+      <div class="card"><small>Tausche</small><b>${gen} genehmigt</b><span class="sub" style="margin:0">${off} offen · ${abg} abgelehnt</span></div></div>
+    <div class="card ndaw-t"><div class="pr-h"><b>Verteilung je Mitarbeiter</b><span class="ndsub">geplant = ursprüngliche Einteilung, tatsächlich = nach genehmigten Tauschen</span><button class="btn ndedit" id="awcsv1">CSV exportieren</button></div>
+      <div class="ndaw-scroll"><table class="ndaw"><thead><tr><th>Mitarbeiter</th><th>Geplant<br><small>1. / 2.</small></th><th>Tatsächlich<br><small>1. / 2.</small></th><th>Diff.</th><th>Geleistet</th><th>WE/Feiertag</th><th>Anteil</th><th class="bal">Verteilung</th></tr></thead><tbody>
+      ${R.L.map(r=>`<tr${r.auff?' class="auff"':''}><td>${ndPersChip(r.id)}${ndP(r.id)&&!ndP(r.id).aktiv?'<span class="ndauff grau">nicht mehr im Notdienst</span>':''}${r.auff?`<span class="ndauff" title="Mehr als 25 % vom Schnitt entfernt">${r.abw>0?'auffällig viel':'auffällig wenig'}</span>`:''}</td>
+        <td><b>${r.o}</b> <small>${r.o1} / ${r.o2}</small></td><td><b>${r.i}</b> <small>${r.i1} / ${r.i2}</small></td><td class="${r.diff>0?'plus':r.diff<0?'minus':''}">${r.diff>0?'+':''}${r.diff}</td><td>${r.g}</td><td>${r.we}</td><td>${Math.round(r.anteil*100)} %</td>
+        <td class="bal"><span class="ndbal" style="width:${Math.round(r.i/max*100)}%;background:${ndFarbe(r.id)}" title="tatsächlich ${r.i}"></span><span class="ndbal o" style="width:${Math.round(r.o/max*100)}%" title="geplant ${r.o}"></span></td></tr>`).join('')||'<tr><td colspan="8" class="sub">Keine Dienste im Zeitraum.</td></tr>'}
+      </tbody><tfoot><tr><td>Summe</td><td>${R.L.reduce((s,r)=>s+r.o,0)}</td><td>${R.L.reduce((s,r)=>s+r.i,0)}</td><td></td><td>${R.L.reduce((s,r)=>s+r.g,0)}</td><td>${R.L.reduce((s,r)=>s+r.we,0)}</td><td></td><td></td></tr></tfoot></table></div>
+      <p class="sub" style="padding:8px 14px">Geleistet = tatsächliche Dienste vor heute. „Auffällig“ = mehr als 25 % über oder unter dem Schnitt der aktiven Notdienst-Mitarbeiter (ab 4 Diensten im Schnitt). Wer erst später dazukam oder ausgeschieden ist, hat naturgemäß weniger. Balken: farbig tatsächlich, grau geplant.</p></div>
+    <div class="card ndaw-t"><div class="pr-h"><b>Tauschanträge im Zeitraum (${R.T.length})</b><button class="btn ndedit" id="awcsv2">CSV exportieren</button></div>
+      <div class="ndaw-scroll"><table class="ndaw"><thead><tr><th>Nr.</th><th>Status</th><th>Antragsteller</th><th>Kollege</th><th>Ursprünglich → neu</th><th>Bemerkung</th><th>Entschieden</th></tr></thead><tbody>
+      ${R.T.map(t=>`<tr><td>${t.id}</td><td><span class="ndst ${(T_ST[t.status]||[])[1]}">${(T_ST[t.status]||[t.status])[0]}</span></td><td>${esc(ndName(+t.antragsteller))}</td><td>${esc(ndName(+t.partner))}</td>
+        <td>${(t.pos||[]).map(q=>`${dDE(q.datum)} ${q.rolle}.: ${esc(ndName(+q.von))} → ${esc(ndName(+q.an))}`).join('<br>')}</td><td>${esc(t.bemerkung||'')}${t.einwand?`<br><b style="color:var(--red)">Einwand:</b> ${esc(t.einwand)}`:''}</td>
+        <td>${t.entschieden_am?esc(t.entschieden_von||'')+'<br><small>'+new Date(t.entschieden_am).toLocaleDateString('de-DE')+'</small>'+(t.grund?'<br><small>'+esc(t.grund)+'</small>':''):'–'}</td></tr>`).join('')||'<tr><td colspan="7" class="sub">Keine Anträge.</td></tr>'}
+      </tbody></table></div></div>`;
+  awFilter();
+  $('#awcsv1').onclick=()=>csvLaden(`Notdienst_Verteilung_${AW.von}_${AW.bis}.csv`,[['Mitarbeiter','Geplant gesamt','Geplant 1.','Geplant 2.','Tatsächlich gesamt','Tatsächlich 1.','Tatsächlich 2.','Differenz','Geleistet','Wochenende/Feiertag','Anteil %','Auffällig']].concat(R.L.map(r=>[ndP(r.id)?ndP(r.id).name:r.id,r.o,r.o1,r.o2,r.i,r.i1,r.i2,r.diff,r.g,r.we,Math.round(r.anteil*1000)/10,r.auff?(r.abw>0?'viel':'wenig'):''])));
+  $('#awcsv2').onclick=()=>csvLaden(`Notdienst_Tausche_${AW.von}_${AW.bis}.csv`,[['Nr.','Status','Art','Antragsteller','Kollege','Datum','Rolle','Ursprünglich','Neu','Bemerkung','Einwand','Beantragt am','Entschieden von','Entschieden am','Grund']].concat(R.T.flatMap(t=>(t.pos||[]).map(q=>[t.id,(T_ST[t.status]||[t.status])[0],t.art==='tausch'?'Tausch':'Übernahme',ndName(+t.antragsteller),ndName(+t.partner),dJ(q.datum),q.rolle+'.',ndName(+q.von),ndName(+q.an),t.bemerkung||'',t.einwand||'',new Date(t.erstellt_am).toLocaleString('de-DE'),t.entschieden_von||'',t.entschieden_am?new Date(t.entschieden_am).toLocaleString('de-DE'):'',t.grund||'']))));
+}
+function awFilter(){
+  const neu=()=>{ AW.daten=AW.daten&&AW.daten._k===AW.von+AW.bis?AW.daten:null; rAuswertung() };
+  if($('#awp')) $('#awp').onchange=e=>{ AW.preset=e.target.value; lsSet('awp',AW.preset); if(AW.preset!=='frei') [AW.von,AW.bis]=awZeitraum(AW.preset); neu() };
+  if($('#awv')) $('#awv').onchange=e=>{ if(!e.target.value) return; AW.von=e.target.value; AW.preset='frei'; if(AW.bis<AW.von) AW.bis=AW.von; neu() };
+  if($('#awb')) $('#awb').onchange=e=>{ if(!e.target.value) return; AW.bis=e.target.value; AW.preset='frei'; if(AW.bis<AW.von) AW.von=AW.bis; neu() };
+  if($('#awm')) $('#awm').onchange=e=>{ AW.person=e.target.value; rAuswertung() };
+  if($('#aws')) $('#aws').onchange=e=>{ AW.status=e.target.value; rAuswertung() };
+}
+function csvLaden(name,rows){
+  const z=v=>{ const s=String(v==null?'':v); return /[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s };
+  const txt='﻿'+rows.map(r=>r.map(v=>typeof v==='number'?String(v).replace('.',','):z(v)).join(';')).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/csv;charset=utf-8'})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove() },500);
 }
 
 /* ---------- Start ---------- */
@@ -387,11 +688,12 @@ function ndPersonBearbeiten(p){
   try{
     if(!storedRefresh()) return toLogin();
     await ndLaden(iso(addD(montag(HEUTE),-200)),iso(addD(HEUTE,460)));
-    $('#wer-bin-ich').textContent=({leser:'Ansehen',planer:'Planer',verwalter:'Verwaltung',admin:'Admin'})[ND.rolle]||'';
-  }catch(e){ ND.fehler=/nd_laden|nd_rolle|function/i.test(e.message)?'Die Datenbank-Erweiterung (notdienst_v2.sql) ist noch nicht eingespielt.':e.message }
+    $('#wer-bin-ich').textContent=({leser:'Ansehen',planer:'Planer',verwalter:'Verwalten und auswerten',admin:'Admin'})[ND.rolle]||'';
+    if(ND.ich!=null||darf.verw()) tauschLaden().then(()=>{ tabsZeigen(); if(VIEW==='tausch') render() }).catch(()=>{});
+  }catch(e){ ND.fehler=/nd_laden|nd_rolle|function/i.test(e.message)?'Die Datenbank-Erweiterung (notdienst_v3.sql) ist noch nicht eingespielt.':e.message }
   render();
 })();
-document.addEventListener('visibilitychange',async()=>{ if(document.hidden||!ND.geladen||$('#sh').classList.contains('on')) return; try{ await ndLaden(ND.von,ND.bis); render() }catch(e){} });
+document.addEventListener('visibilitychange',async()=>{ if(document.hidden||!ND.geladen||$('#sh').classList.contains('on')) return; try{ await ndLaden(ND.von,ND.bis); if(ND.T) await tauschLaden(); render() }catch(e){} });
 
-</script><script src="idee.js" data-app="notdienst" data-slot=".top .home" defer></script>
-</body></html>
+</script>
+<script src="idee.js" data-app="notdienst" data-slot=".top .home" defer></script></body></html>

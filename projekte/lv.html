@@ -49,6 +49,20 @@
 .sheet::before{content:"";position:absolute;top:9px;left:50%;width:40px;height:5px;border-radius:3px;background:var(--line);transform:translateX(-50%)}
 .sheet.on{transform:none}
 .sheet h2{font-size:19px;font-weight:760;margin-bottom:4px;line-height:1.3}
+/* Auswahl für Aufmaß-Entwurf (nur Projektleitung) */
+.selbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);box-shadow:0 -10px 30px -12px rgba(0,0,0,.35);padding:10px 16px calc(10px + var(--safe-b));display:flex;gap:10px;align-items:center}
+.selbar b{flex:1;font-size:14px}
+body.sel .shell{padding-bottom:110px}
+.ps .ck{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);flex:0 0 auto;display:grid;place-items:center;margin-top:2px;color:#fff}
+.ps.on .ck{background:var(--accent);border-color:var(--accent)}
+.ps.on{background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.titsel{font-size:12px;font-weight:700;color:var(--brand-2);padding:6px 14px;display:block;text-align:right;width:100%;border-bottom:1px solid var(--line)}
+.ewl{max-height:42vh;overflow:auto;margin:10px 0;border-radius:14px;background:var(--surface-2);padding:4px}
+.ewz{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:var(--surface);margin:3px 0;font-size:13.5px}
+.ewz .l{flex:1;min-width:0}.ewz small{display:block;color:var(--ink-3);font-size:12px}
+.ewz .w{color:var(--warn,#b45309);font-weight:650}.ewz .r2{color:var(--red);font-weight:700}
+.ewz.ag{box-shadow:inset 3px 0 0 var(--red)}.ewz.aus{opacity:.55}
+.sw{display:flex;gap:10px;align-items:center;margin:10px 0;font-weight:650}.sw input{width:20px;height:20px;accent-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -79,6 +93,7 @@ const ls={ get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v
 const PID=new URLSearchParams(location.search).get('p');
 const K='lv_view_'+PID;
 let PROJ=null, LV=[], STAND=null, OPEN=ls.get('lv_open_'+PID,{}), Q='';
+let SEL=null; // Auswahl für Aufmaß-Entwurf: Set der Positionsnummern (nur Projektleitung)
 let ZEIT_ON=true; try{ ZEIT_ON=localStorage.getItem('pj_zeiten')!=='0'; }catch(e){}
 
 /* Gliederung aufbauen: Los › Titel › (Zwischenüberschrift) › Position */
@@ -87,7 +102,7 @@ function gliedern(){
   LV.forEach((o,i)=>{
     if(o.k==='L'){ los={p:o.p,b:o.b,tits:[]}; out.push(los); tit=null; }
     else if(o.k==='T'){ if(!los){ los={p:'',b:'',tits:[]}; out.push(los); } tit={p:o.p,b:o.b,items:[]}; los.tits.push(tit); }
-    else { if(!los){ los={p:'',b:'',tits:[]}; out.push(los); } if(!tit){ tit={p:'',b:'ohne Titel',items:[]}; los.tits.push(tit); } tit.items.push({...o,i,t:tit.p}); }
+    else { if(!los){ los={p:'',b:'',tits:[]}; out.push(los); } if(!tit){ tit={p:'',b:'ohne Titel',items:[]}; los.tits.push(tit); } o.t=tit.p||'_'; tit.items.push({...o,i,t:tit.p}); }
   });
   return out;
 }
@@ -98,18 +113,19 @@ function treffer(o,terms){ const t=norm(o.p+' '+o.b+' '+o.me), t2=t.replace(/\s+
 function hl(s,terms){ let h=esc(s); terms.filter(w=>w.length>1).forEach(w=>{ const re=new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'); h=h.replace(re,'<mark>$1</mark>'); }); return h; }
 
 function posZeile(o,terms){
-  return `<button class="ps" data-i="${o.i}"><div class="l"><div class="nr">${esc(o.p)}${o.v?'':'<span class="nl">nicht in Aufmaß-Liste</span>'}</div><div class="bz">${terms?hl(o.b,terms):esc(o.b)}</div></div>
+  const on=SEL&&SEL.has(o.p);
+  return `<button class="ps${on?' on':''}" data-i="${o.i}" ${SEL?`role="checkbox" aria-checked="${on}"`:''}>${SEL?`<span class="ck">${on?IC('check','sm'):''}</span>`:''}<div class="l"><div class="nr">${esc(o.p)}${o.v?'':'<span class="nl">nicht in Aufmaß-Liste</span>'}</div><div class="bz">${terms?hl(o.b,terms):esc(o.b)}</div></div>
     <div class="r">${nf(o.m)} ${esc(o.me)}${ZEIT_ON&&o.z>0?`<small>${fmtMin(o.z)}/${esc(o.me)}</small>`:''}</div></button>`;
 }
 function render(){
   const P=pos(), hz=LV.some(o=>o.k==='P'&&o.z>0);
-  if(!LV.length){ $('#app').innerHTML=`<div class="empty">${IC('sheet')}<div>Für dieses Projekt ist noch kein LV importiert.<br>Die Bauleitung kann es in der Projektübersicht unter „Leistungsverzeichnis“ einlesen.</div></div><a class="btn ghost block" href="index.html#p=${PID}">Zum Projekt</a>`; return; }
+  if(!LV.length){ $('#app').innerHTML=`<div class="empty">${IC('sheet')}<div>Für dieses Projekt ist noch kein LV importiert.<br>Die Projektleitung kann es in der Projektübersicht unter „Leistungsverzeichnis“ einlesen.</div></div><a class="btn ghost block" href="index.html#p=${PID}">Zum Projekt</a>`; return; }
   const G=gliedern(), anzT=G.reduce((a,l)=>a+l.tits.filter(t=>t.p).length,0);
   $('#app').innerHTML=`
     <div class="stats"><div><b>${P.length}</b><small>Positionen</small></div><div><b>${anzT}</b><small>Titel</small></div>
       <div>${hz&&ZEIT_ON?`<b>${fmtH(sollH(LV))}</b><small>Soll-Zeit gesamt</small>`:`<b>${P.filter(o=>o.v).length}</b><small>in Aufmaß-Liste</small>`}</div></div>
     <div class="sbar"><div class="sbox">${IC('search')}<input id="q" type="search" placeholder="Suchen, z. B. DN 100 Bogen oder 01.02" autocomplete="off" value="${esc(Q)}">${Q?`<button id="qx" aria-label="Suche leeren">${IC('x','sm')}</button>`:''}</div></div>
-    <div class="tools"><span id="tInfo"></span><span class="r">${hz?`<button class="lnk" id="tZeit">${ZEIT_ON?'Zeiten ausblenden':'Zeiten einblenden'}</button>`:''}<button class="lnk" id="tAuf">Alle auf</button><button class="lnk" id="tZu">Alle zu</button></span></div>
+    <div class="tools"><span id="tInfo"></span><span class="r">${hz?`<button class="lnk" id="tZeit">${ZEIT_ON?'Zeiten ausblenden':'Zeiten einblenden'}</button>`:''}${PJ.leitung()?`<button class="lnk" id="tSel">${SEL?'Auswahl beenden':'Aufmaß-Entwurf'}</button>`:''}<button class="lnk" id="tAuf">Alle auf</button><button class="lnk" id="tZu">Alle zu</button></span></div>
     <div id="liste"></div>
     ${STAND?`<p class="hint" style="text-align:center;margin-top:14px">Stand ${new Date(STAND).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'})}${navigator.onLine?'':' · offline'}</p>`:''}`;
   liste();
@@ -118,6 +134,46 @@ function render(){
   $('#tAuf').onclick=()=>{ G.forEach(l=>l.tits.forEach(t=>OPEN[t.p||'_']=true)); ls.set('lv_open_'+PID,OPEN); liste(); };
   $('#tZu').onclick=()=>{ OPEN={}; ls.set('lv_open_'+PID,OPEN); liste(); };
   if($('#tZeit')) $('#tZeit').onclick=()=>{ ZEIT_ON=!ZEIT_ON; try{ localStorage.setItem('pj_zeiten',ZEIT_ON?'1':'0'); }catch(e){} render(); };
+  if($('#tSel')) $('#tSel').onclick=()=>{ SEL=SEL?null:new Set(); if(SEL) toast('Positionen antippen, die in den Entwurf sollen'); render(); };
+  selBar();
+}
+/* ---------- Aufmaß-Entwurf aus dem LV (nur Projektleitung, Server prüft das in pj_entwurf) ---------- */
+function selBar(){
+  let b=$('#selbar'); document.body.classList.toggle('sel',!!SEL);
+  if(!SEL){ if(b) b.remove(); return; }
+  if(!b){ b=document.createElement('div'); b.id='selbar'; b.className='selbar'; document.body.appendChild(b); }
+  b.innerHTML=`<b>${SEL.size} ${SEL.size===1?'Position':'Positionen'} ausgewählt</b><button class="btn ghost sm" id="sAb">Abbrechen</button><button class="btn cta sm" id="sGo"${SEL.size?'':' disabled'}>Entwurf erstellen</button>`;
+  $('#sAb').onclick=()=>{ SEL=null; render(); };
+  $('#sGo').onclick=entwurfDialog;
+}
+async function entwurfDialog(){
+  if(!navigator.onLine) return toast('Für den Entwurf wird eine Verbindung gebraucht');
+  const posL=[...SEL], P=Object.fromEntries(pos().map(o=>[o.p,o]));
+  let info={};
+  try{ info=await PJ.rpc('pj_entwurf',{p:{aktion:'pruefen',projekt_id:PID,positionen:posL}})||{}; }
+  catch(e){ return toast(/pj_entwurf|function/i.test(e.message)?'Die Datenbank-Erweiterung aufmass_entwurf.sql fehlt noch':e.message); }
+  const trotz=new Set(), heute=new Date().toISOString().slice(0,10);
+  const titel=[...new Set(posL.map(p=>{ const i=P[p]?P[p].i:-1; for(let k=i;k>=0;k--) if(LV[k].k==='T') return LV[k].b; return ''; }))].filter(Boolean);
+  const draw=()=>{
+    const ag=posL.filter(p=>info[p]&&info[p].menge_ag>0), aktiv=posL.filter(p=>!(info[p]&&info[p].menge_ag>0)||trotz.has(p));
+    $('#sheet').innerHTML=`<h2>Aufmaß-Entwurf aus dem LV</h2><p class="hint" style="margin:0 0 10px">Der Entwurf ist ein Aufmaß mit Vorschlägen. Mengen, Ort und Bemerkung ergänzt du dort. Erst „Übernehmen“ macht die Werte verbindlich.</p>
+      <label>Bezeichnung</label><input class="inp" id="eBez" value="${esc('Entwurf '+(titel.length===1?titel[0]+' ':'')+new Date().toLocaleDateString('de-DE'))}">
+      <label style="margin-top:8px;display:block">Datum</label><input class="inp" type="date" id="eDat" value="${heute}">
+      <label class="sw"><input type="checkbox" id="eVor"> Mengen aus dem LV vorbelegen (sonst 0)</label>
+      <div class="ewl">${posL.map(p=>{ const o=P[p]||{}, f=info[p], isAg=f&&f.menge_ag>0;
+        return `<div class="ewz${isAg?' ag':''}${isAg&&!trotz.has(p)?' aus':''}"><div class="l"><b>${esc(p)}</b> ${esc((o.b||'').slice(0,90))}
+          <small>LV: ${nf(o.m)} ${esc(o.me||'')}${f&&f.menge>0?` · <span class="w">schon erfasst: ${nf(f.menge)} ${esc(o.me||'')} in ${f.aufmasse} Aufmaß${f.aufmasse===1?'':'en'}</span>`:''}${f&&f.entwuerfe?` · <span class="w">steht in ${f.entwuerfe} offenen Entwurf${f.entwuerfe===1?'':'en'}</span>`:''}</small>
+          ${isAg?`<small class="r2">Vom Auftraggeber unterschrieben: ${nf(f.menge_ag)} ${esc(o.me||'')} (gilt als abgerechnet)</small><label class="sw" style="margin:4px 0 0;font-size:12.5px"><input type="checkbox" data-trotz="${esc(p)}"${trotz.has(p)?' checked':''}> trotzdem übernehmen</label>`:''}</div></div>`; }).join('')}</div>
+      ${ag.length?`<p class="hint" style="color:var(--red);margin:0 0 8px">${ag.length} ${ag.length===1?'Position ist':'Positionen sind'} schon vom Auftraggeber unterschrieben und ${ag.length===1?'bleibt':'bleiben'} ohne Haken draußen.</p>`:''}
+      <div class="row" style="display:flex;gap:10px"><button class="btn ghost" id="eAb" style="flex:1">Abbrechen</button><button class="btn cta" id="eOk" style="flex:2"${aktiv.length?'':' disabled'}>${aktiv.length} ${aktiv.length===1?'Position':'Positionen'} übernehmen</button></div>`;
+    $$('#sheet [data-trotz]').forEach(c=>c.onchange=()=>{ c.checked?trotz.add(c.dataset.trotz):trotz.delete(c.dataset.trotz); const v=$('#eVor').checked, bz=$('#eBez').value, dt=$('#eDat').value; draw(); $('#eVor').checked=v; $('#eBez').value=bz; $('#eDat').value=dt; });
+    $('#eAb').onclick=schliessen;
+    $('#eOk').onclick=async()=>{ const b=$('#eOk'); b.disabled=true;
+      try{ const r=await PJ.rpc('pj_entwurf',{p:{aktion:'erstellen',projekt_id:PID,bez:$('#eBez').value.trim(),datum:$('#eDat').value,vorbelegen:$('#eVor').checked,positionen:aktiv,trotz_ag:[...trotz]}});
+        SEL=null; schliessen(); toast('Entwurf erstellt'); location.href='aufmass.html?id='+encodeURIComponent(r.id); }
+      catch(e){ b.disabled=false; toast(e.message); } };
+  };
+  draw(); $('#ov').classList.add('on'); $('#sheet').classList.add('on');
 }
 function liste(){
   const terms=norm(Q).split(/\s+/).filter(Boolean), G=gliedern(); let html='', n=0;
@@ -130,12 +186,13 @@ function liste(){
     G.forEach(l=>{ if(l.b) html+=`<div class="los">${esc([l.p,l.b].filter(Boolean).join(' · '))}</div>`;
       l.tits.forEach(t=>{ const k=t.p||'_', P=t.items.filter(o=>o.k==='P'), op=!!OPEN[k], h=sollH(P);
         html+=`<div class="tit${op?' open':''}" data-t="${esc(k)}"><button class="tit-h"><span class="nr">${esc(t.p)}</span><b>${esc(t.b)}<small>${P.length} Position${P.length===1?'':'en'}${ZEIT_ON&&h>0?' · Soll '+fmtH(h):''}</small></b>${IC('chev')}</button>
-          <div class="tit-b">${op?t.items.map(o=>o.k==='X'?`<div class="zw">${esc(o.b)}</div>`:posZeile(o)).join(''):''}</div></div>`; }); });
+          <div class="tit-b">${op&&SEL?`<button class="titsel" data-ts="${esc(k)}">alle Positionen dieses Titels</button>`:''}${op?t.items.map(o=>o.k==='X'?`<div class="zw">${esc(o.b)}</div>`:posZeile(o)).join(''):''}</div></div>`; }); });
     $('#tInfo').textContent='';
     $('#liste').innerHTML=html;
     $$('.tit[data-t] .tit-h').forEach(b=>b.onclick=()=>{ const k=b.parentElement.dataset.t; OPEN[k]=!OPEN[k]; if(!OPEN[k]) delete OPEN[k]; ls.set('lv_open_'+PID,OPEN); liste(); });
   }
-  $$('.ps[data-i]').forEach(b=>b.onclick=()=>detail(+b.dataset.i));
+  $$('.ps[data-i]').forEach(b=>b.onclick=()=>{ if(SEL){ const p=LV[+b.dataset.i].p; SEL.has(p)?SEL.delete(p):SEL.add(p); liste(); selBar(); } else detail(+b.dataset.i); });
+  if(SEL) $$('.titsel').forEach(b=>b.onclick=()=>{ const k=b.dataset.ts, alle=pos().filter(o=>o.t===k||(!o.t&&k==='_')); const an=alle.some(o=>!SEL.has(o.p)); alle.forEach(o=>an?SEL.add(o.p):SEL.delete(o.p)); liste(); selBar(); });
 }
 function detail(i){
   const o=LV[i]; let t=null, l=null; for(let k=i;k>=0;k--){ if(!t&&LV[k].k==='T') t=LV[k]; if(LV[k].k==='L'){ l=LV[k]; break; } }
@@ -167,6 +224,7 @@ $('#ov').onclick=schliessen;
   }catch(e){ if(!c){ $('#app').innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="index.html#p=${PID}">Zum Projekt</a>`; return; } }
   $('#hSub').textContent=PROJ?.name||''; document.title='LV · '+(PROJ?.name||'');
   PJS.set({seite:'lv',pid:PID,pname:PROJ?.name||'',erfassen:false});
+  if(new URLSearchParams(location.search).get('auswahl')==='1'&&PJ.leitung()) SEL=new Set();
   const q=Q; render(); if(q){ $('#q').value=q; }
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();

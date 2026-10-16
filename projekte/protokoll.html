@@ -762,7 +762,7 @@ function sendDialog(build,name,subject,text){
   const em=empfaenger(), share=canShareFiles();
   openSheet(`<h2>PDF senden</h2>
     ${em.length?`<label style="font-size:13px;font-weight:700;color:var(--ink-3)">Empfänger</label>`+em.map((r,i)=>`<label class="chk"><input type="checkbox" data-em="${i}" checked><span><b>${esc(r.name||r.email)}</b><small>${esc([r.rolle,r.email].filter(Boolean).join(' · '))}</small></span></label>`).join('')
-      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Bauleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
+      :`<p class="hint">Für dieses Projekt sind noch keine Empfänger hinterlegt. Die Projektleitung kann sie in der Projektübersicht unter „E-Mail-Empfänger“ eintragen.</p>`}
     <div class="field" style="margin-top:12px"><label for="em_x">Weitere Adresse (optional)</label><input class="inp" id="em_x" type="email" inputmode="email" placeholder="name@firma.de"></div>
     <p class="hint" id="em_st">PDF wird erstellt …</p>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">

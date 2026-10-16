@@ -452,7 +452,7 @@ const MODULES = [
   { id: 'projekte', name: 'Projekte', desc: 'Aufmaß und Bautagebuch', url: 'projekte.html', icon: 'ruler', g: ['#e8742f', '#c94a03'],
     rollen: [
       { k: 'monteur', l: 'Monteur', d: 'Aufmaße erfassen, Bautagebuch führen, Fotos und Unterschriften.' },
-      { k: 'bauleitung', l: 'Bauleitung', d: 'Wie Monteur, dazu Projekte anlegen, LV aus Excel einlesen und Aufmaße löschen.' }] },
+      { k: 'bauleitung', l: 'Projektleitung', d: 'Wie Monteur, dazu Projekte anlegen, LV aus Excel einlesen, Aufmaß-Entwürfe aus dem LV erstellen und übernehmen, Aufmaße löschen.' }] },
   { id: 'planung', name: 'Planung', desc: 'Wochenplan, Zeitplan, Mein Einsatz', url: 'planung.html', icon: 'calendar', g: ['#5b6b8c', '#2f3b53'], alle: true,
     rollen: [
       { k: 'planer', l: 'Planer', d: 'Einsätze im Wochenplan eintragen und verschieben, Termine und Aufgaben pflegen, Besprechungsprotokoll. Ohne Freischaltung: nur ansehen (Mein Einsatz, Wochenplan, Zeitplan).' },
@@ -461,7 +461,7 @@ const MODULES = [
   { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', url: 'notdienst.html', icon: 'bell', g: ['#e8742f', '#c94a03'], alle: true,
     rollen: [
       { k: 'planer', l: 'Planer', d: '1. und 2. Notdienst eintragen und tauschen. Ohne Freischaltung: nur ansehen (Einsatzplan und Infos).' },
-      { k: 'verwalter', l: 'Verwaltung', d: 'Wie Planer, dazu Notdienst-Mitarbeiter mit Handynummern und die Infos (Pauschalen, Stundensätze, Anfahrt, Zeiten, Sperrliste) bearbeiten.' }] },
+      { k: 'verwalter', l: 'Verwalten und auswerten', d: 'Wie Planer, dazu Tauschwünsche genehmigen oder ablehnen, die Auswertung sehen, Notdienst-Mitarbeiter mit Handynummern und Farben sowie die Infos (Pauschalen, Stundensätze, Anfahrt, Zeiten, Sperrliste) bearbeiten.' }] },
   { id: 'geraete', name: 'Geräteverwaltung', desc: 'iPads, Handys, Apps, Kosten', url: 'geraete.html', icon: 'tablet', g: ['#6b7a99', '#465573'],
     rollen: [
       { k: 'verwalter', l: 'Verwalter', d: 'Geräte, Apps und Abos anlegen und ändern, Geräte mit Unterschrift ausgeben und zurücknehmen, Kosten und Fristen sehen.' },
@@ -1260,7 +1260,7 @@ function mailKarte(x) {
       <div class="mzeit">${tagSel}<input class="inp" type="time" data-mf="uhrzeit" data-t="${x.typ}" value="${esc(x.uhrzeit)}" aria-label="Uhrzeit"></div>
       ${impl ? `<div class="mfuss"><span class="faint">${x.letzter_lauf ? 'Zuletzt verschickt ' + new Date(x.letzter_lauf).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }) : 'Noch nie verschickt'}</span><button class="btn btn-soft btn-sm" data-act="mailVorschau" data-t="${x.typ}">Wer bekäme sie jetzt?</button></div>` : ''}</div>`;
   } else if (x.typ !== 'nachricht') {
-    opt = `<div class="mopt">${x.art === 'ereignis' ? `<label class="lrecht"><input type="checkbox" data-mf="bauleitung" data-t="${x.typ}" ${x.bauleitung ? 'checked' : ''}><span>Bauleitung des Projekts</span></label>` : ''}${mailEmpf(x)}</div>`;
+    opt = `<div class="mopt">${x.art === 'ereignis' ? `<label class="lrecht"><input type="checkbox" data-mf="bauleitung" data-t="${x.typ}" ${x.bauleitung ? 'checked' : ''}><span>Projektleitung des Projekts</span></label>` : ''}${mailEmpf(x)}</div>`;
   }
   return `<div class="mkarte${x.aktiv ? ' an' : ''}" data-t="${x.typ}"><div class="mkopf"><div><b>${esc(x.titel)}</b>${impl ? '' : '<span class="chip tone-amber">wird eingebaut</span>'}<small>${esc(MAIL_INFO[x.typ] || '')}</small></div>
     <button class="switch ${x.aktiv ? 'on' : ''}" data-act="mailAn" data-t="${x.typ}" role="switch" aria-checked="${x.aktiv}" aria-label="${esc(x.titel)}"></button></div>${opt}</div>`;

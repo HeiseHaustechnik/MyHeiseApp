@@ -105,6 +105,13 @@ input.f[readonly]{background:var(--surface-2);color:var(--ink-2)}
 .aend textarea{min-height:64px}
 .note{background:var(--amber-bg);color:var(--amber);border-radius:16px;padding:12px 14px;font-size:14px;margin:0 0 12px;font-weight:600}
 button.note{display:flex;gap:10px;align-items:center;width:100%;text-align:left;margin:6px 0 4px}
+.entw{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:12px 14px;margin:0 0 12px;border-left:5px solid var(--accent)}
+.entw.pruefung{border-left-color:var(--blue,#2c60a7)}.entw.uebernommen{border-left-color:var(--ok)}
+.entw b{font-size:15px}.entw p{margin:4px 0 0;font-size:13px;color:var(--ink-2)}
+.entw .st{display:inline-block;font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--amber-bg);color:var(--amber);margin-right:6px}
+.entw.pruefung .st{background:var(--blue-bg,#e8effe);color:var(--blue,#2c60a7)}.entw.uebernommen .st{background:var(--ok-bg,#e6f6ec);color:var(--ok)}
+.entw .bt{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.entw .bt .btn{min-height:40px;font-size:14px;padding:0 14px;border-radius:12px}
+.entw details{margin-top:8px;font-size:12.5px;color:var(--ink-3)}.entw details li{margin:2px 0 0 16px}
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
 .stat>div{background:var(--surface);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow);font-size:12.5px;color:var(--ink-2);font-weight:600}
 .stat b{display:block;font-size:24px;color:var(--ink);font-weight:780;font-variant-numeric:tabular-nums}
@@ -153,6 +160,7 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
       </div>
       <div class="tbar2"><span id="grpTools"></span><button class="btn-free" id="btnFree"></button></div>
     </div>
+    <div id="entwurfBox"></div>
     <div id="zeitBox"></div>
     <div id="preBanner"></div>
     <div id="posList"></div>
@@ -480,7 +488,7 @@ function openPos(key, eid){
       <h2 style="margin-bottom:4px">Bisher erfasst (${ents.length})</h2>
       ${ents.length? ents.map(e=>`<div class="ent"><div class="q">${nf(e.qty)} ${esc(p.me)}</div>
         <div class="o">${esc(e.ort)||'<span class="hint">ohne Ort</span>'}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
-        <div class="x">${e.pre?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(key)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')
+        <div class="x">${e.pre&&darfOk(e)?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(key)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')
         + `<div class="sum"><span>Summe</span><span>${nf(s)} ${esc(p.me)}</span></div>`
         : '<div class="hint">Noch nichts erfasst.</div>'}
     </div>`;
@@ -518,9 +526,36 @@ function renderPick(){
   $('#pickList').querySelectorAll('.pi').forEach(b=>b.onclick=()=>{ $('#e_o').value=b.dataset.o; togglePick(false); $('#e_b').focus(); });
 }
 const isSN=rg=>/^SN-\d/.test(rg||'');
-function preHer(ents){ const sn=ents.some(e=>isSN(e.rg)), rg=ents.some(e=>e.rg&&!isSN(e.rg)); return sn&&rg?'aus Rechnungen und Stundennachweisen':sn?(ents.length>1?'aus Stundennachweisen':'aus Stundennachweis'):(ents.length>1?'aus Rechnungen':'aus Rechnung'); }
+function preHer(ents){ if(ents.length&&ents.every(e=>e.rg==='LV')) return 'aus dem LV-Entwurf'; const sn=ents.some(e=>isSN(e.rg)), rg=ents.some(e=>e.rg&&!isSN(e.rg)&&e.rg!=='LV'); return sn&&rg?'aus Rechnungen und Stundennachweisen':sn?(ents.length>1?'aus Stundennachweisen':'aus Stundennachweis'):(ents.length>1?'aus Rechnungen':'aus Rechnung'); }
 function entSrc(e){ return e.rg? `<small class="src${e.pre?' pre':''}">${e.pre?'Vorschlag aus ':'geprüft · '}${esc(e.rg)}</small>`:''; }
-function okEnt(id){ const e=S.entries.find(x=>x.id===id); if(!e) return; e.pre=false; e.ts=new Date().toISOString(); const k=e.key; dataChanged(); if(cur) openPos(k); toast('Menge bestätigt'); }
+/* ---------- Aufmaß-Entwurf aus dem LV (aufmass_entwurf.sql) ---------- */
+let ENTW=null; // {entwurf, darf, log}
+const darfOk=e=>!(e.rg==='LV'&&ENTW&&['entwurf','pruefung'].includes(ENTW.entwurf)&&!ENTW.darf);
+async function entwurfLaden(){ if(!PJ.rpc||!AID||!navigator.onLine) return; try{ ENTW=await PJ.rpc('pj_entwurf',{p:{aktion:'info',aufmass_id:AID}}); }catch(e){ ENTW=null; } if(ENTW&&ENTW.entwurf) renderAll(); else renderEntwurf(); }
+function renderEntwurf(){
+  const el=$('#entwurfBox'); if(!el) return;
+  if(!ENTW||!ENTW.entwurf){ el.innerHTML=''; return; }
+  const st=ENTW.entwurf, lv=S.entries.filter(e=>e.rg==='LV'&&e.pre), null0=lv.filter(e=>!(+e.qty>0)).length;
+  const TXT={entwurf:['Entwurf','Mengen, Ort und Bemerkung ergänzen. Die Vorschläge sind noch nicht verbindlich.'],pruefung:['Zur Prüfung','Die Projektleitung prüft den Entwurf und übernimmt ihn dann.'],uebernommen:['Übernommen','Die Werte aus dem LV-Entwurf sind bestätigt und zählen wie jedes andere Aufmaß.']}[st];
+  const LOGT={erstellt:'erstellt',status:'Status geändert',uebernommen:'übernommen'};
+  el.innerHTML=`<div class="entw ${st}"><span class="st">${TXT[0]}</span><b>Aufmaß-Entwurf aus dem LV</b><p>${TXT[1]}${st!=='uebernommen'&&lv.length?` Offen: ${lv.length} Vorschläge${null0?`, davon ${null0} ohne Menge`:''}.`:''}</p>
+    ${ENTW.darf&&st!=='uebernommen'?`<div class="bt">${st==='entwurf'?'<button class="btn soft" id="enPr">Zur Prüfung geben</button>':'<button class="btn soft" id="enZu">Zurück auf Entwurf</button>'}<button class="btn ok" id="enUe">Übernehmen</button></div>`:''}
+    ${ENTW.log&&ENTW.log.length?`<details><summary>Verlauf (${ENTW.log.length})</summary><ul>${ENTW.log.map(l=>`<li>${new Date(l.ts).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'})} · ${esc(l.wer||'')} · ${esc(LOGT[l.aktion]||l.aktion)}${l.details&&l.details.nach?' → '+esc(l.details.nach==='pruefung'?'Zur Prüfung':'Entwurf'):''}${l.details&&l.details.bestaetigt!=null?` (${l.details.bestaetigt} bestätigt, ${l.details.ohne_menge_entfernt} ohne Menge entfernt)`:''}${l.details&&l.details.positionen?` (${l.details.positionen} Positionen)`:''}</li>`).join('')}</ul></details>`:''}</div>`;
+  const stat=async n=>{ try{ if(diff().n) await syncNow(); await PJ.rpc('pj_entwurf',{p:{aktion:'status',aufmass_id:AID,status:n}}); toast(n==='pruefung'?'Zur Prüfung gegeben':'Wieder Entwurf'); await entwurfLaden(); }catch(e){ toast(e.message); } };
+  if($('#enPr')) $('#enPr').onclick=()=>stat('pruefung');
+  if($('#enZu')) $('#enZu').onclick=()=>stat('entwurf');
+  if($('#enUe')) $('#enUe').onclick=()=>{
+    $('#sheet').innerHTML=`<h2>Entwurf übernehmen?</h2><p class="hint" style="margin:0 0 12px">${lv.length-null0} Vorschläge werden bestätigt und zählen dann als Aufmaß.${null0?` ${null0} Positionen ohne Menge werden entfernt.`:''} Das wird mit deinem Namen protokolliert.</p>
+      <div class="row" style="display:flex;gap:10px"><button class="btn ghost" id="ueAb" style="flex:1">Abbrechen</button><button class="btn ok" id="ueOk" style="flex:2">Übernehmen</button></div>`;
+    $('#ov').classList.add('on'); $('#sheet').classList.add('on');
+    $('#ueAb').onclick=closeSheet;
+    $('#ueOk').onclick=async()=>{ const b=$('#ueOk'); b.disabled=true;
+      try{ if(diff().n){ await syncNow(); if(diff().n) throw new Error('Bitte erst speichern (keine Verbindung?)'); }
+        const r=await PJ.rpc('pj_entwurf',{p:{aktion:'uebernehmen',aufmass_id:AID}}); closeSheet(); await pull(); await entwurfLaden(); toast(`Übernommen: ${r.bestaetigt} bestätigt${r.entfernt?`, ${r.entfernt} ohne Menge entfernt`:''}`); }
+      catch(e){ b.disabled=false; toast(e.message); } };
+  };
+}
+function okEnt(id){ const e=S.entries.find(x=>x.id===id); if(!e) return; if(!darfOk(e)) return toast('Vorschläge aus dem LV-Entwurf bestätigt die Projektleitung'); e.pre=false; e.ts=new Date().toISOString(); const k=e.key; dataChanged(); if(cur) openPos(k); toast('Menge bestätigt'); }
 function addEnt(){
   const v=parseQty($('#e_q').value);
   if(v===null||isNaN(v)||v===0){ toast('Bitte eine gültige Menge eintragen'); $('#e_q').focus(); return; }
@@ -612,7 +647,7 @@ function renderSum(){
     <div style="display:flex;gap:10px;cursor:pointer" onclick="openPos('${esc(x.p.p)}')"><div style="flex:1;min-width:0"><div class="hint">${esc(x.p.p)}${x.free?' · freie Position · '+(x.p.t?'Zuordnung '+esc(titelOf(x.p.p)):'ohne Zuordnung'):` · LV ${nf(x.p.m)} ${esc(x.p.me)}`}</div><b style="overflow-wrap:anywhere">${esc(x.p.b)}</b></div>
     <div><span class="badge${!x.free&&x.p.m>0&&x.sum>x.p.m?' over':''}">${nf(x.sum)} ${esc(x.p.me)}</span></div></div>
     <div style="margin-top:6px">${x.ents.map(e=>`<div class="ent"><div class="q">${nf(e.qty)}</div><div class="o">${esc(e.ort)||'<span class="hint">ohne Ort</span>'}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
-      <div class="x">${e.pre?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(x.p.p)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')}</div></div>`).join('');
+      <div class="x">${e.pre&&darfOk(e)?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(x.p.p)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')}</div></div>`).join('');
 }
 
 /* ---------- Kopfdaten ---------- */
@@ -797,7 +832,7 @@ function renderAreas(){
 $('#a_add').onclick=()=>{ const n=$('#a_n').value.trim(); if(!n){ toast('Bitte einen Namen eintragen'); return; } const g=$('#a_g').value.trim()||'Eigene Bereiche';
   const A2=areas().slice(); let idx=-1; A2.forEach((a,i)=>{ if(a.g===g) idx=i; }); const it={g,n}; if(idx<0) A2.push(it); else A2.splice(idx+1,0,it);
   S.areas=A2; save(); $('#a_n').value=''; renderAreas(); toast('Bereich hinzugefügt'); };
-function renderAll(){ PJS.set({seite:'aufmass',pid:PROJ?.id||null,pname:PROJ?.name||'',erfassen:true}); renderAreas(); renderPos(); renderSum(); renderHdr(); sigText(); }
+function renderAll(){ PJS.set({seite:'aufmass',pid:PROJ?.id||null,pname:PROJ?.name||'',erfassen:true}); renderAreas(); renderPos(); renderSum(); renderHdr(); sigText(); if(typeof renderEntwurf==='function') renderEntwurf(); }
 
 /* ---------- Datenbank-Abgleich ---------- */
 const eKey=e=>JSON.stringify([e.key,e.qty,e.ort||'',e.bem||'',e.rg||'',!!e.pre]);
@@ -898,7 +933,7 @@ async function mailSenden(){
   mailLauf=false;
 }
 window.addEventListener('online',()=>setTimeout(()=>{ mailPlan(); ohneSenden(); },3000));
-/* „Niemand vor Ort“: Monteur schließt mit eigener Unterschrift ab, PDF geht an die Bauleitung */
+/* „Niemand vor Ort“: Monteur schließt mit eigener Unterschrift ab, PDF geht an die Projektleitung */
 const MAILOHNE_A='pj_mail_auf_ohne';
 function ohneStand(){ try{ return JSON.parse(localStorage.getItem(MAILOHNE_A)||'{}'); }catch(e){ return {}; } }
 function ohneSetzen(v){ const o=ohneStand(); if(v===null) delete o[AID]; else o[AID]=v; try{ localStorage.setItem(MAILOHNE_A,JSON.stringify(o)); }catch(e){} }
@@ -906,12 +941,12 @@ function renderOhne(){
   const el=$('#ohneAg'); if(!el) return;
   const st=ohneStand()[AID];
   if(S.sig.sig2||!S.sig.sig1){ el.innerHTML=''; return; }
-  el.innerHTML=st&&st.am?`<div class="ohne ok">${IC('check')}<div><b>An die Bauleitung gesendet ${new Date(st.am).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'})}</b><span>Die Unterschrift des Auftraggebers wird nachgeholt. Unterschreibt er später hier, geht das PDF noch einmal mit beiden Unterschriften raus.</span></div></div>`
-    :st?`<div class="ohne">${IC('cloudoff')}<div><b>Wird an die Bauleitung gesendet, sobald Netz da ist</b></div></div>`
-    :`<button class="btn block ohne-btn" id="bOhne">${IC('mail','sm')} Niemand vor Ort – an Bauleitung senden</button>`;
+  el.innerHTML=st&&st.am?`<div class="ohne ok">${IC('check')}<div><b>An die Projektleitung gesendet ${new Date(st.am).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'})}</b><span>Die Unterschrift des Auftraggebers wird nachgeholt. Unterschreibt er später hier, geht das PDF noch einmal mit beiden Unterschriften raus.</span></div></div>`
+    :st?`<div class="ohne">${IC('cloudoff')}<div><b>Wird an die Projektleitung gesendet, sobald Netz da ist</b></div></div>`
+    :`<button class="btn block ohne-btn" id="bOhne">${IC('mail','sm')} Niemand vor Ort – an Projektleitung senden</button>`;
   const b=$('#bOhne'); if(b) b.onclick=()=>{
-    $('#sheet').innerHTML=`<h2>Niemand vor Ort</h2><p class="hint" style="margin:0 0 12px">Vor Ort war niemand, der für den Auftraggeber unterschreiben kann? Dann schließt du hier mit deiner Unterschrift ab. Die Bauleitung bekommt das PDF per E-Mail, leitet es an den Auftraggeber weiter und holt die Unterschrift nach.</p>
-      <label for="ohneN">Hinweis für die Bauleitung (optional)</label><textarea class="inp" id="ohneN" rows="3" placeholder="z. B. Bauleiter erst ab Montag wieder vor Ort" style="width:100%;margin:6px 0 14px"></textarea>
+    $('#sheet').innerHTML=`<h2>Niemand vor Ort</h2><p class="hint" style="margin:0 0 12px">Vor Ort war niemand, der für den Auftraggeber unterschreiben kann? Dann schließt du hier mit deiner Unterschrift ab. Die Projektleitung bekommt das PDF per E-Mail, leitet es an den Auftraggeber weiter und holt die Unterschrift nach.</p>
+      <label for="ohneN">Hinweis für die Projektleitung (optional)</label><textarea class="inp" id="ohneN" rows="3" placeholder="z. B. Bauleiter erst ab Montag wieder vor Ort" style="width:100%;margin:6px 0 14px"></textarea>
       <div class="row" style="display:flex;gap:10px"><button class="btn ghost" id="ohneAb" style="flex:1">Abbrechen</button><button class="btn cta" id="ohneOk" style="flex:2">Abschließen und senden</button></div>`;
     $('#ov').classList.add('on'); $('#sheet').classList.add('on');
     $('#ohneAb').onclick=closeSheet;
@@ -944,6 +979,7 @@ async function boot(){
     applyServer(srv,!!(cache&&cache.BASE));
     localStorage.setItem(KEY, JSON.stringify({S,BASE,PROJ,LV}));
     renderAll(); fillHead(); drawSigs(); syncStatus(); if(diff().n) scheduleSync(); else mailPlan(); setTimeout(ohneSenden,4000);
+    entwurfLaden().then(()=>{ if(ENTW&&['entwurf','pruefung'].includes(ENTW.entwurf)&&!(cache&&cache.BASE)){ S.filter='pre'; document.querySelectorAll('.chip[data-f]').forEach(c=>c.classList.toggle('on',c.dataset.f==='pre')); renderPos(); } });
   }catch(e){
     if(!cache){ document.querySelector('main').innerHTML=`<div class="empty">Aufmaß konnte nicht geladen werden.<br>${esc(e.message)}<br><br><a href="index.html">Zur Projektübersicht</a></div>`; return; }
     syncStatus();
