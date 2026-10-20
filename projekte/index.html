@@ -40,6 +40,17 @@ input[type=file].inp{padding:12px 14px}
 .mchk{align-self:center;display:grid;place-items:center}
 .mchk input{width:22px;height:22px;accent-color:var(--accent)}
 .mhint{grid-column:2/-1;display:flex;gap:6px;flex-wrap:wrap}
+/* PDS_V2: Übernahme aus pds */
+.pdsbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pdsp{border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px;background:var(--surface,#fff)}
+.pdsp .kopf{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.pdsp .kopf b{font-size:15px}
+.pdsp small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:2px}
+.pdsp .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pdssys{display:flex;gap:10px;align-items:flex-start;border-radius:16px;padding:12px 14px;margin:0 0 14px;font-size:14px;font-weight:600}
+.pdssys.test{background:var(--amber-bg);color:var(--amber)}
+.pdssys.live{background:var(--ok-bg);color:var(--ok)}
+.pdssys .ic{flex:0 0 auto;margin-top:1px}
 .sec-title .lnk{float:right;font-size:13px;font-weight:650;color:var(--accent);background:none;border:0;cursor:pointer}
 @media(max-width:720px){.mrow{grid-template-columns:28px 1fr 40px}.mrow .field{grid-column:2/3}.mrow .delbtn{grid-column:3;grid-row:1}.mhint{grid-column:2/3}}
 </style>
@@ -62,6 +73,7 @@ const api=(path,opt={})=>PJ.api(path,opt);
 function route(){ const m=location.hash.match(/^#p=(.+)$/); window.scrollTo(0,0);
   if(m){ PJS.set({seite:'projekt',pid:decodeURIComponent(m[1]),erfassen:false}); showProjekt(m[1]); }
   else if(location.hash==='#mehrere'){ PJS.set({seite:'liste',pid:null,pname:''}); showMehrere(); }
+  else if(location.hash==='#pds'){ PJS.set({seite:'liste',pid:null,pname:''}); showPds(); }
   else { PJS.set({seite:'liste',pid:null,pname:''}); showListe().then(()=>{ if(location.hash==='#neu'){ const d=$('#np_name')&&$('#np_name').closest('details'); if(d){ d.open=true; d.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>$('#np_name').focus(),300); } } }); } }
 window.addEventListener('hashchange',route);
 const plural=(n,a,b)=>n+' '+(n==1?a:b);
@@ -100,6 +112,8 @@ async function showListe(){
       <button class="btn cta block" id="np_ok">Projekt anlegen</button>
       <p class="hint" style="margin-top:10px">Das LV wird danach im Projekt aus der Kalkulations-Excel importiert.</p></div></details>
     <a class="row-card nur-leitung" href="#mehrere"><div class="mi tone-brand">${IC('plus')}</div><div class="mt"><b>Mehrere Projekte auf einmal anlegen</b><small>Baustellen aus der Planung übernehmen oder eine Liste aus Excel einfügen</small></div><span class="chev">${IC('chev')}</span></a>
+    <a class="row-card nur-admin" href="#pds"><div class="mi tone-brand">${IC('upload')}</div><div class="mt"><b>${PJ.test?'Aus dem pds-Testsystem übernehmen':'Aus pds übernehmen'}</b><small>Projekte und LV mit „MyHeiseApp = Ja“, erst Vorschau, dann übernehmen</small></div><span class="chev">${IC('chev')}</span></a>
+    ${PJ.test?'':`<button class="row-card nur-admin" style="width:100%;text-align:left" onclick="PJ.setTest(true)"><div class="mi tone-amber">${IC('alert')}</div><div class="mt"><b>PDS-Testbereich öffnen</b><small>Eigene Testdaten für die pds-Anbindung, getrennt von den echten Projekten</small></div><span class="chev">${IC('chev')}</span></button>`}
     <details class="fold nur-leitung"><summary>${IC('upload')}Projekt aus Importdatei anlegen</summary><div class="fold-b">
       <p class="hint" style="margin-bottom:10px">Für vorbereitete Projektdateien mit LV, Bereichen und Vorschlägen (.json).</p>
       <div class="field"><input type="file" class="inp" id="imp_f" accept=".json,application/json"></div>
@@ -204,6 +218,87 @@ async function mpAnlegen(){
       ${z.map(s=>`<a class="row-card" href="#p=${esc(s.id)}"><div class="mi tone-brand">${IC('building')}</div><div class="mt"><b>${esc(s.name)}</b><small>${esc([s.nr,s.status.startsWith('neu')?'neu angelegt':'gab es schon',s.status.includes('verknuepft')?'mit Planung verknüpft':''].filter(Boolean).join(' · '))}</small></div><span class="chev">${IC('chev')}</span></a>`).join('')}</div>`;
     $('#mp_res').scrollIntoView({behavior:'smooth'});
   }catch(e){ toast(e.message); b.disabled=false; b.textContent='Erneut versuchen'; }
+}
+
+/* ---------- Übernahme aus pds (Edge Function pds-bruecke, nur Admin) PDS_V2 ----------
+   Erst immer ein Trockenlauf (nichts wird geändert). Übernommen wird
+   • aus dem pds-Testsystem: in den PDS-Testbereich (Schema pdstest), nie in die echten Projekte,
+   • aus dem Produktivsystem: in die echten Projekte, nur mit Secret PDS_SCHREIBEN = ja.
+   Die Testdaten sieht man nur im Testbereich (PJ.setTest). */
+let PDS={erg:null,laeuft:false,fehler:'',fertig:null};
+async function showPds(){
+  const app=$('#app');
+  if(PJ.rolle!=='admin'){ app.innerHTML=`<div class="err">Nur für Administratoren.</div><a class="btn ghost" href="#">Zurück</a>`; return; }
+  pdsZeichnen();
+}
+function pdsZahl(lv){ if(!lv) return '';
+  if(lv.status!=='aktualisiert') return lv.status||'';
+  const t=[]; if(lv.neu) t.push(plural(lv.neu,'neue Position','neue Positionen')); if(lv.geaendert) t.push(lv.geaendert+' geändert');
+  if(lv.entfallen) t.push(lv.entfallen+' entfallen'); if(lv.behalten_wegen_aufmass) t.push(lv.behalten_wegen_aufmass+' wegen Aufmaß behalten');
+  if(!t.length) t.push('unverändert');
+  return plural(lv.positionen,'Position','Positionen')+' · '+t.join(', '); }
+function pdsProjekt(p,imZiel){
+  const st=p.status==='neu'?['blue','wird neu angelegt']:p.status==='verknüpft'?['blue','wird mit vorhandenem Projekt verknüpft']:p.status==='aktualisiert'?['gray','schon vorhanden']:p.status==='konflikt'?['red','Konflikt']:['red',p.status||'?'];
+  const lv=p.lv||{}, lvTon=lv.status==='übersprungen'?'amber':(lv.neu||lv.geaendert||lv.entfallen)?'blue':'gray';
+  const team=(p.team||[]).map(t=>t.app?`<span class="pill tone-ok"><i></i>${esc(t.app)}</span>`:`<span class="pill tone-amber" title="Kein App-Benutzer zu diesem Namen gefunden">${esc(t.pds)}: kein Benutzer</span>`).join('');
+  return `<div class="pdsp"><div class="kopf"><div style="min-width:0"><b>${esc(p.nr)} · ${esc(p.name)}</b><small>${esc(p.adresse||'ohne Adresse')}</small></div>
+      ${imZiel&&p.app_id&&p.status!=='konflikt'?`<a class="btn ghost sm" href="#p=${esc(p.app_id)}">Öffnen</a>`:''}</div>
+    <div class="tags"><span class="pill tone-${st[0]}">${st[1]}</span><span class="pill tone-${lvTon}">LV: ${esc(pdsZahl(lv))}</span>${team}</div>
+    ${p.hinweis||lv.hinweis?`<p class="hint" style="margin:8px 0 0">${esc(p.hinweis||lv.hinweis)}</p>`:''}
+    ${(lv.umbenannt||[]).length?`<p class="hint" style="margin:6px 0 0">Doppelte Positionsnummern: ${lv.umbenannt.map(u=>esc(u.pds+' → '+u.app)).join(', ')}</p>`:''}</div>`; }
+function pdsZeichnen(){
+  const app=$('#app'), e=PDS.erg;
+  const test=e&&e.testbereich;
+  // Projekte öffnen geht nur dort, wo sie liegen: Testdaten im Testbereich, echte Daten außerhalb
+  const imZiel=e? (!!test===!!PJ.test) : false;
+  const sys=!e?'':test
+      ?`<div class="pdssys test">${IC('alert')}<div>Verbunden mit dem pds-Testsystem. Übernommen wird nur in den <b>PDS-Testbereich</b>. Die echten Projekte der App bleiben unberührt.</div></div>`
+      :e.schreiben_erlaubt
+      ?`<div class="pdssys live">${IC('check')}<div>Verbunden mit ${esc(e.system_name||'pds')}. Übernahme in die echten Projekte ist freigegeben.</div></div>`
+      :`<div class="pdssys test">${IC('alert')}<div>${esc(e.system_name||'pds')}: nur Vorschau. In der App wird nichts angelegt oder geändert (Secret PDS_SCHREIBEN fehlt).</div></div>`;
+  const prj=e?(e.projekte||[]):[];
+  const aenderung=prj.some(p=>p.status==='neu'||p.status==='verknüpft'||(p.lv&&(p.lv.neu||p.lv.geaendert||p.lv.entfallen)));
+  const goText=test?'In den Testbereich übernehmen':'Jetzt übernehmen';
+  app.innerHTML=`${PJS.pills()}
+    <div class="pagehead"><a class="iconbtn" href="#" aria-label="Zurück">${IC('back')}</a><div style="min-width:0"><h1>${PJ.test?'pds-Testsystem → Testbereich':'Aus pds übernehmen'}</h1><small>Projektakten und Aufträge mit „MyHeiseApp = Ja“</small></div></div>
+    <div class="card"><p class="hint" style="margin:0 0 12px">Die Vorschau liest nur aus pds und zeigt, was angelegt oder geändert würde. Preise werden nie übernommen. Vorhandene Aufmaße bleiben erhalten.</p>
+      <div class="pdsbar"><button class="btn cta" id="pds_vor" ${PDS.laeuft?'disabled':''}>${PDS.laeuft==='vorschau'?'Lese pds …':e?'Vorschau neu laden':'Vorschau laden'}</button>
+      ${e&&e.schreiben_erlaubt&&prj.length?`<button class="btn" id="pds_go" ${PDS.laeuft?'disabled':''}>${PDS.laeuft==='echt'?'Übernehme …':goText}</button>`:''}</div>
+      ${PJ.test?`<div class="sep" style="border-top:1px solid var(--line);margin:14px 0 10px"></div><div class="pdsbar"><a class="btn ghost sm" href="#">Testprojekte ansehen</a><button class="btn ghost sm danger" id="pds_leer">Testbereich leeren</button></div>`:''}</div>
+    ${PDS.fehler?`<div class="err">${esc(PDS.fehler)}</div>`:''}
+    ${PDS.fertig?`<div class="card" style="background:var(--ok-bg)"><b style="color:var(--ok)">Übernommen in ${esc(PDS.fertig.ziel)}: ${plural(PDS.fertig.neu,'Projekt','Projekte')} neu, ${PDS.fertig.akt} aktualisiert.</b>
+      ${test&&!PJ.test?`<p class="hint" style="margin:6px 0 0">Die Testprojekte siehst du im Testbereich.</p><button class="btn sm" style="margin-top:8px" onclick="PJ.setTest(true)">Testbereich öffnen</button>`:''}</div>`:''}
+    ${sys}
+    ${e?`<div class="sec-title">${e.probe===false?'Ergebnis':'Vorschau'} · ${plural(prj.length,'Projekt','Projekte')}</div>
+      ${prj.length?prj.map(p=>pdsProjekt(p,imZiel)).join(''):`<div class="empty">${IC('list')}<div>In pds ist keine Projektakte und kein Auftrag mit „MyHeiseApp = Ja“ markiert.</div></div>`}
+      ${prj.length&&!aenderung&&e.probe!==false?'<p class="hint">Alles ist schon auf dem Stand von pds.</p>':''}
+      ${(e.hinweise||[]).length?`<div class="sec-title">Hinweise</div><div class="card">${e.hinweise.map(h=>`<p class="hint" style="margin:0 0 6px">${esc(h)}</p>`).join('')}</div>`:''}
+      <p class="hint" style="margin-top:14px">${plural(e.projektakten_gelesen||0,'Projektakte','Projektakten')} gelesen, ${plural(e.auftraege_markiert||0,'markierter Auftrag','markierte Aufträge')} · ${Math.round((e.dauer_ms||0)/100)/10} s</p>`:''}`;
+  $('#pds_vor').onclick=()=>pdsLaden(true);
+  const go=$('#pds_go'); if(go) go.onclick=()=>{
+    const n=prj.filter(p=>p.status==='neu').length;
+    if(!confirm(`${test?'In den PDS-Testbereich übernehmen?':'Jetzt in die echten Projekte übernehmen?'}
+
+${plural(n,'Projekt wird','Projekte werden')} neu angelegt, ${plural(prj.length-n,'Projekt wird','Projekte werden')} aktualisiert.`)) return;
+    pdsLaden(false); };
+  const leer=$('#pds_leer'); if(leer) leer.onclick=async()=>{
+    if(!confirm('Alle Testdaten im PDS-Testbereich löschen?\n\nDie echten Projekte bleiben unberührt.')) return;
+    try{ await PJ.rpc('pds_test_leeren',{}); PDS.erg=null; PDS.fertig=null; toast('Testbereich geleert'); pdsZeichnen(); }catch(err){ toast(err.message); } };
+}
+async function pdsLaden(probe){
+  PDS.laeuft=probe?'vorschau':'echt'; PDS.fehler=''; PDS.fertig=null; pdsZeichnen();
+  try{
+    const r=await PJ.fn('pds-bruecke',probe?{action:'uebernehmen'}:{action:'uebernehmen',probe:false});
+    PDS.erg=r;
+    if(!probe){ const p=r.projekte||[]; PDS.fertig={ziel:r.ziel||'die App',neu:p.filter(x=>x.status==='neu').length,akt:p.length-p.filter(x=>x.status==='neu').length}; }
+  }catch(e){
+    PDS.fehler=e.daten&&e.daten.hinweis?e.message+' '+e.daten.hinweis
+      :e.status===403&&e.daten&&e.daten.schreiben_erlaubt===false?e.message
+      :/Nur für Administratoren/.test(e.message)?'Nur für Administratoren.'
+      :/Failed to fetch|Load failed|Keine Verbindung/i.test(e.message)?'Keine Verbindung zur Funktion pds-bruecke.'
+      :e.message;
+  }
+  PDS.laeuft=false; pdsZeichnen();
 }
 
 /* ---------- Einmalige Datenübernahme (nur Admin) ---------- */

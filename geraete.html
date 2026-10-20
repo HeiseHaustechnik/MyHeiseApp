@@ -683,6 +683,23 @@ a.tile{color:inherit}
 .sheet .row2 .field{min-width:0}
 /* Hauptaktion im Heise-CI (Dunkelblau statt Violett) */
 .hero-go{background:linear-gradient(135deg,var(--brand-2),var(--brand));box-shadow:0 14px 28px -16px var(--brand)}
+/* Übersicht: Kosten nach Bereich (18.10.2026) */
+.kgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kbox{display:flex;flex-direction:column;gap:2px;background:var(--surface);border-radius:20px;padding:14px;box-shadow:var(--shadow);color:inherit;min-width:0}
+.kbox small{font-size:13px;color:var(--ink-2);font-weight:650;margin-top:6px}
+.kbox b{font-size:21px;font-weight:760;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kbox .muted{font-size:12.5px;line-height:1.35}
+.kico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--surface-2)}
+.kico.tone-blue{background:color-mix(in srgb,#2c60a7 14%,transparent);color:#2c60a7}
+.kico.tone-violet{background:color-mix(in srgb,#7c5cc4 14%,transparent);color:#7c5cc4}
+.kico .ic{width:20px;height:20px}
+.ksum{display:flex;align-items:center;gap:18px;margin-top:10px}
+.ksum span{display:flex;flex-direction:column}
+.ksum b{font-size:22px;font-weight:760;font-variant-numeric:tabular-nums}
+.ksum .chev{margin-left:auto}
+.scard .tt.num{font-variant-numeric:tabular-nums;letter-spacing:.01em}
+@media (max-width:560px){.kgrid{grid-template-columns:1fr}.kbox{display:grid;grid-template-columns:36px 1fr auto;grid-template-rows:auto auto;column-gap:12px;align-items:center}
+  .kbox .kico{grid-row:1/3}.kbox small{margin:0;grid-column:2}.kbox .muted{grid-column:2}.kbox b{grid-column:3;grid-row:1/3;font-size:19px}}
 </style>
 <link rel="stylesheet" href="heise-ci.css">
 </head>
@@ -961,11 +978,13 @@ function saveBlob(blob,name){
 const TYPEN=['Smartphone','Tablet','Laptop','PC','Monitor','Drucker','Telefon','Sonstiges'];
 const TYP_IC={Smartphone:'mobile',Tablet:'tablet',Laptop:'laptop',PC:'monitor',Monitor:'monitor',Drucker:'printer',Telefon:'phone',Sonstiges:'cube'};
 const STATUS={lager:['Im Lager','gray'],ausgegeben:['Ausgegeben','ok'],reparatur:['In Reparatur','amber'],defekt:['Defekt','red'],ausgemustert:['Ausgemustert','gray']};
-const KATEGORIEN=['App','Software','Cloud','Mobilfunk','Sonstiges'];
+const KATEGORIEN=['App','Software','Cloud','Sonstiges'];   // Mobilfunk hat seit 18.10.2026 einen eigenen Bereich (gv_sim)
 const KAT_IC={App:'mobile',Software:'monitor',Cloud:'cloud',Mobilfunk:'phone',Sonstiges:'tag'};
 const INTERVALLE=[['monatlich','monatlich'],['jaehrlich','jährlich'],['einmalig','einmalig']];
 const INT_L={monatlich:'mtl.',jaehrlich:'jährl.',einmalig:'einmalig'};
 const ABO_STATUS={aktiv:['Aktiv','ok'],gekuendigt:['Gekündigt','amber'],beendet:['Beendet','gray']};
+const SIM_ART={sprache_daten:'Sprache & Daten',daten:'Nur Daten',multisim:'Zweitkarte / MultiSIM',esim:'eSIM',sonstiges:'Sonstiges'};
+const ANBIETER=['Telekom','Vodafone','O2','1&1','congstar','freenet'];
 const ZUBEHOER_VORSCHLAG=['Hülle','Schutzglas','Ladekabel','Netzteil','Apple Pencil','Tastatur','Maus','Kopfhörer','Autohalterung','Tasche','Dockingstation'];
 const ZUSTAENDE_AUS=['Neu','Neuwertig','Gebraucht, gut','Gebrauchsspuren'];
 const ZUSTAENDE_RUECK=['Einwandfrei','Gebrauchsspuren','Beschädigt','Defekt'];
@@ -980,36 +999,53 @@ const PRIVAT=['Private Nutzung nicht erlaubt','Private Nutzung in geringem Umfan
 
 const GCOLS='*';
 async function loadAll(){
-  const [rolle,g,a,u]=await Promise.all([
+  const [rolle,g,a,u,s]=await Promise.all([
     rpc('gv_rolle'),
     api('GET','gv_geraete',null,`?select=${GCOLS}&order=inventar_nr.asc&limit=2000`),
     api('GET','gv_abos',null,'?select=*&order=name.asc&limit=2000'),
-    rpc('gv_benutzerliste')
+    rpc('gv_benutzerliste'),
+    api('GET','gv_sim',null,'?select=*&order=rufnummer.asc.nullslast&limit=2000').catch(()=>null)   // null = SQL-Update fehlt noch
   ]);
-  S.rolle=rolle||'leser';S.geraete=g||[];S.abos=a||[];S.users=u||[];S.loadedAt=Date.now();
+  S.rolle=rolle||'leser';S.geraete=g||[];S.abos=a||[];S.users=u||[];S.sims=s||[];S.simOk=!!s;S.loadedAt=Date.now();
 }
 const userName=id=>{const u=S.users.find(x=>x.id===id);return u?u.name:''};
 const gById=id=>S.geraete.find(x=>x.id===id);
 const gTitle=g=>[g.hersteller,g.modell].filter(Boolean).join(' ');
 const gIcon=g=>TYP_IC[g.typ]||'cube';
 
+/* ---------- Mobilfunk (SIM-Karten) ---------- */
+const sById=id=>(S.sims||[]).find(x=>x.id===id);
+const simGeraet=s=>s&&s.geraet_id?gById(s.geraet_id):null;
+const simUser=s=>{const g=simGeraet(s);return g?g.benutzer_id||null:s.benutzer_id||null};   // steckt die SIM in einem Gerät, gilt dessen Mitarbeiter
+const simsFor=g=>(S.sims||[]).filter(s=>s.geraet_id===g.id);
+const simTitle=s=>s.rufnummer||s.tarif||(s.sim_nr?'SIM '+s.sim_nr:'SIM-Karte');
+const simLaeuft=s=>s.status==='aktiv'||(s.status==='gekuendigt'&&(!s.vertrag_ende||dayDiff(s.vertrag_ende)>=0));
+const simMonat=s=>simLaeuft(s)?(+s.kosten||0):0;
+/* Rufnummer eines Geräts: aus der eingesetzten SIM (alte Daten direkt am Gerät als Ausweich) */
+const gRuf=g=>{const l=simsFor(g).filter(s=>s.status!=='beendet'&&s.rufnummer).map(s=>s.rufnummer);return l.length?l.join(', '):(g.rufnummer||'')};
+
 /* ---------- Kosten (alles auf Monat bzw. Jahr umgerechnet) ---------- */
 const aboMonat=a=>a.status!=='aktiv'||a.intervall==='einmalig'?0:(a.intervall==='jaehrlich'?(+a.kosten||0)/12:(+a.kosten||0));
+/* Alt: Vertrag direkt am Gerät (vor dem Update 18.10.2026). Nach geraete_mobilfunk.sql sind diese Felder leer. */
 const vertragAktiv=g=>g.status!=='ausgemustert'&&+g.vertrag_kosten>0&&(!g.vertrag_ende||dayDiff(g.vertrag_ende)>=0);
 const gMonat=g=>vertragAktiv(g)?(+g.vertrag_kosten||0):0;
 function kostenFuer(uid){
   const gs=S.geraete.filter(g=>g.benutzer_id===uid),as=S.abos.filter(a=>a.benutzer_id===uid||(!a.benutzer_id&&a.geraet_id&&gs.some(g=>g.id===a.geraet_id)));
-  const vertrag=gs.reduce((s,g)=>s+gMonat(g),0),abo=as.reduce((s,a)=>s+aboMonat(a),0);
-  const wert=gs.reduce((s,g)=>s+(+g.kaufpreis||0),0);
-  return{gs,as,vertrag,abo,monat:vertrag+abo,wert};
+  const ss=(S.sims||[]).filter(s=>simUser(s)===uid);
+  const mobil=ss.reduce((t,s)=>t+simMonat(s),0)+gs.reduce((t,g)=>t+gMonat(g),0),abo=as.reduce((t,a)=>t+aboMonat(a),0);
+  const wert=gs.reduce((t,g)=>t+(+g.kaufpreis||0),0);
+  return{gs,as,ss,mobil,vertrag:mobil,abo,monat:mobil+abo,wert};
 }
 function kostenGesamt(){
-  const vertrag=S.geraete.reduce((s,g)=>s+gMonat(g),0),abo=S.abos.reduce((s,a)=>s+aboMonat(a),0);
+  const mobil=(S.sims||[]).reduce((t,s)=>t+simMonat(s),0)+S.geraete.reduce((t,g)=>t+gMonat(g),0),abo=S.abos.reduce((t,a)=>t+aboMonat(a),0);
   const jahr=berlinToday().slice(0,4);
-  const kaufJahr=S.geraete.filter(g=>String(g.kaufdatum||'').startsWith(jahr)).reduce((s,g)=>s+(+g.kaufpreis||0),0)
-    +S.abos.filter(a=>a.intervall==='einmalig'&&String(a.beginn||a.created_at||'').startsWith(jahr)).reduce((s,a)=>s+(+a.kosten||0),0);
-  const wert=S.geraete.filter(g=>g.status!=='ausgemustert').reduce((s,g)=>s+(+g.kaufpreis||0),0);
-  return{vertrag,abo,monat:vertrag+abo,kaufJahr,wert,jahr};
+  const geraeteJahr=S.geraete.filter(g=>String(g.kaufdatum||'').startsWith(jahr)).reduce((t,g)=>t+(+g.kaufpreis||0),0);
+  const einmalJahr=S.abos.filter(a=>a.intervall==='einmalig'&&String(a.beginn||a.created_at||'').startsWith(jahr)).reduce((t,a)=>t+(+a.kosten||0),0);
+  const bestand=S.geraete.filter(g=>g.status!=='ausgemustert');
+  const wert=bestand.reduce((t,g)=>t+(+g.kaufpreis||0),0);
+  const simsAktiv=(S.sims||[]).filter(simLaeuft).length;
+  const abosAktiv=S.abos.filter(a=>a.status==='aktiv').length;
+  return{mobil,vertrag:mobil,abo,monat:mobil+abo,geraeteJahr,einmalJahr,kaufJahr:geraeteJahr+einmalJahr,wert,jahr,simsAktiv,abosAktiv,geraeteAnz:bestand.length};
 }
 
 /* ---------- Fristen (gleiche Regeln wie gv_fristen_anzahl() in der Datenbank) ---------- */
@@ -1022,6 +1058,10 @@ function fristen(tage=60){
       if(k<=lim)out.push({art:'vertrag',datum:k,g,t:k<h?'Kündigungsfrist verpasst – Vertrag verlängert sich evtl.':'Vertrag: kündigen bis',sub:`${g.vertrag_anbieter||'Vertrag'} ${g.vertrag_tarif||''} · ${gTitle(g)} · Ende ${fmtD(g.vertrag_ende)}`,verpasst:k<h});
     }
   });
+  (S.sims||[]).filter(s=>s.status==='aktiv'&&s.vertrag_ende&&s.vertrag_ende>=h).forEach(s=>{
+    const k=addMonths(s.vertrag_ende,-(+s.kuendigungsfrist_monate||0)),g=simGeraet(s),who=userName(simUser(s));
+    if(k<=lim)out.push({art:'sim',datum:k,s,t:k<h?'Kündigungsfrist verpasst – Vertrag verlängert sich evtl.':'Mobilfunk: kündigen bis',sub:[simTitle(s),[s.anbieter,s.rufnummer?s.tarif:''].filter(Boolean).join(' '),who||(g?gTitle(g):''),'Ende '+fmtD(s.vertrag_ende)].filter(Boolean).join(' · '),verpasst:k<h});
+  });
   S.abos.filter(a=>a.status==='aktiv'&&a.verlaengerung&&a.intervall!=='einmalig').forEach(a=>{
     const k=addDays(a.verlaengerung,-(+a.kuendigungsfrist_tage||0));
     if(a.verlaengerung<h)out.push({art:'abo',datum:a.verlaengerung,a,t:'Verlängerungsdatum überschritten – bitte prüfen',sub:`${a.name} · ${eur(a.kosten)} ${INT_L[a.intervall]}`,verpasst:true});
@@ -1031,6 +1071,7 @@ function fristen(tage=60){
 }
 const fristenFuerG=g=>fristen(60).filter(f=>f.g&&f.g.id===g.id);
 const fristenFuerA=a=>fristen(60).filter(f=>f.a&&f.a.id===a.id);
+const fristenFuerS=s=>fristen(60).filter(f=>f.s&&f.s.id===s.id);
 function fristTone(f){const d=dayDiff(f.datum);return f.verpasst||d<0?'red':d<=14?'amber':'blue'}
 function fristWann(f){const d=dayDiff(f.datum);return d<0?`seit ${-d} ${-d===1?'Tag':'Tagen'}`:d===0?'heute':d===1?'morgen':`in ${d} Tagen`}
 /* =====================================================================
@@ -1042,7 +1083,7 @@ const rolleName=()=>({admin:'Admin',verwalter:'Verwalter',leser:'Leser'}[S.rolle
 
 function renderShell(){
   const ini=(S.me.name||'?').trim().charAt(0).toUpperCase();
-  const tabs=[['start','home','Start','#/'],['geraete','mobile','Geräte','#/geraete'],['ma','users','Mitarbeiter','#/ma'],['abos','receipt','Apps & Abos','#/abos'],['mehr','more','Mehr','#/mehr']];
+  const tabs=[['start','home','Start','#/'],['geraete','tablet','Geräte','#/geraete'],['mobil','phone','Mobilfunk','#/mobil'],['abos','receipt','Abos','#/abos'],['mehr','more','Mehr','#/mehr']];
   const tb=$('#tabbar');tb.style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
   tb.innerHTML=tabs.map(([k,i,l,h])=>`<a class="tab" data-nav="${k}" href="${h}">${ic(i)}<span>${l}</span></a>`).join('');
   $('#rail').innerHTML=
@@ -1050,9 +1091,10 @@ function renderShell(){
     (darf()?`<button class="btn btn-primary" data-act="gNew" style="margin:0 12px 14px;width:calc(100% - 24px)">${ic('plus')} Neues Gerät</button>`:'')+
     `<nav class="rail-nav">`+
       `<a class="rail-item" data-nav="start" href="#/">${ic('home')} Übersicht</a>`+
-      `<a class="rail-item" data-nav="geraete" href="#/geraete">${ic('mobile')} Geräte</a>`+
-      `<a class="rail-item" data-nav="ma" href="#/ma">${ic('users')} Mitarbeiter</a>`+
+      `<a class="rail-item" data-nav="geraete" href="#/geraete">${ic('tablet')} Geräte</a>`+
+      `<a class="rail-item" data-nav="mobil" href="#/mobil">${ic('phone')} Mobilfunk</a>`+
       `<a class="rail-item" data-nav="abos" href="#/abos">${ic('receipt')} Apps &amp; Abos</a>`+
+      `<a class="rail-item" data-nav="ma" href="#/ma">${ic('users')} Mitarbeiter</a>`+
       `<a class="rail-item" data-nav="kosten" href="#/kosten">${ic('euro')} Kosten</a>`+
       `<a class="rail-item" data-nav="fristen" href="#/fristen">${ic('clock')} Fristen</a>`+
       `<a class="rail-item" data-nav="mehr" href="#/mehr">${ic('more')} Mehr</a>`+
@@ -1064,7 +1106,7 @@ function renderShell(){
     `</div>`;
 }
 function setNav(seg){
-  const map={g:'geraete',m:'ma',kosten:'start',fristen:'start'};
+  const map={g:'geraete',m:'mehr',ma:'mehr',kosten:'start',fristen:'start'};
   const tabKey=map[seg]||seg||'start';
   $$('#tabbar [data-nav]').forEach(a=>{a.classList.toggle('on',a.dataset.nav===tabKey);a.setAttribute('aria-current',a.dataset.nav===tabKey?'page':'false')});
   const railKey={g:'geraete',m:'ma'}[seg]||seg||'start';
@@ -1083,7 +1125,7 @@ function route(){
   const parts=h.startsWith('#/')?h.slice(2).split('/'):[''];const seg=parts[0]||'start';
   TOKEN++;const token=TOKEN;
   window.scrollTo(0,0);setNav(seg);
-  const V={start:viewStart,geraete:viewGeraete,g:()=>viewGeraet(parts[1],token),ma:viewMA,m:()=>viewPerson(parts[1],token),abos:viewAbos,kosten:viewKosten,fristen:viewFristen,mehr:viewMehr};
+  const V={start:viewStart,geraete:viewGeraete,g:()=>viewGeraet(parts[1],token),ma:viewMA,m:()=>viewPerson(parts[1],token),mobil:viewMobil,abos:viewAbos,kosten:viewKosten,fristen:viewFristen,mehr:viewMehr};
   (V[seg]||viewStart)();
 }
 window.addEventListener('hashchange',route);
@@ -1096,9 +1138,9 @@ async function reloadAndRoute(){await loadAll();route()}
 
 /* ---------- Start / Übersicht ---------- */
 function fristRow(f){
-  const href=f.g?`#/g/${f.g.id}`:'#/abos';
-  const act=f.a?`data-act="aEdit" data-id="${f.a.id}"`:'';
-  return`<a class="lcard" href="${href}" ${act}><div class="tnum tone-${fristTone(f)}">${ic(f.art==='garantie'?'shield':f.art==='vertrag'?'phone':'receipt')}</div><div class="lcard-main"><div class="lcard-top"><b class="tt">${esc(f.t)} ${esc(fmtD(f.datum))}</b></div><div class="lcard-sub">${esc(f.sub)}</div><div class="lcard-tags">${chip(fristTone(f),fristWann(f))}</div></div>${ic('chev','chev')}</a>`;
+  const href=f.g?`#/g/${f.g.id}`:f.s?'#/mobil':'#/abos';
+  const act=f.a?`data-act="aEdit" data-id="${f.a.id}"`:f.s?`data-act="sEdit" data-id="${f.s.id}"`:'';
+  return`<a class="lcard" href="${href}" ${act}><div class="tnum tone-${fristTone(f)}">${ic(f.art==='garantie'?'shield':f.art==='vertrag'||f.art==='sim'?'phone':'receipt')}</div><div class="lcard-main"><div class="lcard-top"><b class="tt">${esc(f.t)} ${esc(fmtD(f.datum))}</b></div><div class="lcard-sub">${esc(f.sub)}</div><div class="lcard-tags">${chip(fristTone(f),fristWann(f))}</div></div>${ic('chev','chev')}</a>`;
 }
 function viewStart(){
   const k=kostenGesamt(),fr=fristen(60),n=s=>S.geraete.filter(g=>g.status===s).length;
@@ -1113,11 +1155,14 @@ function viewStart(){
     <a class="tile tone-gray" href="#/geraete" data-act="gFilterGo" data-k="lager">${ic('box')}<b>${n('lager')}</b><span>im Lager / frei</span></a>
     <a class="tile tone-${n('defekt')+n('reparatur')?'red':'gray'}" href="#/geraete" data-act="gFilterGo" data-k="defekt">${ic('wrench')}<b>${n('defekt')+n('reparatur')}</b><span>defekt / Reparatur</span></a>
   </div>
-  <div class="sec"><h2>Laufende Kosten</h2><a href="#/kosten">Details</a></div>
-  <a class="card" href="#/kosten" style="display:block">
-    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><span class="muted">pro Monat</span><b style="font-size:28px;font-weight:760;letter-spacing:-.02em">${eur(k.monat)}</b></div>
-    <div class="dl" style="margin-top:8px"><div><dt>Mobilfunk-/Geräteverträge</dt><dd>${eur(k.vertrag)}</dd></div><div><dt>Apps &amp; Abos (umgerechnet)</dt><dd>${eur(k.abo)}</dd></div><div><dt>Pro Jahr gesamt</dt><dd>${eur(k.monat*12)}</dd></div><div><dt>Anschaffungen ${k.jahr}</dt><dd>${eur(k.kaufJahr)}</dd></div></div>
-  </a>
+  <div class="sec"><h2>Kosten</h2><a href="#/kosten">Details</a></div>
+  <div class="kgrid">
+    <a class="kbox" href="#/mobil"><span class="kico tone-blue">${ic('phone')}</span><small>Mobilfunk</small><b>${eur(k.mobil)}</b><span class="muted">pro Monat · ${k.simsAktiv} ${k.simsAktiv===1?'SIM-Karte':'SIM-Karten'}</span></a>
+    <a class="kbox" href="#/abos"><span class="kico tone-violet">${ic('receipt')}</span><small>Apps &amp; Abos</small><b>${eur(k.abo)}</b><span class="muted">pro Monat · ${k.abosAktiv} aktiv</span></a>
+    <a class="kbox" href="#/geraete"><span class="kico tone-gray">${ic('tablet')}</span><small>Geräte</small><b>${eur(k.geraeteJahr)}</b><span class="muted">gekauft ${k.jahr} · Bestand ${eur(k.wert)}</span></a>
+  </div>
+  <a class="card ksum" href="#/kosten"><span><small class="muted">Laufend pro Monat</small><b>${eur(k.monat)}</b></span><span><small class="muted">pro Jahr</small><b>${eur(k.monat*12)}</b></span>${ic('chev','chev')}</a>
+  ${!S.simOk?callout('amber','info','Mobilfunk noch nicht eingerichtet','Bitte einmal geraete_mobilfunk.sql in Supabase ausführen. Bis dahin zählen die Vertragskosten, die direkt an den Geräten stehen.',true):''}
   <div class="sec"><h2>Fristen (60 Tage)</h2>${fr.length?`<a href="#/fristen">Alle ${fr.length}</a>`:''}</div>
   ${fr.length?`<div class="list">${fr.slice(0,4).map(fristRow).join('')}</div>`:`<div class="card">${emptyState('check','Nichts fällig','In den nächsten 60 Tagen enden keine Garantien, Verträge oder Abos.')}</div>`}
   <div style="height:8px"></div>`);
@@ -1126,7 +1171,7 @@ ACT.gFilterGo=el=>{S.gf=el.dataset.k;location.hash='#/geraete';if(location.hash=
 function viewFristen(){
   const fr=fristen(60);
   paint(`${backHead('#/','Geräteverwaltung','Fristen')}
-  <p class="muted" style="margin:-4px 2px 12px">Garantie-Ende, Kündigungsfristen von Verträgen und Abos in den nächsten 60 Tagen. Das Badge auf der Kachel in My Heise zählt die nächsten 30 Tage.</p>
+  <p class="muted" style="margin:-4px 2px 12px">Garantie-Ende, Kündigungsfristen von Mobilfunkverträgen und Abos in den nächsten 60 Tagen. Das Badge auf der Kachel in My Heise zählt die nächsten 30 Tage.</p>
   ${fr.length?`<div class="list">${fr.map(fristRow).join('')}</div>`:`<div class="card">${emptyState('check','Nichts fällig','Alles im grünen Bereich.')}</div>`}`);
 }
 
@@ -1137,9 +1182,10 @@ function viewMehr(){
   ${topHead('Konto','Mehr')}
   <div class="card" style="display:flex;gap:14px;align-items:center;margin-bottom:14px"><div class="avatar" style="width:52px;height:52px;font-size:20px">${esc((S.me.name||'?').charAt(0).toUpperCase())}</div><div><b style="font-size:17px">${esc(S.me.name)}</b><div class="muted" style="margin-top:3px"><span class="grpchip">${esc(rolleName())}</span></div></div></div>
   <div class="menu-list">
-    ${item('euro','Kostenübersicht','Pro Mitarbeiter, Kategorie, Export','goKosten')}
+    ${item('users','Mitarbeiter','Wer hat welche Geräte, Nummern und Abos','goMA')}
+    ${item('euro','Kostenübersicht','Mobilfunk, Abos, Geräte, pro Mitarbeiter','goKosten')}
     ${item('clock','Fristen','Garantie, Verträge, Abos','goFristen')}
-    ${item('download','Export (CSV für Excel)','Geräte und Abos','csvMenu')}
+    ${item('download','Export (CSV für Excel)','Geräte, Mobilfunk, Abos','csvMenu')}
     ${item('bell','Nachrichten','Mitteilungen &amp; Meldungen in My Heise','goMsg')}
     ${item('apps','My Heise Startseite','Zu allen Apps','goApps')}
     ${item('refresh','Daten aktualisieren','','reload')}
@@ -1148,6 +1194,7 @@ function viewMehr(){
   <p class="hint" style="margin:14px 4px 0">Bitte keine Passwörter, PINs oder Entsperrcodes in den Notizen speichern – dafür gibt es den Passwort-Safe.</p>`);
 }
 ACT.goKosten=()=>{location.hash='#/kosten'};
+ACT.goMA=()=>{location.hash='#/ma'};
 ACT.goFristen=()=>{location.hash='#/fristen'};
 ACT.goApps=()=>{location.href=PORTAL};
 ACT.goMsg=()=>{location.href=PORTAL+'#/nachrichten'};
@@ -1162,7 +1209,7 @@ ACT.logout=async()=>{
 function gCard(g){
   const [sl,st]=STATUS[g.status]||[g.status,'gray'],tags=[chip(st,sl)];
   if(g.benutzer_id)tags.push(`<span class="chip tone-blue">${ic('user','sm')}${esc(userName(g.benutzer_id)||'?')}</span>`);
-  if(g.rufnummer)tags.push(`<span class="chip tone-gray">${esc(g.rufnummer)}</span>`);
+  const ruf=gRuf(g);if(ruf)tags.push(`<span class="chip tone-gray">${ic('phone','sm')}${esc(ruf)}</span>`);
   const f=fristenFuerG(g);if(f.length)tags.push(chip(fristTone(f[0]),'Frist '+fristWann(f[0])));
   const sub=[g.inventar_nr,g.typ,g.speicher,g.seriennummer?'SN '+g.seriennummer:''].filter(Boolean).join(' · ');
   return`<a class="lcard gcard" href="#/g/${g.id}"><div class="tnum tone-${st}">${ic(gIcon(g))}</div>
@@ -1171,7 +1218,7 @@ function gCard(g){
 function gFiltered(){
   const q=(S.gq||'').trim().toLowerCase(),f=S.gf;
   return S.geraete.filter(g=>f==='alle'?g.status!=='ausgemustert':f==='defekt'?(g.status==='defekt'||g.status==='reparatur'):TYPEN.includes(f)?(g.typ===f&&g.status!=='ausgemustert'):g.status===f)
-    .filter(g=>!q||[g.inventar_nr,g.typ,g.hersteller,g.modell,g.seriennummer,g.imei,g.rufnummer,g.notiz,userName(g.benutzer_id)].some(v=>v&&String(v).toLowerCase().includes(q)));
+    .filter(g=>!q||[g.inventar_nr,g.typ,g.hersteller,g.modell,g.seriennummer,g.imei,gRuf(g),g.notiz,userName(g.benutzer_id)].some(v=>v&&String(v).toLowerCase().includes(q)));
 }
 function viewGeraete(){
   const cnt=k=>k==='alle'?S.geraete.filter(g=>g.status!=='ausgemustert').length:k==='defekt'?S.geraete.filter(g=>g.status==='defekt'||g.status==='reparatur').length:TYPEN.includes(k)?S.geraete.filter(g=>g.typ===k&&g.status!=='ausgemustert').length:S.geraete.filter(g=>g.status===k).length;
@@ -1210,7 +1257,7 @@ async function viewGeraet(id,tk){
 }
 function drawGeraet(){
   const {g,ueb,verl}=GD,[sl,st]=STATUS[g.status]||[g.status,'gray'];
-  const abos=S.abos.filter(a=>a.geraet_id===g.id),fr=fristenFuerG(g),holder=g.benutzer_id?userName(g.benutzer_id):'';
+  const abos=S.abos.filter(a=>a.geraet_id===g.id),sims=simsFor(g),fr=[...fristenFuerG(g),...sims.flatMap(fristenFuerS)],holder=g.benutzer_id?userName(g.benutzer_id):'';
   const acts=[];
   if(darf()&&g.status==='lager')acts.push(`<button class="act" data-act="uebAus">${ic('out')}<span>Ausgeben</span></button>`);
   if(darf()&&g.benutzer_id)acts.push(`<button class="act" data-act="uebRueck">${ic('in')}<span>Zurücknehmen</span></button>`);
@@ -1227,8 +1274,10 @@ function drawGeraet(){
   ${fr.map(f=>callout(fristTone(f),'clock',`${f.t} ${fmtD(f.datum)} (${fristWann(f)})`,esc(f.sub),true)).join('')}
   <div class="sec"><h2>Gerät</h2></div>
   <div class="card" style="padding:6px 16px"><div class="dl">${rows([['Inventar-Nr.',g.inventar_nr],['Typ',g.typ],['Hersteller',g.hersteller],['Modell',g.modell],['Speicher',g.speicher],['Farbe',g.farbe],['Seriennummer',g.seriennummer],['IMEI',g.imei]])}</div></div>
-  ${g.rufnummer||g.sim_nr||g.vertrag_anbieter||g.vertrag_kosten?`<div class="sec"><h2>Rufnummer &amp; Vertrag</h2></div>
-  <div class="card" style="padding:6px 16px"><div class="dl">${rows([['Rufnummer',g.rufnummer],['SIM-Karte',g.sim_nr],['Anbieter',g.vertrag_anbieter],['Tarif',g.vertrag_tarif],['Kosten',g.vertrag_kosten!=null?eur(g.vertrag_kosten)+' / Monat':''],['Vertragsende',g.vertrag_ende?fmtD(g.vertrag_ende):''],['Kündigungsfrist',g.kuendigungsfrist_monate!=null&&g.vertrag_ende?g.kuendigungsfrist_monate+' Monate':'']])}</div></div>`:''}
+  ${S.simOk&&['Smartphone','Tablet','Laptop','Telefon','Sonstiges'].includes(g.typ)||sims.length?`<div class="sec"><h2>SIM-Karte &amp; Rufnummer</h2>${darf()&&S.simOk?`<button class="lnk" data-act="sZuordnen" data-g="${g.id}">+ SIM einsetzen</button>`:''}</div>
+  ${sims.length?`<div class="list">${sims.map(s=>sCard(s,{ohneGeraet:true,ohneUser:true})+(darf()?`<div style="display:flex;justify-content:flex-end;margin:-4px 2px 4px"><button class="lnk" data-act="sRaus" data-id="${s.id}">SIM entnehmen</button></div>`:'')).join('')}</div>`:`<div class="card"><p class="muted">Keine SIM-Karte zugeordnet.</p></div>`}`:''}
+  ${g.rufnummer||g.sim_nr||g.vertrag_anbieter||g.vertrag_kosten?`<div class="sec"><h2>Alte Vertragsdaten am Gerät</h2></div>
+  <div class="card" style="padding:6px 16px"><div class="dl">${rows([['Rufnummer',g.rufnummer],['SIM-Karte',g.sim_nr],['Anbieter',g.vertrag_anbieter],['Tarif',g.vertrag_tarif],['Kosten',g.vertrag_kosten!=null?eur(g.vertrag_kosten)+' / Monat':''],['Vertragsende',g.vertrag_ende?fmtD(g.vertrag_ende):'']])}</div><p class="hint" style="margin:6px 0 4px">Wird mit dem Datenbank-Update (geraete_mobilfunk.sql) automatisch nach „Mobilfunk“ verschoben.</p></div>`:''}
   <div class="sec"><h2>Kauf &amp; Garantie</h2></div>
   <div class="card" style="padding:6px 16px"><div class="dl">${rows([['Kaufdatum',g.kaufdatum?fmtD(g.kaufdatum):''],['Kaufpreis',g.kaufpreis!=null?eur(g.kaufpreis):''],['Lieferant',g.lieferant],['Garantie bis',g.garantie_bis?fmtD(g.garantie_bis):'']])||'<div><dt class="muted">Keine Angaben</dt><dd></dd></div>'}</div>
   ${g.beleg_pfad?`<button class="doc-row" data-act="openF" data-p="${esc(g.beleg_pfad)}" style="border-top:1px solid var(--line)"><span class="ico">${ic('doc')}</span><div><b>Rechnung / Beleg</b><small>öffnen</small></div>${ic('chev','chev')}</button>`:''}</div>
@@ -1279,12 +1328,7 @@ function gForm(g){
     <div class="row2">${field('Speicher',inp('fSp',g.speicher,'placeholder="z. B. 256 GB"'))}${field('Farbe',inp('fFa',g.farbe))}</div>
     <div class="sec" style="margin-top:14px"><h2>Zuordnung</h2></div>
     <div class="row2">${field('Aktuell bei',sel('fUser',users,g.benutzer_id||''),n?'Für die Ausgabe mit Unterschrift das Gerät erst anlegen und dann „Ausgeben“ wählen.':'')}${field('Status (ohne Zuordnung)',sel('fSt',stOpts,g.status==='ausgegeben'?'lager':g.status))}</div>
-    <div class="sec" style="margin-top:14px"><h2>Rufnummer &amp; Vertrag</h2></div>
-    <div class="row2">${field('Rufnummer',inp('fRuf',g.rufnummer,'inputmode="tel"'))}${field('SIM-Karten-Nr.',inp('fSim',g.sim_nr))}</div>
-    <div class="row2">${field('Anbieter',inp('fAnb',g.vertrag_anbieter,'placeholder="z. B. Telekom" list="dlAnb"'))}${field('Tarif',inp('fTar',g.vertrag_tarif))}</div>
-    <datalist id="dlAnb">${['Telekom','Vodafone','O2','1&1','congstar'].map(x=>`<option value="${x}">`).join('')}</datalist>
-    <div class="row2">${field('Kosten pro Monat (€)',inp('fVk',numIn(g.vertrag_kosten),'inputmode="decimal" placeholder="0,00"'))}${field('Vertragsende',inp('fVe',g.vertrag_ende,'type="date"'))}</div>
-    ${field('Kündigungsfrist (Monate vor Ende)',inp('fKf',g.kuendigungsfrist_monate,'inputmode="numeric" placeholder="z. B. 3"'))}
+    ${S.simOk?`<p class="hint" style="margin:10px 2px 0">Rufnummer und Mobilfunkvertrag stehen jetzt unter <b>Mobilfunk</b>. Nach dem Speichern im Gerät „+ SIM einsetzen“ wählen.</p>`:''}
     <div class="sec" style="margin-top:14px"><h2>Kauf &amp; Garantie</h2></div>
     <div class="row2">${field('Kaufdatum',inp('fKd',g.kaufdatum,'type="date"'))}${field('Kaufpreis (€)',inp('fKp',numIn(g.kaufpreis),'inputmode="decimal" placeholder="0,00"'))}</div>
     <div class="row2">${field('Lieferant',inp('fLi',g.lieferant))}${field('Garantie bis',inp('fGb',g.garantie_bis,'type="date"'))}</div>
@@ -1313,13 +1357,11 @@ function gForm(g){
   $('#fGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
     const err=m=>{$('#fErr',bd).textContent=m||''};err('');
     const mod=val(bd,'fMod');if(!mod)return err('Bitte das Modell eingeben.');
-    const kp=val(bd,'fKp'),vk=val(bd,'fVk'),kf=val(bd,'fKf');
+    const kp=val(bd,'fKp');
     if(kp&&pnum(kp)==null)return err('Kaufpreis ist keine Zahl.');
-    if(vk&&pnum(vk)==null)return err('Vertragskosten sind keine Zahl.');
     const uid=val(bd,'fUser')||null;
     const row={typ:val(bd,'fTyp'),inventar_nr:val(bd,'fInv')||null,hersteller:val(bd,'fHer')||null,modell:mod,seriennummer:val(bd,'fSn')||null,imei:val(bd,'fImei')||null,
-      speicher:val(bd,'fSp')||null,farbe:val(bd,'fFa')||null,rufnummer:val(bd,'fRuf')||null,sim_nr:val(bd,'fSim')||null,vertrag_anbieter:val(bd,'fAnb')||null,vertrag_tarif:val(bd,'fTar')||null,
-      vertrag_kosten:pnum(vk),vertrag_ende:val(bd,'fVe')||null,kuendigungsfrist_monate:kf?Math.max(0,Math.min(24,parseInt(kf)||0)):null,
+      speicher:val(bd,'fSp')||null,farbe:val(bd,'fFa')||null,
       kaufdatum:val(bd,'fKd')||null,kaufpreis:pnum(kp),lieferant:val(bd,'fLi')||null,garantie_bis:val(bd,'fGb')||null,
       benutzer_id:uid,status:uid?'ausgegeben':val(bd,'fSt'),zubehoer:getZub(),notiz:val(bd,'fNo')||null};
     const old=[];
@@ -1342,11 +1384,11 @@ function gForm(g){
 function viewMA(){
   const rows=S.users.map(u=>({u,...kostenFuer(u.id)}));
   const q=(S.mq||'').trim().toLowerCase();
-  const withStuff=rows.filter(r=>r.gs.length||r.as.length),none=rows.filter(r=>!r.gs.length&&!r.as.length);
+  const withStuff=rows.filter(r=>r.gs.length||r.as.length||r.ss.length),none=rows.filter(r=>!r.gs.length&&!r.as.length&&!r.ss.length);
   const card=r=>`<a class="lcard mcard" href="#/m/${r.u.id}"><div class="avatar" style="width:46px;height:46px;font-size:17px;flex:none">${esc((r.u.name||'?').charAt(0).toUpperCase())}</div>
     <div class="lcard-main"><div class="lcard-top"><b class="tt">${esc(r.u.name)}</b></div>
-    <div class="lcard-sub">${r.gs.length?esc(r.gs.map(g=>g.modell).slice(0,3).join(', ')+(r.gs.length>3?' …':'')):'Keine Geräte'}</div>
-    <div class="lcard-tags">${r.gs.length?`<span class="chip tone-blue">${ic('mobile','sm')}${r.gs.length} ${r.gs.length===1?'Gerät':'Geräte'}</span>`:''}${r.as.length?`<span class="chip tone-violet">${ic('receipt','sm')}${r.as.length} ${r.as.length===1?'Abo':'Abos'}</span>`:''}${r.monat?`<span class="chip tone-gray">${eur(r.monat)} / Monat</span>`:''}</div></div>${ic('chev','chev')}</a>`;
+    <div class="lcard-sub">${esc([r.gs.map(g=>g.modell).slice(0,3).join(', ')+(r.gs.length>3?' …':''),r.ss.filter(s=>s.rufnummer).map(s=>s.rufnummer).slice(0,2).join(', ')].filter(Boolean).join(' · ')||'Keine Geräte')}</div>
+    <div class="lcard-tags">${r.gs.length?`<span class="chip tone-blue">${ic('mobile','sm')}${r.gs.length} ${r.gs.length===1?'Gerät':'Geräte'}</span>`:''}${r.ss.length?`<span class="chip tone-blue">${ic('phone','sm')}${r.ss.length} ${r.ss.length===1?'Nummer':'Nummern'}</span>`:''}${r.as.length?`<span class="chip tone-violet">${ic('receipt','sm')}${r.as.length} ${r.as.length===1?'Abo':'Abos'}</span>`:''}${r.monat?`<span class="chip tone-gray">${eur(r.monat)} / Monat</span>`:''}</div></div>${ic('chev','chev')}</a>`;
   const f=l=>l.filter(r=>!q||String(r.u.name).toLowerCase().includes(q));
   paint(`
   ${topHead('Geräteverwaltung','Mitarbeiter')}
@@ -1356,7 +1398,7 @@ function viewMA(){
 }
 function mList(f,a,b,card){
   const A=f(a),B=f(b);
-  return`${A.length?`<div class="sec"><h2>Mit Geräten oder Abos</h2><span class="muted">${A.length}</span></div><div class="list">${A.map(card).join('')}</div>`:''}
+  return`${A.length?`<div class="sec"><h2>Mit Geräten, Nummern oder Abos</h2><span class="muted">${A.length}</span></div><div class="list">${A.map(card).join('')}</div>`:''}
   ${B.length?`<div class="sec"><h2>Ohne Geräte</h2><span class="muted">${B.length}</span></div><div class="list">${B.map(card).join('')}</div>`:''}
   ${!A.length&&!B.length?`<div class="card" style="margin-top:12px">${emptyState('search','Niemand gefunden','Andere Suche?')}</div>`:''}`;
 }
@@ -1375,10 +1417,12 @@ async function viewPerson(id,tk){
   </div>
   <div class="sec"><h2>Geräte</h2></div>
   ${k.gs.length?`<div class="list">${k.gs.map(gCard).join('')}</div>`:`<div class="card"><p class="muted">Keine Geräte zugeordnet.</p></div>`}
+  <div class="sec"><h2>Mobilfunk</h2>${darf()&&S.simOk?`<button class="lnk" data-act="sNew" data-u="${u.id}">+ Nummer ohne Gerät</button>`:''}</div>
+  ${k.ss.length?`<div class="list">${k.ss.map(s=>sCard(s,{ohneUser:true})).join('')}</div>`:`<div class="card"><p class="muted">Keine SIM-Karte.</p></div>`}
   <div class="sec"><h2>Apps &amp; Abos</h2>${darf()?`<button class="lnk" data-act="aNew" data-u="${u.id}">+ Hinzufügen</button>`:''}</div>
   ${k.as.length?`<div class="list">${k.as.map(aCard).join('')}</div>`:`<div class="card"><p class="muted">Keine kostenpflichtigen Apps oder Abos.</p></div>`}
   <div class="sec"><h2>Kosten pro Monat</h2></div>
-  <div class="card" style="padding:6px 16px"><div class="dl"><div><dt>Verträge (Mobilfunk)</dt><dd>${eur(k.vertrag)}</dd></div><div><dt>Apps &amp; Abos</dt><dd>${eur(k.abo)}</dd></div><div><dt>Summe / Jahr</dt><dd>${eur(k.monat*12)}</dd></div></div></div>
+  <div class="card" style="padding:6px 16px"><div class="dl"><div><dt>Mobilfunk</dt><dd>${eur(k.mobil)}</dd></div><div><dt>Apps &amp; Abos</dt><dd>${eur(k.abo)}</dd></div><div><dt>Summe / Jahr</dt><dd>${eur(k.monat*12)}</dd></div></div></div>
   <div class="sec"><h2>Übergabeprotokolle</h2></div>
   <div class="card">${ueb.length?ueb.map(x=>`<button class="doc-row" data-act="uebPdf" data-id="${x.id}"><span class="ico">${ic('doc')}</span><div><b>${x.art==='ausgabe'?'Ausgabe':'Rückgabe'}: ${esc([x.geraet.hersteller,x.geraet.modell].filter(Boolean).join(' '))}</b><small>${esc(fmtD(x.datum))} · ${esc(x.geraet.inventar_nr||'')}${x.zustand?' · '+esc(x.zustand):''}</small></div>${ic('download','sm')}</button>`).join(''):'<p class="muted">Noch keine Protokolle.</p>'}</div>
   <div style="height:8px"></div>`);
@@ -1391,7 +1435,7 @@ ACT.pAusgeben=el=>{
   bd.addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(!b)return;closeSheet();uebergabeSheet(gById(b.dataset.pick),'ausgabe',el.dataset.id)});
 };
 /* =====================================================================
-   Apps & Abos (kostenpflichtige Apps, Lizenzen, Cloud, Mobilfunk-Optionen)
+   Apps & Abos (kostenpflichtige Apps, Lizenzen, Cloud). Mobilfunk: siehe v35-mobilfunk.js
    ===================================================================== */
 function aCard(a){
   const [sl,st]=ABO_STATUS[a.status]||[a.status,'gray'],g=a.geraet_id?gById(a.geraet_id):null,who=a.benutzer_id?userName(a.benutzer_id):'';
@@ -1422,7 +1466,7 @@ function viewAbos(){
   const q=$('#aq');if(q)q.addEventListener('input',()=>{S.aq=q.value;$('#aList').innerHTML=aListHTML()});
 }
 function aListHTML(){
-  if(!S.abos.length)return`<div class="card">${emptyState('receipt','Noch keine Apps oder Abos','Erfasse kostenpflichtige Apps (z. B. GoodNotes, Navi), Lizenzen (Microsoft 365, CAD), Cloud-Speicher oder Mobilfunk-Optionen.',darf()?`<button class="btn btn-primary" data-act="aNew">${ic('plus','sm')} Erstes Abo anlegen</button>`:'')}</div>`;
+  if(!S.abos.length)return`<div class="card">${emptyState('receipt','Noch keine Apps oder Abos','Erfasse kostenpflichtige Apps (z. B. GoodNotes, Navi), Lizenzen (Microsoft 365, CAD) oder Cloud-Speicher. Rufnummern und SIM-Karten gehören unter Mobilfunk.',darf()?`<button class="btn btn-primary" data-act="aNew">${ic('plus','sm')} Erstes Abo anlegen</button>`:'')}</div>`;
   const l=aFiltered();return l.length?l.map(aCard).join(''):`<div class="card">${emptyState('search','Nichts gefunden','Andere Suche oder anderer Filter?')}</div>`;
 }
 ACT.aFilter=el=>{S.af=el.dataset.k;viewAbos()};
@@ -1436,7 +1480,7 @@ function aForm(a,pre={}){
   const dis=ro?'disabled':'';
   const bd=sheet({title:n?'Neue App / neues Abo':(ro?a.name:'Abo bearbeiten'),body:`
     ${field('Name *',inp('bNa',a.name,`placeholder="z. B. GoodNotes 5, Microsoft 365" ${n?'autofocus':''} ${dis}`))}
-    <div class="row2">${field('Kategorie',sel('bKa',KATEGORIEN,a.kategorie,dis))}${field('Anbieter',inp('bAn',a.anbieter,`placeholder="z. B. Apple App Store" ${dis}`))}</div>
+    <div class="row2">${field('Kategorie',sel('bKa',KATEGORIEN.includes(a.kategorie)?KATEGORIEN:[...KATEGORIEN,a.kategorie],a.kategorie,dis))}${field('Anbieter',inp('bAn',a.anbieter,`placeholder="z. B. Apple App Store" ${dis}`))}</div>
     <div class="row2">${field('Kosten (€)',inp('bKo',numIn(a.kosten),`inputmode="decimal" placeholder="0,00" ${dis}`))}${field('Abrechnung',sel('bIn',INTERVALLE,a.intervall,dis))}</div>
     <div class="row2">${field('Mitarbeiter',sel('bUs',users,a.benutzer_id||'',dis))}${field('Gerät',sel('bGe',devs,a.geraet_id||'',dis))}</div>
     ${field('Konto / Apple-ID / Lizenz-E-Mail',inp('bKt',a.konto,`placeholder="z. B. ipad03@heise-haustechnik.de" ${dis}`),'Nur das Konto, <b>kein Passwort</b>.')}
@@ -1468,29 +1512,180 @@ function aForm(a,pre={}){
   }});
 }
 /* =====================================================================
+   Mobilfunk: SIM-Karten und Rufnummern (gv_sim)
+   Eine SIM steckt in einem Gerät (dann gilt dessen Mitarbeiter) oder gehört
+   direkt einem Mitarbeiter (Nummer ohne Firmenhandy) oder der Firma.
+   ===================================================================== */
+const SIM_ST={aktiv:['Aktiv','ok'],gekuendigt:['Gekündigt','amber'],beendet:['Beendet','gray']};
+function sCard(s,opt={}){
+  const [sl,st]=SIM_ST[s.status]||[s.status,'gray'],g=simGeraet(s),uid=simUser(s),who=uid?userName(uid):'';
+  const tags=[];
+  if(s.status!=='aktiv')tags.push(chip(st,sl));
+  if(!opt.ohneGeraet){
+    if(g)tags.push(`<span class="chip tone-gray">${ic(gIcon(g),'sm')}${esc(g.modell)} · ${esc(g.inventar_nr||'')}</span>`);
+    else tags.push(`<span class="chip tone-gray">${ic("phone","sm")}ohne Gerät</span>`);
+  }
+  if(who&&!opt.ohneUser)tags.push(`<span class="chip tone-blue">${ic('user','sm')}${esc(who)}</span>`);
+  else if(!who&&!opt.ohneUser)tags.push(`<span class="chip tone-gray">Firma / nicht zugeordnet</span>`);
+  if(s.art&&s.art!=='sprache_daten')tags.push(`<span class="chip tone-violet">${esc(SIM_ART[s.art]||s.art)}</span>`);
+  const f=fristenFuerS(s);if(f.length)tags.push(chip(fristTone(f[0]),'Frist '+fristWann(f[0])));
+  const sub=[s.rufnummer?s.tarif:'',s.anbieter,s.vertrag_ende?'bis '+fmtD(s.vertrag_ende):''].filter(Boolean).join(' · ');
+  return`<button class="lcard acard scard" data-act="sEdit" data-id="${s.id}" style="width:100%;text-align:left"><div class="tnum tone-${s.status==='aktiv'?'blue':'gray'}">${ic(s.art==='daten'?'cloud':'phone')}</div>
+    <div class="lcard-main"><div class="lcard-top"><b class="tt num">${esc(simTitle(s))}</b><b style="white-space:nowrap;margin-left:auto;font-variant-numeric:tabular-nums">${eur(s.kosten)} <small class="muted" style="font-weight:600">mtl.</small></b></div>
+    <div class="lcard-sub">${esc(sub)}</div><div class="lcard-tags">${tags.join('')}</div></div></button>`;
+}
+const S_FILT=[['aktiv','Aktiv'],['geraet','In Gerät'],['ohne','Ohne Gerät'],['offen','Nicht zugeordnet'],['gekuendigt','Gekündigt'],['beendet','Beendet'],['alle','Alle']];
+function sMatch(s,k){
+  if(k==='alle')return true;
+  if(k==='aktiv'||k==='gekuendigt'||k==='beendet')return s.status===k;
+  if(s.status==='beendet')return false;
+  if(k==='geraet')return !!s.geraet_id;
+  if(k==='ohne')return !s.geraet_id;
+  if(k==='offen')return !simUser(s);
+  return true;
+}
+function sFiltered(){
+  const q=(S.sq||'').trim().toLowerCase(),qd=q.replace(/\D/g,'');
+  return (S.sims||[]).filter(s=>sMatch(s,S.sf||'aktiv'))
+    .filter(s=>{if(!q)return true;const g=simGeraet(s);
+      if(qd.length>=3&&String(s.rufnummer||'').replace(/\D/g,'').includes(qd))return true;
+      return [s.rufnummer,s.sim_nr,s.anbieter,s.tarif,s.notiz,userName(simUser(s)),g&&gTitle(g),g&&g.inventar_nr].some(v=>v&&String(v).toLowerCase().includes(q))})
+    .sort((a,b)=>{const ua=userName(simUser(a))||'~',ub=userName(simUser(b))||'~';return ua.localeCompare(ub,'de')||String(a.rufnummer||'').localeCompare(String(b.rufnummer||''))});
+}
+function viewMobil(){
+  if(!S.simOk){paint(`${topHead('Geräteverwaltung','Mobilfunk')}<div class="card">${emptyState('info','Noch nicht eingerichtet','Für den Bereich Mobilfunk muss einmal die Datei <b>geraete_mobilfunk.sql</b> in Supabase ausgeführt werden. Danach erscheinen hier alle SIM-Karten.')}</div>`);return}
+  const sims=S.sims,lauf=sims.filter(simLaeuft),monat=lauf.reduce((t,s)=>t+simMonat(s),0);
+  const cnt=k=>sims.filter(s=>sMatch(s,k)).length;
+  const filt=S_FILT.filter(([k])=>cnt(k)||k==='aktiv'||k===(S.sf||'aktiv'));
+  const offen=sims.filter(s=>s.status!=='beendet'&&!simUser(s)).length;
+  paint(`
+  ${topHead('Geräteverwaltung','Mobilfunk',darf()?`<button class="btn btn-primary btn-sm" data-act="sNew">${ic('plus','sm')} Neu</button>`:'')}
+  <div class="sumtiles s3"><div class="sumtile"><small>Aktive SIM-Karten</small><b>${lauf.length}</b></div><div class="sumtile"><small>Kosten pro Monat</small><b>${eur(monat)}</b></div><div class="sumtile"><small>Pro Jahr</small><b>${eur(monat*12)}</b></div></div>
+  ${sims.length?`<div class="searchbar">${ic('search')}<input id="sq" type="search" placeholder="Rufnummer, Name, Tarif, Gerät …" value="${esc(S.sq||'')}" aria-label="Suchen"></div>
+  <div class="filters">${filt.map(([k,l])=>`<button class="fchip ${(S.sf||'aktiv')===k?'on':''}" data-act="sFilter" data-k="${k}">${esc(l)}<em>${cnt(k)}</em></button>`).join('')}</div>`:''}
+  ${offen&&darf()&&(S.sf||'aktiv')!=='offen'?`<button class="callout tone-amber plain" data-act="sFilter" data-k="offen" style="width:100%;text-align:left;margin-top:10px">${ic('info')}<div><b>${offen} ${offen===1?'Nummer ist':'Nummern sind'} noch niemandem zugeordnet</b><span>Antippen, um sie anzuzeigen. In der Karte Mitarbeiter oder Gerät wählen.</span></div></button>`:''}
+  <div class="list" id="sList" style="margin-top:10px">${sListHTML()}</div>`);
+  const q=$('#sq');if(q)q.addEventListener('input',()=>{S.sq=q.value;$('#sList').innerHTML=sListHTML()});
+}
+function sListHTML(){
+  if(!S.sims.length)return`<div class="card">${emptyState('phone','Noch keine SIM-Karten','Erfasse Rufnummern mit Tarif und Kosten. Steckt die Karte in einem Firmenhandy, verknüpfe sie mit dem Gerät. Hat jemand nur eine Nummer, ordne sie direkt dem Mitarbeiter zu.',darf()?`<button class="btn btn-primary" data-act="sNew">${ic('plus','sm')} Erste SIM-Karte anlegen</button>`:'')}</div>`;
+  const l=sFiltered();return l.length?l.map(s=>sCard(s)).join(''):`<div class="card">${emptyState('search','Nichts gefunden','Andere Suche oder anderer Filter?')}</div>`;
+}
+ACT.sFilter=el=>{S.sf=el.dataset.k;viewMobil()};
+ACT.sNew=el=>{if(!darf())return;sForm(null,{geraet_id:el.dataset.g||null,benutzer_id:el.dataset.u||null})};
+ACT.sEdit=el=>{const s=sById(el.dataset.id);if(s)sForm(s)};
+ACT.goMobil=()=>{location.hash='#/mobil'};
+
+/* Gerät → SIM zuordnen: freie Karte wählen oder neue anlegen */
+ACT.sZuordnen=el=>{
+  const g=gById(el.dataset.g);if(!g||!darf())return;
+  const frei=(S.sims||[]).filter(s=>!s.geraet_id&&s.status!=='beendet');
+  const holder=g.benutzer_id;
+  frei.sort((a,b)=>(simUser(b)===holder)-(simUser(a)===holder)||String(a.rufnummer||'').localeCompare(String(b.rufnummer||'')));
+  const bd=sheet({title:'SIM-Karte einsetzen',body:`
+    <p class="muted" style="margin:0 0 10px">${esc(gTitle(g))} · ${esc(g.inventar_nr||'')}${holder?' · '+esc(userName(holder)):''}</p>
+    ${frei.length?`<div class="searchbar" style="margin-bottom:10px">${ic('search')}<input id="szq" type="search" placeholder="Nummer oder Name …" aria-label="Suchen"></div>
+    <div class="list" id="szList">${frei.map(s=>szRow(s,holder)).join('')}</div>`:`<p class="muted">Keine freie SIM-Karte vorhanden.</p>`}`,
+    footer:`<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-soft" id="szNeu">${ic('plus','sm')} Neue SIM-Karte</button>`});
+  const q=$('#szq',bd);if(q)q.addEventListener('input',()=>{const t=q.value.trim().toLowerCase(),d=t.replace(/\D/g,'');$$('[data-sz]',bd).forEach(r=>{r.hidden=!!t&&!(r.dataset.such.includes(t)||(d.length>=3&&r.dataset.nr.includes(d)))})});
+  bd.addEventListener('click',async e=>{const b=e.target.closest('[data-sz]');if(!b)return;
+    b.disabled=true;try{await api('PATCH','gv_sim',{geraet_id:g.id},`?id=eq.${b.dataset.sz}`);closeSheet();await reloadAndRoute();toast('SIM-Karte eingesetzt','ok')}catch(err){toast(niceErr(err),'err');b.disabled=false}});
+  $('#szNeu',bd).onclick=()=>{closeSheet();sForm(null,{geraet_id:g.id})};
+};
+function szRow(s,holder){
+  const who=userName(simUser(s));
+  return`<button class="lcard" data-sz="${s.id}" data-nr="${esc(String(s.rufnummer||'').replace(/\D/g,''))}" data-such="${esc([s.rufnummer,s.tarif,who,s.anbieter].filter(Boolean).join(' ').toLowerCase())}" style="width:100%;text-align:left"><div class="tnum tone-blue">${ic('phone')}</div><div class="lcard-main"><b class="tt num">${esc(simTitle(s))}</b><div class="lcard-sub">${esc([s.rufnummer?s.tarif:'',who||'nicht zugeordnet',eur(s.kosten)+' mtl.'].filter(Boolean).join(' · '))}</div>${holder&&simUser(s)===holder?`<div class="lcard-tags"><span class="chip tone-ok">passt zum Mitarbeiter</span></div>`:''}</div>${ic('chev','chev')}</button>`;
+}
+ACT.sRaus=el=>{
+  const s=sById(el.dataset.id);if(!s||!darf())return;
+  const g=simGeraet(s),uid=g&&g.benutzer_id;
+  confirmSheet({title:'SIM-Karte entnehmen?',text:`${esc(simTitle(s))} wird vom Gerät ${esc(g?gTitle(g):'')} getrennt${uid?` und bleibt bei <b>${esc(userName(uid))}</b>`:''}.`,ok:'Entnehmen',onOk:async()=>{
+    await api('PATCH','gv_sim',{geraet_id:null,benutzer_id:uid||null},`?id=eq.${s.id}`);await reloadAndRoute();toast('SIM-Karte entnommen','ok');
+  }});
+};
+
+function sForm(s,pre={}){
+  const n=!s,ro=!darf(),dis=ro?'disabled':'';
+  s=s||{status:'aktiv',art:'sprache_daten',kosten:0,...pre};
+  const users=[['','– Firma / niemand –'],...S.users.map(u=>[u.id,u.name])];
+  const devs=[['','– steckt in keinem Firmengerät –'],...S.geraete.filter(g=>g.status!=='ausgemustert'||g.id===s.geraet_id)
+    .sort((a,b)=>(['Smartphone','Tablet'].includes(b.typ)-['Smartphone','Tablet'].includes(a.typ))||String(a.inventar_nr).localeCompare(String(b.inventar_nr)))
+    .map(g=>[g.id,`${gTitle(g)} (${g.inventar_nr}${g.benutzer_id?' · '+firstName(userName(g.benutzer_id)):''})${simsFor(g).filter(x=>x.id!==s.id&&x.status!=='beendet').length?' – hat schon eine SIM':''}`])];
+  const bd=sheet({title:n?'Neue SIM-Karte':(ro?simTitle(s):'SIM-Karte bearbeiten'),body:`
+    <div class="row2">${field('Rufnummer',inp('sRuf',s.rufnummer,`inputmode="tel" placeholder="z. B. 0151 12345678" ${n?'autofocus':''} ${dis}`))}${field('Art',sel('sArt',Object.entries(SIM_ART),s.art||'sprache_daten',dis))}</div>
+    <div class="row2">${field('Anbieter',inp('sAnb',s.anbieter,`placeholder="z. B. Telekom" list="dlSAnb" ${dis}`))}${field('Tarif',inp('sTar',s.tarif,`placeholder="z. B. Business M, 10 GB" ${dis}`))}</div>
+    <datalist id="dlSAnb">${[...new Set([...ANBIETER,...(S.sims||[]).map(x=>x.anbieter).filter(Boolean)])].map(x=>`<option value="${esc(x)}">`).join('')}</datalist>
+    <div class="row2">${field('Kosten pro Monat (€)',inp('sKo',numIn(s.kosten),`inputmode="decimal" placeholder="0,00" ${dis}`))}${field('Status',sel('sSt',Object.entries(SIM_ST).map(([k,[l]])=>[k,l]),s.status,dis))}</div>
+    <div class="sec" style="margin-top:14px"><h2>Wo steckt die Karte?</h2></div>
+    ${field('Gerät',sel('sGe',devs,s.geraet_id||'',dis),'Steckt die SIM in einem Firmengerät, gilt automatisch der Mitarbeiter, der das Gerät hat.')}
+    <div id="sUsBox">${field('Mitarbeiter (Nummer ohne Firmengerät)',sel('sUs',users,s.benutzer_id||'',dis))}</div>
+    <div class="sec" style="margin-top:14px"><h2>Vertrag</h2></div>
+    <div class="row2">${field('Vertragsbeginn',inp('sVb',s.vertrag_beginn,`type="date" ${dis}`))}${field('Vertragsende',inp('sVe',s.vertrag_ende,`type="date" ${dis}`))}</div>
+    <div class="row2">${field('Kündigungsfrist (Monate vor Ende)',inp('sKf',s.kuendigungsfrist_monate,`inputmode="numeric" placeholder="z. B. 3" ${dis}`))}${field('SIM-Kartennummer',inp('sSim',s.sim_nr,`placeholder="steht auf der Karte (ICCID)" ${dis}`))}</div>
+    ${field('Notiz',`<textarea class="inp" id="sNo" rows="3" ${dis} placeholder="keine PIN oder PUK speichern">${esc(s.notiz||'')}</textarea>`)}
+    <div class="err" id="sErr" role="alert"></div>`,
+    footer:ro?`<button class="btn btn-primary" data-act="closeSheet">Schließen</button>`:`${!n?`<button class="btn btn-ghost" id="sDel" style="color:var(--red)" aria-label="Löschen">${ic('trash','sm')}</button>`:''}<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="sGo">${n?'Anlegen':'Speichern'}</button>`});
+  const usBox=$('#sUsBox',bd),ge=$('#sGe',bd);
+  const syncUs=()=>{const g=gById(ge.value);usBox.innerHTML=g?field('Mitarbeiter',`<input class="inp" value="${esc(g.benutzer_id?userName(g.benutzer_id):'– Gerät liegt im Lager –')}" disabled>`,'Ergibt sich aus dem Gerät.'):field('Mitarbeiter (Nummer ohne Firmengerät)',sel('sUs',users,s.benutzer_id||'',dis))};
+  syncUs();ge.addEventListener('change',syncUs);
+  if(ro)return;
+  $('#sGo',bd).onclick=ev=>busy(ev.currentTarget,async()=>{
+    const err=m=>{$('#sErr',bd).textContent=m||''};err('');
+    const ruf=val(bd,'sRuf'),tar=val(bd,'sTar'),sim=val(bd,'sSim');
+    if(!ruf&&!tar&&!sim)return err('Bitte Rufnummer oder Tarif eingeben.');
+    const ko=val(bd,'sKo');if(ko&&pnum(ko)==null)return err('Kosten sind keine Zahl.');
+    const kf=val(bd,'sKf');
+    const nr=ruf.replace(/[^\d+]/g,'').replace(/^(\+49|0049)/,'0');
+    if(nr&&(S.sims||[]).some(x=>x.id!==s.id&&String(x.rufnummer||'').replace(/[^\d+]/g,'').replace(/^(\+49|0049)/,'0')===nr))return err('Diese Rufnummer gibt es schon.');
+    const gid=val(bd,'sGe')||null;
+    const row={rufnummer:ruf||null,art:val(bd,'sArt'),anbieter:val(bd,'sAnb')||null,tarif:tar||null,kosten:pnum(ko)||0,status:val(bd,'sSt'),
+      geraet_id:gid,benutzer_id:gid?null:(val(bd,'sUs')||null),vertrag_beginn:val(bd,'sVb')||null,vertrag_ende:val(bd,'sVe')||null,
+      kuendigungsfrist_monate:kf?Math.max(0,Math.min(24,parseInt(kf)||0)):null,sim_nr:sim||null,notiz:val(bd,'sNo')||null};
+    if(n)await api('POST','gv_sim',row);else await api('PATCH','gv_sim',row,`?id=eq.${s.id}`);
+    closeSheet();await reloadAndRoute();toast(n?'SIM-Karte angelegt':'Gespeichert','ok');
+  });
+  const del=$('#sDel',bd);if(del)del.onclick=()=>confirmSheet({title:'SIM-Karte löschen?',text:`„${esc(simTitle(s))}“ wird gelöscht. Tipp: Gekündigte Karten besser auf „Gekündigt“ oder „Beendet“ setzen, dann bleiben sie nachvollziehbar.`,ok:'Löschen',danger:true,onOk:async()=>{
+    await api('DELETE','gv_sim',null,`?id=eq.${s.id}`);closeSheet();await reloadAndRoute();toast('Gelöscht','ok');
+  }});
+}
+/* =====================================================================
    Kostenübersicht + CSV-Export
    ===================================================================== */
 function viewKosten(){
   const k=kostenGesamt();
-  const per=S.users.map(u=>({u,...kostenFuer(u.id)})).filter(r=>r.monat>0||r.gs.length).sort((a,b)=>b.monat-a.monat);
-  const zugeordnet=new Set();per.forEach(r=>{r.gs.forEach(g=>zugeordnet.add('g'+g.id));r.as.forEach(a=>zugeordnet.add('a'+a.id))});
-  const firmaV=S.geraete.filter(g=>!zugeordnet.has('g'+g.id)).reduce((s,g)=>s+gMonat(g),0),firmaA=S.abos.filter(a=>!zugeordnet.has('a'+a.id)).reduce((s,a)=>s+aboMonat(a),0);
+  const per=S.users.map(u=>({u,...kostenFuer(u.id)})).filter(r=>r.monat>0||r.gs.length||r.ss.length).sort((a,b)=>b.monat-a.monat);
+  const zugeordnet=new Set();per.forEach(r=>{r.gs.forEach(g=>zugeordnet.add('g'+g.id));r.as.forEach(a=>zugeordnet.add('a'+a.id));r.ss.forEach(x=>zugeordnet.add('s'+x.id))});
+  const firmaM=(S.sims||[]).filter(x=>!zugeordnet.has('s'+x.id)).reduce((t,x)=>t+simMonat(x),0)+S.geraete.filter(g=>!zugeordnet.has('g'+g.id)).reduce((t,g)=>t+gMonat(g),0);
+  const firmaA=S.abos.filter(a=>!zugeordnet.has('a'+a.id)).reduce((t,a)=>t+aboMonat(a),0);
   const kat={};S.abos.forEach(a=>{const m=aboMonat(a);if(m)kat[a.kategorie]=(kat[a.kategorie]||0)+m});
-  const anb={};S.geraete.forEach(g=>{const m=gMonat(g);if(m){const x=g.vertrag_anbieter||'Ohne Anbieter';anb[x]=(anb[x]||0)+m}});
+  const anb={};(S.sims||[]).forEach(x=>{const m=simMonat(x);if(m){const n=x.anbieter||'Ohne Anbieter';anb[n]=anb[n]||{v:0,n:0};anb[n].v+=m;anb[n].n++}});
+  S.geraete.forEach(g=>{const m=gMonat(g);if(m){const n=g.vertrag_anbieter||'Ohne Anbieter';anb[n]=anb[n]||{v:0,n:0};anb[n].v+=m;anb[n].n++}});
+  const tarif={};(S.sims||[]).filter(simLaeuft).forEach(x=>{const n=[x.tarif||'ohne Tarif',x.kosten?eur(x.kosten):''].filter(Boolean).join(' · ');tarif[n]=(tarif[n]||0)+1});
   const typ={};S.geraete.filter(g=>g.status!=='ausgemustert').forEach(g=>{typ[g.typ]=typ[g.typ]||{n:0,w:0};typ[g.typ].n++;typ[g.typ].w+=+g.kaufpreis||0});
+  const y0=+k.jahr,jahre=[y0,y0-1,y0-2].map(y=>({y,v:S.geraete.filter(g=>String(g.kaufdatum||'').startsWith(String(y))).reduce((t,g)=>t+(+g.kaufpreis||0),0),n:S.geraete.filter(g=>String(g.kaufdatum||'').startsWith(String(y))).length}));
   const max=Math.max(1,...per.map(r=>r.monat));
   const bar=(l,v,m,sub='')=>`<div style="padding:9px 0;border-top:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:12px"><span>${l}${sub?`<small class="muted" style="display:block;font-size:12.5px">${sub}</small>`:''}</span><b style="font-variant-numeric:tabular-nums;white-space:nowrap">${eur(v)}</b></div><div class="pbar" style="margin-top:6px"><i style="width:${Math.max(2,Math.round(v/m*100))}%"></i></div></div>`;
   paint(`
   ${backHead('#/','Geräteverwaltung','Kostenübersicht',`<button class="btn btn-soft btn-sm" data-act="csvMenu">${ic('download','sm')} CSV</button>`)}
-  <div class="sumtiles"><div class="sumtile"><small>Pro Monat</small><b>${eur(k.monat)}</b></div><div class="sumtile"><small>Pro Jahr</small><b>${eur(k.monat*12)}</b></div>
-    <div class="sumtile"><small>Anschaffungen ${k.jahr}</small><b style="font-size:19px">${eur(k.kaufJahr)}</b></div><div class="sumtile"><small>Gerätewert (Kaufpreis)</small><b style="font-size:19px">${eur(k.wert)}</b></div></div>
-  <p class="hint" style="margin:0 4px 6px">Laufende Kosten = Mobilfunk-/Geräteverträge + aktive Apps &amp; Abos (jährliche auf den Monat umgerechnet, einmalige Käufe nicht).</p>
+  <div class="sumtiles"><div class="sumtile"><small>Laufend pro Monat</small><b>${eur(k.monat)}</b></div><div class="sumtile"><small>Laufend pro Jahr</small><b>${eur(k.monat*12)}</b></div>
+    <div class="sumtile"><small>Mobilfunk pro Monat</small><b style="font-size:19px">${eur(k.mobil)}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${k.simsAktiv} SIM-Karten</div></div><div class="sumtile"><small>Apps &amp; Abos pro Monat</small><b style="font-size:19px">${eur(k.abo)}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${k.abosAktiv} aktiv</div></div></div>
+  <p class="hint" style="margin:0 4px 6px">Laufende Kosten = Mobilfunk (aktive SIM-Karten) + aktive Apps &amp; Abos (jährliche auf den Monat umgerechnet). Geräte sind einmalige Anschaffungen und stehen unten extra.</p>
+
+  <div class="sec"><h2>Mobilfunk nach Anbieter</h2><a href="#/mobil">Alle Nummern</a></div>
+  <div class="card" style="padding:4px 16px 8px">${Object.keys(anb).length?Object.entries(anb).sort((a,b)=>b[1].v-a[1].v).map(([l,x])=>bar(esc(l),x.v,Math.max(...Object.values(anb).map(z=>z.v)),`${x.n} ${x.n===1?'Karte':'Karten'}`)).join(''):'<p class="muted" style="padding:10px 0">Noch keine SIM-Karten erfasst.</p>'}</div>
+  ${Object.keys(tarif).length?`<div class="card" style="padding:6px 16px;margin-top:10px"><div class="dl">${Object.entries(tarif).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<div><dt>${esc(t)}</dt><dd>${n}×</dd></div>`).join('')}</div></div>`:''}
+
+  <div class="sec"><h2>Apps &amp; Abos nach Kategorie</h2><a href="#/abos">Alle Abos</a></div>
+  <div class="card" style="padding:4px 16px 8px">${Object.keys(kat).length?Object.entries(kat).sort((a,b)=>b[1]-a[1]).map(([l,v])=>bar(esc(l),v,Math.max(...Object.values(kat)))).join(''):'<p class="muted" style="padding:10px 0">Keine laufenden Abos.</p>'}</div>
+
+  <div class="sec"><h2>Gerätekosten</h2><a href="#/geraete">Alle Geräte</a></div>
+  <div class="sumtiles"><div class="sumtile"><small>Gerätewert (Kaufpreis, Bestand)</small><b style="font-size:19px">${eur(k.wert)}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${k.geraeteAnz} Geräte</div></div><div class="sumtile"><small>Anschaffungen ${k.jahr}</small><b style="font-size:19px">${eur(k.geraeteJahr)}</b>${k.einmalJahr?`<div class="muted" style="font-size:12.5px;margin-top:2px">+ ${eur(k.einmalJahr)} einmalige App-Käufe</div>`:''}</div></div>
+  <div class="card" style="padding:4px 16px 8px">${jahre.map(j=>bar(`Gekauft ${j.y}`,j.v,Math.max(1,...jahre.map(z=>z.v)),`${j.n} ${j.n===1?'Gerät':'Geräte'}`)).join('')}</div>
+  ${Object.keys(typ).length?`<div class="card" style="padding:6px 16px;margin-top:10px"><div class="dl">${Object.entries(typ).map(([t,x])=>`<div><dt>${esc(t)} (${x.n})</dt><dd>${eur(x.w)}</dd></div>`).join('')}</div></div>`:''}
+
   <div class="sec"><h2>Pro Mitarbeiter (monatlich)</h2></div>
-  <div class="card" style="padding:4px 16px 8px">${per.length?per.map(r=>`<a href="#/m/${r.u.id}" style="display:block">${bar(esc(r.u.name),r.monat,max,`${r.gs.length} ${r.gs.length===1?'Gerät':'Geräte'} · Verträge ${eur(r.vertrag)} · Abos ${eur(r.abo)}`)}</a>`).join(''):'<p class="muted" style="padding:10px 0">Noch keine Kosten erfasst.</p>'}
-    ${firmaV+firmaA?bar('Firma / nicht zugeordnet',firmaV+firmaA,max,`Verträge ${eur(firmaV)} · Abos ${eur(firmaA)}`):''}</div>
-  ${Object.keys(kat).length?`<div class="sec"><h2>Abos nach Kategorie</h2></div><div class="card" style="padding:4px 16px 8px">${Object.entries(kat).sort((a,b)=>b[1]-a[1]).map(([l,v])=>bar(esc(l),v,Math.max(...Object.values(kat)))).join('')}</div>`:''}
-  ${Object.keys(anb).length?`<div class="sec"><h2>Verträge nach Anbieter</h2></div><div class="card" style="padding:4px 16px 8px">${Object.entries(anb).sort((a,b)=>b[1]-a[1]).map(([l,v])=>bar(esc(l),v,Math.max(...Object.values(anb)))).join('')}</div>`:''}
-  ${Object.keys(typ).length?`<div class="sec"><h2>Bestand nach Typ</h2></div><div class="card" style="padding:6px 16px"><div class="dl">${Object.entries(typ).map(([t,x])=>`<div><dt>${esc(t)} (${x.n})</dt><dd>${eur(x.w)}</dd></div>`).join('')}</div></div>`:''}
+  <div class="card" style="padding:4px 16px 8px">${per.length?per.map(r=>`<a href="#/m/${r.u.id}" style="display:block">${bar(esc(r.u.name),r.monat,max,`${r.gs.length} ${r.gs.length===1?'Gerät':'Geräte'} · Mobilfunk ${eur(r.mobil)} · Abos ${eur(r.abo)}`)}</a>`).join(''):'<p class="muted" style="padding:10px 0">Noch keine Kosten erfasst.</p>'}
+    ${firmaM+firmaA?bar('Firma / nicht zugeordnet',firmaM+firmaA,max,`Mobilfunk ${eur(firmaM)} · Abos ${eur(firmaA)}`):''}</div>
   <div style="height:8px"></div>`);
 }
 
@@ -1502,14 +1697,17 @@ function csvSave(name,head,rows){
   saveBlob(new Blob([txt],{type:'text/csv;charset=utf-8'}),name);
 }
 ACT.csvMenu=()=>{
-  const bd=sheet({title:'Export für Excel',body:`<div class="menu-list"><button class="menu-item" id="cG"><span class="ico">${ic('mobile')}</span><span>Geräte<small>${S.geraete.length} Einträge</small></span>${ic('download','chev')}</button><button class="menu-item" id="cA"><span class="ico">${ic('receipt')}</span><span>Apps &amp; Abos<small>${S.abos.length} Einträge</small></span>${ic('download','chev')}</button><button class="menu-item" id="cM"><span class="ico">${ic('users')}</span><span>Kosten pro Mitarbeiter<small>monatlich</small></span>${ic('download','chev')}</button></div>`});
+  const sims=S.sims||[];
+  const bd=sheet({title:'Export für Excel',body:`<div class="menu-list"><button class="menu-item" id="cG"><span class="ico">${ic('tablet')}</span><span>Geräte<small>${S.geraete.length} Einträge</small></span>${ic('download','chev')}</button><button class="menu-item" id="cS"><span class="ico">${ic('phone')}</span><span>Mobilfunk (SIM-Karten)<small>${sims.length} Einträge</small></span>${ic('download','chev')}</button><button class="menu-item" id="cA"><span class="ico">${ic('receipt')}</span><span>Apps &amp; Abos<small>${S.abos.length} Einträge</small></span>${ic('download','chev')}</button><button class="menu-item" id="cM"><span class="ico">${ic('users')}</span><span>Kosten pro Mitarbeiter<small>monatlich</small></span>${ic('download','chev')}</button></div>`});
   const d=berlinToday();
-  $('#cG',bd).onclick=()=>csvSave(`Geraete_${d}.csv`,['Inventar-Nr.','Typ','Hersteller','Modell','Seriennummer','IMEI','Speicher','Status','Mitarbeiter','Ausgegeben seit','Rufnummer','SIM','Anbieter','Tarif','Vertrag €/Monat','Vertragsende','Kaufdatum','Kaufpreis €','Lieferant','Garantie bis','Zubehör','Notiz'],
-    S.geraete.map(g=>[g.inventar_nr,g.typ,g.hersteller,g.modell,g.seriennummer,g.imei,g.speicher,(STATUS[g.status]||[g.status])[0],userName(g.benutzer_id),fmtD(g.ausgegeben_seit).replace('–',''),g.rufnummer,g.sim_nr,g.vertrag_anbieter,g.vertrag_tarif,csvNum(g.vertrag_kosten),g.vertrag_ende?fmtD(g.vertrag_ende):'',g.kaufdatum?fmtD(g.kaufdatum):'',csvNum(g.kaufpreis),g.lieferant,g.garantie_bis?fmtD(g.garantie_bis):'',(g.zubehoer||[]).map(z=>(z.n>1?z.n+'x ':'')+z.t).join(', '),g.notiz]));
+  $('#cG',bd).onclick=()=>csvSave(`Geraete_${d}.csv`,['Inventar-Nr.','Typ','Hersteller','Modell','Seriennummer','IMEI','Speicher','Status','Mitarbeiter','Ausgegeben seit','Rufnummer (SIM)','Kaufdatum','Kaufpreis €','Lieferant','Garantie bis','Zubehör','Notiz'],
+    S.geraete.map(g=>[g.inventar_nr,g.typ,g.hersteller,g.modell,g.seriennummer,g.imei,g.speicher,(STATUS[g.status]||[g.status])[0],userName(g.benutzer_id),fmtD(g.ausgegeben_seit).replace('–',''),gRuf(g),g.kaufdatum?fmtD(g.kaufdatum):'',csvNum(g.kaufpreis),g.lieferant,g.garantie_bis?fmtD(g.garantie_bis):'',(g.zubehoer||[]).map(z=>(z.n>1?z.n+'x ':'')+z.t).join(', '),g.notiz]));
+  $('#cS',bd).onclick=()=>csvSave(`Mobilfunk_${d}.csv`,['Rufnummer','Mitarbeiter','Gerät','Art','Anbieter','Tarif','€/Monat','Vertragsbeginn','Vertragsende','Kündigungsfrist Monate','SIM-Kartennummer','Status','Notiz'],
+    sims.map(x=>{const g=simGeraet(x);return[x.rufnummer,userName(simUser(x)),g?`${gTitle(g)} (${g.inventar_nr})`:'',SIM_ART[x.art]||x.art,x.anbieter,x.tarif,csvNum(x.kosten),x.vertrag_beginn?fmtD(x.vertrag_beginn):'',x.vertrag_ende?fmtD(x.vertrag_ende):'',x.kuendigungsfrist_monate,x.sim_nr,(SIM_ST[x.status]||[x.status])[0],x.notiz]}));
   $('#cA',bd).onclick=()=>csvSave(`Apps_Abos_${d}.csv`,['Name','Kategorie','Anbieter','Kosten €','Abrechnung','€/Monat','Mitarbeiter','Gerät','Konto','Beginn','Verlängerung/Ende','Kündigungsfrist Tage','Auto-Verlängerung','Status','Notiz'],
     S.abos.map(a=>{const g=a.geraet_id?gById(a.geraet_id):null;return[a.name,a.kategorie,a.anbieter,csvNum(a.kosten),a.intervall,csvNum(aboMonat(a)),userName(a.benutzer_id),g?`${gTitle(g)} (${g.inventar_nr})`:'',a.konto,a.beginn?fmtD(a.beginn):'',a.verlaengerung?fmtD(a.verlaengerung):'',a.kuendigungsfrist_tage,a.auto_verlaengerung?'ja':'nein',(ABO_STATUS[a.status]||[a.status])[0],a.notiz]}));
-  $('#cM',bd).onclick=()=>csvSave(`Kosten_Mitarbeiter_${d}.csv`,['Mitarbeiter','Geräte','Verträge €/Monat','Abos €/Monat','Summe €/Monat','Summe €/Jahr','Gerätewert €'],
-    S.users.map(u=>({u,...kostenFuer(u.id)})).filter(r=>r.gs.length||r.as.length).map(r=>[r.u.name,r.gs.length,csvNum(r.vertrag),csvNum(r.abo),csvNum(r.monat),csvNum(r.monat*12),csvNum(r.wert)]));
+  $('#cM',bd).onclick=()=>csvSave(`Kosten_Mitarbeiter_${d}.csv`,['Mitarbeiter','Geräte','Rufnummern','Mobilfunk €/Monat','Abos €/Monat','Summe €/Monat','Summe €/Jahr','Gerätewert €'],
+    S.users.map(u=>({u,...kostenFuer(u.id)})).filter(r=>r.gs.length||r.as.length||r.ss.length).map(r=>[r.u.name,r.gs.length,r.ss.map(x=>x.rufnummer).filter(Boolean).join(', '),csvNum(r.mobil),csvNum(r.abo),csvNum(r.monat),csvNum(r.monat*12),csvNum(r.wert)]));
 };
 /* ---------- Unterschrift (wie in den anderen Modulen) ---------- */
 function sigPad(host,initial){
@@ -1540,7 +1738,7 @@ function uebergabeSheet(g,art,preUser){
   const holder=g.benutzer_id?userName(g.benutzer_id):'';
   const users=[['','– bitte wählen –'],...S.users.map(u=>[u.id,u.name])];
   const bd=sheet({title:aus?'Gerät ausgeben':'Gerät zurücknehmen',body:`
-    <div class="card" style="display:flex;gap:12px;align-items:center;margin-bottom:12px;box-shadow:none;background:var(--surface-2)"><div class="tnum tone-blue">${ic(gIcon(g))}</div><div style="min-width:0"><b>${esc(gTitle(g))}</b><div class="muted" style="font-size:13px">${esc([g.inventar_nr,g.seriennummer?'SN '+g.seriennummer:'',g.imei?'IMEI '+g.imei:'',g.rufnummer].filter(Boolean).join(' · '))}</div></div></div>
+    <div class="card" style="display:flex;gap:12px;align-items:center;margin-bottom:12px;box-shadow:none;background:var(--surface-2)"><div class="tnum tone-blue">${ic(gIcon(g))}</div><div style="min-width:0"><b>${esc(gTitle(g))}</b><div class="muted" style="font-size:13px">${esc([g.inventar_nr,g.seriennummer?'SN '+g.seriennummer:'',g.imei?'IMEI '+g.imei:'',gRuf(g)].filter(Boolean).join(' · '))}</div></div></div>
     <div class="row2">
       ${aus?field('An Mitarbeiter *',sel('uUser',users,preUser||'')):field('Von Mitarbeiter',`<input class="inp" value="${esc(holder)}" disabled>`)}
       ${field('Datum',inp('uDat',berlinToday(),'type="date"'))}
@@ -1671,9 +1869,11 @@ async function pdfPerson(uid){
   const P=await pdfNew('Geräte & Abos',`${u.name} · Stand ${fmtD(berlinToday())}`);
   let y=pdfKV(P,[['Mitarbeiter',u.name],['Geräte',String(k.gs.length)],['Laufende Kosten',`${eur(k.monat)} pro Monat (${eur(k.monat*12)} pro Jahr)`],['Gerätewert (Kaufpreis)',eur(k.wert)]],P.y);
   y=pdfH(P,'Geräte',y);
-  y=k.gs.length?pdfTable(P,['Inv.-Nr.','Gerät','Serien-Nr. / IMEI','Rufnummer','Seit','Vertrag/Monat'],k.gs.map(g=>[g.inventar_nr||'',`${gTitle(g)}\n${g.typ}${g.speicher?' · '+g.speicher:''}`,[g.seriennummer,g.imei].filter(Boolean).join('\n'),g.rufnummer||'',g.ausgegeben_seit?fmtD(g.ausgegeben_seit):'',g.vertrag_kosten?eur(g.vertrag_kosten):'']),y,{styles:{fontSize:9,cellPadding:2}}):pdfText(P,'Keine Geräte zugeordnet.',y+1);
+  y=k.gs.length?pdfTable(P,['Inv.-Nr.','Gerät','Serien-Nr. / IMEI','Rufnummer','Seit'],k.gs.map(g=>[g.inventar_nr||'',`${gTitle(g)}\n${g.typ}${g.speicher?' · '+g.speicher:''}`,[g.seriennummer,g.imei].filter(Boolean).join('\n'),gRuf(g),g.ausgegeben_seit?fmtD(g.ausgegeben_seit):'']),y,{styles:{fontSize:9,cellPadding:2}}):pdfText(P,'Keine Geräte zugeordnet.',y+1);
   const zub=k.gs.filter(g=>(g.zubehoer||[]).length);
   if(zub.length){y=pdfH(P,'Zubehör',y);y=pdfTable(P,['Gerät','Zubehör'],zub.map(g=>[`${g.inventar_nr} ${g.modell}`,g.zubehoer.map(z=>(z.n>1?z.n+'× ':'')+z.t).join(', ')]),y)}
+  y=pdfH(P,'Mobilfunk',y);
+  y=k.ss.length?pdfTable(P,['Rufnummer','Tarif','Gerät','Kosten','Vertragsende'],k.ss.map(x=>{const g=simGeraet(x);return[x.rufnummer||'',[x.anbieter,x.tarif].filter(Boolean).join(' · '),g?`${g.inventar_nr} ${g.modell}`:'ohne Gerät',`${eur(x.kosten)} mtl.`,x.vertrag_ende?fmtD(x.vertrag_ende):'']}),y):pdfText(P,'Keine SIM-Karte.',y+1);
   y=pdfH(P,'Apps & Abos',y);
   y=k.as.length?pdfTable(P,['App / Abo','Kategorie','Konto','Kosten','Status'],k.as.map(a=>[a.name,a.kategorie,a.konto||'',`${eur(a.kosten)} ${INT_L[a.intervall]}`,(ABO_STATUS[a.status]||[a.status])[0]]),y):pdfText(P,'Keine kostenpflichtigen Apps oder Abos.',y+1);
   await pdfDeliver(P,`Geraete_${fname(u.name)}_${berlinToday()}.pdf`);

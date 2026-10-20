@@ -12,6 +12,9 @@
     portal: '../index.html'
   }, window.PJ_CONFIG || {});
   const SB = CFG.sb, KEY = CFG.key, PORTAL = CFG.portal, SESS_KEY = 'heiseSession';
+  // PDS_V2: PDS-Testbereich (nur Admin). Alle Datenbank-Funktionen laufen dann im Schema „pdstest“,
+  // die echten Projekte bleiben unberührt. Umschalten über PJ.setTest(true/false).
+  const TEST = (() => { try { return localStorage.getItem('pj_test') === '1' } catch (e) { return false } })();
 
   /* ---------- Sitzung ---------- */
   const AUTH = { access: null, refresh: null, exp: 0 }; let refreshP = null;
@@ -48,7 +51,9 @@
     const tok = await ensureToken();
     let r;
     try {
-      r = await fetch(`${SB}/rest/v1/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + tok }, body: JSON.stringify(body || {}) });
+      const h = { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + tok };
+      if (TEST && /^rpc\/(pj_|pds_)/.test(path)) { h['Accept-Profile'] = 'pdstest'; h['Content-Profile'] = 'pdstest'; }
+      r = await fetch(`${SB}/rest/v1/${path}`, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
     } catch (e) { throw new Error('Keine Verbindung – bitte Netz prüfen') }
     const j = await r.json().catch(() => null);
     if (!r.ok) {
@@ -107,6 +112,8 @@
       PJ.me = me;
       if (me.pw_aendern) { toLogin(); return null }
       const r = await rpc('pj_rolle');
+      // Testbereich nur für Admins: sonst sofort verlassen
+      if (TEST && r !== 'admin') { try { localStorage.removeItem('pj_test') } catch (e) { } location.reload(); return null }
       setRolle(r);
       if (!r) { keinZugriff('Das Modul „Projekte“ ist für dein Konto nicht freigeschaltet. Bitte beim Administrator melden.'); return null }
       return r;
@@ -115,13 +122,39 @@
 
   // E-Mail über die Edge Function „mail-senden“ (z. B. Ereignis „Bautagebuch unterschrieben“ mit PDF)
   async function mail(action, payload) {
+    if (TEST) return { ok: true, test: true };               // im Testbereich keine E-Mails
     const tok = await ensureToken();
     const r = await fetch(`${SB}/functions/v1/mail-senden`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, 'x-user-token': tok || '' }, body: JSON.stringify(Object.assign({ action }, payload || {})) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || j.error) throw new Error(j.error || ('Fehler ' + r.status));
     return j;
   }
-  const PJ = window.PJ = { api, rpc, za, pr, mail, rolle: null, me: null, portal: PORTAL, logout() { authClear(); location.replace(PORTAL) } };
+  // Edge Function mit Login-Token aufrufen (PDS_V2: pds-bruecke, nur Admin)
+  async function fn(name, body) {
+    const tok = await ensureToken();
+    let r;
+    try {
+      r = await fetch(`${SB}/functions/v1/${name}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, 'x-user-token': tok || '' }, body: JSON.stringify(body || {}) });
+    } catch (e) { throw new Error('Keine Verbindung – bitte Netz prüfen') }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.error) { const e = new Error(j.error || ('Fehler ' + r.status)); e.daten = j; e.status = r.status; throw e; }
+    return j;
+  }
+  const PJ = window.PJ = { api, rpc, za, pr, mail, fn, test: TEST, rolle: null, me: null, portal: PORTAL, logout() { authClear(); location.replace(PORTAL) } };
+  PJ.setTest = on => { try { on ? localStorage.setItem('pj_test', '1') : localStorage.removeItem('pj_test') } catch (e) { } location.replace(location.pathname + '?bereich=' + (on ? 'test#pds' : 'echt')) };
+  // Hinweisleiste im Testbereich
+  if (TEST) {
+    const leiste = () => {
+      if (document.getElementById('pj-testleiste')) return;
+      const d = document.createElement('div'); d.id = 'pj-testleiste';
+      d.style.cssText = 'position:sticky;top:0;z-index:999;background:#E25304;color:#fff;font:600 13.5px/1.35 Montserrat,system-ui,sans-serif;padding:8px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap';
+      d.innerHTML = '<span><b>PDS-Testbereich</b> · Testdaten, nicht die echten Projekte. E-Mails werden nicht verschickt.</span>';
+      const b = document.createElement('button'); b.textContent = 'Testbereich verlassen';
+      b.style.cssText = 'background:#fff;color:#E25304;border:0;border-radius:10px;padding:6px 12px;font:700 13px Montserrat,system-ui,sans-serif;cursor:pointer';
+      b.onclick = () => PJ.setTest(false); d.appendChild(b); document.body.prepend(d);
+    };
+    if (document.body) leiste(); else document.addEventListener('DOMContentLoaded', leiste);
+  }
   PJ.leitung = () => PJ.rolle === 'bauleitung' || PJ.rolle === 'admin';
   PJ.ready = check();
   window.addEventListener('storage', e => { if (e.key === SESS_KEY && !e.newValue) location.replace(PORTAL) });
