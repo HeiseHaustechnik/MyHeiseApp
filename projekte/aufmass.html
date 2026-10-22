@@ -121,6 +121,20 @@ button.note{display:flex;gap:10px;align-items:center;width:100%;text-align:left;
 @media(max-width:560px){.grid2{grid-template-columns:1fr}}
 .src{display:block;font-size:12px;color:var(--ink-3)}
 .src.pre{color:var(--amber);font-weight:680}
+/* X31_V1: Kriterien und Export für pds */
+.krrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.krrow label{margin-top:8px}
+.krk{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:10px 0}
+.krk .kh{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.krk .kh b{font-size:15px}
+.krk .kh span{display:flex;gap:4px}
+.krw{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.krw span{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);border-radius:10px;padding:4px 4px 4px 10px;font-size:14px}
+.krw span button{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--ink-3)}
+.krtag{display:inline-block;background:var(--surface-2);border-radius:8px;padding:1px 7px;margin:2px 4px 0 0;font-size:12px;color:var(--ink-2)}
+.x31g{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0}
+.x31g b{display:block;font-size:15px}
+.x31g .hint{margin:4px 0 8px}
 .pick{border-radius:16px;padding:10px;margin-top:10px;background:var(--surface-2);max-height:46vh;overflow:auto}
 .pick .pg{font-size:11.5px;font-weight:700;color:var(--ink-3);margin:12px 4px 6px;text-transform:uppercase;letter-spacing:.06em}
 .pi{display:block;width:100%;text-align:left;background:var(--surface);border-radius:12px;padding:11px 12px;margin:5px 0;font-size:15px;box-shadow:inset 0 0 0 1.5px var(--line)}
@@ -217,6 +231,7 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
         <button class="btn" id="btnXlsx">Excel erstellen</button>
       </div>
       <button class="btn sec block" id="btnShare" style="margin-top:10px;display:none">PDF + Excel teilen (Mail, Teams …)</button>
+      <button class="btn sec block nur-leitung" id="btnX31" style="margin-top:10px">X31 für pds (Aufmaß plus)</button>
       <p class="hint">Die Dateien landen im Download-Ordner des Geräts.</p>
     </div>
 
@@ -228,6 +243,16 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
       <input class="f" id="a_g" list="dl_ag" placeholder="z. B. Fahrzeughalle (Achse 11–31)" autocomplete="off"><datalist id="dl_ag"></datalist>
       <label for="a_n">Neuer Bereich</label>
       <div class="qwrap"><input class="f" id="a_n" placeholder="z. B. Achse 12, Dachablauf H4.3" autocomplete="off"><button class="btn" id="a_add">Hinzufügen</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Kriterien für das pds-Aufmaß</h2>
+      <p class="hint" style="margin-top:0">Zusätzlich zum Raum (Bereiche oben) kann jede Messzeile weitere Kriterien bekommen, z. B. Geschoss, Achse oder Bauteil. Sie gelten für das ganze Projekt und gehen mit dem X31-Export nach pds Aufmaß plus. Neue Kriterien und Werte legt Aufmaß plus beim Import selbst an.</p>
+      <div id="krList"></div>
+      <label for="kr_n">Neues Kriterium</label>
+      <div class="qwrap"><input class="f" id="kr_n" placeholder="z. B. Geschoss, Achse, Bauteil" autocomplete="off"><button class="btn" id="kr_add">Hinzufügen</button></div>
+      <label for="kr_f" style="margin-top:12px">Kriterien aus pds Aufmaß plus übernehmen (X31- oder DA11-Datei)</label>
+      <input class="f" type="file" id="kr_f" accept=".x31,.X31,.d11,.D11,.d11s,.D11S,.xml">
     </div>
 
     <div class="card">
@@ -271,7 +296,7 @@ const KEY = 'aufmass_'+AID;
 /* ---------- State ---------- */
 const DEF = () => ({
   head:{bv:'', bez:'', dat:'', mon:'', ag:'', bem:''},
-  entries:[], free:[], sig:{sig1:null,sig2:null,ts:null,aend:null}, filter:'list', lastOrt:'', open:{}, areas:[]
+  entries:[], free:[], sig:{sig1:null,sig2:null,ts:null,aend:null}, filter:'list', lastOrt:'', open:{}, areas:[], krit:[], lastKr:{}
 });
 let S;
 S = DEF();
@@ -477,6 +502,8 @@ function openPos(key, eid){
       <label for="e_o">Raum / Ort</label>
       <div class="qwrap"><input class="f" id="e_o" autocomplete="off" placeholder="Bereich wählen oder frei eintragen" value="${esc(ed?ed.ort:S.lastOrt)}"><button type="button" class="btn sec" id="e_pick" style="white-space:nowrap">Liste ▾</button></div>
       <div id="pickPanel" class="pick" hidden></div>
+      ${krit().length?`<div class="krrow">${krit().map(k=>{ const v=ed?(ed.kr||{})[k.n]||'':(S.lastKr||{})[k.n]||''; const ws=k.w.includes(v)||!v?k.w:[v,...k.w];
+        return `<div><label>${esc(k.n)}</label><select class="f" data-kr="${esc(k.n)}"><option value="">–</option>${ws.map(w=>`<option${w===v?' selected':''}>${esc(w)}</option>`).join('')}</select></div>`; }).join('')}</div>`:''}
       <label for="e_b">Bemerkung</label>
       <input class="f" id="e_b" autocomplete="off" placeholder="optional" value="${esc(ed?ed.bem:'')}">
       <div class="row" style="margin-top:12px">
@@ -487,7 +514,7 @@ function openPos(key, eid){
     <div class="card">
       <h2 style="margin-bottom:4px">Bisher erfasst (${ents.length})</h2>
       ${ents.length? ents.map(e=>`<div class="ent"><div class="q">${nf(e.qty)} ${esc(p.me)}</div>
-        <div class="o">${esc(e.ort)||'<span class="hint">ohne Ort</span>'}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
+        <div class="o">${esc(e.ort)||'<span class="hint">ohne Ort</span>'}${krTags(e)}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
         <div class="x">${e.pre&&darfOk(e)?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(key)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')
         + `<div class="sum"><span>Summe</span><span>${nf(s)} ${esc(p.me)}</span></div>`
         : '<div class="hint">Noch nichts erfasst.</div>'}
@@ -560,9 +587,10 @@ function addEnt(){
   const v=parseQty($('#e_q').value);
   if(v===null||isNaN(v)||v===0){ toast('Bitte eine gültige Menge eintragen'); $('#e_q').focus(); return; }
   const ort=$('#e_o').value.trim(), bem=$('#e_b').value.trim();
-  if(editId){ const e=S.entries.find(x=>x.id===editId); Object.assign(e,{qty:v,ort,bem,pre:false,ts:new Date().toISOString()}); toast('Geändert'); }
-  else { S.entries.push({id:uid(),key:cur,qty:v,ort,bem,ts:new Date().toISOString()}); toast('+ '+nf(v)+' '+posOf(cur).me+' erfasst'); }
-  S.lastOrt=ort;
+  const kr={}; document.querySelectorAll('#sheet select[data-kr]').forEach(x=>{ if(x.value) kr[x.dataset.kr]=x.value; });
+  if(editId){ const e=S.entries.find(x=>x.id===editId); Object.assign(e,{qty:v,ort,bem,kr,pre:false,ts:new Date().toISOString()}); toast('Geändert'); }
+  else { S.entries.push({id:uid(),key:cur,qty:v,ort,bem,kr,ts:new Date().toISOString()}); toast('+ '+nf(v)+' '+posOf(cur).me+' erfasst'); }
+  S.lastOrt=ort; S.lastKr=kr;
   const k=cur; dataChanged(); openPos(k);
 }
 function delEnt(id){
@@ -832,15 +860,181 @@ function renderAreas(){
 $('#a_add').onclick=()=>{ const n=$('#a_n').value.trim(); if(!n){ toast('Bitte einen Namen eintragen'); return; } const g=$('#a_g').value.trim()||'Eigene Bereiche';
   const A2=areas().slice(); let idx=-1; A2.forEach((a,i)=>{ if(a.g===g) idx=i; }); const it={g,n}; if(idx<0) A2.push(it); else A2.splice(idx+1,0,it);
   S.areas=A2; save(); $('#a_n').value=''; renderAreas(); toast('Bereich hinzugefügt'); };
-function renderAll(){ PJS.set({seite:'aufmass',pid:PROJ?.id||null,pname:PROJ?.name||'',erfassen:true}); renderAreas(); renderPos(); renderSum(); renderHdr(); sigText(); if(typeof renderEntwurf==='function') renderEntwurf(); }
+/* ---------- Kriterien (X31_V1) ---------- */
+function krTags(e){ const o=krSauber(e.kr); const k=Object.keys(o); return k.length?`<div>${k.map(n=>`<span class="krtag">${esc(n)}: ${esc(o[n])}</span>`).join('')}</div>`:''; }
+function renderKrit(){
+  const el=$('#krList'); if(!el) return;
+  const K=krit();
+  el.innerHTML=K.length?K.map((k,i)=>`<div class="krk"><div class="kh"><b>${esc(k.n)}</b><span><button class="icon" data-krren="${i}" aria-label="Umbenennen">${IC('edit')}</button><button class="icon" data-krdel="${i}" aria-label="Kriterium löschen">${IC('trash')}</button></span></div>
+      <div class="krw">${k.w.map((w,j)=>`<span>${esc(w)}<button data-krwdel="${i}:${j}" aria-label="Wert löschen">${IC('x')}</button></span>`).join('')||'<span class="hint">noch keine Werte</span>'}</div>
+      <div class="qwrap"><input class="f" data-krwin="${i}" placeholder="Wert hinzufügen, z. B. EG" autocomplete="off"><button class="btn sec" data-krwadd="${i}">+</button></div></div>`).join('')
+    :'<p class="hint">Noch keine weiteren Kriterien.</p>';
+  const setK=K2=>{ S.krit=K2; save(); renderKrit(); };
+  const kopie=()=>krit().map(k=>({n:k.n,w:k.w.slice()}));
+  el.querySelectorAll('[data-krdel]').forEach(b=>b.onclick=()=>{ const K2=kopie(); const k=K2[+b.dataset.krdel];
+    if(!confirm(`Kriterium „${k.n}“ löschen? Bereits erfasste Werte bleiben an den Messzeilen erhalten.`)) return; K2.splice(+b.dataset.krdel,1); setK(K2); });
+  el.querySelectorAll('[data-krren]').forEach(b=>b.onclick=()=>{ const K2=kopie(); const k=K2[+b.dataset.krren]; const n=(prompt('Kriterium umbenennen:',k.n)||'').trim();
+    if(!n||n===k.n) return; if(K2.some(x=>x.n===n)){ toast('Das Kriterium gibt es schon'); return; }
+    S.entries.forEach(e=>{ if(e.kr&&e.kr[k.n]!==undefined){ e.kr={...e.kr,[n]:e.kr[k.n]}; delete e.kr[k.n]; } }); k.n=n; S.krit=K2; dataChanged(); });
+  el.querySelectorAll('[data-krwdel]').forEach(b=>b.onclick=()=>{ const [i,j]=b.dataset.krwdel.split(':').map(Number); const K2=kopie(); K2[i].w.splice(j,1); setK(K2); });
+  const addW=i=>{ const inp=el.querySelector(`[data-krwin="${i}"]`); const v=inp.value.trim(); if(!v) return; const K2=kopie();
+    if(K2[i].w.includes(v)){ toast('Den Wert gibt es schon'); return; } K2[i].w.push(v); setK(K2); setTimeout(()=>{ const n=$(`#krList [data-krwin="${i}"]`); if(n) n.focus(); },50); };
+  el.querySelectorAll('[data-krwadd]').forEach(b=>b.onclick=()=>addW(+b.dataset.krwadd));
+  el.querySelectorAll('[data-krwin]').forEach(x=>x.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); addW(+x.dataset.krwin); } });
+}
+$('#kr_add').onclick=()=>{ const n=$('#kr_n').value.trim(); if(!n){ toast('Bitte einen Namen eintragen'); return; }
+  if(/^(raum|az)$/i.test(n)){ toast(n.toUpperCase()==='AZ'?'AZ (Abschlag) wird beim Export gesetzt':'Der Raum kommt aus den Bereichen oben'); return; }
+  if(krit().some(k=>k.n===n)){ toast('Das Kriterium gibt es schon'); return; }
+  S.krit=[...krit().map(k=>({n:k.n,w:k.w.slice()})),{n,w:[]}]; $('#kr_n').value=''; save(); renderKrit(); toast('Kriterium angelegt'); };
+$('#kr_n').onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); $('#kr_add').click(); } };
+// Kriterien aus einer Datei von pds Aufmaß plus (X31 oder DA11) übernehmen. Raum-Werte werden Bereiche, AZ wird übersprungen.
+const CP850={0x81:'ü',0x84:'ä',0x94:'ö',0x8E:'Ä',0x99:'Ö',0x9A:'Ü',0xE1:'ß',0x82:'é',0x85:'à',0x8A:'è',0xF8:'°'};
+$('#kr_f').onchange=async ev=>{
+  const f=ev.target.files[0]; if(!f) return; ev.target.value='';
+  const roh=new Uint8Array(await f.arrayBuffer());
+  const gef={}; // Kriterium -> Set(Werte)
+  const txt=new TextDecoder('utf-8').decode(roh);
+  try{
+    if(/<GAEB[\s>]/.test(txt)){
+      const doc=new DOMParser().parseFromString(txt,'application/xml');
+      const el=(n,t)=>[...n.getElementsByTagNameNS('*',t)];
+      const namen={}; el(doc,'Ctlg').forEach(c=>{ const id=(el(c,'CtlgID')[0]||{}).textContent, nm=(el(c,'CtlgName')[0]||{}).textContent; if(id&&nm) namen[id.trim()]=nm.trim(); });
+      Object.values(namen).forEach(n=>gef[n]=gef[n]||new Set());
+      el(doc,'CtlgAssign').forEach(a=>{ const id=((el(a,'CtlgID')[0]||{}).textContent||'').trim(), v=((el(a,'CtlgCode')[0]||{}).textContent||'').trim(); if(namen[id]&&v) gef[namen[id]].add(v); });
+    } else {
+      let t=''; roh.forEach(b=>t+=CP850[b]||String.fromCharCode(b));
+      t.split(/\r?\n/).forEach(z=>{
+        if(/^S1/.test(z)){ const n=z.slice(2,40).trim(); if(n) gef[n]=gef[n]||new Set(); }
+        else if(/^S8Kriterienwert/.test(z)){ const n=z.slice(22,52).trim(), v=z.slice(52).trim(); if(n&&v)(gef[n]=gef[n]||new Set()).add(v); }
+      });
+    }
+  }catch(e){ toast('Datei nicht lesbar: '+e.message); return; }
+  const namen=Object.keys(gef); if(!namen.length){ toast('Keine Kriterien in der Datei gefunden'); return; }
+  const K2=krit().map(k=>({n:k.n,w:k.w.slice()})); let nk=0, nw=0, nr=0;
+  namen.forEach(n=>{ const werte=[...gef[n]];
+    if(/^az$/i.test(n)) return;
+    if(/^raum$/i.test(n)){ const A2=areas().slice(); werte.forEach(w=>{ if(!A2.some(a=>a.n===w)){ A2.push({g:'aus pds Aufmaß plus',n:w}); nr++; } }); S.areas=A2; return; }
+    let k=K2.find(x=>x.n===n); if(!k){ k={n,w:[]}; K2.push(k); nk++; }
+    werte.forEach(w=>{ if(!k.w.includes(w)){ k.w.push(w); nw++; } });
+  });
+  S.krit=K2; save(); renderAll();
+  toast(`Übernommen: ${nk} Kriterien, ${nw} Werte, ${nr} Räume`);
+};
+
+/* ---------- Export „X31 für pds“ (X31_V1) ----------
+   GAEB DA XML 3.3, Datenart X31 (Mengenermittlung nach REB 23.003), Aufbau wie von pds Aufmaß plus erzeugt.
+   Jede Messzeile wird ein Massenansatz mit fester Zeilenadresse (pj_kr 'x31'): Beim nächsten Export kommen nur neue Zeilen,
+   Aufmaß plus hängt sie an. Raum = Feld „Ort“, dazu die Kriterien des Projekts und optional AZ (Abschlag).
+   Freie Positionen und ungeprüfte Vorschläge gehen nicht mit. */
+function x31Gruppen(){
+  // pds-Übernahme: je Auftrag ein Los „Auftrag 1126…“; Positionen mit doppelter Nummer heißen dort „<Auftrag>-<OZ>“
+  const L=[]; let cur=null;
+  LV.forEach(o=>{
+    if(o.k==='L' && /^Auftrag \d{5,}/.test(o.b||'')){ cur={nr:o.p,b:o.b,pos:[]}; L.push(cur); return; }
+    if(o.k==='P'){ if(!cur){ cur={nr:'',b:'Leistungsverzeichnis',pos:[]}; L.push(cur); }
+      const oz=cur.nr&&o.p.startsWith(cur.nr+'-')?o.p.slice(cur.nr.length+1):o.p; cur.pos.push({key:o.p,oz,i:o.i}); }
+  });
+  return L.filter(g=>g.pos.length);
+}
+const x31Esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+function x31Zeile(adr,menge){
+  const f='91'+String(Math.round(menge*1000)/1000).replace('.',',')+'=';
+  return ' '.repeat(29)+f.padEnd(40)+String(adr).padStart(4,'0')+'B0'+' '.repeat(5);
+}
+function x31Datei(g,zeilen,az){
+  // zeilen: [{oz, adr, menge, ort, kr}]
+  const lv=g.pos.map(x=>x.oz.split('.')), stufen=Math.max(...lv.map(t=>t.length));
+  const laengen=[...Array(stufen)].map((_,i)=>Math.max(1,...lv.filter(t=>t.length===stufen).map(t=>(t[i]||'').length)));
+  const K=[]; if(az) K.push('AZ'); if(zeilen.some(z=>z.ort)) K.push('Raum');
+  zeilen.forEach(z=>Object.keys(z.kr).forEach(n=>{ if(!K.includes(n)) K.push(n); }));
+  const kid=n=>K.indexOf(n)+1;
+  const baum={kinder:new Map(),pos:new Map()};
+  zeilen.forEach(z=>{ const t=z.oz.split('.'); let k=baum; t.slice(0,-1).forEach(x=>{ if(!k.kinder.has(x)) k.kinder.set(x,{kinder:new Map(),pos:new Map()}); k=k.kinder.get(x); });
+    const p=t[t.length-1]; if(!k.pos.has(p)) k.pos.set(p,[]); k.pos.get(p).push(z); });
+  let id=0; const nid=()=>'ID'+(++id);
+  const body=(k,e)=>{ let o=e+'<BoQBody>\n';
+    k.kinder.forEach((v,x)=>{ o+=`${e} <BoQCtgy ID="${nid()}" RNoPart="${x31Esc(x)}">\n`+body(v,e+'  ')+`${e} </BoQCtgy>\n`; });
+    if(k.pos.size){ o+=e+' <Itemlist>\n';
+      k.pos.forEach((zs,p)=>{ o+=`${e}  <Item ID="${nid()}" RNoPart="${x31Esc(p)}">\n${e}   <QtyDeterm>\n`;
+        zs.forEach(z=>{ o+=`${e}    <QDetermItem>\n${e}     <QTakeoff Row="${x31Esc(x31Zeile(z.adr,z.menge))}"/>\n`;
+          const w=[]; if(az) w.push(['AZ',az]); if(z.ort) w.push(['Raum',z.ort]); Object.keys(z.kr).forEach(n=>w.push([n,z.kr[n]]));
+          w.forEach(([n,v])=>{ o+=`${e}     <CtlgAssign>\n${e}      <CtlgID>${kid(n)}</CtlgID>\n${e}      <CtlgCode>${x31Esc(String(v).slice(0,60))}</CtlgCode>\n${e}     </CtlgAssign>\n`; });
+          o+=`${e}    </QDetermItem>\n`; });
+        o+=`${e}   </QtyDeterm>\n${e}  </Item>\n`; });
+      o+=e+' </Itemlist>\n'; }
+    return o+e+'</BoQBody>\n'; };
+  const b=body(baum,'   ');
+  const bk=laengen.map((l,i)=>`   <BoQBkdn>\n    <Type>${i===laengen.length-1?'Item':'BoQLevel'}</Type>\n    <Length>${l}</Length>\n    <Num>No</Num>\n    <Alignment>right</Alignment>\n   </BoQBkdn>\n`).join('');
+  const ct=K.map(n=>`   <Ctlg>\n    <CtlgID>${kid(n)}</CtlgID>\n    <CtlgType>miscellaneous</CtlgType>\n    <CtlgName>${x31Esc(n)}</CtlgName>\n   </Ctlg>\n`).join('');
+  const heute=new Date();
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<GAEB xmlns="http://www.gaeb.de/GAEB_DA_XML/DA31/3.3">\n <GAEBInfo>\n  <Version>3.3</Version>\n  <VersDate>2023-01</VersDate>\n  <Date>${heute.toISOString().slice(0,10)}</Date>\n  <ProgSystem>My Heise App</ProgSystem>\n  <ProgName>My Heise App Aufmass</ProgName>\n </GAEBInfo>\n`+
+    ` <QtyDeterm>\n  <PrjInfo>\n   <RefPrjName>${x31Esc(PROJ?PROJ.name:'')}</RefPrjName>\n  </PrjInfo>\n  <QtyDetermInfo>\n   <MethodDescription>REB23003-2009</MethodDescription>\n   <ProjDescr>${x31Esc(g.nr||(PROJ&&PROJ.nr)||'')}</ProjDescr>\n  </QtyDetermInfo>\n  <DP>31</DP>\n`+
+    `  <BoQ ID="ID0">\n   <RefBoQName>Aufmaß</RefBoQName>\n${bk}${ct}${b}  </BoQ>\n </QtyDeterm>\n</GAEB>\n`;
+}
+function x31Planung(g,alle){
+  const keys=new Map(g.pos.map(x=>[x.key,x]));
+  const ents=S.entries.filter(e=>keys.has(e.key));
+  const ok=ents.filter(e=>!e.pre&&typeof e.qty==='number'&&isFinite(e.qty)&&e.qty!==0);
+  const stufen=Math.max(...g.pos.map(x=>x.oz.split('.').length));
+  const falsch=ok.filter(e=>keys.get(e.key).oz.split('.').length!==stufen);
+  const nutzbar=ok.filter(e=>!falsch.includes(e)).sort((a,b)=>keys.get(a.key).i-keys.get(b.key).i||String(a.ts).localeCompare(String(b.ts)));
+  return {keys,neu:nutzbar.filter(e=>!e.xa),alt:nutzbar.filter(e=>e.xa),pre:ents.filter(e=>e.pre).length,falsch,liste:alle?nutzbar:nutzbar.filter(e=>!e.xa)};
+}
+async function openX31(){
+  if(!navigator.onLine){ toast('Für den Export wird eine Verbindung gebraucht'); return; }
+  if(diff().n){ await syncNow(); if(diff().n){ toast('Bitte erst abgleichen lassen'); return; } }
+  const G=x31Gruppen();
+  const frei=[...new Set(S.entries.filter(e=>!POS[e.key]).map(e=>e.key))].map(k=>posOf(k)).filter(Boolean);
+  $('#sheet').innerHTML=`<div class="hd"><div class="t"><div class="nr">Export für pds Aufmaß plus</div><h3>X31-Datei erstellen</h3></div><button class="icon" onclick="closeSheet()" aria-label="Schließen">${IC('x')}</button></div>
+    <p class="hint" style="margin:0 0 10px">In pds aus dem Auftrag ein Aufmaß erzeugen, „Aufmaßerfassung“ öffnen und in Aufmaß plus über <b>Projekt → X31/DA11 Import</b> die Datei einlesen. Danach speichern und mit „pds Export“ zurück nach pds. Jede Messzeile wird nur einmal übertragen, beim nächsten Export kommen nur neue Zeilen dazu.</p>
+    <div class="card"><label for="x31_az">AZ (Abschlag, optional)</label><input class="f" id="x31_az" placeholder="z. B. 01" autocomplete="off" value="${esc(localStorage.getItem('x31_az_'+AID)||'')}">
+      <label style="display:flex;gap:10px;align-items:center;margin-top:10px;font-weight:600"><input type="checkbox" id="x31_alle" style="width:20px;height:20px;accent-color:var(--accent)"> Bereits übertragene Zeilen noch einmal mitnehmen</label>
+      <div id="x31_gr"></div></div>
+    ${frei.length?`<div class="card"><h2 style="margin-bottom:4px">Freie Positionen (${frei.length})</h2><p class="hint" style="margin-top:0">Gehen nicht in die X31-Datei, weil es sie im LV von pds nicht gibt. Bitte in pds als Nachtrag anlegen:</p>${frei.map(f=>`<div class="hint" style="margin:4px 0"><b>${esc(f.p)}</b> ${esc(f.b)} · ${nf(sumOf(f.p))} ${esc(f.me||'')}</div>`).join('')}</div>`:''}
+    <div class="row" style="margin-top:6px"><button class="btn sec nur-leitung" id="x31_reset">Exportstand zurücksetzen</button></div>`;
+  $('#ov').classList.add('on'); $('#sheet').classList.add('on');
+  const zeichne=()=>{ const alle=$('#x31_alle').checked;
+    $('#x31_gr').innerHTML=G.length?G.map((g,i)=>{ const pl=x31Planung(g,alle);
+      return `<div class="x31g"><b>${esc(g.nr?g.b:'Leistungsverzeichnis')}</b><div class="hint">${pl.neu.length} neue Zeile${pl.neu.length===1?'':'n'}${pl.alt.length?`, ${pl.alt.length} bereits übertragen`:''}${pl.pre?` · ${pl.pre} ungeprüfte Vorschläge nicht dabei`:''}${pl.falsch.length?` · ${pl.falsch.length} Zeilen mit abweichender Positionsnummer nicht dabei`:''}</div>
+        <button class="btn cta" data-x31="${i}" ${pl.liste.length?'':'disabled'}>X31 erstellen (${pl.liste.length})</button></div>`; }).join(''):'<p class="hint">Kein LV mit Positionen vorhanden.</p>';
+    $('#x31_gr').querySelectorAll('[data-x31]').forEach(b=>b.onclick=()=>x31Erstellen(G[+b.dataset.x31],b)); };
+  $('#x31_alle').onchange=zeichne; zeichne();
+  $('#x31_reset').onclick=async()=>{ if(!confirm('Exportstand dieses Aufmaßes zurücksetzen?\n\nBeim nächsten Export werden alle Zeilen erneut übertragen und bekommen neue Adressen. Nur verwenden, wenn die Zeilen in Aufmaß plus gelöscht wurden.')) return;
+    try{ await PJ.rpc('pj_kr',{p:{aktion:'x31_zuruecksetzen',aufmass_id:AID}}); await pull(); toast('Zurückgesetzt'); zeichne(); }catch(e){ toast(e.message); } };
+}
+async function x31Erstellen(g,btn){
+  const az=$('#x31_az').value.trim(); try{ localStorage.setItem('x31_az_'+AID,az); }catch(e){}
+  const pl=x31Planung(g,$('#x31_alle').checked); if(!pl.liste.length) return;
+  btn.disabled=true; const t=btn.textContent; btn.textContent='Wird erstellt …';
+  try{
+    const r=await PJ.rpc('pj_kr',{p:{aktion:'x31',aufmass_id:AID,ids:pl.liste.map(e=>e.id)}});
+    const adr=r.adressen||{};
+    const zeilen=pl.liste.map(e=>({oz:pl.keys.get(e.key).oz,adr:adr[e.id],menge:e.qty,ort:(e.ort||'').trim(),kr:krSauber(e.kr)}));
+    if(zeilen.some(z=>!z.adr)) throw new Error('Adressen konnten nicht vergeben werden');
+    const name=('Aufmass_'+(g.nr||(PROJ&&PROJ.nr)||'')+'_'+(S.head.bez||'')+'_'+new Date().toISOString().slice(0,10)).replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss').replace(/[^A-Za-z0-9_-]+/g,'_')+'.x31';
+    dl(new Blob([x31Datei(g,zeilen,az)],{type:'application/xml'}),name);
+    toast(zeilen.length+' Zeilen exportiert');
+    await pull(); closeSheet();
+  }catch(e){ toast(/pj_kr|function/i.test(e.message)?'Datenbank-Erweiterung pj_kriterien_x31.sql fehlt':e.message); btn.disabled=false; btn.textContent=t; }
+}
+$('#btnX31').onclick=()=>openX31();
+
+function renderAll(){ PJS.set({seite:'aufmass',pid:PROJ?.id||null,pname:PROJ?.name||'',erfassen:true}); renderAreas(); renderKrit(); renderPos(); renderSum(); renderHdr(); sigText(); if(typeof renderEntwurf==='function') renderEntwurf(); }
 
 /* ---------- Datenbank-Abgleich ---------- */
-const eKey=e=>JSON.stringify([e.key,e.qty,e.ort||'',e.bem||'',e.rg||'',!!e.pre]);
+// Kriterien-Werte eines Eintrags als Text (leere Werte zählen nicht); nur angehängt, wenn vorhanden,
+// damit ältere gespeicherte Stände gleich bleiben
+const krSauber=kr=>{ const o={}; Object.keys(kr||{}).sort().forEach(k=>{ const v=String(kr[k]??'').trim(); if(v) o[k]=v; }); return o; };
+const krKey=kr=>{ const o=krSauber(kr); return Object.keys(o).length?JSON.stringify(o):''; };
+const eKey=e=>{ const k=krKey(e.kr); return JSON.stringify(k?[e.key,e.qty,e.ort||'',e.bem||'',e.rg||'',!!e.pre,k]:[e.key,e.qty,e.ort||'',e.bem||'',e.rg||'',!!e.pre]); };
+const kKey=k=>JSON.stringify((k||[]).map(x=>[x.n,(x.w||[]).slice()]));
+const krit=()=>Array.isArray(S.krit)?S.krit:[];
 const fKey=f=>JSON.stringify([f.p,f.b,f.me||'',f.t||'',f.ref||'']);
 const hKey=()=>JSON.stringify([S.head.bez||'',S.head.dat||'',S.head.mon||'',S.head.ag||'',S.head.bem||'',S.sig.sig1||null,S.sig.sig2||null,S.sig.ts||null,S.sig.aend?JSON.stringify(S.sig.aend):null]);
 const parseAend=v=>{ if(!v) return null; try{ const o=JSON.parse(v); return o&&o.ts?{text:o.text||'',ts:o.ts}:null; }catch(e){ return null; } };
 const aKey=a=>JSON.stringify((a||[]).map(x=>[x.g||'',x.n]));
-const fromE=e=>({id:e.id,key:e.pos_key,qty:e.menge,ort:e.ort||'',bem:e.bemerkung||'',rg:e.rg||'',pre:!!e.pre,ts:e.created_at||e.updated_at,von:e.erfasst_von||''});
+const fromE=e=>({id:e.id,key:e.pos_key,qty:e.menge,ort:e.ort||'',bem:e.bemerkung||'',rg:e.rg||'',pre:!!e.pre,ts:e.created_at||e.updated_at,von:e.erfasst_von||'',
+  kr:(e.kriterien&&typeof e.kriterien==='object'&&!Array.isArray(e.kriterien))?e.kriterien:{},xa:e.x31_adr||null});
 const fromF=f=>({id:f.id,p:f.nr,b:f.bez,me:f.me||'',t:f.titel||'',ref:f.ref||''});
 function baseFrom(srv){ // Serverstand in Vergleichswerte übersetzen
   const e={}, f={};
@@ -849,13 +1043,13 @@ function baseFrom(srv){ // Serverstand in Vergleichswerte übersetzen
   return {e,f};
 }
 function diff(){
-  if(!BASE) return {e:[],f:[],de:[],df:[],head:false,areas:false,n:0};
+  if(!BASE) return {e:[],f:[],de:[],df:[],head:false,areas:false,krit:false,n:0};
   const e=S.entries.filter(x=>BASE.e[x.id]!==eKey(x));
   const f=S.free.filter(x=>BASE.f[x.id]!==fKey(x));
   const ids=new Set(S.entries.map(x=>x.id)), fids=new Set(S.free.map(x=>x.id));
   const de=Object.keys(BASE.e).filter(id=>!ids.has(id)), df=Object.keys(BASE.f).filter(id=>!fids.has(id));
-  const head=BASE.h!==hKey(), ar=BASE.a!==aKey(S.areas);
-  return {e,f,de,df,head,areas:ar,n:e.length+f.length+de.length+df.length+(head?1:0)+(ar?1:0)};
+  const head=BASE.h!==hKey(), ar=BASE.a!==aKey(S.areas), kr=BASE.k!==undefined&&BASE.k!==kKey(krit());
+  return {e,f,de,df,head,areas:ar,krit:kr,n:e.length+f.length+de.length+df.length+(head?1:0)+(ar?1:0)+(kr?1:0)};
 }
 function setSync(kind,txt){ const el=$('#saveState'); el.innerHTML=IC(kind==='err'?'cloudoff':(txt.startsWith('✓')?'cloud':'sync'))+'<span>'+esc(txt.replace(/^✓ /,''))+'</span>'; el.style.color=kind==='err'?'var(--amber)':(txt.startsWith('✓')?'var(--ok)':''); }
 function syncStatus(){
@@ -873,6 +1067,7 @@ function applyServer(srv, keepLocal){
   const k=srv.kopf;
   const srvHead={bez:k.bez||'',dat:k.datum||'',mon:k.monteur||'',ag:k.ag||'',bem:k.bemerkung||''}, srvSig={sig1:k.sig1||null,sig2:k.sig2||null,ts:k.sig_ts||null,aend:parseAend(k.sig_aenderung)};
   const srvAreas=(srv.bereiche||[]).map(b=>({g:b.gruppe||'',n:b.name}));
+  const srvKrit=(Array.isArray(PROJ&&PROJ.kriterien)?PROJ.kriterien:[]).filter(k=>k&&k.n).map(k=>({n:String(k.n),w:(k.w||[]).map(String)}));
   if(keepLocal && BASE){
     const d=diff();
     const chE=new Map(d.e.map(x=>[x.id,x])), delE=new Set(d.de), chF=new Map(d.f.map(x=>[x.id,x])), delF=new Set(d.df);
@@ -883,13 +1078,17 @@ function applyServer(srv, keepLocal){
     S.entries=ents; S.free=frs;
     if(!d.head){ S.head=Object.assign(S.head,srvHead); S.sig=srvSig; }
     if(!d.areas) S.areas=srvAreas;
+    if(!d.krit) S.krit=srvKrit;
   } else {
-    S.entries=srvE; S.free=srvF; S.head=Object.assign(S.head,srvHead); S.sig=srvSig; S.areas=srvAreas;
+    S.entries=srvE; S.free=srvF; S.head=Object.assign(S.head,srvHead); S.sig=srvSig; S.areas=srvAreas; S.krit=srvKrit;
   }
+  // Exportstand (Adresse im pds-Aufmaß) kommt immer vom Server
+  { const xa=new Map(srvE.map(x=>[x.id,x.xa])); S.entries.forEach(x=>{ x.xa=xa.get(x.id)||null; }); }
   S.head.bv=[PROJ.nr,PROJ.name,PROJ.adresse].filter(Boolean).join(' · ');
   BASE=baseFrom(srv);
   BASE.h=JSON.stringify([srvHead.bez,srvHead.dat,srvHead.mon,srvHead.ag,srvHead.bem,srvSig.sig1,srvSig.sig2,srvSig.ts,srvSig.aend?JSON.stringify(srvSig.aend):null]);
   BASE.a=aKey(srvAreas);
+  BASE.k=kKey(srvKrit);
 }
 let syncT=null, syncing=false, syncAgain=false;
 function scheduleSync(){ clearTimeout(syncT); syncStatus(); syncT=setTimeout(syncNow,1500); }
@@ -909,6 +1108,10 @@ async function syncNow(){
                ...d.df.map(id=>({id,nr:'-',bez:'-',updated_at:t,deleted:1}))]
     };
     await api('aufmasse/'+AID+'/sync',{method:'POST',body:JSON.stringify(body)});
+    // Kriterien (pj_kriterien_x31.sql): Liste des Projekts und Werte je Eintrag
+    if(d.krit) await PJ.rpc('pj_kr',{p:{aktion:'kriterien',projekt_id:PROJ.id,kriterien:krit()}});
+    const krListe=d.e.filter(e=>krKey(e.kr)||(BASE.e[e.id]||'').length>0&&krit().length).map(e=>({id:e.id,kr:krSauber(e.kr)}));
+    if(krListe.length && (krit().length || krListe.some(x=>Object.keys(x.kr).length))) await PJ.rpc('pj_kr',{p:{aktion:'werte',aufmass_id:AID,liste:krListe}});
     const srv=await api('aufmasse/'+AID);
     applyServer(srv,true);
     localStorage.setItem(KEY, JSON.stringify({S,BASE,PROJ,LV}));
