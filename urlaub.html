@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f3b53">
+<title>Urlaub · My Heise App</title>
+<link rel="icon" href="icon-192.png">
+<style>
+@font-face{font-family:'Montserrat';src:url(montserrat.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{--bg:#f4f5f8;--surface:#fff;--surface-2:#eef0f4;--ink:#0d1524;--ink-2:#485468;--ink-3:#8491a3;--line:#e3e7ee;
+  --brand:#2f3b53;--brand-2:#4a5a7a;--accent:#e25304;--accent-2:#c94a03;--red:#c32328;--red-bg:#fdeceb;--amber-bg:#fdeee5;--ok:#15803d;--ok-bg:#e6f6ec;
+  --u:#e25304;--u-bg:#fde3d2;--frei:#eceff3;--ft:#dce3ec;--shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font:15px/1.45 Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:inherit;text-decoration:none}[hidden]{display:none!important}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;padding:calc(10px + var(--safe-t)) 16px 10px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.top .zur{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow);font-size:20px;font-weight:700}
+.top b{font-size:17px;font-weight:780;display:block}.top small{font-size:12px;color:var(--ink-3);font-weight:600}
+.top .sp{flex:1}
+.shell{max-width:1500px;margin:0 auto;padding:4px 16px calc(40px + var(--safe-b))}
+.leiste{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 14px}
+.seg{display:inline-grid;grid-auto-flow:column;gap:4px;padding:4px;background:var(--surface-2);border-radius:14px}
+.seg button{min-height:38px;padding:0 14px;border-radius:11px;font-weight:660;font-size:13.5px;color:var(--ink-2)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(13,21,36,.16)}
+.nav{display:flex;align-items:center;gap:6px}.nav b{min-width:150px;text-align:center;font-weight:760;font-size:16px}
+.nb{width:38px;height:38px;border-radius:12px;background:var(--surface);box-shadow:var(--shadow);font-weight:800;font-size:17px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:14px;font-weight:700;background:var(--brand);color:#fff}
+.btn.cta{background:var(--accent)}.btn.sec{background:var(--surface-2);color:var(--ink)}.btn.del{background:var(--red-bg);color:var(--red)}.btn.sm{min-height:38px;padding:0 13px;font-size:14px;border-radius:12px}
+.btn:disabled{opacity:.5}
+.grow{flex:1}
+.hinweis{background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);color:var(--ink-2);font-size:14px;margin-bottom:12px}
+.schw{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);font-weight:600}
+.schw input{width:54px;min-height:38px;border-radius:11px;border:1.5px solid var(--line);text-align:center;background:var(--surface)}
+/* Tabelle */
+.tw{overflow:auto;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);max-height:calc(100dvh - 190px)}
+table.plan{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%}
+.plan th,.plan td{border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.plan thead th{position:sticky;top:0;z-index:3;background:var(--surface);padding:6px 0 5px;font-weight:700;color:var(--ink-2);font-size:11.5px;line-height:1.15}
+.plan thead th small{display:block;font-weight:600;color:var(--ink-3);font-size:10px}
+.plan .nm{position:sticky;left:0;z-index:2;background:var(--surface);text-align:left;padding:0 12px;width:190px;min-width:150px;max-width:220px;overflow:hidden;text-overflow:ellipsis;font-weight:650;border-right:1px solid var(--line)}
+.plan thead .nm{z-index:4}
+.plan tr.gr td{background:var(--surface-2);text-align:left;font-weight:760;color:var(--brand);padding:6px 12px;font-size:12px}
+.plan td.t{min-width:28px;height:32px;padding:0;cursor:default;position:relative}
+.plan td.we{background:var(--frei);min-width:14px;width:14px}
+.plan td.ft,.plan th.ft{background:var(--ft)}.plan td.bu{background:#fbe8dc}.plan td.bu5{background:linear-gradient(135deg,#fbe8dc 50%,transparent 50%)}
+.plan td.ndb{background:repeating-linear-gradient(45deg,var(--frei) 0 4px,transparent 4px 8px)}
+.plan td.u1{background:var(--u);color:#fff;font-weight:800}
+.plan td.u5{background:linear-gradient(135deg,var(--u) 50%,var(--u-bg) 50%);color:#7a2c00;font-weight:800}
+.plan th.heute{color:var(--accent)}.plan th.heute::after{content:"";position:absolute;left:4px;right:4px;bottom:0;height:3px;border-radius:2px;background:var(--accent)}
+.plan thead th{position:sticky}
+.plan td.sum{font-weight:760;color:var(--ink-2);padding:0 10px;border-left:1px solid var(--line)}
+.ed .plan td.t:not(.we):not(.ft){cursor:pointer}.ed .plan td.t:not(.we):not(.ft):hover{outline:2px solid var(--accent);outline-offset:-2px}
+.plan tr.ich .nm{color:var(--accent)}
+.plan tfoot td{position:sticky;bottom:0;background:var(--surface);border-top:2px solid var(--line);font-weight:760;height:32px;z-index:2}
+.plan tfoot td.nm{z-index:3}
+.plan tfoot td.viel{background:var(--red);color:#fff}.plan tfoot td.etw{background:var(--amber-bg);color:var(--accent-2)}
+.plan.jahr td.m{min-width:64px;padding:0 6px;height:34px;font-weight:700;cursor:pointer}.plan.jahr td.m.hat{background:var(--u-bg);color:var(--accent-2)}
+.plan.jahr thead th{cursor:pointer;padding:8px 6px}
+.leer{padding:30px;text-align:center;color:var(--ink-3)}
+.leg{display:flex;flex-wrap:wrap;gap:14px;margin:12px 4px 0;font-size:12.5px;color:var(--ink-2)}.leg i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+/* Fenster */
+.bd{position:fixed;inset:0;z-index:100;background:rgba(8,13,21,.5);display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.bd{align-items:center}}
+.sh{background:var(--surface);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 18px calc(18px + var(--safe-b));max-height:92dvh;overflow:auto;animation:rise .2s}
+@media(min-width:700px){.sh{border-radius:24px}}
+@keyframes rise{from{transform:translateY(30px);opacity:0}}
+.sh h3{font-size:18px;font-weight:780;margin-bottom:4px}.sh .sub{color:var(--ink-2);font-size:13.5px;margin-bottom:14px}
+.f{display:grid;gap:5px;margin-bottom:12px}.f label{font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.inp{width:100%;min-height:46px;padding:0 12px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);font-size:16px;outline:none}
+.inp:focus{border-color:var(--accent)}
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.warn{background:var(--amber-bg);border-radius:14px;padding:12px 14px;margin:6px 0 12px;font-size:14px}
+.warn b{color:var(--accent-2);display:block;margin-bottom:6px}.warn ul{margin-left:18px}.warn li{margin:2px 0}
+.info{background:var(--surface-2);border-radius:14px;padding:10px 14px;margin:0 0 12px;font-size:13.5px;color:var(--ink-2)}
+.knoepfe{display:flex;gap:10px;margin-top:6px}.knoepfe .btn{flex:1}
+.toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%);background:#0f1826;color:#fff;padding:12px 16px;border-radius:14px;font-weight:600;font-size:14px;z-index:200;max-width:92vw;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+@media(max-width:600px){.plan .nm{width:110px;min-width:110px;max-width:110px;padding:0 8px;font-size:12px}.plan tr.gr td.nm{white-space:normal}}
+#boot{padding:60px 20px;text-align:center;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="zur" href="index.html" aria-label="Zur Startseite">‹</a>
+  <div><b>Urlaub</b><small id="rolleTxt"></small></div>
+  <div class="sp"></div>
+  <button class="btn cta sm nur-planer" id="neuBtn" hidden>+ Urlaub</button>
+</header>
+<main class="shell">
+  <div id="boot">Lädt …</div>
+  <div id="app" hidden>
+    <div class="hinweis" id="eigenHinweis" hidden>Du siehst hier deinen eigenen Urlaub. Eingetragen wird er von der Verwaltung.</div>
+    <div class="leiste">
+      <div class="seg" id="segBer"><button data-b="alle">Alle</button><button data-b="buero">Büro</button><button data-b="baustelle">Baustelle</button></div>
+      <div class="seg" id="segMod"><button data-m="monat">Monat</button><button data-m="jahr">Jahr</button></div>
+      <div class="nav"><button class="nb" id="zurueck" aria-label="zurück">‹</button><b id="titel"></b><button class="nb" id="vor" aria-label="vor">›</button></div>
+      <button class="btn sec sm" id="heute">Heute</button>
+      <div class="grow"></div>
+      <label class="schw" title="Ab dieser Zahl wird der Tag rot markiert">Rot ab <input type="number" id="schwelle" min="1" max="30"> gleichzeitig</label>
+    </div>
+    <div id="ansicht"></div>
+    <div class="leg">
+      <span><i style="background:var(--u)"></i>Urlaub</span>
+      <span><i style="background:linear-gradient(135deg,var(--u) 50%,var(--u-bg) 50%)"></i>halber Tag</span>
+      <span><i style="background:var(--ft)"></i>Feiertag</span>
+      <span><i style="background:#fbe8dc"></i>Betriebsurlaub</span>
+      <span><i style="background:repeating-linear-gradient(45deg,var(--frei) 0 4px,#fff 4px 8px)"></i>kein Arbeitstag</span>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+/* ===================== Anmeldung (gemeinsame Sitzung heiseSession) ===================== */
+const SB = 'https://bbjzfoirefcsqqgztjpt.supabase.co', KEY = 'sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H', SESS_KEY = 'heiseSession';
+const AUTH = { access: null, refresh: null, exp: 0 }; let refreshP = null;
+const storedRefresh = () => { try { return (JSON.parse(localStorage.getItem(SESS_KEY) || 'null') || {}).r || null } catch (e) { return null } };
+function authSave(j) { AUTH.access = j.access_token; AUTH.refresh = j.refresh_token; AUTH.exp = j.expires_at ? j.expires_at * 1000 : Date.now() + (j.expires_in || 3600) * 1000; try { localStorage.setItem(SESS_KEY, JSON.stringify({ r: AUTH.refresh })) } catch (e) { } }
+function toLogin() { location.replace('index.html?next=' + encodeURIComponent('urlaub.html')) }
+async function refresh() {
+  let r; try { r = await fetch(`${SB}/auth/v1/token?grant_type=refresh_token`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ refresh_token: AUTH.refresh }) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { try { localStorage.removeItem(SESS_KEY) } catch (e) { } toLogin(); throw new Error('Sitzung abgelaufen') }
+  authSave(j);
+}
+async function token() {
+  if (AUTH.access && AUTH.exp - Date.now() > 60000) return AUTH.access;
+  const r = storedRefresh() || AUTH.refresh; if (!r) { toLogin(); throw new Error('Nicht angemeldet') }
+  AUTH.refresh = r; if (!refreshP) refreshP = refresh().finally(() => { refreshP = null }); await refreshP; return AUTH.access;
+}
+async function rpc(name, args) {
+  const t = await token(); let r;
+  try { r = await fetch(`${SB}/rest/v1/rpc/${name}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + t }, body: JSON.stringify(args || {}) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => null);
+  if (!r.ok) { const m = (j && j.message) || r.statusText || 'Fehler'; if (r.status === 401) AUTH.access = null; throw new Error(/42501|permission denied/i.test(m) && !/dürfen/.test(m) ? 'Dafür fehlt dir die Berechtigung' : m) }
+  return j;
+}
+window.addEventListener('storage', e => { if (e.key === SESS_KEY && !e.newValue) location.replace('index.html') });
+
+/* ===================== Hilfen ===================== */
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const dt = s => new Date(s + 'T12:00'), addD = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x };
+const WT = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'], MON = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const wtag = s => (dt(s).getDay() + 6) % 7, dDE = s => { const d = dt(s); return `${WT[wtag(s)]} ${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.` };
+const dKurz = s => { const d = dt(s); return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}` };
+const kw = d => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const n = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - n); const y = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y) / 864e5 + 1) / 7) };
+const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem('ul_' + k); localStorage.setItem('ul_' + k, v) } catch (e) { return null } };
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3200) }
+const zahl = n => String(n).replace('.', ',');
+
+/* ===================== Daten ===================== */
+const GR_BAU = ['Obermonteur', 'Monteur', 'Kundendienst', 'Azubi', 'Leiharbeiter', 'Praktikant'];
+const GR_BAU_TXT = { Obermonteur: 'Obermonteure', Monteur: 'Monteure', Kundendienst: 'Kundendienst', Azubi: 'Auszubildende', Leiharbeiter: 'Leiharbeiter', Praktikant: 'Praktikanten' };
+const GR_BUERO = ['Geschäftsführung', 'Projektleitung', 'Büro', 'Lager'];
+let ROLLE = null, PERS = [], EIN = {}, BU = {}, FT = {}, GELADEN = null;
+let BER = ls('ber') || 'alle', MODUS = ls('modus') || 'monat', SCHWELLE = +(ls('schwelle') || 3);
+const H = new Date(); H.setHours(12, 0, 0, 0);
+let MONAT = new Date(H.getFullYear(), H.getMonth(), 1, 12), JAHR = H.getFullYear();
+const darf = () => ROLLE === 'planer' || ROLLE === 'admin';
+const pk = p => p.art + ':' + p.id;
+
+async function laden(jahr, still) {
+  if (!still) $('#ansicht').innerHTML = '<div class="leer">Lädt …</div>';
+  const j = await rpc('ul_laden', { p_von: `${jahr}-01-01`, p_bis: `${jahr}-12-31` });
+  ROLLE = j.rolle; PERS = j.personen || []; EIN = {}; BU = {}; FT = {};
+  (j.eintraege || []).forEach(e => { (EIN[e.art + ':' + e.id] ||= {})[e.datum] = e });
+  (j.bu || []).forEach(b => BU[b.datum] = +b.anteil);
+  (j.feiertage || []).forEach(f => FT[f.datum] = f.name);
+  GELADEN = jahr;
+  $('#rolleTxt').textContent = { admin: 'Admin', planer: 'Planer', leser: 'ansehen', eigen: 'eigener Urlaub' }[ROLLE] || '';
+  document.body.classList.toggle('ed', darf());
+  $('#neuBtn').hidden = !darf();
+  $('#eigenHinweis').hidden = ROLLE !== 'eigen';
+}
+const sichtbar = () => PERS.filter(p => BER === 'alle' || p.bereich === BER);
+function arbeitstag(p, s) {
+  const w = wtag(s);
+  if (w >= 5 || w >= (p.tage || 5)) return false;
+  if (p.ab && s < p.ab) return false; if (p.bis && s > p.bis) return false;
+  return true;
+}
+const urlaub = (p, s) => (EIN[pk(p)] || {})[s] || null;
+function gruppen(L) {
+  const out = [], push = (titel, arr) => { if (arr.length) out.push([titel, arr]) };
+  if (BER !== 'baustelle') {
+    const b = L.filter(p => p.bereich === 'buero');
+    GR_BUERO.forEach(g => push(g, b.filter(p => p.gruppe === g)));
+    push('Büro (weitere)', b.filter(p => !GR_BUERO.includes(p.gruppe)));
+  }
+  if (BER !== 'buero') {
+    const b = L.filter(p => p.bereich === 'baustelle');
+    GR_BAU.forEach(g => push((BER === 'alle' ? 'Baustelle · ' : '') + GR_BAU_TXT[g], b.filter(p => p.gruppe === g)));
+    push('Baustelle · weitere', b.filter(p => !GR_BAU.includes(p.gruppe)));
+  }
+  return out;
+}
+
+/* ===================== Monatsansicht ===================== */
+function tageImMonat(m) { const L = []; for (let d = new Date(m); d.getMonth() === m.getMonth(); d = addD(d, 1)) L.push(iso(d)); return L }
+function zelle(p, s) {
+  const w = wtag(s), we = w >= 5, u = urlaub(p, s);
+  let cls = 't', txt = '', tip = `${p.name}, ${dDE(s)}`;
+  if (we) cls += ' we';
+  else if (FT[s]) { cls += ' ft'; tip += ': ' + FT[s] }
+  else if (u) { cls += u.anteil < 1 ? ' u5' : ' u1'; txt = u.anteil < 1 ? '½' : 'U'; tip += u.anteil < 1 ? ': ½ Tag Urlaub' : ': Urlaub'; if (u.neben) tip += ' · sonst ' + u.neben; if (u.notiz) tip += ' · ' + u.notiz }
+  else if (BU[s] === 1) { cls += ' bu'; tip += ': Betriebsurlaub' }
+  else if (!arbeitstag(p, s)) { cls += ' ndb'; tip += ': kein Arbeitstag' }
+  else if (BU[s] === 0.5) { cls += ' bu5'; tip += ': ½ Betriebsurlaub' }
+  return `<td class="${cls}" data-k="${esc(pk(p))}" data-d="${s}" title="${esc(tip)}">${txt}</td>`;
+}
+function rMonat() {
+  const tage = tageImMonat(MONAT), L = sichtbar(), heute = iso(H);
+  $('#titel').textContent = `${MON[MONAT.getMonth()]} ${MONAT.getFullYear()}`;
+  if (!L.length) { $('#ansicht').innerHTML = '<div class="tw"><div class="leer">Keine Personen in dieser Auswahl.</div></div>'; return }
+  const kopf = tage.map(s => { const w = wtag(s), d = dt(s); return `<th class="${w >= 5 ? 'we' : ''}${FT[s] ? ' ft' : ''}${s === heute ? ' heute' : ''}" title="${esc(FT[s] || (BU[s] ? (BU[s] === 1 ? 'Betriebsurlaub' : '½ Betriebsurlaub') : ''))}">${w >= 5 ? '' : `<small>${w === 0 || s === tage[0] ? 'KW' + kw(d) : WT[w]}</small>`}${w >= 5 ? '<small>&nbsp;</small>' : d.getDate()}</th>` }).join('');
+  const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm" colspan="1">${esc(titel)} · ${P.length}</td><td colspan="${tage.length + 1}"></td></tr>` + P.map(p => {
+    const summe = tage.reduce((a, s) => { const u = urlaub(p, s); return a + (u && wtag(s) < 5 && !FT[s] ? +u.anteil : 0) }, 0);
+    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name)}">${esc(p.name)}</td>${tage.map(s => zelle(p, s)).join('')}<td class="sum">${summe ? zahl(summe) : ''}</td></tr>`
+  }).join('')).join('');
+  const fuss = tage.map(s => { if (wtag(s) >= 5) return '<td class="we"></td>'; const n = L.filter(p => urlaub(p, s)).length; const cls = n >= SCHWELLE ? 'viel' : n >= Math.max(1, SCHWELLE - 1) && n > 0 ? 'etw' : '';
+    return `<td class="${cls}" title="${esc(dDE(s) + ': ' + (n ? L.filter(p => urlaub(p, s)).map(p => p.name).join(', ') : 'niemand im Urlaub'))}">${n || ''}</td>` }).join('');
+  $('#ansicht').innerHTML = `<div class="tw"><table class="plan"><thead><tr><th class="nm">Name</th>${kopf}<th>Tage</th></tr></thead><tbody>${zeilen}</tbody>
+    <tfoot><tr><td class="nm">Gleichzeitig im Urlaub</td>${fuss}<td></td></tr></tfoot></table></div>`;
+}
+
+/* ===================== Jahresansicht ===================== */
+function rJahr() {
+  $('#titel').textContent = String(JAHR);
+  const L = sichtbar();
+  if (!L.length) { $('#ansicht').innerHTML = '<div class="tw"><div class="leer">Keine Personen in dieser Auswahl.</div></div>'; return }
+  const monTage = Array.from({ length: 12 }, (_, m) => tageImMonat(new Date(JAHR, m, 1, 12)).filter(s => wtag(s) < 5 && !FT[s]));
+  const maxGl = monTage.map(T => T.reduce((a, s) => Math.max(a, L.filter(p => urlaub(p, s)).length), 0));
+  const kopf = MON.map((m, i) => `<th data-m="${i}" title="Monat öffnen">${m.slice(0, 3)}<small>${maxGl[i] ? 'max. ' + maxGl[i] + ' gleichz.' : '&nbsp;'}</small></th>`).join('');
+  const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm">${esc(titel)} · ${P.length}</td><td colspan="13"></td></tr>` + P.map(p => {
+    const je = monTage.map(T => T.reduce((a, s) => { const u = urlaub(p, s); return a + (u ? +u.anteil : 0) }, 0)), sum = je.reduce((a, b) => a + b, 0);
+    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name)}">${esc(p.name)}</td>${je.map((n, i) => `<td class="m${n ? ' hat' : ''}" data-m="${i}">${n ? zahl(n) : ''}</td>`).join('')}<td class="sum">${sum ? zahl(sum) : ''}</td></tr>`
+  }).join('')).join('');
+  $('#ansicht').innerHTML = `<div class="tw"><table class="plan jahr"><thead><tr><th class="nm">Name · Urlaubstage</th>${kopf}<th>Summe</th></tr></thead><tbody>${zeilen}</tbody></table></div>`;
+}
+
+async function zeigen() {
+  document.querySelectorAll('#segBer button').forEach(b => b.classList.toggle('on', b.dataset.b === BER));
+  document.querySelectorAll('#segMod button').forEach(b => b.classList.toggle('on', b.dataset.m === MODUS));
+  const jahr = MODUS === 'monat' ? MONAT.getFullYear() : JAHR;
+  if (GELADEN !== jahr) { try { await laden(jahr) } catch (e) { $('#ansicht').innerHTML = `<div class="tw"><div class="leer">${esc(e.message)}</div></div>`; return } }
+  MODUS === 'monat' ? rMonat() : rJahr();
+}
+
+/* ===================== Eintragen / Löschen ===================== */
+function fenster(html) {
+  const bd = document.createElement('div'); bd.className = 'bd'; bd.innerHTML = `<div class="sh" role="dialog">${html}</div>`;
+  bd.addEventListener('click', e => { if (e.target === bd) bd.remove() }); document.body.appendChild(bd);
+  const zu = () => bd.remove(); bd.querySelectorAll('[data-zu]').forEach(b => b.onclick = zu); return { el: bd, zu };
+}
+function personOptionen(sel) {
+  return gruppen(sichtbar()).map(([t, P]) => `<optgroup label="${esc(t)}">${P.map(p => `<option value="${esc(pk(p))}"${pk(p) === sel ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</optgroup>`).join('');
+}
+function gleichzeitig(key, von, bis) {
+  if (!von || !bis || bis < von) return '';
+  const res = [];
+  PERS.forEach(p => { if (pk(p) === key) return; const T = Object.keys(EIN[pk(p)] || {}).filter(s => s >= von && s <= bis).sort(); if (T.length) res.push(`${esc(p.name)} (${T.length === 1 ? dKurz(T[0]).slice(0, 6) : dKurz(T[0]).slice(0, 6) + '–' + dKurz(T[T.length - 1]).slice(0, 6)})`) });
+  const außerhalb = von.slice(0, 4) != GELADEN || bis.slice(0, 4) != GELADEN ? ' (nur ' + GELADEN + ' geprüft)' : '';
+  return res.length ? `<div class="info"><b>Gleichzeitig im Urlaub${außerhalb}:</b> ${res.join(', ')}</div>` : '';
+}
+function eintragenFenster(key, von, bis) {
+  const f = fenster(`<h3>Urlaub eintragen</h3><div class="sub">Bei Baustellen-Mitarbeitern wird der Urlaub direkt im Wochenplan eingetragen.</div>
+    <div class="f"><label>Mitarbeiter</label><select class="inp" id="fP"><option value="">Bitte wählen</option>${personOptionen(key)}</select></div>
+    <div class="zwei"><div class="f"><label>Von</label><input class="inp" type="date" id="fV" value="${von || ''}"></div><div class="f"><label>Bis</label><input class="inp" type="date" id="fB" value="${bis || von || ''}"></div></div>
+    <div class="f"><label>Umfang</label><div class="seg" id="fA"><button data-a="1" class="on">Ganzer Tag</button><button data-a="0.5">Halber Tag</button></div></div>
+    <div class="f"><label>Notiz (optional)</label><input class="inp" id="fN" maxlength="120"></div>
+    <div id="fGl"></div><div id="fW"></div>
+    <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn cta" id="fOk">Eintragen</button></div>`);
+  let anteil = 1;
+  const gl = () => { $('#fGl').innerHTML = gleichzeitig($('#fP').value, $('#fV').value, $('#fB').value); $('#fW').innerHTML = ''; $('#fOk').textContent = 'Eintragen'; bestaetigt = false };
+  let bestaetigt = false;
+  f.el.querySelectorAll('#fA button').forEach(b => b.onclick = () => { anteil = +b.dataset.a; f.el.querySelectorAll('#fA button').forEach(x => x.classList.toggle('on', x === b)); gl() });
+  ['#fP', '#fV', '#fB'].forEach(s => $(s).addEventListener('change', () => { if (s === '#fV' && (!$('#fB').value || $('#fB').value < $('#fV').value)) $('#fB').value = $('#fV').value; gl() }));
+  gl();
+  $('#fOk').onclick = async () => {
+    const k = $('#fP').value, v = $('#fV').value, b = $('#fB').value;
+    if (!k || !v || !b) return toast('Bitte Mitarbeiter und Zeitraum angeben');
+    if (b < v) return toast('Das Ende liegt vor dem Beginn');
+    const [art, id] = [k.slice(0, 1), k.slice(2)];
+    $('#fOk').disabled = true;
+    try {
+      const r = await rpc('ul_eintragen', { p_art: art, p_id: id, p_von: v, p_bis: b, p_anteil: anteil, p_notiz: $('#fN').value.trim(), p_bestaetigt: bestaetigt });
+      if (!r.ok) {
+        bestaetigt = true;
+        $('#fW').innerHTML = `<div class="warn"><b>Im Wochenplan ist an ${r.konflikte.length === 1 ? 'diesem Tag' : 'diesen Tagen'} schon etwas anderes eingetragen:</b><ul>${r.konflikte.map(x => `<li>${dDE(x.datum)} ${esc(x.grund || '')}</li>`).join('')}</ul><div style="margin-top:8px">Mit „Trotzdem eintragen“ wird ${anteil === 1 ? 'der Eintrag durch Urlaub ersetzt' : 'der halbe Tag Urlaub dazugesetzt bzw. die Abwesenheit ersetzt'}.</div></div>`;
+        $('#fOk').textContent = 'Trotzdem eintragen'; $('#fOk').disabled = false; return;
+      }
+      f.zu();
+      const teile = [];
+      if (r.neu) teile.push(`${r.neu} ${r.neu === 1 ? 'Tag' : 'Tage'} eingetragen`);
+      if (r.ersetzt) teile.push(`${r.ersetzt} ersetzt`);
+      if (r.ergaenzt) teile.push(`${r.ergaenzt} neben der Baustelle`);
+      if (r.vorhanden) teile.push(`${r.vorhanden} schon vorhanden`);
+      toast(teile.join(', ') || 'Keine Arbeitstage im Zeitraum');
+      GELADEN = null; await zeigen();
+    } catch (e) { toast(e.message); $('#fOk').disabled = false }
+  };
+}
+function block(key, s) {
+  // zusammenhängenden Urlaub um den Tag herum finden (freie Tage dazwischen werden übersprungen)
+  const p = PERS.find(x => pk(x) === key), frei = d => wtag(d) >= 5 || FT[d] || BU[d] === 1 || !arbeitstag(p, d);
+  let v = s, b = s;
+  for (let d = iso(addD(dt(s), -1)), n = 0; n < 40; d = iso(addD(dt(d), -1)), n++) { if (urlaub(p, d)) v = d; else if (!frei(d)) break }
+  for (let d = iso(addD(dt(s), 1)), n = 0; n < 40; d = iso(addD(dt(d), 1)), n++) { if (urlaub(p, d)) b = d; else if (!frei(d)) break }
+  return [v, b];
+}
+function urlaubFenster(key, s) {
+  const p = PERS.find(x => pk(x) === key), u = urlaub(p, s), [v, b] = block(key, s);
+  const f = fenster(`<h3>${esc(p.name)}</h3><div class="sub">${dDE(s)}: ${u.anteil < 1 ? '½ Tag Urlaub' : 'Urlaub'}${u.neben ? ' · sonst ' + esc(u.neben) : ''}${u.notiz ? ' · ' + esc(u.notiz) : ''}</div>
+    <div class="zwei"><div class="f"><label>Von</label><input class="inp" type="date" id="lV" value="${v}"></div><div class="f"><label>Bis</label><input class="inp" type="date" id="lB" value="${b}"></div></div>
+    <div class="info">${p.bereich === 'baustelle' ? 'Beim Löschen wird der Urlaub auch im Wochenplan entfernt. Steht daneben eine Baustelle, bleibt sie stehen.' : 'Löscht den Urlaub im gewählten Zeitraum.'}</div>
+    <div class="knoepfe"><button class="btn sec" id="lNeu">Ändern / ergänzen</button><button class="btn del" id="lDel">Urlaub löschen</button></div>`);
+  $('#lNeu').onclick = () => { f.zu(); eintragenFenster(key, $('#lV').value, $('#lB').value) };
+  $('#lDel').onclick = async () => {
+    const lv = $('#lV').value, lb = $('#lB').value; if (!lv || !lb || lb < lv) return toast('Zeitraum prüfen');
+    if (!confirm(`Urlaub von ${p.name} vom ${dKurz(lv)} bis ${dKurz(lb)} löschen?`)) return;
+    try { const r = await rpc('ul_loeschen', { p_art: p.art, p_id: p.id, p_von: lv, p_bis: lb }); f.zu(); toast(`${r.tage} ${r.tage === 1 ? 'Tag' : 'Tage'} gelöscht`); GELADEN = null; await zeigen() }
+    catch (e) { toast(e.message) }
+  };
+}
+
+/* ===================== Bedienung ===================== */
+document.querySelectorAll('#segBer button').forEach(b => b.onclick = () => { BER = b.dataset.b; ls('ber', BER); zeigen() });
+document.querySelectorAll('#segMod button').forEach(b => b.onclick = () => { MODUS = b.dataset.m; ls('modus', MODUS); if (MODUS === 'jahr') JAHR = MONAT.getFullYear(); else if (MONAT.getFullYear() !== JAHR) MONAT = new Date(JAHR, 0, 1, 12); zeigen() });
+$('#zurueck').onclick = () => { if (MODUS === 'monat') MONAT = new Date(MONAT.getFullYear(), MONAT.getMonth() - 1, 1, 12); else JAHR--; zeigen() };
+$('#vor').onclick = () => { if (MODUS === 'monat') MONAT = new Date(MONAT.getFullYear(), MONAT.getMonth() + 1, 1, 12); else JAHR++; zeigen() };
+$('#heute').onclick = () => { MONAT = new Date(H.getFullYear(), H.getMonth(), 1, 12); JAHR = H.getFullYear(); zeigen() };
+$('#schwelle').value = SCHWELLE;
+$('#schwelle').onchange = e => { SCHWELLE = Math.max(1, +e.target.value || 3); e.target.value = SCHWELLE; ls('schwelle', SCHWELLE); zeigen() };
+$('#neuBtn').onclick = () => { const d = MODUS === 'monat' && iso(H).slice(0, 7) === iso(MONAT).slice(0, 7) ? iso(H) : ''; eintragenFenster('', d, d) };
+$('#ansicht').addEventListener('click', e => {
+  const m = e.target.closest('[data-m]');
+  if (m && MODUS === 'jahr') { MODUS = 'monat'; ls('modus', MODUS); MONAT = new Date(JAHR, +m.dataset.m, 1, 12); zeigen(); return }
+  const td = e.target.closest('td.t'); if (!td || !darf()) return;
+  if (td.classList.contains('we') || td.classList.contains('ft')) return;
+  const key = td.dataset.k, s = td.dataset.d, p = PERS.find(x => pk(x) === key);
+  if (urlaub(p, s)) urlaubFenster(key, s); else eintragenFenster(key, s, s);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { const b = document.querySelector('.bd'); if (b) b.remove() } });
+let weg = 0;
+document.addEventListener('visibilitychange', () => { if (document.hidden) { weg = Date.now(); return } if (Date.now() - weg > 60000 && !document.querySelector('.bd')) { GELADEN = null; zeigen() } });
+
+(async function start() {
+  if (!storedRefresh()) return toLogin();
+  try { await laden(MONAT.getFullYear()) } catch (e) { $('#boot').textContent = e.message; return }
+  if (ROLLE === null) { $('#boot').textContent = 'Für dieses Konto ist kein Benutzerprofil hinterlegt.'; return }
+  $('#boot').hidden = true; $('#app').hidden = false; zeigen();
+})();
+</script>
+</body>
+</html>

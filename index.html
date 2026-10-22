@@ -462,6 +462,11 @@ const MODULES = [
     rollen: [
       { k: 'planer', l: 'Planer', d: '1. und 2. Notdienst eintragen und tauschen. Ohne Freischaltung: nur ansehen (Einsatzplan und Infos).' },
       { k: 'verwalter', l: 'Verwalten und auswerten', d: 'Wie Planer, dazu Tauschwünsche genehmigen oder ablehnen, die Auswertung sehen, Notdienst-Mitarbeiter mit Handynummern und Farben sowie die Infos (Pauschalen, Stundensätze, Anfahrt, Zeiten, Sperrliste) bearbeiten.' }] },
+  // Urlaub: eigener Bereich urlaub.html. Ohne Freischaltung sieht jeder nur seinen eigenen Urlaub.
+  { id: 'urlaub', name: 'Urlaub', desc: 'Urlaubsplan Büro und Baustelle', url: 'urlaub.html', icon: 'calendar', g: ['#f08a3c', '#e25304'], alle: true,
+    rollen: [
+      { k: 'leser', l: 'Ansehen', d: 'Urlaub aller Mitarbeiter ansehen (Büro und Baustelle). Ohne Freischaltung: nur den eigenen Urlaub.' },
+      { k: 'planer', l: 'Planer', d: 'Urlaub eintragen und löschen. Urlaub von Baustellen-Mitarbeitern wird direkt im Wochenplan der Planung eingetragen.' }] },
   { id: 'geraete', name: 'Geräteverwaltung', desc: 'iPads, Handys, Apps, Kosten', url: 'geraete.html', icon: 'tablet', g: ['#6b7a99', '#465573'],
     rollen: [
       { k: 'verwalter', l: 'Verwalter', d: 'Geräte, Apps und Abos anlegen und ändern, Geräte mit Unterschrift ausgeben und zurücknehmen, Kosten und Fristen sehen.' },
@@ -479,6 +484,8 @@ const BEREICHE = [
     apps: ['projekte', 'objekt', 'gefaehrdung'], zaehlt: ['projekte', 'objekt', 'gefaehrdung'] },
   { id: 'planung', name: 'Planung', desc: 'Wochenplan, Zeitplan, Mein Einsatz', icon: 'calendar', g: ['#5b6b8c', '#2f3b53'],
     apps: ['planung'], zaehlt: [] },
+  { id: 'urlaub', name: 'Urlaub', desc: 'Wer hat wann Urlaub', icon: 'calendar', g: ['#f08a3c', '#e25304'],
+    apps: ['urlaub'], zaehlt: [] },
   { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', icon: 'bell', g: ['#e8742f', '#c94a03'],
     apps: ['notdienst'], zaehlt: [] },
   { id: 'lager', name: 'Lager & Material', desc: 'Kommission, eigenes Lager, Reste', icon: 'box', g: ['#4a5a7a', '#2f3b53'],
