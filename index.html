@@ -1110,7 +1110,25 @@ function uMenu(el) {
   const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
   const self = u.id === ME.id;
   sheet(u.name, `<div class="kv"><b>${esc(u.name)}</b><span>${esc(u.benutzername || '')}${u.rolle === 'admin' ? ' · Admin' : ''}${u.email ? ' · ' + esc(u.email) : ''}</span></div>
-    <div class="btnrow" style="flex-direction:column"><button class="btn btn-soft" data-act="uMail" data-u="${u.id}">${ic('mail')} E-Mail ${u.email ? 'ändern' : 'hinterlegen'}</button>${self ? '' : `<button class="btn btn-soft" data-act="uRolle" data-u="${u.id}">${ic('shield')} ${u.rolle === 'admin' ? 'Zum normalen Benutzer machen' : 'Zum Admin machen'}</button>`}<button class="btn btn-soft" data-act="uPw" data-u="${u.id}">${ic('lock')} Passwort zurücksetzen</button>${self ? '' : `<button class="btn btn-ghost" style="color:var(--red)" data-act="uDel" data-u="${u.id}">${ic('trash')} Benutzer löschen</button>`}</div>`);
+    <div class="btnrow" style="flex-direction:column"><button class="btn btn-soft" data-act="uAnzeige" data-u="${u.id}">${ic('users')} Anzeigenamen ändern</button><button class="btn btn-soft" data-act="uMail" data-u="${u.id}">${ic('mail')} E-Mail ${u.email ? 'ändern' : 'hinterlegen'}</button>${self ? '' : `<button class="btn btn-soft" data-act="uRolle" data-u="${u.id}">${ic('shield')} ${u.rolle === 'admin' ? 'Zum normalen Benutzer machen' : 'Zum Admin machen'}</button>`}<button class="btn btn-soft" data-act="uPw" data-u="${u.id}">${ic('lock')} Passwort zurücksetzen</button>${self ? '' : `<button class="btn btn-ghost" style="color:var(--red)" data-act="uDel" data-u="${u.id}">${ic('trash')} Benutzer löschen</button>`}</div>`);
+}
+function uAnzeige(el) {
+  const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
+  closeSheet();
+  const bd = sheet('Anzeigename', `<div class="kv"><b>${esc(u.name)}</b><span>Benutzername: ${esc(u.benutzername || '')}</span></div>
+    <div class="field"><label for="nmIn">Anzeigename</label><input class="inp" id="nmIn" autocomplete="off" maxlength="80" placeholder="Vorname Nachname"><small class="faint">So erscheint die Person in allen Apps. Der Benutzername zum Anmelden bleibt gleich.</small></div><div class="err" id="nmErr" role="alert"></div>`,
+    `<button class="btn btn-ghost" data-act="closeSheet">Abbrechen</button><button class="btn btn-primary" id="nmGo">Speichern</button>`);
+  $('#nmIn', bd).value = u.name || '';
+  $('#nmGo', bd).onclick = async ev => {
+    const name = $('#nmIn', bd).value.trim().replace(/\s+/g, ' '), err = m => { $('#nmErr', bd).textContent = m || '' };
+    if (name.length < 2) return err('Bitte einen Namen eingeben.');
+    if (name === u.name) return closeSheet();
+    if (ZU.some(x => x.id !== u.id && (x.name || '').toLowerCase() === name.toLowerCase())) return err('Diesen Namen hat schon jemand anderes.');
+    const b = ev.currentTarget; b.disabled = true; err('');
+    try { await api('PATCH', 'benutzer', { name }, `?id=eq.${u.id}`); closeSheet(); toast('Name gespeichert', 'ok'); if (location.hash === '#/zugriff') showZugriff() }
+    catch (e) { err(niceErr(e)); b.disabled = false }
+  };
+  setTimeout(() => $('#nmIn', bd).focus(), 60);
 }
 function uMail(el) {
   const u = ZU.find(x => x.id === el.dataset.u); if (!u) return;
@@ -1174,7 +1192,7 @@ function uDel(el) {
 
 /* ---------- Klicks ---------- */
 const ACT = {
-  uNeu, uListe, uGruppen, uMenu, uMail, uRolle, uPw, uDel, uTog, rolInfo,
+  uNeu, uListe, uGruppen, uMenu, uAnzeige, uMail, uRolle, uPw, uDel, uTog, rolInfo,
   pwGen(el) { const t = $('#' + el.dataset.t); if (t) t.value = pwVorschlag() },
   nvR(el) { $$('#nvRolle button').forEach(b => b.classList.toggle('on', b === el)) },
   logout, konto: kontoSheet, pw: () => { closeSheet(); pwSheet() }, closeSheet: () => closeSheet(),

@@ -10,7 +10,7 @@
 @font-face{font-family:'Montserrat';src:url(montserrat.woff2) format('woff2');font-weight:100 900;font-display:swap}
 :root{--bg:#f4f5f8;--surface:#fff;--surface-2:#eef0f4;--ink:#0d1524;--ink-2:#485468;--ink-3:#8491a3;--line:#e3e7ee;
   --brand:#2f3b53;--brand-2:#4a5a7a;--accent:#e25304;--accent-2:#c94a03;--red:#c32328;--red-bg:#fdeceb;--amber-bg:#fdeee5;--ok:#15803d;--ok-bg:#e6f6ec;
-  --u:#e25304;--u-bg:#fde3d2;--frei:#eceff3;--ft:#dce3ec;--shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);
+  --u:#13877a;--u-bg:#d3efea;--frei:#eceff3;--ft:#dce3ec;--shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);
   --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font:15px/1.45 Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh;-webkit-font-smoothing:antialiased}
@@ -47,7 +47,13 @@ table.plan{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%
 .plan td.ft,.plan th.ft{background:var(--ft)}.plan td.bu{background:#fbe8dc}.plan td.bu5{background:linear-gradient(135deg,#fbe8dc 50%,transparent 50%)}
 .plan td.ndb{background:repeating-linear-gradient(45deg,var(--frei) 0 4px,transparent 4px 8px)}
 .plan td.u1{background:var(--u);color:#fff;font-weight:800}
-.plan td.u5{background:linear-gradient(135deg,var(--u) 50%,var(--u-bg) 50%);color:#7a2c00;font-weight:800}
+.plan td.u5{background:linear-gradient(135deg,var(--u) 50%,var(--u-bg) 50%);color:#0b5a51;font-weight:800}
+.plan thead th.sf{background:#e4effb;box-shadow:inset 0 4px 0 #2c60a7}.plan thead th.sf.we{background:#dbe6f3}
+.plan tfoot td.sf{box-shadow:inset 0 3px 0 #2c60a7}
+.monhin{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}.monhin span{background:var(--surface);border-radius:10px;padding:5px 10px;font-size:12.5px;font-weight:650;color:var(--ink-2);box-shadow:var(--shadow)}
+.monhin span.sfh{background:#e4effb;color:#1f4f8f}.monhin span.fth{background:var(--ft);color:var(--brand)}
+.ferliste{margin:12px 4px 0;font-size:13px;color:var(--ink-2)}.ferliste b{color:#1f4f8f}
+.info.sfw{background:#e4effb;color:#1f4f8f}
 .plan th.heute{color:var(--accent)}.plan th.heute::after{content:"";position:absolute;left:4px;right:4px;bottom:0;height:3px;border-radius:2px;background:var(--accent)}
 .plan thead th{position:sticky}
 .plan td.sum{font-weight:760;color:var(--ink-2);padding:0 10px;border-left:1px solid var(--line)}
@@ -56,7 +62,7 @@ table.plan{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%
 .plan tfoot td{position:sticky;bottom:0;background:var(--surface);border-top:2px solid var(--line);font-weight:760;height:32px;z-index:2}
 .plan tfoot td.nm{z-index:3}
 .plan tfoot td.viel{background:var(--red);color:#fff}.plan tfoot td.etw{background:var(--amber-bg);color:var(--accent-2)}
-.plan.jahr td.m{min-width:64px;padding:0 6px;height:34px;font-weight:700;cursor:pointer}.plan.jahr td.m.hat{background:var(--u-bg);color:var(--accent-2)}
+.plan.jahr td.m{min-width:64px;padding:0 6px;height:34px;font-weight:700;cursor:pointer}.plan.jahr td.m.hat{background:var(--u-bg);color:#0b5a51}
 .plan.jahr thead th{cursor:pointer;padding:8px 6px}
 .leer{padding:30px;text-align:center;color:var(--ink-3)}
 .leg{display:flex;flex-wrap:wrap;gap:14px;margin:12px 4px 0;font-size:12.5px;color:var(--ink-2)}.leg i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
@@ -105,6 +111,7 @@ table.plan{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%
       <span><i style="background:var(--u)"></i>Urlaub</span>
       <span><i style="background:linear-gradient(135deg,var(--u) 50%,var(--u-bg) 50%)"></i>halber Tag</span>
       <span><i style="background:var(--ft)"></i>Feiertag</span>
+      <span><i style="background:#e4effb;box-shadow:inset 0 3px 0 #2c60a7"></i>Schulferien Niedersachsen</span>
       <span><i style="background:#fbe8dc"></i>Betriebsurlaub</span>
       <span><i style="background:repeating-linear-gradient(45deg,var(--frei) 0 4px,#fff 4px 8px)"></i>kein Arbeitstag</span>
     </div>
@@ -157,7 +164,7 @@ const zahl = n => String(n).replace('.', ',');
 const GR_BAU = ['Obermonteur', 'Monteur', 'Kundendienst', 'Azubi', 'Leiharbeiter', 'Praktikant'];
 const GR_BAU_TXT = { Obermonteur: 'Obermonteure', Monteur: 'Monteure', Kundendienst: 'Kundendienst', Azubi: 'Auszubildende', Leiharbeiter: 'Leiharbeiter', Praktikant: 'Praktikanten' };
 const GR_BUERO = ['Geschäftsführung', 'Projektleitung', 'Meister', 'Büro', 'Lager'];
-let ROLLE = null, PERS = [], EIN = {}, BU = {}, FT = {}, GELADEN = null;
+let ROLLE = null, PERS = [], EIN = {}, BU = {}, FT = {}, FER = [], GELADEN = null;
 let BER = ls('ber') || 'alle', MODUS = ls('modus') || 'monat', SCHWELLE = +(ls('schwelle') || 3);
 const H = new Date(); H.setHours(12, 0, 0, 0);
 let MONAT = new Date(H.getFullYear(), H.getMonth(), 1, 12), JAHR = H.getFullYear();
@@ -167,7 +174,7 @@ const pk = p => p.art + ':' + p.id;
 async function laden(jahr, still) {
   if (!still) $('#ansicht').innerHTML = '<div class="leer">Lädt …</div>';
   const j = await rpc('ul_laden', { p_von: `${jahr}-01-01`, p_bis: `${jahr}-12-31` });
-  ROLLE = j.rolle; PERS = j.personen || []; EIN = {}; BU = {}; FT = {};
+  ROLLE = j.rolle; PERS = j.personen || []; EIN = {}; BU = {}; FT = {}; FER = j.ferien || [];
   (j.eintraege || []).forEach(e => { (EIN[e.art + ':' + e.id] ||= {})[e.datum] = e });
   (j.bu || []).forEach(b => BU[b.datum] = +b.anteil);
   (j.feiertage || []).forEach(f => FT[f.datum] = f.name);
@@ -178,6 +185,9 @@ async function laden(jahr, still) {
   $('#eigenHinweis').hidden = ROLLE !== 'eigen';
 }
 const sichtbar = () => PERS.filter(p => BER === 'alle' || p.bereich === BER);
+const ferien = s => { const f = FER.find(x => s >= x.von && s <= x.bis); return f ? f.name : '' };
+const ferienIn = (von, bis) => FER.filter(x => x.bis >= von && x.von <= bis);
+const dRange = (v, b) => v === b ? dKurz(v).slice(0, 6) : dKurz(v).slice(0, 6) + '–' + dKurz(b).slice(0, 6) + (v.slice(0, 4) !== b.slice(0, 4) ? b.slice(0, 4) : '');
 function arbeitstag(p, s) {
   const w = wtag(s);
   if (w >= 5 || w >= (p.tage || 5)) return false;
@@ -217,14 +227,16 @@ function rMonat() {
   const tage = tageImMonat(MONAT), L = sichtbar(), heute = iso(H);
   $('#titel').textContent = `${MON[MONAT.getMonth()]} ${MONAT.getFullYear()}`;
   if (!L.length) { $('#ansicht').innerHTML = '<div class="tw"><div class="leer">Keine Personen in dieser Auswahl.</div></div>'; return }
-  const kopf = tage.map(s => { const w = wtag(s), d = dt(s); return `<th class="${w >= 5 ? 'we' : ''}${FT[s] ? ' ft' : ''}${s === heute ? ' heute' : ''}" title="${esc(FT[s] || (BU[s] ? (BU[s] === 1 ? 'Betriebsurlaub' : '½ Betriebsurlaub') : ''))}">${w >= 5 ? '' : `<small>${w === 0 || s === tage[0] ? 'KW' + kw(d) : WT[w]}</small>`}${w >= 5 ? '<small>&nbsp;</small>' : d.getDate()}</th>` }).join('');
+  const kopf = tage.map(s => { const w = wtag(s), d = dt(s), sf = ferien(s); return `<th class="${w >= 5 ? 'we' : ''}${FT[s] ? ' ft' : ''}${sf ? ' sf' : ''}${s === heute ? ' heute' : ''}" title="${esc([FT[s], BU[s] ? (BU[s] === 1 ? 'Betriebsurlaub' : '½ Betriebsurlaub') : '', sf ? 'Schulferien: ' + sf : ''].filter(Boolean).join(' · '))}">${w >= 5 ? '' : `<small>${w === 0 || s === tage[0] ? 'KW' + kw(d) : WT[w]}</small>`}${w >= 5 ? '<small>&nbsp;</small>' : d.getDate()}</th>` }).join('');
   const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm" colspan="1">${esc(titel)} · ${P.length}</td><td colspan="${tage.length + 1}"></td></tr>` + P.map(p => {
     const summe = tage.reduce((a, s) => { const u = urlaub(p, s); return a + (u && wtag(s) < 5 && !FT[s] ? +u.anteil : 0) }, 0);
     return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name)}">${esc(p.name)}</td>${tage.map(s => zelle(p, s)).join('')}<td class="sum">${summe ? zahl(summe) : ''}</td></tr>`
   }).join('')).join('');
-  const fuss = tage.map(s => { if (wtag(s) >= 5) return '<td class="we"></td>'; const n = L.filter(p => urlaub(p, s)).length; const cls = n >= SCHWELLE ? 'viel' : n >= Math.max(1, SCHWELLE - 1) && n > 0 ? 'etw' : '';
+  const fuss = tage.map(s => { if (wtag(s) >= 5) return '<td class="we"></td>'; const n = L.filter(p => urlaub(p, s)).length; const cls = (n >= SCHWELLE ? 'viel' : n >= Math.max(1, SCHWELLE - 1) && n > 0 ? 'etw' : '') + (ferien(s) ? ' sf' : '');
     return `<td class="${cls}" title="${esc(dDE(s) + ': ' + (n ? L.filter(p => urlaub(p, s)).map(p => p.name).join(', ') : 'niemand im Urlaub'))}">${n || ''}</td>` }).join('');
-  $('#ansicht').innerHTML = `<div class="tw"><table class="plan"><thead><tr><th class="nm">Name</th>${kopf}<th>Tage</th></tr></thead><tbody>${zeilen}</tbody>
+  const mv = tage[0], mb = tage[tage.length - 1];
+  const hin = ferienIn(mv, mb).map(f => `<span class="sfh">${esc(f.name)} ${dRange(f.von, f.bis)}</span>`).concat(tage.filter(s => FT[s]).map(s => `<span class="fth">${dDE(s)} ${esc(FT[s])}</span>`)).join('');
+  $('#ansicht').innerHTML = (hin ? `<div class="monhin">${hin}</div>` : '') + `<div class="tw"><table class="plan"><thead><tr><th class="nm">Name</th>${kopf}<th>Tage</th></tr></thead><tbody>${zeilen}</tbody>
     <tfoot><tr><td class="nm">Gleichzeitig im Urlaub</td>${fuss}<td></td></tr></tfoot></table></div>`;
 }
 
@@ -235,12 +247,15 @@ function rJahr() {
   if (!L.length) { $('#ansicht').innerHTML = '<div class="tw"><div class="leer">Keine Personen in dieser Auswahl.</div></div>'; return }
   const monTage = Array.from({ length: 12 }, (_, m) => tageImMonat(new Date(JAHR, m, 1, 12)).filter(s => wtag(s) < 5 && !FT[s]));
   const maxGl = monTage.map(T => T.reduce((a, s) => Math.max(a, L.filter(p => urlaub(p, s)).length), 0));
-  const kopf = MON.map((m, i) => `<th data-m="${i}" title="Monat öffnen">${m.slice(0, 3)}<small>${maxGl[i] ? 'max. ' + maxGl[i] + ' gleichz.' : '&nbsp;'}</small></th>`).join('');
+  const kopf = MON.map((m, i) => { const mv = `${JAHR}-${String(i + 1).padStart(2, '0')}-01`, mb = iso(new Date(JAHR, i + 1, 0, 12)), sf = ferienIn(mv, mb);
+    return `<th data-m="${i}" class="${sf.length ? 'sf' : ''}" title="${esc(['Monat öffnen'].concat(sf.map(f => f.name + ' ' + dRange(f.von, f.bis))).join(' · '))}">${m.slice(0, 3)}<small>${maxGl[i] ? 'max. ' + maxGl[i] + ' gleichz.' : '&nbsp;'}</small></th>` }).join('');
   const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm">${esc(titel)} · ${P.length}</td><td colspan="13"></td></tr>` + P.map(p => {
     const je = monTage.map(T => T.reduce((a, s) => { const u = urlaub(p, s); return a + (u ? +u.anteil : 0) }, 0)), sum = je.reduce((a, b) => a + b, 0);
     return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name)}">${esc(p.name)}</td>${je.map((n, i) => `<td class="m${n ? ' hat' : ''}" data-m="${i}">${n ? zahl(n) : ''}</td>`).join('')}<td class="sum">${sum ? zahl(sum) : ''}</td></tr>`
   }).join('')).join('');
-  $('#ansicht').innerHTML = `<div class="tw"><table class="plan jahr"><thead><tr><th class="nm">Name · Urlaubstage</th>${kopf}<th>Summe</th></tr></thead><tbody>${zeilen}</tbody></table></div>`;
+  const fl = ferienIn(`${JAHR}-01-01`, `${JAHR}-12-31`);
+  $('#ansicht').innerHTML = `<div class="tw"><table class="plan jahr"><thead><tr><th class="nm">Name · Urlaubstage</th>${kopf}<th>Summe</th></tr></thead><tbody>${zeilen}</tbody></table></div>`
+    + (fl.length ? `<div class="ferliste"><b>Schulferien Niedersachsen ${JAHR}:</b> ${fl.map(f => esc(f.name) + ' ' + dRange(f.von, f.bis)).join(' · ')}</div>` : '');
 }
 
 async function zeigen() {
@@ -276,7 +291,8 @@ function eintragenFenster(key, von, bis) {
     <div id="fGl"></div><div id="fW"></div>
     <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn cta" id="fOk">Eintragen</button></div>`);
   let anteil = 1;
-  const gl = () => { $('#fGl').innerHTML = gleichzeitig($('#fP').value, $('#fV').value, $('#fB').value); $('#fW').innerHTML = ''; $('#fOk').textContent = 'Eintragen'; bestaetigt = false };
+  const sfHin = (v, b) => { if (!v || !b || b < v) return ''; const f = ferienIn(v, b); return f.length ? `<div class="info sfw"><b>Schulferien:</b> ${f.map(x => esc(x.name) + ' ' + dRange(x.von, x.bis)).join(', ')} In dieser Zeit wollen viele Urlaub.</div>` : '' };
+  const gl = () => { $('#fGl').innerHTML = sfHin($('#fV').value, $('#fB').value) + gleichzeitig($('#fP').value, $('#fV').value, $('#fB').value); $('#fW').innerHTML = ''; $('#fOk').textContent = 'Eintragen'; bestaetigt = false };
   let bestaetigt = false;
   f.el.querySelectorAll('#fA button').forEach(b => b.onclick = () => { anteil = +b.dataset.a; f.el.querySelectorAll('#fA button').forEach(x => x.classList.toggle('on', x === b)); gl() });
   ['#fP', '#fV', '#fB'].forEach(s => $(s).addEventListener('change', () => { if (s === '#fV' && (!$('#fB').value || $('#fB').value < $('#fV').value)) $('#fB').value = $('#fV').value; gl() }));
