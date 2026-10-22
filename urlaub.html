@@ -156,7 +156,7 @@ const zahl = n => String(n).replace('.', ',');
 /* ===================== Daten ===================== */
 const GR_BAU = ['Obermonteur', 'Monteur', 'Kundendienst', 'Azubi', 'Leiharbeiter', 'Praktikant'];
 const GR_BAU_TXT = { Obermonteur: 'Obermonteure', Monteur: 'Monteure', Kundendienst: 'Kundendienst', Azubi: 'Auszubildende', Leiharbeiter: 'Leiharbeiter', Praktikant: 'Praktikanten' };
-const GR_BUERO = ['Geschäftsführung', 'Projektleitung', 'Büro', 'Lager'];
+const GR_BUERO = ['Geschäftsführung', 'Projektleitung', 'Meister', 'Büro', 'Lager'];
 let ROLLE = null, PERS = [], EIN = {}, BU = {}, FT = {}, GELADEN = null;
 let BER = ls('ber') || 'alle', MODUS = ls('modus') || 'monat', SCHWELLE = +(ls('schwelle') || 3);
 const H = new Date(); H.setHours(12, 0, 0, 0);

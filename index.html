@@ -428,8 +428,8 @@ const FIRMA = 'Heise Haustechnik GmbH & Co. KG';
    NEUES MODUL: hier einen Eintrag ergänzen (id = Kürzel in Kleinbuchstaben, url = Datei).
    Freigeschaltet wird es dann unter Zugriff & Rollen. Admins sehen immer alle Module. */
 const MODULES = [
-  { id: 'lager', name: 'Lagerverwaltung', desc: 'Kommission, eigenes Lager, Reste', url: 'lagerverwaltung.html', also: ['lager.html'], icon: 'box', g: ['#4a5a7a', '#2f3b53'] },
-  { id: 'leitern', name: 'Leiterprüfung', desc: 'Leitern scannen, buchen und prüfen', url: 'leitern.html', icon: 'ladder', g: ['#f08a3c', '#e25304'],
+  { id: 'lager', name: 'Lagerverwaltung', desc: 'Kommission, eigenes Lager, Reste', url: 'lagerverwaltung.html', also: ['lager.html'], icon: 'box', g: ['#8a6bbf', '#5e4596'] },
+  { id: 'leitern', name: 'Leiterprüfung', desc: 'Leitern scannen, buchen und prüfen', url: 'leitern.html', icon: 'ladder', g: ['#5a96d6', '#3a74bd'],
     rollen: [
       { k: 'nutzer', l: 'Nutzer', d: 'Leitern ansehen, scannen, buchen und Mängel melden.' },
       { k: 'obermonteur', l: 'Obermonteur', d: 'Wie Nutzer, dazu Aufgaben stellen (prüfen, reparieren).' },
@@ -440,12 +440,12 @@ const MODULES = [
       { k: 'fahrer', l: 'Fahrer', d: 'Schäden und Anfragen melden, Fahrzeuge buchen, Fahrzeugkontrolle machen.' },
       { k: 'fuhrpark', l: 'Fuhrpark', d: 'Wie Fahrer, dazu Meldungen bearbeiten, Fahrzeuge, Belege, Termine und Führerscheinkontrollen verwalten.' },
       { k: 'admin', l: 'Admin', d: 'Alles, dazu Fahrzeuge löschen und Belege entfernen.' }] },
-  { id: 'unterweisung', name: 'Unterweisungen', desc: 'Sicherheit: Folien, Prüfung, Nachweis', url: 'unterweisung.html', icon: 'book', g: ['#d8474b', '#c32328'] },
+  { id: 'unterweisung', name: 'Unterweisungen', desc: 'Sicherheit: Folien, Prüfung, Nachweis', url: 'unterweisung.html', icon: 'book', g: ['#3fa45b', '#1f7a3c'] },
   { id: 'gefaehrdung', name: 'Gefährdungs\u00adbeurteilung', desc: 'Baustellen: Checkliste, Freigabe, PDF', url: 'gefaehrdung.html', icon: 'hardhat', g: ['#e2b93b', '#b98a00'],
     rollen: [
       { k: 'benutzer', l: 'Leser', d: 'Freigegebene Beurteilungen ansehen und als PDF laden.' },
       { k: 'ersteller', l: 'Ersteller', d: 'Beurteilungen erstellen und unterschreiben, Unterschriften der Beschäftigten einholen (Meister, Fachkraft für Arbeitssicherheit).' }] },
-  { id: 'objekt', name: 'Objektaufnahme', desc: 'Beim Kunden: Anlage, Fotos, PDF', url: 'objekt.html', icon: 'house', g: ['#5a86c8', '#1f4f8f'],
+  { id: 'objekt', name: 'Objektaufnahme', desc: 'Beim Kunden: Anlage, Fotos, PDF', url: 'objekt.html', icon: 'house', g: ['#f08a3c', '#e25304'],
     rollen: [
       { k: 'aufnehmer', l: 'Aufnehmer', d: 'Objekte beim Kunden aufnehmen (Meister, Servicetechniker): eigene Aufnahmen erstellen, bearbeiten und als PDF ausgeben.' },
       { k: 'buero', l: 'Büro', d: 'Alle Aufnahmen ansehen und als PDF ausgeben, zum Beispiel für das Angebot. Nicht bearbeiten.' }] },
@@ -458,16 +458,16 @@ const MODULES = [
       { k: 'planer', l: 'Planer', d: 'Einsätze im Wochenplan eintragen und verschieben, Termine und Aufgaben pflegen, Besprechungsprotokoll. Ohne Freischaltung: nur ansehen (Mein Einsatz, Wochenplan, Zeitplan).' },
       { k: 'verwalter', l: 'Verwaltung', d: 'Wie Planer, dazu Mitarbeiter, Baustellen, Farben und Betriebsurlaub verwalten.' }] },
   // Notdienst: eigener Bereich notdienst.html. Ansehen dürfen alle, ändern nur mit Rolle.
-  { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', url: 'notdienst.html', icon: 'bell', g: ['#e8742f', '#c94a03'], alle: true,
+  { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', url: 'notdienst.html', icon: 'bell', g: ['#d8474b', '#c32328'], alle: true,
     rollen: [
       { k: 'planer', l: 'Planer', d: '1. und 2. Notdienst eintragen und tauschen. Ohne Freischaltung: nur ansehen (Einsatzplan und Infos).' },
       { k: 'verwalter', l: 'Verwalten und auswerten', d: 'Wie Planer, dazu Tauschwünsche genehmigen oder ablehnen, die Auswertung sehen, Notdienst-Mitarbeiter mit Handynummern und Farben sowie die Infos (Pauschalen, Stundensätze, Anfahrt, Zeiten, Sperrliste) bearbeiten.' }] },
   // Urlaub: eigener Bereich urlaub.html. Ohne Freischaltung sieht jeder nur seinen eigenen Urlaub.
-  { id: 'urlaub', name: 'Urlaub', desc: 'Urlaubsplan Büro und Baustelle', url: 'urlaub.html', icon: 'calendar', g: ['#f08a3c', '#e25304'], alle: true,
+  { id: 'urlaub', name: 'Urlaub', desc: 'Urlaubsplan Büro und Baustelle', url: 'urlaub.html', icon: 'calendar', g: ['#2bb3a3', '#13877a'], alle: true,
     rollen: [
       { k: 'leser', l: 'Ansehen', d: 'Urlaub aller Mitarbeiter ansehen (Büro und Baustelle). Ohne Freischaltung: nur den eigenen Urlaub.' },
       { k: 'planer', l: 'Planer', d: 'Urlaub eintragen und löschen. Urlaub von Baustellen-Mitarbeitern wird direkt im Wochenplan der Planung eingetragen.' }] },
-  { id: 'geraete', name: 'Geräteverwaltung', desc: 'iPads, Handys, Apps, Kosten', url: 'geraete.html', icon: 'tablet', g: ['#6b7a99', '#465573'],
+  { id: 'geraete', name: 'Geräteverwaltung', desc: 'iPads, Handys, Apps, Kosten', url: 'geraete.html', icon: 'tablet', g: ['#3d6aa8', '#1f4f8f'],
     rollen: [
       { k: 'verwalter', l: 'Verwalter', d: 'Geräte, Apps und Abos anlegen und ändern, Geräte mit Unterschrift ausgeben und zurücknehmen, Kosten und Fristen sehen.' },
       { k: 'leser', l: 'Leser', d: 'Alles ansehen (z. B. Buchhaltung), Kostenübersicht und PDFs, nichts ändern.' }] },
@@ -484,15 +484,15 @@ const BEREICHE = [
     apps: ['projekte', 'objekt', 'gefaehrdung'], zaehlt: ['projekte', 'objekt', 'gefaehrdung'] },
   { id: 'planung', name: 'Planung', desc: 'Wochenplan, Zeitplan, Mein Einsatz', icon: 'calendar', g: ['#5b6b8c', '#2f3b53'],
     apps: ['planung'], zaehlt: [] },
-  { id: 'urlaub', name: 'Urlaub', desc: 'Wer hat wann Urlaub', icon: 'calendar', g: ['#f08a3c', '#e25304'],
+  { id: 'urlaub', name: 'Urlaub', desc: 'Wer hat wann Urlaub', icon: 'calendar', g: ['#2bb3a3', '#13877a'],
     apps: ['urlaub'], zaehlt: [] },
-  { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', icon: 'bell', g: ['#e8742f', '#c94a03'],
+  { id: 'notdienst', name: 'Notdienst', desc: 'Wer hat Dienst, Preise, wichtige Infos', icon: 'bell', g: ['#d8474b', '#c32328'],
     apps: ['notdienst'], zaehlt: [] },
-  { id: 'lager', name: 'Lager & Material', desc: 'Kommission, eigenes Lager, Reste', icon: 'box', g: ['#4a5a7a', '#2f3b53'],
+  { id: 'lager', name: 'Lager & Material', desc: 'Kommission, eigenes Lager, Reste', icon: 'box', g: ['#8a6bbf', '#5e4596'],
     apps: ['lager'], zaehlt: ['lager', 'lager_kom'] },
   { id: 'betriebsmittel', name: 'Fahrzeuge & Betriebsmittel', desc: 'Fuhrpark, Leiterprüfung, Geräte', icon: 'car', g: ['#4a7fc4', '#2c60a7'],
     apps: ['fuhrpark', 'leitern', 'geraete'], zaehlt: ['fuhrpark', 'leitern', 'geraete'] },
-  { id: 'arbeitsschutz', name: 'Arbeitsschutz & Personal', desc: 'Unterweisungen, Gefährdungsbeurteilungen', icon: 'shield', g: ['#d8474b', '#c32328'],
+  { id: 'arbeitsschutz', name: 'Arbeitsschutz & Personal', desc: 'Unterweisungen, Gefährdungsbeurteilungen', icon: 'shield', g: ['#3fa45b', '#1f7a3c'],
     apps: ['unterweisung', 'gefaehrdung'], zaehlt: ['unterweisung'] },
 ];
 /* Lager & Material: statt einer Kachel „Lagerverwaltung“ die einzelnen Lager (je nach Lager-Recht aus lager_ich()).
