@@ -69,7 +69,7 @@ table.plan{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%
 .plan.jahr td.m{min-width:64px;padding:0 6px;height:34px;font-weight:700;cursor:pointer}.plan.jahr td.m.hat{background:var(--u-bg);color:#0b5a51}.plan.jahr td.m.hat.bst{background:var(--u2-bg);color:#1f2c66}
 .plan td.u1.bst{background:var(--u2)}.plan td.u5.bst{background:linear-gradient(135deg,var(--u2) 50%,var(--u2-bg) 50%);color:#1f2c66}
 .plan td.nm{box-shadow:inset 5px 0 0 var(--gf,transparent)}.plan tr.gr td.nm{box-shadow:inset 5px 0 0 var(--gf,transparent)}
-.plan tfoot tr.f2 td{border-top:0}.plan tfoot td.nm small{font-weight:600;color:var(--ink-3)}
+.plan tfoot tr.f2 td{border-top:0}.plan td.nm small.beide{font-size:10.5px;font-weight:700;color:var(--ink-3);background:var(--surface-2);border-radius:6px;padding:1px 5px;margin-left:4px}.plan tfoot td.nm small{font-weight:600;color:var(--ink-3)}
 .plan.jahr thead th{cursor:pointer;padding:8px 6px}
 .leer{padding:30px;text-align:center;color:var(--ink-3)}
 .leg{display:flex;flex-wrap:wrap;gap:14px;margin:12px 4px 0;font-size:12.5px;color:var(--ink-2)}.leg i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
@@ -178,7 +178,7 @@ const GR_BUERO = ['Geschäftsführung', 'Projektleitung', 'Meister', 'Büro', 'L
 const GR_FARBE = { 'Geschäftsführung': '#2f3b53', Projektleitung: '#c94a03', Meister: '#b98a00', 'Büro': '#13877a', Lager: '#5e4596',
   Obermonteur: '#1f2c66', Monteur: '#34489c', Kundendienst: '#c32328', Azubi: '#1f7a3c', Leiharbeiter: '#6b7a99', Praktikant: '#b0175a' };
 const gfarbe = g => GR_FARBE[g] || '#a3acba';
-let ROLLE = null, PERS = [], EIN = {}, BU = {}, FT = {}, FER = [], TER = [], REG = [], GELADEN = null;
+let ROLLE = null, PERS = [], EIN = {}, BU = {}, FT = {}, FER = [], TER = [], REG = [], AUCH = {}, GELADEN = null;
 let BER = ls('ber') || 'alle', MODUS = ls('modus') || 'monat', SCHWELLE = +(ls('schwelle') || 3);
 const H = new Date(); H.setHours(12, 0, 0, 0);
 let MONAT = new Date(H.getFullYear(), H.getMonth(), 1, 12), JAHR = H.getFullYear();
@@ -187,7 +187,8 @@ const pk = p => p.art + ':' + p.id;
 
 async function laden(jahr, still) {
   if (!still) $('#ansicht').innerHTML = '<div class="leer">Lädt …</div>';
-  const j = await rpc('ul_laden', { p_von: `${jahr}-01-01`, p_bis: `${jahr}-12-31` });
+  const [j, au] = await Promise.all([rpc('ul_laden', { p_von: `${jahr}-01-01`, p_bis: `${jahr}-12-31` }), rpc('ul_auch_laden').catch(() => [])]);
+  AUCH = {}; (au || []).forEach(x => AUCH[x.k] = x.bereich);
   ROLLE = j.rolle; PERS = j.personen || []; EIN = {}; BU = {}; FT = {}; FER = j.ferien || []; TER = j.termine || []; REG = j.regeln || [];
   (j.eintraege || []).forEach(e => { (EIN[e.art + ':' + e.id] ||= {})[e.datum] = e });
   (j.bu || []).forEach(b => BU[b.datum] = +b.anteil);
@@ -198,7 +199,9 @@ async function laden(jahr, still) {
   $('#neuBtn').hidden = !darf(); $('#verwBtn').hidden = !darf();
   $('#eigenHinweis').hidden = ROLLE !== 'eigen';
 }
-const sichtbar = () => PERS.filter(p => BER === 'alle' || p.bereich === BER);
+const inBer = (p, b) => p.bereich === b || AUCH[pk(p)] === b;
+const beide = p => !!AUCH[pk(p)] && AUCH[pk(p)] !== p.bereich;
+const sichtbar = () => PERS.filter(p => BER === 'alle' || inBer(p, BER));
 const ferien = s => { const f = FER.find(x => s >= x.von && s <= x.bis); return f ? f.name : '' };
 const ferienIn = (von, bis) => FER.filter(x => x.bis >= von && x.von <= bis);
 const termineIn = (von, bis) => TER.filter(x => x.bis >= von && x.von <= bis);
@@ -225,11 +228,13 @@ function gruppen(L) {
     const b = L.filter(p => p.bereich === 'buero');
     GR_BUERO.forEach(g => push(g, b.filter(p => p.gruppe === g)));
     push('Büro (weitere)', b.filter(p => !GR_BUERO.includes(p.gruppe)));
+    if (BER === 'buero') push('Büro · auch Baustelle', L.filter(p => p.bereich !== 'buero' && inBer(p, 'buero')));
   }
   if (BER !== 'buero') {
     const b = L.filter(p => p.bereich === 'baustelle');
     GR_BAU.forEach(g => push((BER === 'alle' ? 'Baustelle · ' : '') + GR_BAU_TXT[g], b.filter(p => p.gruppe === g)));
     push('Baustelle · weitere', b.filter(p => !GR_BAU.includes(p.gruppe)));
+    if (BER === 'baustelle') push('Baustelle · auch Büro', L.filter(p => p.bereich !== 'baustelle' && inBer(p, 'baustelle')));
   }
   return out;
 }
@@ -254,12 +259,12 @@ function rMonat() {
   const kopf = tage.map(s => { const w = wtag(s), d = dt(s); const sf = ferien(s), te = termineIn(s, s); return `<th class="${w >= 5 ? 'we' : ''}${FT[s] ? ' ft' : ''}${sf ? ' sf' : ''}${te.length ? ' ev' : ''}${s === heute ? ' heute' : ''}" title="${esc([FT[s], BU[s] ? (BU[s] === 1 ? 'Betriebsurlaub' : '½ Betriebsurlaub') : '', sf ? 'Schulferien: ' + sf : ''].concat(te.map(t => t.titel)).filter(Boolean).join(' · '))}">${w >= 5 ? '' : `<small>${w === 0 || s === tage[0] ? 'KW' + kw(d) : WT[w]}</small>`}${w >= 5 ? '<small>&nbsp;</small>' : d.getDate()}</th>` }).join('');
   const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm" colspan="1" style="--gf:${gfarbe(P[0].gruppe)}">${esc(titel)} · ${P.length}</td><td colspan="${tage.length + 1}"></td></tr>` + P.map(p => {
     const summe = tage.reduce((a, s) => { const u = urlaub(p, s); return a + (u && wtag(s) < 5 && !FT[s] ? +u.anteil : 0) }, 0);
-    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name + ' · ' + (p.gruppe || ''))}" style="--gf:${gfarbe(p.gruppe)}">${esc(p.name)}</td>${tage.map(s => zelle(p, s)).join('')}<td class="sum">${summe ? zahl(summe) : ''}</td></tr>`
+    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name + ' · ' + (p.gruppe || ''))}" style="--gf:${gfarbe(p.gruppe)}">${esc(p.name)}${beide(p) ? ` <small class="beide">${p.bereich === 'buero' ? 'auch Baustelle' : 'auch Büro'}</small>` : ''}</td>${tage.map(s => zelle(p, s)).join('')}<td class="sum">${summe ? zahl(summe) : ''}</td></tr>`
   }).join('')).join('');
   const fussZ = (LL, regeln) => tage.map(s => { if (wtag(s) >= 5) return '<td class="we"></td>'; const wer = LL.filter(p => urlaub(p, s)), n = wer.length; const rv = regeln ? regelVerstoss(s) : []; const cls = (n >= SCHWELLE ? 'viel' : n >= Math.max(1, SCHWELLE - 1) && n > 0 ? 'etw' : '') + (ferien(s) ? ' sf' : '') + (rv.length ? ' rg' : '');
     return `<td class="${cls}" title="${esc(dDE(s) + ': ' + (n ? wer.map(p => p.name).join(', ') : 'niemand im Urlaub') + (rv.length ? ' · Warnung: ' + rv.map(regelName).join(', ') : ''))}">${n || ''}${rv.length ? '!' : ''}</td>` }).join('');
   const fz = BER === 'alle'
-    ? [['Gleichzeitig Büro', L.filter(p => p.bereich === 'buero'), false], ['Gleichzeitig Baustelle', L.filter(p => p.bereich === 'baustelle'), false], ['Gleichzeitig gesamt', L, true]]
+    ? [['Gleichzeitig Büro', L.filter(p => inBer(p, 'buero')), false], ['Gleichzeitig Baustelle', L.filter(p => inBer(p, 'baustelle')), false], ['Gleichzeitig gesamt', L, true]]
     : [['Gleichzeitig im Urlaub', L, true]];
   const fuss = fz.map(([t, LL, rg], i) => `<tr class="${i ? 'f2' : ''}"><td class="nm" style="bottom:${(fz.length - 1 - i) * 32}px">${t}</td>${fussZ(LL, rg).replace(/<td /g, `<td style="bottom:${(fz.length - 1 - i) * 32}px" `)}<td style="bottom:${(fz.length - 1 - i) * 32}px"></td></tr>`).join('');
   const mv = tage[0], mb = tage[tage.length - 1];
@@ -285,7 +290,7 @@ function rJahr() {
     return `<th data-m="${i}" class="${sf.length ? 'sf' : ''}" title="${esc(['Monat öffnen'].concat(sf.map(f => f.name + ' ' + dRange(f.von, f.bis))).join(' · '))}">${m.slice(0, 3)}<small>${maxGl[i] ? 'max. ' + maxGl[i] + ' gleichz.' : '&nbsp;'}</small></th>` }).join('');
   const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm" style="--gf:${gfarbe(P[0].gruppe)}">${esc(titel)} · ${P.length}</td><td colspan="13"></td></tr>` + P.map(p => {
     const je = monTage.map(T => T.reduce((a, s) => { const u = urlaub(p, s); return a + (u ? +u.anteil : 0) }, 0)), sum = je.reduce((a, b) => a + b, 0);
-    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name + ' · ' + (p.gruppe || ''))}" style="--gf:${gfarbe(p.gruppe)}">${esc(p.name)}</td>${je.map((n, i) => `<td class="m${n ? ' hat' : ''}${p.bereich === 'baustelle' ? ' bst' : ''}" data-m="${i}">${n ? zahl(n) : ''}</td>`).join('')}<td class="sum">${sum ? zahl(sum) : ''}</td></tr>`
+    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name + ' · ' + (p.gruppe || ''))}" style="--gf:${gfarbe(p.gruppe)}">${esc(p.name)}${beide(p) ? ` <small class="beide">${p.bereich === 'buero' ? 'auch Baustelle' : 'auch Büro'}</small>` : ''}</td>${je.map((n, i) => `<td class="m${n ? ' hat' : ''}${p.bereich === 'baustelle' ? ' bst' : ''}" data-m="${i}">${n ? zahl(n) : ''}</td>`).join('')}<td class="sum">${sum ? zahl(sum) : ''}</td></tr>`
   }).join('')).join('');
   const fl = ferienIn(`${JAHR}-01-01`, `${JAHR}-12-31`);
   $('#ansicht').innerHTML = `<div class="tw"><table class="plan jahr"><thead><tr><th class="nm">Name · Urlaubstage</th>${kopf}<th>Summe</th></tr></thead><tbody>${zeilen}</tbody></table></div>`
@@ -393,11 +398,12 @@ function urlaubFenster(key, s) {
 /* ===================== Verwalten ===================== */
 function verwaltenFenster() {
   const f = fenster(`<h3>Verwalten</h3><div class="sub">Gilt für alle Mitarbeiter.</div><div class="menue">
-    <button class="btn sec" id="vBu">Betriebsurlaub</button><button class="btn sec" id="vEv">Firmenveranstaltungen</button><button class="btn sec" id="vRg">Warnregeln (wer nicht gleichzeitig)</button></div>
+    <button class="btn sec" id="vBu">Betriebsurlaub</button><button class="btn sec" id="vEv">Firmenveranstaltungen</button><button class="btn sec" id="vRg">Warnregeln (wer nicht gleichzeitig)</button><button class="btn sec" id="vAu">Personen in Büro und Baustelle</button></div>
     <div class="knoepfe" style="margin-top:14px"><button class="btn sec" data-zu>Schließen</button></div>`);
   $('#vBu').onclick = () => { f.zu(); buFenster() };
   $('#vEv').onclick = () => { f.zu(); terminFenster() };
   $('#vRg').onclick = () => { f.zu(); regelFenster() };
+  $('#vAu').onclick = () => { f.zu(); auchFenster() };
 }
 // zusammenhängende Betriebsurlaub-Zeiträume (Wochenenden und Feiertage dazwischen werden überbrückt)
 function buBloecke() {
@@ -472,6 +478,19 @@ function regelFenster(id) {
     try { await rpc('ul_regel_speichern', { p: { id: g ? g.id : '', name: $('#rN').value.trim(), personen, max_gleich: max } }); f.zu(); toast('Regel gespeichert'); GELADEN = null; await zeigen() } catch (e) { toast(e.message) }
   };
   if (g) $('#rDel').onclick = async () => { if (!confirm('Regel löschen?')) return; try { await rpc('ul_regel_loeschen', { p_id: g.id }); f.zu(); toast('Gelöscht'); GELADEN = null; await zeigen() } catch (e) { toast(e.message) } };
+}
+
+function auchFenster() {
+  const merk = BER; BER = 'alle';
+  const chk = gruppen(PERS).map(([t, P]) => `<b>${esc(t)}</b>` + P.map(p => `<label><input type="checkbox" value="${esc(pk(p))}" data-b="${p.bereich === 'buero' ? 'baustelle' : 'buero'}"${beide(p) ? ' checked' : ''}>${esc(p.name)}</label>`).join('')).join('');
+  BER = merk;
+  const f = fenster(`<h3>Personen in Büro und Baustelle</h3><div class="sub">Angehakte Personen erscheinen zusätzlich im anderen Bereich und zählen dort bei „Gleichzeitig“ mit. Der Urlaub bleibt an einer Stelle gespeichert.</div>
+    <div class="f"><div class="chk" id="auP" style="max-height:340px">${chk}</div></div>
+    <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn cta" id="auOk">Speichern</button></div>`);
+  $('#auOk').onclick = async () => {
+    const p = [...f.el.querySelectorAll('#auP input:checked')].map(x => ({ k: x.value, bereich: x.dataset.b }));
+    try { await rpc('ul_auch_setzen', { p }); f.zu(); toast('Gespeichert'); GELADEN = null; await zeigen() } catch (e) { toast(e.message) }
+  };
 }
 
 /* ===================== Bedienung ===================== */
