@@ -30,6 +30,7 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;min-width:760px}
 .cell:hover{transform:scale(1.02)}.cell small{font-weight:500;font-size:10.5px;opacity:.85;overflow:hidden;text-overflow:ellipsis}
 .cell.leer{background:transparent;box-shadow:inset 0 0 0 1px dashed var(--line);border:1px dashed var(--line);color:var(--ink3);font-weight:500;align-items:center}
 .cell.frei{background:repeating-linear-gradient(45deg,#f1f2f5,#f1f2f5 6px,#e9ebf0 6px,#e9ebf0 12px);cursor:default;color:var(--ink3);font-weight:500;align-items:center}
+.cell.ausn{outline:2px dashed #b0175a;outline-offset:-3px}.cell.frei[data-ex]{cursor:pointer}
 .cell.unk{background:#fff;box-shadow:inset 0 0 0 2px var(--red);color:var(--red)}
 .cell.zwei{background-image:linear-gradient(135deg,transparent 50%,var(--c2) 50%)}
 .g td.today{background:#fff8f3}
@@ -337,8 +338,10 @@ function maEntfernen(p,n){
 $('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;VIEW=b.dataset.v;[...$('#tabs').children].forEach(x=>x.classList.toggle('on',x===b));render()};
 function render(){ ({woche:rWoche,zeit:rZeit,bes:rBes,me:rMe})[VIEW](); }
 /* ---------- Wochenplan ---------- */
+/* FREIE_TAGE_V1: freie Tage ausnahmsweise belegbar */
 function zelle(p,d,i){
-  if(i>=p.tage) return `<div class="cell frei" data-p="${p.id}" data-d="${d}" data-frei="1">frei</div>`;
+  if(i>=p.tage){ if(!EIN[p.id+'|'+d]||!dabei(p,d)) return `<div class="cell frei" data-p="${p.id}" data-d="${d}" data-frei="1"${dabei(p,d)?' data-ex="1" title="Arbeitet normalerweise nicht an diesem Tag. Antippen, um trotzdem etwas einzutragen."':''}>frei</div>`;
+    return zelle(p,d,0).replace('<div class="cell','<div title="Ausnahme: arbeitet normalerweise nicht an diesem Tag" class="cell ausn'); }
   if(!dabei(p,d)) return `<div class="cell frei" data-p="${p.id}" data-d="${d}" data-frei="1">nicht dabei</div>`;
   const e=eintrag(p.id,d), c=codeInfo(e&&e.code);
   if(!c&&BU[d]===0.5&&!FT[d]) return `<div class="cell" data-p="${p.id}" data-d="${d}" style="background:#FDEADF;box-shadow:inset 7px 0 0 ${ABS.bu[1]}">½ Betriebsurlaub<small>andere Hälfte frei planbar</small></div>`;
@@ -357,7 +360,8 @@ function kurz(code,e,c){ if(c.unk) return '?'; if(code.startsWith('a:')) return 
   const t=code==='p:dis'&&e.note?e.note:c.name, w=t.replace(/^mit /,'').split(/[\s\/,]+/)[0]||t; return (code.startsWith('m:')?'↳':'')+(w.length<=5?w:w.slice(0,4)+'.'); }
 function zelleMini(p,d){
   const i=(new Date(d+'T12:00').getDay()+6)%7;
-  if(i>=p.tage||!dabei(p,d)) return `<div class="cell mini frei" data-p="${p.id}" data-d="${d}" data-frei="1" title="${i>=p.tage?'frei':'nicht dabei'}"></div>`;
+  if(i>=p.tage&&dabei(p,d)&&EIN[p.id+'|'+d]) return zelleMini(Object.assign({},p,{tage:7}),d).replace('class="cell mini','class="cell mini ausn');
+  if(i>=p.tage||!dabei(p,d)) return `<div class="cell mini frei" data-p="${p.id}" data-d="${d}" data-frei="1"${i>=p.tage&&dabei(p,d)?' data-ex="1"':''} title="${i>=p.tage?'frei (antippen, um trotzdem etwas einzutragen)':'nicht dabei'}"></div>`;
   const e=eintrag(p.id,d), c=codeInfo(e&&e.code), dim=fltAktiv()&&!passtEintrag(e)?' dim':'', wer=esc(p.name.split(/[ ,]/)[0])+', '+dDE(d)+': ';
   if(!c&&BU[d]===0.5&&!FT[d]) return `<div class="cell mini${dim}" data-p="${p.id}" data-d="${d}" style="background:#FDEADF;color:#8a3b00" title="${wer}½ Betriebsurlaub">½</div>`;
   if(!c) return `<div class="cell mini leer${dim}" data-p="${p.id}" data-d="${d}" title="${wer}frei planbar"></div>`;
@@ -464,7 +468,11 @@ function leisteZieh(ev,c){
 }
 /* Drag & Drop im Wochenplan: Maus sofort, Finger nach kurzem Halten. Strg/Alt gedrückt = kopieren. */
 function ziehStart(ev,c){
-  if(c.dataset.frei) return;
+  if(c.dataset.frei){
+    if(c.dataset.ex&&(ev.button===0||ev.pointerType==='touch')){ ev.preventDefault();
+      const p0=D.people.find(x=>x.id===+c.dataset.p), wt=new Date(c.dataset.d+'T12:00').toLocaleDateString('de-DE',{weekday:'long'});
+      setTimeout(()=>{ if(confirm(`${p0.name} arbeitet normalerweise am ${wt} nicht.\n\nTrotzdem etwas eintragen?`)) (STEMPEL?setze(+c.dataset.p,c.dataset.d,STEMPEL):einsatz(+c.dataset.p,c.dataset.d)); },0); }
+    return; }
   const pid=+c.dataset.p, d=c.dataset.d, voll=!!EIN[pid+'|'+d];
   const touch=ev.pointerType==='touch'; let aktiv=false, ghost=null, ziel=null, timer=null; const x0=ev.clientX,y0=ev.clientY;
   const los=e=>{ if(!voll) return; aktiv=true; c.classList.add('dragsrc'); ghost=c.cloneNode(true); ghost.classList.add('ghost'); const r=c.getBoundingClientRect(); ghost.style.width=r.width+'px'; document.body.appendChild(ghost); if(navigator.vibrate) navigator.vibrate(15); bewege(e); };
@@ -694,7 +702,7 @@ function rMe(){
     ME_ID=(wahl[0]||D.people[0]||{}).id; if(ME_ID==null){ $('#app').innerHTML='<div class="lade">Noch keine Mitarbeiter angelegt.</div>'; return }
   }
   const p=D.people.find(x=>x.id===ME_ID), m=montag(HEUTE);
-  const tage=[...Array(10)].map((_,i)=>addD(m,i<5?i:i+2)).filter((d,i)=>(i%5)<p.tage);
+  const tage=[...Array(10)].map((_,i)=>addD(m,i<5?i:i+2)).filter((d,i)=>(i%5)<p.tage||!!EIN[p.id+'|'+iso(d)]);
   const heute=eintrag(p.id,iso(HEUTE)), hc=codeInfo(heute&&heute.code);
   const bid=heute&&heute.code&&heute.code.startsWith('p:')?heute.code.slice(2):null, bs=bid?PR[bid]:null, ap=bid?appVon(bid):null;
   const vorname=p.name.split(/[ ,]/)[0].toLowerCase(), ganz=p.name.toLowerCase();

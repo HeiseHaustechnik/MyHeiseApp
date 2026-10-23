@@ -246,10 +246,10 @@ function tageImMonat(m) { const L = []; for (let d = new Date(m); d.getMonth() =
 function zelle(p, s) {
   const w = wtag(s), we = w >= 5, u = urlaub(p, s);
   let cls = 't', txt = '', tip = `${p.name}, ${dDE(s)}`;
-  if (we) cls += ' we';
+  if (we) { cls += ' we'; if (termineIn(s, s).length) { cls += ' evz'; tip += ': ' + termineIn(s, s).map(x => x.titel).join(', ') } }
   else if (FT[s]) { cls += ' ft'; tip += ': ' + FT[s] }
   else if (u) { cls += (u.anteil < 1 ? ' u5' : ' u1') + (p.bereich === 'baustelle' ? ' bst' : ''); txt = u.anteil < 1 ? '½' : 'U'; tip += u.anteil < 1 ? ': ½ Tag Urlaub' : ': Urlaub'; if (u.neben) tip += ' · sonst ' + u.neben; if (u.notiz) tip += ' · ' + u.notiz }
-  else if (termineIn(s, s).length && arbeitstag(p, s)) { const te = termineIn(s, s); cls += ' evz'; txt = esc(kuerzel(te[0].titel)); tip += ': ' + te.map(x => x.titel + (x.notiz ? ' (' + x.notiz + ')' : '')).join(', ') }
+  else if (termineIn(s, s).length && (!p.ab || s >= p.ab) && (!p.bis || s <= p.bis)) { const te = termineIn(s, s); cls += ' evz'; txt = esc(kuerzel(te[0].titel)); tip += ': ' + te.map(x => x.titel + (x.notiz ? ' (' + x.notiz + ')' : '')).join(', ') }
   else if (BU[s] === 1) { cls += ' bu'; tip += ': Betriebsurlaub' }
   else if (!arbeitstag(p, s)) { cls += ' ndb'; tip += ': kein Arbeitstag' }
   else if (BU[s] === 0.5) { cls += ' bu5'; tip += ': ½ Betriebsurlaub' }
