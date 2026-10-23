@@ -69,7 +69,7 @@ table.plan{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%
 .plan.jahr td.m{min-width:64px;padding:0 6px;height:34px;font-weight:700;cursor:pointer}.plan.jahr td.m.hat{background:var(--u-bg);color:#0b5a51}.plan.jahr td.m.hat.bst{background:var(--u2-bg);color:#1f2c66}
 .plan td.u1.bst{background:var(--u2)}.plan td.u5.bst{background:linear-gradient(135deg,var(--u2) 50%,var(--u2-bg) 50%);color:#1f2c66}
 .plan td.nm{box-shadow:inset 5px 0 0 var(--gf,transparent)}.plan tr.gr td.nm{box-shadow:inset 5px 0 0 var(--gf,transparent)}
-.plan tfoot tr.f2 td{border-top:0}.plan td.nm small.beide{font-size:10.5px;font-weight:700;color:var(--ink-3);background:var(--surface-2);border-radius:6px;padding:1px 5px;margin-left:4px}.plan tfoot td.nm small{font-weight:600;color:var(--ink-3)}
+.plan tfoot tr.f2 td{border-top:0}.plan td.evz{background:var(--ev);color:#fff;font-weight:800;font-size:11px}.plan td.nm small.beide{font-size:10.5px;font-weight:700;color:var(--ink-3);background:var(--surface-2);border-radius:6px;padding:1px 5px;margin-left:4px}.plan tfoot td.nm small{font-weight:600;color:var(--ink-3)}
 .plan.jahr thead th{cursor:pointer;padding:8px 6px}
 .leer{padding:30px;text-align:center;color:var(--ink-3)}
 .leg{display:flex;flex-wrap:wrap;gap:14px;margin:12px 4px 0;font-size:12.5px;color:var(--ink-2)}.leg i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
@@ -205,9 +205,11 @@ const sichtbar = () => PERS.filter(p => BER === 'alle' || inBer(p, BER));
 const ferien = s => { const f = FER.find(x => s >= x.von && s <= x.bis); return f ? f.name : '' };
 const ferienIn = (von, bis) => FER.filter(x => x.bis >= von && x.von <= bis);
 const termineIn = (von, bis) => TER.filter(x => x.bis >= von && x.von <= bis);
+const kuerzel = t => (String(t || '').match(/[A-Za-zÄÖÜäöü0-9]+/g) || ['V']).slice(0, 2).map(w => w[0].toUpperCase()).join('');
 const pName = k => (PERS.find(p => pk(p) === k) || {}).name || '(nicht mehr vorhanden)';
 const regelName = g => g.name || g.personen.map(pName).join(' + ');
 function regelVerstoss(s, extra) {
+  if (BU[s]) return [];   // Betriebsurlaub (ganz oder halb): da haben alle frei, keine Warnung
   return REG.filter(g => {
     let n = 0;
     g.personen.forEach(k => { const p = PERS.find(x => pk(x) === k); if ((p && urlaub(p, s)) || k === extra) n++ });
@@ -247,6 +249,7 @@ function zelle(p, s) {
   if (we) cls += ' we';
   else if (FT[s]) { cls += ' ft'; tip += ': ' + FT[s] }
   else if (u) { cls += (u.anteil < 1 ? ' u5' : ' u1') + (p.bereich === 'baustelle' ? ' bst' : ''); txt = u.anteil < 1 ? '½' : 'U'; tip += u.anteil < 1 ? ': ½ Tag Urlaub' : ': Urlaub'; if (u.neben) tip += ' · sonst ' + u.neben; if (u.notiz) tip += ' · ' + u.notiz }
+  else if (termineIn(s, s).length && arbeitstag(p, s)) { const te = termineIn(s, s); cls += ' evz'; txt = esc(kuerzel(te[0].titel)); tip += ': ' + te.map(x => x.titel + (x.notiz ? ' (' + x.notiz + ')' : '')).join(', ') }
   else if (BU[s] === 1) { cls += ' bu'; tip += ': Betriebsurlaub' }
   else if (!arbeitstag(p, s)) { cls += ' ndb'; tip += ': kein Arbeitstag' }
   else if (BU[s] === 0.5) { cls += ' bu5'; tip += ': ½ Betriebsurlaub' }
@@ -345,7 +348,7 @@ function eintragenFenster(key, von, bis) {
     const [art, id] = [k.slice(0, 1), k.slice(2)];
     if (!regelOk && REG.length) {
       const p = PERS.find(x => pk(x) === k), rv = {};
-      for (let d = v; d <= b; d = iso(addD(dt(d), 1))) { if (!p || !arbeitstag(p, d) || FT[d] || BU[d] === 1) continue; regelVerstoss(d, k).forEach(g => { if (g.personen.includes(k)) (rv[g.id] ||= { g, t: [] }).t.push(d) }) }
+      for (let d = v; d <= b; d = iso(addD(dt(d), 1))) { if (!p || !arbeitstag(p, d) || FT[d] || BU[d]) continue; regelVerstoss(d, k).forEach(g => { if (g.personen.includes(k)) (rv[g.id] ||= { g, t: [] }).t.push(d) }) }
       const L = Object.values(rv);
       if (L.length) {
         regelOk = true;
@@ -445,15 +448,16 @@ function terminFenster(id) {
     <div class="f"><label>Titel</label><input class="inp" id="tT" maxlength="80" placeholder="Weihnachtsfeier"></div>
     <div class="zwei"><div class="f"><label>Von</label><input class="inp" type="date" id="tV"></div><div class="f"><label>Bis</label><input class="inp" type="date" id="tB"></div></div>
     <div class="f"><label>Notiz (optional)</label><input class="inp" id="tN" maxlength="160" placeholder="Ort, Uhrzeit"></div>
+    <label class="f" style="display:flex;gap:10px;align-items:flex-start;font-size:14px;font-weight:600"><input type="checkbox" id="tW" checked style="margin-top:3px"><span>Im Wochenplan für alle Baustellen-Mitarbeiter eintragen<br><small style="font-weight:500;color:var(--ink-3)">Freie Tage werden „Betriebsveranstaltung“, bei geplanter Baustelle kommt sie als zweiter Eintrag dazu. Urlaub und Krank bleiben.</small></span></label>
     <div class="knoepfe">${t ? '<button class="btn del" id="tDel">Löschen</button>' : '<button class="btn sec" data-zu>Schließen</button>'}<button class="btn cta" id="tOk">Speichern</button></div>`);
-  if (t) { $('#tT').value = t.titel; $('#tV').value = t.von; $('#tB').value = t.bis; $('#tN').value = t.notiz || '' }
+  if (t) { $('#tT').value = t.titel; $('#tV').value = t.von; $('#tB').value = t.bis; $('#tN').value = t.notiz || ''; $('#tW').checked = t.wochenplan !== false }
   f.el.querySelectorAll('.liste button').forEach(x => x.onclick = () => { f.zu(); terminFenster(x.dataset.id) });
   $('#tV').addEventListener('change', () => { if (!$('#tB').value || $('#tB').value < $('#tV').value) $('#tB').value = $('#tV').value });
   $('#tOk').onclick = async () => {
-    const p = { id: t ? t.id : '', titel: $('#tT').value.trim(), von: $('#tV').value, bis: $('#tB').value || $('#tV').value, notiz: $('#tN').value.trim() };
+    const p = { id: t ? t.id : '', titel: $('#tT').value.trim(), von: $('#tV').value, bis: $('#tB').value || $('#tV').value, notiz: $('#tN').value.trim(), wochenplan: $('#tW').checked };
     if (!p.titel || !p.von) return toast('Bitte Titel und Datum angeben');
     if (p.bis < p.von) return toast('Das Ende liegt vor dem Beginn');
-    try { await rpc('ul_termin_speichern', { p }); f.zu(); toast('Veranstaltung gespeichert'); GELADEN = null; await zeigen() } catch (e) { toast(e.message) }
+    try { const r = await rpc('ul_termin_speichern', { p }); f.zu(); toast('Veranstaltung gespeichert' + (r && r.wochenplan ? ` · im Wochenplan bei ${r.wochenplan} Einträgen` : '')); GELADEN = null; await zeigen() } catch (e) { toast(e.message) }
   };
   if (t) $('#tDel').onclick = async () => { if (!confirm(`„${t.titel}“ löschen?`)) return; try { await rpc('ul_termin_loeschen', { p_id: t.id }); f.zu(); toast('Gelöscht'); GELADEN = null; await zeigen() } catch (e) { toast(e.message) } };
 }
@@ -463,7 +467,7 @@ function regelFenster(id) {
   const alleP = PERS.slice(), merk = BER; BER = 'alle';
   const chk = gruppen(alleP).map(([t, P]) => `<b>${esc(t)}</b>` + P.map(p => `<label><input type="checkbox" value="${esc(pk(p))}"${auswahl.has(pk(p)) ? ' checked' : ''}>${esc(p.name)}</label>`).join('')).join('');
   BER = merk;
-  const f = fenster(`<h3>${g ? 'Warnregel bearbeiten' : 'Warnregeln'}</h3><div class="sub">Wenn mehr als die erlaubte Zahl dieser Personen gleichzeitig Urlaub hat, gibt es eine Warnung.</div>
+  const f = fenster(`<h3>${g ? 'Warnregel bearbeiten' : 'Warnregeln'}</h3><div class="sub">Wenn mehr als die erlaubte Zahl dieser Personen gleichzeitig Urlaub hat, gibt es eine Warnung. Betriebsurlaub zählt nicht mit.</div>
     ${!g && REG.length ? `<div class="liste">${REG.map(x => `<button data-id="${x.id}"><span>${esc(regelName(x))}</span><small>höchstens ${x.max} gleichzeitig</small></button>`).join('')}</div>` : ''}
     <div class="f"><label>Name (optional)</label><input class="inp" id="rN" maxlength="60" placeholder="Buchhaltung"></div>
     <div class="f"><label>Personen</label><div class="chk" id="rP">${chk}</div></div>
