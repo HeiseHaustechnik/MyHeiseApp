@@ -10,7 +10,7 @@
 @font-face{font-family:'Montserrat';src:url(montserrat.woff2) format('woff2');font-weight:100 900;font-display:swap}
 :root{--bg:#f4f5f8;--surface:#fff;--surface-2:#eef0f4;--ink:#0d1524;--ink-2:#485468;--ink-3:#8491a3;--line:#e3e7ee;
   --brand:#2f3b53;--brand-2:#4a5a7a;--accent:#e25304;--accent-2:#c94a03;--red:#c32328;--red-bg:#fdeceb;--amber-bg:#fdeee5;--ok:#15803d;--ok-bg:#e6f6ec;
-  --u:#13877a;--u-bg:#d3efea;--frei:#d6dce6;--ft:#9fb0ca;--bu:#f0965a;--sf:#a9c9f0;--sfbar:#1f4f8f;--ev:#b0175a;--ev-bg:#f4b3cf;--rg:#c32328;--shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);
+  --u:#13877a;--u-bg:#d3efea;--u2:#34489c;--u2-bg:#d8ddf3;--frei:#d6dce6;--ft:#9fb0ca;--bu:#f0965a;--sf:#a9c9f0;--sfbar:#1f4f8f;--ev:#b0175a;--ev-bg:#f4b3cf;--rg:#c32328;--shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);
   --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font:15px/1.45 Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh;-webkit-font-smoothing:antialiased}
@@ -66,7 +66,10 @@ table.plan{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%
 .plan tfoot td{position:sticky;bottom:0;background:var(--surface);border-top:2px solid var(--line);font-weight:760;height:32px;z-index:2}
 .plan tfoot td.nm{z-index:3}
 .plan tfoot td.viel{background:var(--red);color:#fff}.plan tfoot td.etw{background:var(--amber-bg);color:var(--accent-2)}
-.plan.jahr td.m{min-width:64px;padding:0 6px;height:34px;font-weight:700;cursor:pointer}.plan.jahr td.m.hat{background:var(--u-bg);color:#0b5a51}
+.plan.jahr td.m{min-width:64px;padding:0 6px;height:34px;font-weight:700;cursor:pointer}.plan.jahr td.m.hat{background:var(--u-bg);color:#0b5a51}.plan.jahr td.m.hat.bst{background:var(--u2-bg);color:#1f2c66}
+.plan td.u1.bst{background:var(--u2)}.plan td.u5.bst{background:linear-gradient(135deg,var(--u2) 50%,var(--u2-bg) 50%);color:#1f2c66}
+.plan td.nm{box-shadow:inset 5px 0 0 var(--gf,transparent)}.plan tr.gr td.nm{box-shadow:inset 5px 0 0 var(--gf,transparent)}
+.plan tfoot tr.f2 td{border-top:0}.plan tfoot td.nm small{font-weight:600;color:var(--ink-3)}
 .plan.jahr thead th{cursor:pointer;padding:8px 6px}
 .leer{padding:30px;text-align:center;color:var(--ink-3)}
 .leg{display:flex;flex-wrap:wrap;gap:14px;margin:12px 4px 0;font-size:12.5px;color:var(--ink-2)}.leg i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
@@ -113,7 +116,8 @@ table.plan{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%
     </div>
     <div id="ansicht"></div>
     <div class="leg">
-      <span><i style="background:var(--u)"></i>Urlaub</span>
+      <span><i style="background:var(--u)"></i>Urlaub Büro</span>
+      <span><i style="background:var(--u2)"></i>Urlaub Baustelle</span>
       <span><i style="background:linear-gradient(135deg,var(--u) 50%,var(--u-bg) 50%)"></i>halber Tag</span>
       <span><i style="background:var(--ft)"></i>Feiertag</span>
       <span><i style="background:var(--sf);box-shadow:inset 0 3px 0 var(--sfbar)"></i>Schulferien Niedersachsen</span>
@@ -171,6 +175,9 @@ const zahl = n => String(n).replace('.', ',');
 const GR_BAU = ['Obermonteur', 'Monteur', 'Kundendienst', 'Azubi', 'Leiharbeiter', 'Praktikant'];
 const GR_BAU_TXT = { Obermonteur: 'Obermonteure', Monteur: 'Monteure', Kundendienst: 'Kundendienst', Azubi: 'Auszubildende', Leiharbeiter: 'Leiharbeiter', Praktikant: 'Praktikanten' };
 const GR_BUERO = ['Geschäftsführung', 'Projektleitung', 'Meister', 'Büro', 'Lager'];
+const GR_FARBE = { 'Geschäftsführung': '#2f3b53', Projektleitung: '#c94a03', Meister: '#b98a00', 'Büro': '#13877a', Lager: '#5e4596',
+  Obermonteur: '#1f2c66', Monteur: '#34489c', Kundendienst: '#c32328', Azubi: '#1f7a3c', Leiharbeiter: '#6b7a99', Praktikant: '#b0175a' };
+const gfarbe = g => GR_FARBE[g] || '#a3acba';
 let ROLLE = null, PERS = [], EIN = {}, BU = {}, FT = {}, FER = [], TER = [], REG = [], GELADEN = null;
 let BER = ls('ber') || 'alle', MODUS = ls('modus') || 'monat', SCHWELLE = +(ls('schwelle') || 3);
 const H = new Date(); H.setHours(12, 0, 0, 0);
@@ -234,7 +241,7 @@ function zelle(p, s) {
   let cls = 't', txt = '', tip = `${p.name}, ${dDE(s)}`;
   if (we) cls += ' we';
   else if (FT[s]) { cls += ' ft'; tip += ': ' + FT[s] }
-  else if (u) { cls += u.anteil < 1 ? ' u5' : ' u1'; txt = u.anteil < 1 ? '½' : 'U'; tip += u.anteil < 1 ? ': ½ Tag Urlaub' : ': Urlaub'; if (u.neben) tip += ' · sonst ' + u.neben; if (u.notiz) tip += ' · ' + u.notiz }
+  else if (u) { cls += (u.anteil < 1 ? ' u5' : ' u1') + (p.bereich === 'baustelle' ? ' bst' : ''); txt = u.anteil < 1 ? '½' : 'U'; tip += u.anteil < 1 ? ': ½ Tag Urlaub' : ': Urlaub'; if (u.neben) tip += ' · sonst ' + u.neben; if (u.notiz) tip += ' · ' + u.notiz }
   else if (BU[s] === 1) { cls += ' bu'; tip += ': Betriebsurlaub' }
   else if (!arbeitstag(p, s)) { cls += ' ndb'; tip += ': kein Arbeitstag' }
   else if (BU[s] === 0.5) { cls += ' bu5'; tip += ': ½ Betriebsurlaub' }
@@ -245,12 +252,16 @@ function rMonat() {
   $('#titel').textContent = `${MON[MONAT.getMonth()]} ${MONAT.getFullYear()}`;
   if (!L.length) { $('#ansicht').innerHTML = '<div class="tw"><div class="leer">Keine Personen in dieser Auswahl.</div></div>'; return }
   const kopf = tage.map(s => { const w = wtag(s), d = dt(s); const sf = ferien(s), te = termineIn(s, s); return `<th class="${w >= 5 ? 'we' : ''}${FT[s] ? ' ft' : ''}${sf ? ' sf' : ''}${te.length ? ' ev' : ''}${s === heute ? ' heute' : ''}" title="${esc([FT[s], BU[s] ? (BU[s] === 1 ? 'Betriebsurlaub' : '½ Betriebsurlaub') : '', sf ? 'Schulferien: ' + sf : ''].concat(te.map(t => t.titel)).filter(Boolean).join(' · '))}">${w >= 5 ? '' : `<small>${w === 0 || s === tage[0] ? 'KW' + kw(d) : WT[w]}</small>`}${w >= 5 ? '<small>&nbsp;</small>' : d.getDate()}</th>` }).join('');
-  const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm" colspan="1">${esc(titel)} · ${P.length}</td><td colspan="${tage.length + 1}"></td></tr>` + P.map(p => {
+  const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm" colspan="1" style="--gf:${gfarbe(P[0].gruppe)}">${esc(titel)} · ${P.length}</td><td colspan="${tage.length + 1}"></td></tr>` + P.map(p => {
     const summe = tage.reduce((a, s) => { const u = urlaub(p, s); return a + (u && wtag(s) < 5 && !FT[s] ? +u.anteil : 0) }, 0);
-    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name)}">${esc(p.name)}</td>${tage.map(s => zelle(p, s)).join('')}<td class="sum">${summe ? zahl(summe) : ''}</td></tr>`
+    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name + ' · ' + (p.gruppe || ''))}" style="--gf:${gfarbe(p.gruppe)}">${esc(p.name)}</td>${tage.map(s => zelle(p, s)).join('')}<td class="sum">${summe ? zahl(summe) : ''}</td></tr>`
   }).join('')).join('');
-  const fuss = tage.map(s => { if (wtag(s) >= 5) return '<td class="we"></td>'; const n = L.filter(p => urlaub(p, s)).length; const rv = regelVerstoss(s); const cls = (n >= SCHWELLE ? 'viel' : n >= Math.max(1, SCHWELLE - 1) && n > 0 ? 'etw' : '') + (ferien(s) ? ' sf' : '') + (rv.length ? ' rg' : '');
-    return `<td class="${cls}" title="${esc(dDE(s) + ': ' + (n ? L.filter(p => urlaub(p, s)).map(p => p.name).join(', ') : 'niemand im Urlaub') + (rv.length ? ' · Warnung: ' + rv.map(regelName).join(', ') : ''))}">${n || ''}${rv.length ? '!' : ''}</td>` }).join('');
+  const fussZ = (LL, regeln) => tage.map(s => { if (wtag(s) >= 5) return '<td class="we"></td>'; const wer = LL.filter(p => urlaub(p, s)), n = wer.length; const rv = regeln ? regelVerstoss(s) : []; const cls = (n >= SCHWELLE ? 'viel' : n >= Math.max(1, SCHWELLE - 1) && n > 0 ? 'etw' : '') + (ferien(s) ? ' sf' : '') + (rv.length ? ' rg' : '');
+    return `<td class="${cls}" title="${esc(dDE(s) + ': ' + (n ? wer.map(p => p.name).join(', ') : 'niemand im Urlaub') + (rv.length ? ' · Warnung: ' + rv.map(regelName).join(', ') : ''))}">${n || ''}${rv.length ? '!' : ''}</td>` }).join('');
+  const fz = BER === 'alle'
+    ? [['Gleichzeitig Büro', L.filter(p => p.bereich === 'buero'), false], ['Gleichzeitig Baustelle', L.filter(p => p.bereich === 'baustelle'), false], ['Gleichzeitig gesamt', L, true]]
+    : [['Gleichzeitig im Urlaub', L, true]];
+  const fuss = fz.map(([t, LL, rg], i) => `<tr class="${i ? 'f2' : ''}"><td class="nm" style="bottom:${(fz.length - 1 - i) * 32}px">${t}</td>${fussZ(LL, rg).replace(/<td /g, `<td style="bottom:${(fz.length - 1 - i) * 32}px" `)}<td style="bottom:${(fz.length - 1 - i) * 32}px"></td></tr>`).join('');
   const mv = tage[0], mb = tage[tage.length - 1];
   const buT = tage.filter(s => BU[s]), rvT = {};
   tage.forEach(s => { if (wtag(s) < 5) regelVerstoss(s).forEach(g => (rvT[g.id] ||= { g, t: [] }).t.push(s)) });
@@ -260,7 +271,7 @@ function rMonat() {
     .concat(ferienIn(mv, mb).map(f => `<span class="sfh">${esc(f.name)} ${dRange(f.von, f.bis)}</span>`))
     .concat(tage.filter(s => FT[s]).map(s => `<span class="fth">${dDE(s)} ${esc(FT[s])}</span>`)).join('');
   $('#ansicht').innerHTML = (hin ? `<div class="monhin">${hin}</div>` : '') + `<div class="tw"><table class="plan"><thead><tr><th class="nm">Name</th>${kopf}<th>Tage</th></tr></thead><tbody>${zeilen}</tbody>
-    <tfoot><tr><td class="nm">Gleichzeitig im Urlaub</td>${fuss}<td></td></tr></tfoot></table></div>`;
+    <tfoot>${fuss}</tfoot></table></div>`;
 }
 
 /* ===================== Jahresansicht ===================== */
@@ -272,9 +283,9 @@ function rJahr() {
   const maxGl = monTage.map(T => T.reduce((a, s) => Math.max(a, L.filter(p => urlaub(p, s)).length), 0));
   const kopf = MON.map((m, i) => { const mv = `${JAHR}-${String(i + 1).padStart(2, '0')}-01`, mb = iso(new Date(JAHR, i + 1, 0, 12)), sf = ferienIn(mv, mb);
     return `<th data-m="${i}" class="${sf.length ? 'sf' : ''}" title="${esc(['Monat öffnen'].concat(sf.map(f => f.name + ' ' + dRange(f.von, f.bis))).join(' · '))}">${m.slice(0, 3)}<small>${maxGl[i] ? 'max. ' + maxGl[i] + ' gleichz.' : '&nbsp;'}</small></th>` }).join('');
-  const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm">${esc(titel)} · ${P.length}</td><td colspan="13"></td></tr>` + P.map(p => {
+  const zeilen = gruppen(L).map(([titel, P]) => `<tr class="gr"><td class="nm" style="--gf:${gfarbe(P[0].gruppe)}">${esc(titel)} · ${P.length}</td><td colspan="13"></td></tr>` + P.map(p => {
     const je = monTage.map(T => T.reduce((a, s) => { const u = urlaub(p, s); return a + (u ? +u.anteil : 0) }, 0)), sum = je.reduce((a, b) => a + b, 0);
-    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name)}">${esc(p.name)}</td>${je.map((n, i) => `<td class="m${n ? ' hat' : ''}" data-m="${i}">${n ? zahl(n) : ''}</td>`).join('')}<td class="sum">${sum ? zahl(sum) : ''}</td></tr>`
+    return `<tr class="${p.ich ? 'ich' : ''}"><td class="nm" title="${esc(p.name + ' · ' + (p.gruppe || ''))}" style="--gf:${gfarbe(p.gruppe)}">${esc(p.name)}</td>${je.map((n, i) => `<td class="m${n ? ' hat' : ''}${p.bereich === 'baustelle' ? ' bst' : ''}" data-m="${i}">${n ? zahl(n) : ''}</td>`).join('')}<td class="sum">${sum ? zahl(sum) : ''}</td></tr>`
   }).join('')).join('');
   const fl = ferienIn(`${JAHR}-01-01`, `${JAHR}-12-31`);
   $('#ansicht').innerHTML = `<div class="tw"><table class="plan jahr"><thead><tr><th class="nm">Name · Urlaubstage</th>${kopf}<th>Summe</th></tr></thead><tbody>${zeilen}</tbody></table></div>`
