@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f3b53">
+<title>News · My Heise App</title>
+<link rel="icon" href="icon-192.png">
+<style>
+@font-face{font-family:'Montserrat';src:url(montserrat.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{--bg:#f4f5f8;--surface:#fff;--surface-2:#eef0f4;--ink:#0d1524;--ink-2:#485468;--ink-3:#8491a3;--line:#e3e7ee;
+  --brand:#2f3b53;--accent:#e25304;--accent-2:#c94a03;--red:#c32328;--red-bg:#fdeceb;--amber-bg:#fdeee5;--ok:#15803d;--ok-bg:#e6f6ec;--ext:#2c60a7;--ext-bg:#e3ecf8;--violet:#5e4596;--violet-bg:#efe9fe;
+  --shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font:15px/1.5 Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:inherit;text-decoration:none}[hidden]{display:none!important}
+svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t)) 16px 10px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.top .zur{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow);flex:none}
+.top b{font-size:17px;font-weight:780;display:block}.top small{font-size:12px;color:var(--ink-3);font-weight:600}.top .sp{flex:1}
+.shell{max-width:980px;margin:0 auto;padding:4px 16px calc(40px + var(--safe-b))}
+.leiste{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 14px}
+.seg{display:inline-grid;grid-auto-flow:column;gap:4px;padding:4px;background:var(--surface-2);border-radius:14px;max-width:100%;overflow-x:auto}
+.seg button{min-height:38px;padding:0 13px;border-radius:11px;font-weight:660;font-size:13.5px;color:var(--ink-2);white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(13,21,36,.16)}
+.seg button i{font-style:normal;background:var(--accent);color:#fff;border-radius:9px;padding:0 6px;font-size:11.5px;margin-left:5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:14px;font-weight:700;background:var(--brand);color:#fff;text-align:center}
+.btn.cta{background:var(--accent)}.btn.sec{background:var(--surface-2);color:var(--ink)}.btn.del{background:var(--red-bg);color:var(--red)}.btn.ok{background:var(--ok)}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13.5px;border-radius:12px}.btn:disabled{opacity:.5}
+/* Titelbild / Farbfläche */
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--g1,#f08a3c),var(--g2,#e25304));color:#fff}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .sym{position:absolute;right:-6%;bottom:-18%;width:62%;max-width:300px;aspect-ratio:1;opacity:.22}
+.hero .sym svg{width:100%;height:100%;fill:none;stroke:#fff;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.hero .sym2{position:absolute;left:22px;top:20px;width:54px;height:54px;border-radius:17px;background:rgba(255,255,255,.2);display:grid;place-items:center}
+.hero .sym2 svg{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hero.hell{color:#2f3b53}.hero.hell .sym svg,.hero.hell .sym2 svg{stroke:#2f3b53}.hero.hell .sym2{background:rgba(255,255,255,.45)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(8,13,21,.55));pointer-events:none}
+.hero:not(.foto)::after{display:none}
+.badge{position:absolute;top:14px;right:14px;z-index:2;background:var(--accent);color:#fff;font-weight:800;font-size:11.5px;letter-spacing:.06em;border-radius:9px;padding:3px 9px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.badge.vs{background:var(--violet)}.badge.ent{background:var(--ink-2)}.badge.pin{background:var(--brand);left:14px;right:auto}
+/* Feed */
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.karte{display:flex;flex-direction:column;background:var(--surface);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);text-align:left;transition:transform .15s}
+.karte:hover{transform:translateY(-2px)}
+.karte .hero{height:170px}
+.karte .tx{padding:14px 16px 16px;display:grid;gap:5px}
+.karte .tx b{font-size:17px;font-weight:780;line-height:1.3}
+.karte .tx p{color:var(--ink-2);font-size:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.karte .tx small{color:var(--ink-3);font-size:12px;font-weight:650}
+.karte.gross{grid-column:1/-1}
+.karte.gross .hero{height:270px}
+.karte.gross .tx b{font-size:22px}
+.karte.gross .tx p{-webkit-line-clamp:4;font-size:15px}
+@media(min-width:760px){.karte.gross{flex-direction:row}.karte.gross .hero{height:auto;min-height:290px;flex:1.25}.karte.gross .tx{flex:1;align-content:center;padding:24px}}
+.leer{padding:34px;text-align:center;color:var(--ink-3);background:var(--surface);border-radius:20px}
+.adminzeile{display:flex;gap:8px;margin:0 16px 14px;flex-wrap:wrap}
+/* Artikel */
+.artikel{background:var(--surface);border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+.artikel .hero{height:clamp(200px,40vw,380px)}
+.artikel .kopf{padding:20px 22px 6px}
+.artikel h1{font-size:clamp(23px,4vw,30px);line-height:1.2;font-weight:800;color:var(--brand)}
+.artikel .meta{color:var(--ink-3);font-size:13px;font-weight:650;margin-top:6px}
+.artikel .lead{font-size:17px;font-weight:600;color:var(--ink-2);padding:6px 22px 0}
+.inhalt{padding:12px 22px 6px;font-size:16px;line-height:1.65}
+.inhalt p{margin:0 0 12px}.inhalt h2{font-size:19px;color:var(--brand);margin:18px 0 8px}.inhalt ul,.inhalt ol{margin:0 0 12px 22px}.inhalt li{margin:3px 0}
+.inhalt a{color:var(--ext);text-decoration:underline}.inhalt b{font-weight:750}
+.inhalt .hinweis{background:var(--amber-bg);border-left:4px solid var(--accent);border-radius:12px;padding:10px 14px;margin:0 0 12px}
+.galerie{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;padding:8px 22px 6px}
+.galerie button{border-radius:14px;overflow:hidden;aspect-ratio:4/3;background:var(--surface-2)}
+.galerie img{width:100%;height:100%;object-fit:cover;display:block}
+.dateien{display:grid;gap:6px;padding:8px 22px 6px}
+.datei{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:var(--surface-2);text-align:left;width:100%}
+.datei span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:650}.datei small{color:var(--ink-3);font-weight:600}
+.appknopf{margin:12px 22px 0}
+.fuss{padding:16px 22px 22px;display:flex;gap:10px;flex-wrap:wrap}
+/* Editor */
+.ed{display:grid;gap:14px}
+@media(min-width:980px){.ed.zwei{grid-template-columns:minmax(0,1fr) minmax(0,.9fr);align-items:start}.vorschau{position:sticky;top:76px}}
+.box{background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:16px}
+.box h3{font-size:14px;font-weight:780;color:var(--ink-2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.f{display:grid;gap:5px;margin-bottom:12px}.f label{font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.inp{width:100%;min-height:46px;padding:0 12px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);font-size:16px;outline:none}
+textarea.inp{padding:10px 12px;min-height:220px;resize:vertical;line-height:1.5}
+.inp:focus{border-color:var(--accent)}
+.werkzeug{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}.werkzeug button{min-height:32px;padding:0 10px;border-radius:9px;background:var(--surface-2);font-size:13px;font-weight:700}
+.wahl{display:flex;flex-wrap:wrap;gap:6px}.wahl button{min-height:38px;padding:0 12px;border-radius:12px;background:var(--surface-2);font-weight:650;font-size:14px}.wahl button.on{background:var(--brand);color:#fff}
+.farben{display:flex;gap:8px;flex-wrap:wrap}.farben button{width:38px;height:38px;border-radius:12px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)}.farben button.on{outline:3px solid var(--ink);outline-offset:2px}
+.icons{display:flex;gap:6px;flex-wrap:wrap}.icons button{width:40px;height:40px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center}.icons button.on{background:var(--brand);color:#fff}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.thumb{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--surface-2)}.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb .weg,.dz .weg{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:9px;background:rgba(13,21,36,.65);color:#fff;display:grid;place-items:center}
+.dz{position:relative;display:flex;align-items:center;gap:10px;padding:10px 44px 10px 12px;border-radius:12px;background:var(--surface-2);font-size:14px;font-weight:650;margin-top:6px}.dz small{color:var(--ink-3);font-weight:600;margin-left:auto}
+.hoch{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border:2px dashed var(--line);border-radius:14px;color:var(--ink-2);font-weight:700;cursor:pointer;margin-top:8px}
+.hoch:hover{border-color:var(--accent);color:var(--accent)}
+.schalter{display:flex;align-items:center;gap:10px;font-weight:650;font-size:14.5px}.schalter input{width:20px;height:20px}
+.chk{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 10px;padding:8px;border:1.5px solid var(--line);border-radius:13px;margin-top:6px}.chk label{display:flex;gap:8px;align-items:center;font-size:14px}
+.err{color:var(--red);font-size:13.5px;font-weight:650;margin:0 0 8px}
+.info{background:var(--surface-2);border-radius:14px;padding:10px 14px;font-size:13.5px;color:var(--ink-2)}
+.leiste-ed{position:sticky;bottom:0;z-index:20;display:flex;gap:10px;flex-wrap:wrap;padding:12px 0 calc(12px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%)}
+.leiste-ed .btn{flex:1 1 150px}
+/* Fenster */
+.bd{position:fixed;inset:0;z-index:100;background:rgba(8,13,21,.55);display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.bd{align-items:center}}
+.sh{background:var(--surface);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 18px calc(18px + var(--safe-b));max-height:92dvh;overflow:auto}
+@media(min-width:700px){.sh{border-radius:24px}}
+.sh h3{font-size:18px;font-weight:780;margin-bottom:6px}.sh .sub{color:var(--ink-2);font-size:14px;margin-bottom:14px}
+.knoepfe{display:flex;gap:10px;margin-top:10px}.knoepfe .btn{flex:1}
+.licht{position:fixed;inset:0;z-index:150;background:rgba(5,8,13,.92);display:grid;place-items:center;padding:20px}.licht img{max-width:100%;max-height:100%;border-radius:10px}
+.toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%);background:#0f1826;color:#fff;padding:12px 16px;border-radius:14px;font-weight:600;font-size:14px;z-index:200;max-width:92vw;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+#boot{padding:60px 20px;text-align:center;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="zur" href="index.html" aria-label="Zur Startseite"><svg class="ic"><use href="#i-back"/></svg></a>
+  <div><b>News</b><small id="unterTitel">Neues aus der App und dem Betrieb</small></div>
+  <div class="sp"></div>
+  <button class="btn cta sm" id="neuBtn" hidden><svg class="ic"><use href="#i-plus"/></svg> News</button>
+</header>
+<main class="shell"><div id="boot">Lädt …</div><div id="app" hidden></div></main>
+<div class="toast" id="toast"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8 20 3M16.5 6.5l2.5 2.5M14 9l2 2"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="17" rx="2.4"/><path d="M8 2.5v4M16 2.5v4M3 10h18M8 14h2M14 14h2M8 17.5h2"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M5.7 16.5H3.5v-4l2-4.5a2 2 0 0 1 1.8-1.2h9.4a2 2 0 0 1 1.8 1.2l2 4.5v4h-2.2M9.3 16.5h5.4M3.5 12.5h17"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5.5h4V20"/></symbol>
+<symbol id="i-ladder" viewBox="0 0 24 24"><path d="M7 2v20M17 2v20M7 6.5h10M7 11.5h10M7 16.5h10"/></symbol>
+<symbol id="i-ruler" viewBox="0 0 24 24"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0ZM14.5 12.5l2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.2 7.8 8 9 4.8-1.2 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-tablet" viewBox="0 0 24 24"><rect x="4.5" y="2.5" width="15" height="19" rx="2.4"/><path d="M11 18.5h2"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11a2 2 0 0 1 1 .3A2 2 0 0 1 13 4h5.5A1.5 1.5 0 0 1 20 5.5v12a1.5 1.5 0 0 1-1.5 1.5H13a1 1 0 0 0-1 1 1 1 0 0 0-1-1H5.5A1.5 1.5 0 0 1 4 17.5z"/><path d="M12 4.3V20"/></symbol>
+<symbol id="i-hardhat" viewBox="0 0 24 24"><path d="M3 17h18v2.5H3zM5 17a7 7 0 0 1 14 0M12 5v5.5M9 6.5 8 10.5M15 6.5l1 4"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19zM12 10v4.5M12 17.5v.1"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol>
+<symbol id="i-megafon" viewBox="0 0 24 24"><path d="M3 10v4a1 1 0 0 0 1 1h3l9 5V4L7 9H4a1 1 0 0 0-1 1zM7 15l1.5 5h2.5L9.5 15M19 9a3 3 0 0 1 0 6"/></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13a6 6 0 0 1-7.9 2.6L7 21.7a2 2 0 0 1-2.8-2.8l6.1-6.1A6 6 0 0 1 13 4.9z"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-4 0-7-2.7-7-6.5 0-3.4 2.3-5.4 3.7-7.3.4 1.7 1.3 2.8 2.3 3.3 0-3.3 1.5-5.8 4-7.5-.3 3 1 4.6 2.4 6.4 1.2 1.5 1.6 3 1.6 5.1C19 18.3 16 21 12 21z"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.7v.1"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="9.5" r="1.8"/><path d="m21 16-5-5-9 9"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</svg>
+<script>
+'use strict';
+/* ===================== Anmeldung (gemeinsame Sitzung heiseSession) ===================== */
+const SB = 'https://bbjzfoirefcsqqgztjpt.supabase.co', KEY = 'sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H', SESS_KEY = 'heiseSession', BUCKET = 'news-dateien';
+const AUTH = { access: null, refresh: null, exp: 0 }; let refreshP = null;
+const storedRefresh = () => { try { return (JSON.parse(localStorage.getItem(SESS_KEY) || 'null') || {}).r || null } catch (e) { return null } };
+function authSave(j) { AUTH.access = j.access_token; AUTH.refresh = j.refresh_token; AUTH.exp = j.expires_at ? j.expires_at * 1000 : Date.now() + (j.expires_in || 3600) * 1000; try { localStorage.setItem(SESS_KEY, JSON.stringify({ r: AUTH.refresh })) } catch (e) { } }
+function toLogin() { location.replace('index.html?next=' + encodeURIComponent('news.html' + location.hash)) }
+async function refresh() {
+  let r; try { r = await fetch(`${SB}/auth/v1/token?grant_type=refresh_token`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ refresh_token: AUTH.refresh }) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { try { localStorage.removeItem(SESS_KEY) } catch (e) { } toLogin(); throw new Error('Sitzung abgelaufen') }
+  authSave(j);
+}
+async function token() {
+  if (AUTH.access && AUTH.exp - Date.now() > 60000) return AUTH.access;
+  const r = storedRefresh() || AUTH.refresh; if (!r) { toLogin(); throw new Error('Nicht angemeldet') }
+  AUTH.refresh = r; if (!refreshP) refreshP = refresh().finally(() => { refreshP = null }); await refreshP; return AUTH.access;
+}
+async function rpc(name, args) {
+  const t = await token(); let r;
+  try { r = await fetch(`${SB}/rest/v1/rpc/${name}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + t }, body: JSON.stringify(args || {}) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => null);
+  if (!r.ok) { const m = (j && j.message) || r.statusText || 'Fehler'; if (r.status === 401) AUTH.access = null; throw new Error(/42501|permission denied/i.test(m) && !/dürfen/.test(m) ? 'Dafür fehlt dir die Berechtigung' : m) }
+  return j;
+}
+/* Speicher: hochladen, signierte Links, löschen */
+async function hochladen(pfad, blob, typ) {
+  const t = await token();
+  const r = await fetch(`${SB}/storage/v1/object/${BUCKET}/${pfad}`, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + t, 'Content-Type': typ || blob.type || 'application/octet-stream', 'x-upsert': 'true' }, body: blob });
+  if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error('Hochladen fehlgeschlagen: ' + (j.message || j.error || r.status)) }
+}
+const URLS = {};
+async function links(pfade) {
+  const fehlend = [...new Set(pfade.filter(p => p && !p.startsWith('data:') && !URLS[p]))];
+  if (fehlend.length) {
+    try {
+      const t = await token();
+      const r = await fetch(`${SB}/storage/v1/object/sign/${BUCKET}`, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' }, body: JSON.stringify({ expiresIn: 7200, paths: fehlend }) });
+      const j = await r.json().catch(() => []);
+      (Array.isArray(j) ? j : []).forEach(x => { if (x.signedURL) URLS[x.path] = SB + '/storage/v1' + x.signedURL });
+    } catch (e) { }
+  }
+}
+const url = p => !p ? '' : p.startsWith('data:') ? p : (URLS[p] || '');
+async function loeschenSpeicher(pfade) {
+  pfade = (pfade || []).filter(p => p && !p.startsWith('data:')); if (!pfade.length) return;
+  try { const t = await token(); await fetch(`${SB}/storage/v1/object/${BUCKET}`, { method: 'DELETE', headers: { apikey: KEY, Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' }, body: JSON.stringify({ prefixes: pfade }) }) } catch (e) { }
+}
+async function mailSenden(gid) {
+  const t = await token();
+  const r = await fetch(`${SB}/functions/v1/mail-senden`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, 'x-user-token': t }, body: JSON.stringify({ action: 'nachricht', gruppe_id: gid }) });
+  const j = await r.json().catch(() => ({})); if (!r.ok || j.error) throw new Error(j.error || 'E-Mail-Versand nicht möglich'); return j;
+}
+window.addEventListener('storage', e => { if (e.key === SESS_KEY && !e.newValue) location.replace('index.html') });
+
+/* ===================== Hilfen ===================== */
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ic = n => `<svg class="ic"><use href="#i-${n}"/></svg>`;
+const zwei = n => String(n).padStart(2, '0');
+const dTag = s => { if (!s) return ''; const d = new Date(s); return `${zwei(d.getDate())}.${zwei(d.getMonth() + 1)}.${d.getFullYear()}` };
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'x' + Date.now() + Math.random().toString(16).slice(2));
+const groesse = b => b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3400) }
+const FARBEN = { orange: ['#f08a3c', '#e25304'], blau: ['#4a5a7a', '#2f3b53'], heizung: ['#d8474b', '#c32328'], sanitaer: ['#4a7fc4', '#2c60a7'], lueftung: ['#f7e061', '#f5d423', 1], gruen: ['#3fa45b', '#1f7a3c'], tuerkis: ['#2bb3a3', '#13877a'], lila: ['#8a6bbf', '#5e4596'] };
+const ICONS = ['megafon', 'star', 'bulb', 'key', 'calendar', 'bell', 'info', 'alert', 'users', 'wrench', 'flame', 'drop', 'house', 'car', 'box', 'ladder', 'ruler', 'shield', 'tablet', 'book', 'hardhat', 'flag'];
+const APPS = [['', 'Kein Knopf'], ['schluessel.html', 'Schlüssel'], ['urlaub.html', 'Urlaub'], ['notdienst.html', 'Notdienst'], ['planung.html', 'Planung'], ['projekte.html', 'Projekte'], ['lagerverwaltung.html', 'Lagerverwaltung'], ['fahrzeuge.html', 'Fuhrpark'], ['leitern.html', 'Leiterprüfung'], ['geraete.html', 'Geräteverwaltung'], ['unterweisung.html', 'Unterweisungen'], ['gefaehrdung.html', 'Gefährdungsbeurteilung'], ['objekt.html', 'Objektaufnahme'], ['index.html#/ideen', 'Ideen'], ['index.html#/nachrichten', 'Nachrichten']];
+
+/* Einfache Textgestaltung: **fett**, *kursiv*, ## Überschrift, - Liste, 1. Liste, > Hinweis, [Text](Link) */
+function format(txt) {
+  const inl = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\n]+?)\*/g, '$1<i>$2</i>')
+    .replace(/\[([^\]]+)\]\(((?:https?:\/\/|mailto:|tel:|[\w.-]+\.html)[^)\s]*)\)/g, (m, t, u) => `<a href="${u.replace(/"/g, '')}"${/^https?:/.test(u) ? ' target="_blank" rel="noopener"' : ''}>${t}</a>`)
+    .replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+  const zeilen = String(txt || '').replace(/\r/g, '').split('\n'); let h = '', liste = null, absatz = [];
+  const absatzEnde = () => { if (absatz.length) { h += `<p>${absatz.map(inl).join('<br>')}</p>`; absatz = [] } };
+  const listeEnde = () => { if (liste) { h += `<${liste.t}>${liste.i.map(x => `<li>${inl(x)}</li>`).join('')}</${liste.t}>`; liste = null } };
+  for (const z of zeilen) {
+    let m;
+    if (!z.trim()) { absatzEnde(); listeEnde(); continue }
+    if ((m = /^\s*[-•*]\s+(.*)$/.exec(z))) { absatzEnde(); if (!liste || liste.t !== 'ul') { listeEnde(); liste = { t: 'ul', i: [] } } liste.i.push(m[1]); continue }
+    if ((m = /^\s*\d+[.)]\s+(.*)$/.exec(z))) { absatzEnde(); if (!liste || liste.t !== 'ol') { listeEnde(); liste = { t: 'ol', i: [] } } liste.i.push(m[1]); continue }
+    listeEnde();
+    if ((m = /^#{1,3}\s+(.*)$/.exec(z))) { absatzEnde(); h += `<h2>${inl(m[1])}</h2>`; continue }
+    if ((m = /^>\s?(.*)$/.exec(z))) { absatzEnde(); h += `<div class="hinweis">${inl(m[1])}</div>`; continue }
+    absatz.push(z);
+  }
+  absatzEnde(); listeEnde(); return h;
+}
+function heroHTML(n, extra) {
+  const st = n.stil || {}, f = FARBEN[st.farbe] || FARBEN.orange, foto = n.titelbild && url(n.titelbild);
+  return `<div class="hero${foto ? ' foto' : ''}${!foto && f[2] ? ' hell' : ''}" style="--g1:${f[0]};--g2:${f[1]}">${foto ? `<img src="${esc(foto)}" alt="" loading="lazy">` : `<div class="sym"><svg><use href="#i-${esc(st.icon || 'bulb')}"/></svg></div><div class="sym2"><svg><use href="#i-${esc(st.icon || 'bulb')}"/></svg></div>`}${extra || ''}</div>`;
+}
+
+/* ===================== Daten ===================== */
+let D = { admin: false, gruppen: [], news: [] }, TAB = 'feed';
+async function laden() { D = await rpc('news_liste', { p_alle: true }); D.news = D.news || []; await links(D.news.flatMap(n => [n.titelbild])) }
+const sichtbar = () => D.news.filter(n => n.status === 'veroeffentlicht');
+const zahl = s => D.news.filter(n => n.status === s).length;
+
+/* ===================== Feed ===================== */
+function badge(n) {
+  if (n.status === 'vorschlag') return '<span class="badge vs">VORSCHLAG</span>';
+  if (n.status === 'entwurf') return '<span class="badge ent">ENTWURF</span>';
+  if (n.status === 'archiviert') return '<span class="badge ent">ARCHIV</span>';
+  return (n.angeheftet ? '<span class="badge pin">ANGEHEFTET</span>' : '') + (!n.gelesen ? '<span class="badge">NEU</span>' : '');
+}
+function karte(n, gross) {
+  const datum = n.status === 'veroeffentlicht' ? dTag(n.veroeffentlicht_am) : (n.quelle === 'claude' ? 'Vorschlag von Claude · ' : 'Stand ') + dTag(n.geaendert_am);
+  return `<a class="karte${gross ? ' gross' : ''}" href="#/n/${n.id}">${heroHTML(n, badge(n))}<div class="tx"><small>${esc(datum)}</small><b>${esc(n.titel || '(ohne Titel)')}</b>${n.teaser ? `<p>${esc(n.teaser)}</p>` : ''}</div></a>`;
+}
+function zeigeFeed() {
+  const tabs = D.admin ? `<div class="leiste"><div class="seg" id="tabs">${[['feed', 'Veröffentlicht', 0], ['vorschlag', 'Vorschläge', zahl('vorschlag')], ['entwurf', 'Entwürfe', zahl('entwurf')], ['archiviert', 'Archiv', 0]].map(([k, l, z]) => `<button data-t="${k}" class="${TAB === k ? 'on' : ''}">${l}${z ? `<i>${z}</i>` : ''}</button>`).join('')}</div></div>` : '';
+  const L = TAB === 'feed' ? sichtbar() : D.news.filter(n => n.status === TAB);
+  const leer = { feed: 'Noch keine News veröffentlicht.', vorschlag: 'Keine Vorschläge offen. Neue Funktionen bringen ihren Vorschlag mit, dazu einmal pro Woche ein Rundgang durch die Änderungen.', entwurf: 'Keine Entwürfe.', archiviert: 'Archiv ist leer.' }[TAB];
+  $('#app').innerHTML = tabs + (TAB === 'vorschlag' && L.length ? '<div class="info" style="margin-bottom:14px">Diese Entwürfe hat Claude zu neuen Funktionen geschrieben. Ansehen, bei Bedarf bearbeiten und dann veröffentlichen oder verwerfen.</div>' : '')
+    + (L.length ? `<div class="feed">${L.map((n, i) => karte(n, TAB === 'feed' && i === 0)).join('')}</div>` : `<div class="leer">${leer}</div>`);
+  const t = $('#tabs'); if (t) t.onclick = e => { const b = e.target.closest('button'); if (b) { TAB = b.dataset.t; zeigeFeed() } };
+}
+
+/* ===================== Artikel ===================== */
+async function zeigeArtikel(id) {
+  const n = D.news.find(x => x.id === id);
+  if (!n) { $('#app').innerHTML = '<div class="leer">Diese News gibt es nicht (mehr).</div>'; return }
+  const bilder = (n.anhaenge || []).filter(a => a.bild), dateien = (n.anhaenge || []).filter(a => !a.bild);
+  await links([n.titelbild, ...bilder.map(a => a.pfad)]);
+  const meta = n.status === 'veroeffentlicht' ? `${dTag(n.veroeffentlicht_am)}${n.veroeffentlicht_von ? ' · ' + esc(n.veroeffentlicht_von) : ''}` : `${n.quelle === 'claude' ? 'Vorschlag von Claude' : 'Entwurf'} · ${dTag(n.geaendert_am)}`;
+  const fuer = n.gruppen && n.gruppen.length ? ` · nur für ${n.gruppen.map(esc).join(', ')}` : '';
+  $('#app').innerHTML = `<article class="artikel">${heroHTML(n, badge(n))}
+    <div class="kopf"><h1>${esc(n.titel)}</h1><div class="meta">${meta}${D.admin ? fuer : ''}</div></div>
+    ${n.teaser ? `<p class="lead">${esc(n.teaser)}</p>` : ''}
+    <div class="inhalt">${format(n.inhalt)}</div>
+    ${bilder.length ? `<div class="galerie">${bilder.map((a, i) => `<button data-bild="${i}"><img src="${esc(url(a.pfad))}" alt="${esc(a.name || '')}" loading="lazy"></button>`).join('')}</div>` : ''}
+    ${dateien.length ? `<div class="dateien">${dateien.map((a, i) => `<button class="datei" data-datei="${i}">${ic('file')}<span>${esc(a.name)}</span><small>${groesse(a.groesse || 0)}</small></button>`).join('')}</div>` : ''}
+    ${n.app_url ? `<div class="appknopf"><a class="btn cta" href="${esc(n.app_url)}">${esc(n.app_name || 'Zur App')} öffnen ${ic('arrow')}</a></div>` : ''}
+    <div class="fuss"><a class="btn sec" href="#/">Alle News</a>${D.admin ? `<a class="btn sec" href="#/bearbeiten/${n.id}">Bearbeiten</a>${n.status !== 'veroeffentlicht' ? `<button class="btn cta" id="aPub">Veröffentlichen</button>` : `<button class="btn sec" id="aArch">Archivieren</button>`}${n.status === 'vorschlag' || n.status === 'entwurf' ? `<button class="btn del" id="aDel">${n.status === 'vorschlag' ? 'Verwerfen' : 'Löschen'}</button>` : ''}` : ''}</div></article>`;
+  $$('[data-bild]').forEach(b => b.onclick = () => { const d = document.createElement('div'); d.className = 'licht'; d.innerHTML = `<img src="${esc(url(bilder[+b.dataset.bild].pfad))}" alt="">`; d.onclick = () => d.remove(); document.body.appendChild(d) });
+  $$('[data-datei]').forEach(b => b.onclick = async () => { const a = dateien[+b.dataset.datei]; await links([a.pfad]); const u = url(a.pfad); if (u) window.open(u + '&download=' + encodeURIComponent(a.name), '_blank'); else toast('Datei konnte nicht geladen werden') });
+  const on = (s, f) => { const e = $(s); if (e) e.onclick = f };
+  on('#aPub', () => veroeffentlichenFenster(n));
+  on('#aArch', async () => { await rpc('news_status_setzen', { p_id: n.id, p_status: 'archiviert' }); toast('Archiviert'); await laden(); location.hash = '#/' });
+  on('#aDel', () => loeschenFenster(n));
+  if (n.status === 'veroeffentlicht' && !n.gelesen) { n.gelesen = true; rpc('news_gelesen_setzen', { p_id: n.id }).catch(() => { }) }
+}
+function fenster(html) {
+  const bd = document.createElement('div'); bd.className = 'bd'; bd.innerHTML = `<div class="sh" role="dialog">${html}</div>`;
+  bd.addEventListener('click', e => { if (e.target === bd) bd.remove() }); document.body.appendChild(bd);
+  bd.querySelectorAll('[data-zu]').forEach(b => b.onclick = () => bd.remove()); return { el: bd, zu: () => bd.remove(), q: s => bd.querySelector(s) };
+}
+function veroeffentlichenFenster(n, vorher) {
+  const fuer = n.gruppen && n.gruppen.length ? n.gruppen.join(', ') : 'alle Mitarbeitenden';
+  const f = fenster(`<h3>Veröffentlichen</h3><div class="sub">„${esc(n.titel)}“ erscheint auf der Startseite und unter News für <b>${esc(fuer)}</b>.</div>
+    <label class="schalter" style="margin-bottom:10px"><input type="checkbox" id="pNach" checked> Nachricht in der App (Glocke)</label>
+    <label class="schalter"><input type="checkbox" id="pMail"> Zusätzlich per E-Mail</label>
+    <div class="info" style="margin-top:10px">E-Mail geht über myheise@heise-haustechnik.de an alle Empfänger mit hinterlegter Adresse, sofern unter „E-Mail-Benachrichtigungen“ der Typ „Nachrichten“ eingeschaltet ist.</div>
+    <p class="err" id="pErr"></p><div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn cta" id="pOk">Jetzt veröffentlichen</button></div>`);
+  f.q('#pMail').onchange = e => { if (e.target.checked) f.q('#pNach').checked = true };
+  f.q('#pOk').onclick = async e => {
+    e.target.disabled = true; f.q('#pErr').textContent = '';
+    try {
+      if (vorher) await vorher();
+      const gid = await rpc('news_veroeffentlichen', { p_id: n.id, p_nachricht: f.q('#pNach').checked });
+      if (gid && f.q('#pMail').checked) mailSenden(gid).then(r => r && r.gesendet && toast(`Zusätzlich per E-Mail an ${r.gesendet} Personen`)).catch(err => toast('E-Mail: ' + err.message));
+      f.zu(); toast('Veröffentlicht'); await laden(); TAB = 'feed'; location.hash = '#/n/' + n.id; route();
+    } catch (err) { f.q('#pErr').textContent = err.message; e.target.disabled = false }
+  };
+}
+function loeschenFenster(n) {
+  const f = fenster(`<h3>${n.status === 'vorschlag' ? 'Vorschlag verwerfen' : 'News löschen'}</h3><div class="sub">„${esc(n.titel)}“ wird mit allen Bildern und Dateien gelöscht.</div><div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn del" id="lOk">${n.status === 'vorschlag' ? 'Verwerfen' : 'Löschen'}</button></div>`);
+  f.q('#lOk').onclick = async () => { try { const p = await rpc('news_loeschen', { p_id: n.id }); await loeschenSpeicher(p); f.zu(); toast('Gelöscht'); await laden(); location.hash = '#/' } catch (e) { toast(e.message) } };
+}
+
+/* ===================== Editor (Admin) ===================== */
+function bildVerkleinern(file, max) {
+  return new Promise((ok, no) => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => { URL.revokeObjectURL(u); const s = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); c.toBlob(b => b ? ok(b) : no(new Error('Bild nicht lesbar')), 'image/jpeg', 0.84) };
+    img.onerror = () => { URL.revokeObjectURL(u); no(new Error('Bild nicht lesbar')) }; img.src = u;
+  });
+}
+async function zeigeEditor(id) {
+  const alt = id ? D.news.find(x => x.id === id) : null;
+  if (id && !alt) { $('#app').innerHTML = '<div class="leer">Nicht gefunden.</div>'; return }
+  const E = alt ? JSON.parse(JSON.stringify(alt)) : { titel: '', teaser: '', inhalt: '', titelbild: null, stil: { farbe: 'orange', icon: 'megafon' }, anhaenge: [], app_url: '', app_name: '', gruppen: [], angeheftet: false, status: 'entwurf' };
+  const ordner = (alt && alt.id) || uuid(), weg = [];
+  await links([E.titelbild, ...(E.anhaenge || []).map(a => a.pfad)]);
+  let modus = E.titelbild ? 'foto' : 'farbe';
+  $('#app').innerHTML = `<div class="ed zwei">
+    <div class="ed">
+      ${E.status === 'vorschlag' ? '<div class="info">Vorschlag von Claude. Beim Speichern wird er zum Entwurf, veröffentlicht wird er erst mit „Veröffentlichen“.</div>' : ''}
+      <div class="box"><h3>Text</h3>
+        <div class="f"><label>Titel *</label><input class="inp" id="eTitel" maxlength="140" value="${esc(E.titel)}" placeholder="z. B. Neu in der App: Schlüsselverwaltung"></div>
+        <div class="f"><label>Kurztext für Startseite und Nachricht</label><input class="inp" id="eTeaser" maxlength="300" value="${esc(E.teaser)}" placeholder="Ein bis zwei Sätze, worum es geht"></div>
+        <div class="f"><label>Text</label><div class="werkzeug"><button type="button" data-w="**|**">Fett</button><button type="button" data-w="## |">Überschrift</button><button type="button" data-w="- |">Liste</button><button type="button" data-w="> |">Hinweis-Kasten</button><button type="button" data-w="[|](https://)">Link</button></div>
+          <textarea class="inp" id="eInhalt" maxlength="20000" placeholder="Was ist neu? Was muss man tun?">${esc(E.inhalt)}</textarea></div>
+      </div>
+      <div class="box"><h3>Titelbild</h3>
+        <div class="wahl" id="eModus"><button data-m="foto">Foto</button><button data-m="farbe">Farbfläche mit Symbol</button></div>
+        <div id="eFoto" style="margin-top:10px"></div>
+        <div id="eFarbe" style="margin-top:10px"><div class="farben" id="eFarben">${Object.entries(FARBEN).map(([k, f]) => `<button data-f="${k}" title="${k}" style="background:linear-gradient(135deg,${f[0]},${f[1]})"></button>`).join('')}</div>
+          <div class="icons" id="eIcons" style="margin-top:10px">${ICONS.map(i => `<button data-i="${i}" title="${i}">${ic(i)}</button>`).join('')}</div></div>
+      </div>
+      <div class="box"><h3>Bilder und Dateien</h3>
+        <div class="thumbs" id="eBilder"></div><label class="hoch">${ic('image')} Bilder hinzufügen<input type="file" accept="image/*" multiple hidden id="eBildIn"></label>
+        <div id="eDateien"></div><label class="hoch">${ic('file')} Dateien anhängen (PDF, Word, Excel …, bis 15 MB)<input type="file" multiple hidden id="eDateiIn"></label>
+      </div>
+      <div class="box"><h3>Einstellungen</h3>
+        <div class="f"><label>Knopf zu einer App</label><select class="inp" id="eApp">${APPS.map(([u, l]) => `<option value="${esc(u)}"${(E.app_url || '') === u ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></div>
+        <div class="f"><label>Wer sieht die News?</label><div class="wahl" id="eZiel"><button data-z="alle">Alle</button><button data-z="gruppen">Nur bestimmte Gruppen</button></div>
+          <div class="chk" id="eGruppen">${(D.gruppen || []).map(g => `<label><input type="checkbox" value="${esc(g)}"${E.gruppen.includes(g) ? ' checked' : ''}> ${esc(g)}</label>`).join('') || '<span style="color:var(--ink-3)">Es sind noch keine Benutzergruppen angelegt.</span>'}</div></div>
+        <label class="schalter"><input type="checkbox" id="ePin"${E.angeheftet ? ' checked' : ''}> Oben anheften</label>
+      </div>
+    </div>
+    <div class="vorschau"><div class="box" style="padding:10px"><h3 style="margin:6px 6px 10px">Vorschau Startseite</h3><div id="eVorschau"></div></div></div>
+  </div>
+  <p class="err" id="eErr"></p>
+  <div class="leiste-ed"><a class="btn sec" href="${alt ? '#/n/' + alt.id : '#/'}">Abbrechen</a><button class="btn" id="eSpeichern">${E.status === 'veroeffentlicht' ? 'Änderungen speichern' : 'Als Entwurf speichern'}</button>${E.status !== 'veroeffentlicht' ? '<button class="btn cta" id="ePub">Veröffentlichen …</button>' : ''}</div>`;
+  const vorschau = () => { E.titel = $('#eTitel').value; E.teaser = $('#eTeaser').value; $('#eVorschau').innerHTML = karte({ ...E, gelesen: false, status: 'veroeffentlicht', veroeffentlicht_am: new Date().toISOString() }, false).replace('<a ', '<div ').replace(/<\/a>$/, '</div>') };
+  const malFoto = () => {
+    $('#eFoto').innerHTML = E.titelbild ? `<div class="thumb" style="aspect-ratio:16/9"><img src="${esc(url(E.titelbild))}" alt=""><button class="weg" id="eFotoWeg" aria-label="Foto entfernen">${ic('x')}</button></div>` : `<label class="hoch">${ic('image')} Foto auswählen<input type="file" accept="image/*" hidden id="eFotoIn"></label>`;
+    const w = $('#eFotoWeg'); if (w) w.onclick = () => { if (!E.titelbild.startsWith('data:')) weg.push(E.titelbild); E.titelbild = null; malFoto(); vorschau() };
+    const i = $('#eFotoIn'); if (i) i.onchange = async () => { const f = i.files[0]; if (!f) return; try { toast('Foto wird hochgeladen …'); const b = await bildVerkleinern(f, 1800); const p = `${ordner}/${uuid()}.jpg`; await hochladen(p, b, 'image/jpeg'); URLS[p] = URL.createObjectURL(b); E.titelbild = p; malFoto(); vorschau() } catch (e) { toast(e.message) } };
+  };
+  const setModus = m => { modus = m; $$('#eModus button').forEach(b => b.classList.toggle('on', b.dataset.m === m)); $('#eFoto').hidden = m !== 'foto'; $('#eFarbe').hidden = m !== 'farbe'; if (m === 'farbe' && E.titelbild) { if (!E.titelbild.startsWith('data:')) weg.push(E.titelbild); E.titelbild = null; malFoto() } vorschau() };
+  const malStil = () => { $$('#eFarben button').forEach(b => b.classList.toggle('on', b.dataset.f === E.stil.farbe)); $$('#eIcons button').forEach(b => b.classList.toggle('on', b.dataset.i === E.stil.icon)) };
+  const malAnh = () => {
+    const B = E.anhaenge.filter(a => a.bild), F = E.anhaenge.filter(a => !a.bild);
+    $('#eBilder').innerHTML = B.map(a => `<div class="thumb"><img src="${esc(url(a.pfad))}" alt=""><button class="weg" data-weg="${esc(a.pfad)}" aria-label="Bild entfernen">${ic('x')}</button></div>`).join('');
+    $('#eDateien').innerHTML = F.map(a => `<div class="dz">${ic('file')}${esc(a.name)}<small>${groesse(a.groesse || 0)}</small><button class="weg" data-weg="${esc(a.pfad)}" aria-label="Datei entfernen">${ic('x')}</button></div>`).join('');
+    $$('[data-weg]').forEach(b => b.onclick = () => { weg.push(b.dataset.weg); E.anhaenge = E.anhaenge.filter(a => a.pfad !== b.dataset.weg); malAnh() });
+  };
+  const setZiel = z => { $$('#eZiel button').forEach(b => b.classList.toggle('on', b.dataset.z === z)); $('#eGruppen').hidden = z !== 'gruppen'; if (z === 'alle') $$('#eGruppen input').forEach(i => i.checked = false) };
+  malFoto(); setModus(modus); malStil(); malAnh(); setZiel(E.gruppen.length ? 'gruppen' : 'alle'); vorschau();
+  $('#eModus').onclick = e => { const b = e.target.closest('button'); if (b) setModus(b.dataset.m) };
+  $('#eFarben').onclick = e => { const b = e.target.closest('button'); if (b) { E.stil.farbe = b.dataset.f; malStil(); vorschau() } };
+  $('#eIcons').onclick = e => { const b = e.target.closest('button'); if (b) { E.stil.icon = b.dataset.i; malStil(); vorschau() } };
+  $('#eZiel').onclick = e => { const b = e.target.closest('button'); if (b) setZiel(b.dataset.z) };
+  $('#eTitel').oninput = $('#eTeaser').oninput = vorschau;
+  $$('.werkzeug button').forEach(b => b.onclick = () => {
+    const t = $('#eInhalt'), [vor, nach] = b.dataset.w.split('|'), a = t.selectionStart, z = t.selectionEnd, sel = t.value.slice(a, z);
+    const zeilenAnfang = !nach && a > 0 && t.value[a - 1] !== '\n' ? '\n' : '';
+    t.setRangeText(zeilenAnfang + vor + (sel || (nach ? 'Text' : '')) + nach, a, z, 'end'); t.focus();
+  });
+  $('#eBildIn').onchange = async e => {
+    for (const f of e.target.files) { try { toast('Bild wird hochgeladen …'); const b = await bildVerkleinern(f, 1800); const p = `${ordner}/${uuid()}.jpg`; await hochladen(p, b, 'image/jpeg'); URLS[p] = URL.createObjectURL(b); E.anhaenge.push({ pfad: p, name: f.name, typ: 'image/jpeg', groesse: b.size, bild: true }); malAnh() } catch (err) { toast(err.message) } }
+    e.target.value = '';
+  };
+  $('#eDateiIn').onchange = async e => {
+    for (const f of e.target.files) {
+      if (f.size > 15 * 1048576) { toast(`${f.name} ist größer als 15 MB`); continue }
+      try { toast(`${f.name} wird hochgeladen …`); const end = (f.name.match(/\.[\w]{1,6}$/) || [''])[0].toLowerCase(); const p = `${ordner}/${uuid()}${end}`; await hochladen(p, f, f.type); E.anhaenge.push({ pfad: p, name: f.name, typ: f.type || '', groesse: f.size, bild: false }); malAnh() } catch (err) { toast(err.message) }
+    }
+    e.target.value = '';
+  };
+  const speichern = async () => {
+    const app = $('#eApp').value;
+    const p = { id: alt ? alt.id : null, titel: $('#eTitel').value, teaser: $('#eTeaser').value, inhalt: $('#eInhalt').value, titelbild: modus === 'foto' ? E.titelbild : null,
+      stil: E.stil, anhaenge: E.anhaenge, app_url: app, app_name: app ? (APPS.find(x => x[0] === app) || [])[1] : '', gruppen: $$('#eGruppen input:checked').map(i => i.value), angeheftet: $('#ePin').checked };
+    if (!p.titel.trim()) throw new Error('Bitte einen Titel eingeben.');
+    const nid = await rpc('news_speichern', { p });
+    await loeschenSpeicher(weg.splice(0)); return nid;
+  };
+  $('#eSpeichern').onclick = async e => { e.target.disabled = true; $('#eErr').textContent = ''; try { const nid = await speichern(); toast('Gespeichert'); await laden(); location.hash = '#/n/' + nid } catch (err) { $('#eErr').textContent = err.message; e.target.disabled = false } };
+  const pub = $('#ePub'); if (pub) pub.onclick = async () => {
+    $('#eErr').textContent = '';
+    try { const nid = await speichern(); await laden(); veroeffentlichenFenster(D.news.find(x => x.id === nid)); history.replaceState(null, '', '#/bearbeiten/' + nid) } catch (err) { $('#eErr').textContent = err.message }
+  };
+}
+
+/* ===================== Ablauf ===================== */
+function route() {
+  const h = location.hash; let m;
+  $('#neuBtn').hidden = !D.admin || /^#\/(neu|bearbeiten)/.test(h);
+  if ((m = /^#\/n\/([\w-]+)$/.exec(h))) zeigeArtikel(m[1]);
+  else if (h === '#/neu' && D.admin) zeigeEditor(null);
+  else if ((m = /^#\/bearbeiten\/([\w-]+)$/.exec(h)) && D.admin) zeigeEditor(m[1]);
+  else { if (h === '#/vorschlaege' && D.admin) TAB = 'vorschlag'; zeigeFeed() }
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+$('#neuBtn').onclick = () => { location.hash = '#/neu' };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { const b = document.querySelector('.licht, .bd'); if (b) b.remove() } });
+(async function start() {
+  if (!storedRefresh()) return toLogin();
+  try { await laden() } catch (e) { $('#boot').textContent = /news_liste|schema cache|function/i.test(e.message) ? 'Die News sind noch nicht eingerichtet (news.sql fehlt in Supabase).' : e.message; return }
+  $('#unterTitel').textContent = D.admin ? 'Neues aus der App und dem Betrieb · du kannst News schreiben' : 'Neues aus der App und dem Betrieb';
+  $('#boot').hidden = true; $('#app').hidden = false; route();
+})();
+</script>
+</body>
+</html>
