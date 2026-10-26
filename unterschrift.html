@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f3b53">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Unterschrift · Heise Haustechnik</title>
+<link rel="icon" href="icon-192.png">
+<style>
+@font-face{font-family:'Montserrat';src:url(montserrat.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{--bg:#f4f5f8;--surface:#fff;--surface-2:#eef0f4;--ink:#0d1524;--ink-2:#485468;--ink-3:#8491a3;--line:#e3e7ee;--brand:#2f3b53;--accent:#e25304;--red:#c32328;--ok:#15803d;--ok-bg:#e6f6ec;
+  --shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:16px/1.45 Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;border:0}
+.kopf{background:#fff;border-bottom:3px solid var(--accent);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.kopf img{height:40px}.kopf small{color:var(--ink-3);font-size:12px;font-weight:600;text-align:right}
+.inhalt{max-width:560px;margin:0 auto;padding:18px 16px calc(30px + var(--safe-b))}
+.karte{background:var(--surface);border-radius:22px;box-shadow:var(--shadow);padding:20px 18px}
+h1{font-size:21px;font-weight:780;margin-bottom:4px;color:var(--brand)}
+.sub{color:var(--ink-2);font-size:14px;margin-bottom:14px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin-bottom:14px;font-size:15px}dt{color:var(--ink-3);font-weight:650}dd{font-weight:650}
+.bestaet{font-weight:650;margin:4px 0 12px}
+.sig{border:1.5px solid var(--line);border-radius:16px;background:#fff;position:relative;touch-action:none}
+.sig canvas{display:block;width:100%;height:230px;border-radius:15px}
+.sig .linie{position:absolute;left:18px;right:18px;bottom:42px;border-bottom:1.5px solid var(--line);pointer-events:none}
+.sig .x{position:absolute;right:8px;top:8px;font-size:13px;font-weight:700;color:var(--ink-3);background:var(--surface-2);border-radius:10px;padding:5px 10px}
+.sig .ph{position:absolute;left:18px;bottom:16px;font-size:12.5px;color:var(--ink-3);pointer-events:none}
+.btn{width:100%;min-height:52px;border-radius:16px;font-weight:750;font-size:17px;background:var(--accent);color:#fff;margin-top:14px}.btn:disabled{opacity:.5}
+.err{color:var(--red);font-weight:650;font-size:14px;margin-top:10px}
+.hin{color:var(--ink-3);font-size:12px;margin-top:14px;text-align:center}
+.status{text-align:center;padding:26px 8px}.status b{display:block;font-size:20px;margin:10px 0 6px;color:var(--brand)}.status p{color:var(--ink-2)}
+.haken{width:64px;height:64px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center;margin:0 auto;font-size:34px;font-weight:800}
+</style>
+</head>
+<body>
+<header class="kopf"><img src="logo-heise.png" alt="Heise Haustechnik"><small>Heise Haustechnik GmbH &amp; Co. KG<br>Braunlage</small></header>
+<main class="inhalt"><div class="karte" id="karte"><div class="status"><p>Lädt …</p></div></div></main>
+<script>
+'use strict';
+/* Unterschrift per QR-Code: öffentliche Seite ohne Anmeldung. Sie kann nur über den einmaligen Link aus der
+   Schlüsselverwaltung etwas anzeigen und nur genau diese eine Unterschrift speichern (15 Minuten gültig). */
+const SB = 'https://bbjzfoirefcsqqgztjpt.supabase.co', KEY = 'sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H';
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const TOKEN = new URLSearchParams(location.search).get('t') || '';
+async function rpc(name, args) {
+  let r; try { r = await fetch(`${SB}/rest/v1/rpc/${name}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + KEY }, body: JSON.stringify(args) }) }
+  catch (e) { throw new Error('Keine Verbindung. Bitte Internet prüfen und erneut versuchen.') }
+  const j = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((j && j.message) || 'Das hat nicht geklappt. Bitte erneut versuchen.');
+  return j;
+}
+const VORGANG = { entnahme_extern: 'Schlüsselabholung', rueckgabe: 'Schlüsselrückgabe', an_kunde: 'Übergabe des Schlüssels an den Kunden' };
+const BESTAET = { entnahme_extern: 'Ich habe den Schlüssel erhalten und bringe ihn nach Gebrauch zurück.', rueckgabe: 'Ich habe den Schlüssel zurückgegeben.', an_kunde: 'Ich habe den Schlüssel endgültig erhalten.' };
+const zwei = n => String(n).padStart(2, '0');
+const dZeit = s => { const d = new Date(s); return `${zwei(d.getDate())}.${zwei(d.getMonth() + 1)}.${d.getFullYear()}, ${zwei(d.getHours())}:${zwei(d.getMinutes())} Uhr` };
+function status(icon, titel, text) { $('#karte').innerHTML = `<div class="status">${icon}<b>${titel}</b><p>${text}</p></div>` }
+
+function unterschriftFeld(el) {
+  el.innerHTML = '<canvas></canvas><div class="linie"></div><span class="ph">Hier mit dem Finger unterschreiben</span><button type="button" class="x">Löschen</button>';
+  const c = el.querySelector('canvas'), ctx = c.getContext('2d'); let striche = 0, zeichnet = false, last = null;
+  const groesse = () => { const r = c.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1); c.width = r.width * dpr; c.height = r.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0d1524'; striche = 0; el.querySelector('.ph').hidden = false };
+  requestAnimationFrame(groesse);
+  const pos = e => { const r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top] };
+  c.addEventListener('pointerdown', e => { zeichnet = true; last = pos(e); c.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.arc(last[0], last[1], 1.2, 0, 7); ctx.fillStyle = '#0d1524'; ctx.fill(); striche++; el.querySelector('.ph').hidden = true });
+  c.addEventListener('pointermove', e => { if (!zeichnet) return; const p = pos(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); last = p; striche++ });
+  const ende = () => { zeichnet = false }; c.addEventListener('pointerup', ende); c.addEventListener('pointercancel', ende);
+  el.querySelector('.x').onclick = () => { ctx.clearRect(0, 0, c.width, c.height); striche = 0; el.querySelector('.ph').hidden = false };
+  return { leer: () => striche < 6, bild: () => {
+    const o = document.createElement('canvas'), w = Math.min(600, c.width); o.width = w; o.height = Math.round(c.height * w / c.width);
+    const x = o.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, o.width, o.height); x.drawImage(c, 0, 0, o.width, o.height); return o.toDataURL('image/png') } };
+}
+
+(async function start() {
+  if (!/^[0-9a-f]{64}$/.test(TOKEN)) return status('', 'Link ungültig', 'Bitte den QR-Code am Empfang erneut scannen.');
+  let a; try { a = await rpc('sk_qr_laden', { p_token: TOKEN }) } catch (e) { return status('', 'Fehler', esc(e.message)) }
+  if (a.status === 'erledigt') return status('<div class="haken">✓</div>', 'Schon unterschrieben', 'Vielen Dank. Sie können dieses Fenster schließen.');
+  if (a.status === 'abgelaufen') return status('', 'Link abgelaufen', 'Der QR-Code ist nur 15 Minuten gültig. Bitte am Empfang einen neuen anzeigen lassen.');
+  if (a.status !== 'offen') return status('', 'Link ungültig', 'Bitte den QR-Code am Empfang erneut scannen.');
+  $('#karte').innerHTML = `<h1>${esc(VORGANG[a.art] || 'Unterschrift')}</h1><div class="sub">Bitte prüfen und unterschreiben.</div>
+    <dl><dt>Name</dt><dd>${esc(a.person)}</dd>${a.firma ? `<dt>Firma</dt><dd>${esc(a.firma)}</dd>` : ''}<dt>Schlüssel</dt><dd>Nr. ${esc(a.nr)}</dd>${a.objekt ? `<dt>Objekt</dt><dd>${esc(a.objekt)}</dd>` : ''}${a.zweck ? `<dt>Zweck</dt><dd>${esc(a.zweck)}</dd>` : ''}<dt>Datum</dt><dd>${dZeit(a.zeit)}</dd></dl>
+    <p class="bestaet">${esc(BESTAET[a.art] || '')}</p>
+    <div class="sig" id="sig"></div>
+    <button class="btn" id="ok">Unterschreiben und bestätigen</button><p class="err" id="err"></p>
+    <p class="hin">Ihre Unterschrift wird nur für diese Quittung bei Heise Haustechnik gespeichert. Stimmt etwas nicht, bitte nicht unterschreiben und am Empfang Bescheid geben.</p>`;
+  const sig = unterschriftFeld($('#sig'));
+  $('#ok').onclick = async () => {
+    $('#err').textContent = '';
+    if (sig.leer()) { $('#err').textContent = 'Bitte unterschreiben.'; return }
+    $('#ok').disabled = true;
+    try { await rpc('sk_qr_unterschreiben', { p_token: TOKEN, p_unterschrift: sig.bild() }); status('<div class="haken">✓</div>', 'Vielen Dank', 'Die Unterschrift ist gespeichert. Sie können dieses Fenster schließen.') }
+    catch (e) { $('#err').textContent = e.message; $('#ok').disabled = false }
+  };
+})();
+</script>
+</body>
+</html>
