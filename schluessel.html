@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f3b53">
+<title>Schlüssel · My Heise App</title>
+<link rel="icon" href="icon-192.png">
+<style>
+@font-face{font-family:'Montserrat';src:url(montserrat.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{--bg:#f4f5f8;--surface:#fff;--surface-2:#eef0f4;--ink:#0d1524;--ink-2:#485468;--ink-3:#8491a3;--line:#e3e7ee;
+  --brand:#2f3b53;--accent:#e25304;--accent-2:#c94a03;--red:#c32328;--red-bg:#fdeceb;--amber-bg:#fdeee5;--ok:#15803d;--ok-bg:#e6f6ec;
+  --ext:#2c60a7;--ext-bg:#e3ecf8;--grau:#a3acba;--shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font:15px/1.45 Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:inherit;text-decoration:none}[hidden]{display:none!important}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t)) 16px 10px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.top .zur{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow);font-size:20px;font-weight:700;flex:none}
+.top b{font-size:17px;font-weight:780;display:block}.top small{font-size:12px;color:var(--ink-3);font-weight:600}
+.top .sp{flex:1}
+.shell{max-width:1100px;margin:0 auto;padding:4px 16px calc(40px + var(--safe-b))}
+.leiste{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 12px}
+.seg{display:inline-grid;grid-auto-flow:column;gap:4px;padding:4px;background:var(--surface-2);border-radius:14px;max-width:100%;overflow-x:auto}
+.seg button{min-height:38px;padding:0 13px;border-radius:11px;font-weight:660;font-size:13.5px;color:var(--ink-2);white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(13,21,36,.16)}
+.seg button i{font-style:normal;background:var(--accent);color:#fff;border-radius:9px;padding:0 6px;font-size:11.5px;margin-left:5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:14px;font-weight:700;background:var(--brand);color:#fff;text-align:center}
+.btn.cta{background:var(--accent)}.btn.sec{background:var(--surface-2);color:var(--ink)}.btn.del{background:var(--red-bg);color:var(--red)}.btn.ok{background:var(--ok)}.btn.ext{background:var(--ext)}
+.btn.sm{min-height:38px;padding:0 13px;font-size:14px;border-radius:12px}.btn:disabled{opacity:.5}
+.grow{flex:1}
+.such{flex:1;min-width:200px;position:relative}.such input{width:100%;min-height:44px;padding:0 14px 0 40px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-size:16px;outline:none}
+.such input:focus{border-color:var(--accent)}.such::before{content:"";position:absolute;left:14px;top:50%;width:13px;height:13px;margin-top:-9px;border:2.2px solid var(--ink-3);border-radius:50%}
+.such::after{content:"";position:absolute;left:27px;top:50%;width:7px;height:2.2px;margin-top:5px;background:var(--ink-3);transform:rotate(45deg)}
+select.fil{min-height:44px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);padding:0 10px;font-size:14px;font-weight:600}
+.hinweis{background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);color:var(--ink-2);font-size:14px;margin-bottom:12px}
+.meine{background:var(--amber-bg);border-radius:18px;padding:12px 14px;margin-bottom:12px}.meine h4{font-size:13px;color:var(--accent-2);margin-bottom:8px;font-weight:780}
+.meine .zl{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(201,74,3,.15)}.meine .zl:first-of-type{border-top:0}
+.meine .zl div{flex:1;min-width:0;font-size:14px}.meine .zl small{display:block;color:var(--ink-2);font-size:12px}
+.liste{display:grid;gap:8px;grid-template-columns:minmax(0,1fr)}
+.k{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border-radius:16px;padding:10px 12px;box-shadow:var(--shadow)}
+.k:hover{outline:2px solid var(--line)}
+.nr{flex:none;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:18px;background:var(--ok-bg);color:var(--ok)}
+.nr.mitarbeiter{background:var(--amber-bg);color:var(--accent-2)}.nr.extern{background:var(--ext-bg);color:var(--ext)}.nr.kunde,.nr.geloescht{background:var(--surface-2);color:var(--ink-3)}
+.k .tx{flex:1;min-width:0}.k .tx b{display:block;font-weight:720;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .tx span{display:block;color:var(--ink-2);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .tx em{display:block;font-style:normal;font-size:12.5px;font-weight:650;color:var(--accent-2);margin-top:1px}.k .tx em.ext{color:var(--ext)}.k .tx em.gr{color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;flex:none;max-width:40%}
+.chip{font-size:11.5px;font-weight:700;border-radius:8px;padding:2px 7px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.chip.h{background:#e8eefb;color:#2c60a7}.chip.z{background:#fbe9e9;color:#c32328}.chip.o{background:#fff5d6;color:#8a6a00}.chip.w{background:var(--ok-bg);color:var(--ok)}.chip.alt{background:var(--red);color:#fff}
+.leer{padding:30px;text-align:center;color:var(--ink-3);background:var(--surface);border-radius:16px}
+.mehr{text-align:center;margin:12px}
+/* Kasten */
+.kasten{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:4px;background:var(--surface);border-radius:18px;padding:10px;box-shadow:var(--shadow)}
+.kasten button{height:40px;border-radius:9px;font-weight:750;font-size:13px;background:var(--ok-bg);color:var(--ok)}
+.kasten button.frei{background:transparent;color:var(--ink-3);outline:1.5px dashed var(--line);outline-offset:-2px;font-weight:600}
+.kasten button.res{background:repeating-linear-gradient(45deg,#f1f3f7 0 4px,#fff 4px 8px);color:var(--ink-3);font-weight:600}
+.kasten button.mitarbeiter{background:var(--accent);color:#fff}.kasten button.extern{background:var(--ext);color:#fff}
+.kasten .bt{grid-column:1/-1;font-size:12.5px;font-weight:780;color:var(--brand);padding:8px 2px 2px}
+.leg{display:flex;flex-wrap:wrap;gap:14px;margin:12px 4px 0;font-size:12.5px;color:var(--ink-2)}.leg i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+/* Buchungen */
+.bu{display:grid;gap:6px}.bz{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);font-size:14px}
+.bz .zt{flex:none;width:92px;color:var(--ink-3);font-size:12.5px;font-weight:650}.bz .bt2{flex:1;min-width:0}.bz .bt2 small{display:block;color:var(--ink-3);font-size:12px}
+.bz .bnr{flex:none;font-weight:800;color:var(--brand);width:40px}
+/* Fenster */
+.bd{position:fixed;inset:0;z-index:100;background:rgba(8,13,21,.5);display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.bd{align-items:center}}
+.sh{background:var(--surface);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:20px 18px calc(18px + var(--safe-b));max-height:94dvh;overflow:auto;animation:rise .2s}
+@media(min-width:700px){.sh{border-radius:24px}}
+@keyframes rise{from{transform:translateY(30px);opacity:0}}
+.sh h3{font-size:18px;font-weight:780;margin-bottom:4px;display:flex;align-items:center;gap:10px}.sh .sub{color:var(--ink-2);font-size:13.5px;margin-bottom:14px}
+.sh h3 .nr{width:44px;height:44px;font-size:16px}
+.f{display:grid;gap:5px;margin-bottom:12px}.f label{font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.inp{width:100%;min-height:46px;padding:0 12px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);font-size:16px;outline:none}
+textarea.inp{padding:10px 12px;min-height:70px;resize:vertical}
+.inp:focus{border-color:var(--accent)}
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:10px}.zwei .f{min-width:0}
+.wahl{display:flex;flex-wrap:wrap;gap:6px}.wahl button{min-height:40px;padding:0 12px;border-radius:12px;background:var(--surface-2);font-weight:650;font-size:14px}
+.wahl button.on{background:var(--brand);color:#fff}
+.warn{background:var(--amber-bg);border-radius:14px;padding:12px 14px;margin:6px 0 12px;font-size:14px}
+.info{background:var(--surface-2);border-radius:14px;padding:10px 14px;margin:0 0 12px;font-size:13.5px;color:var(--ink-2)}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;margin-bottom:14px}.dl dt{color:var(--ink-3);font-weight:650}.dl dd{font-weight:600}
+.knoepfe{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}.knoepfe .btn{flex:1 1 150px;line-height:1.2;padding:8px 14px}
+.vl{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}.vl h4{font-size:13px;color:var(--ink-3);margin-bottom:6px}
+.vl div{display:flex;gap:10px;font-size:13.5px;padding:5px 0;border-bottom:1px solid var(--surface-2)}.vl div span{flex:none;width:104px;color:var(--ink-3);font-size:12.5px}.vl div p{flex:1}
+.vl button.q{color:var(--ext);font-weight:700;font-size:12.5px;text-decoration:underline}
+.chk{display:flex;gap:10px;align-items:center;font-size:14.5px;font-weight:600;margin-bottom:12px}.chk input{width:20px;height:20px}
+.sig{border:1.5px solid var(--line);border-radius:14px;background:#fff;position:relative;touch-action:none}
+.sig canvas{display:block;width:100%;height:170px;border-radius:13px}
+.sig .linie{position:absolute;left:18px;right:18px;bottom:38px;border-bottom:1.5px solid var(--line);pointer-events:none}
+.sig .x{position:absolute;right:8px;top:8px;font-size:12.5px;font-weight:700;color:var(--ink-3);background:var(--surface-2);border-radius:9px;padding:4px 9px}
+.sig .ph{position:absolute;left:18px;bottom:14px;font-size:12px;color:var(--ink-3);pointer-events:none}
+.err{color:var(--red);font-size:13.5px;font-weight:650;min-height:0;margin:0 0 8px}
+.toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%);background:#0f1826;color:#fff;padding:12px 16px;border-radius:14px;font-weight:600;font-size:14px;z-index:200;max-width:92vw;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.menue{display:grid;gap:8px}.menue .btn{justify-content:flex-start}
+.btab{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:12px}.btab td,.btab th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}.btab th{font-size:12px;color:var(--ink-3)}
+.schw{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);font-weight:600}
+#boot{padding:60px 20px;text-align:center;color:var(--ink-3)}
+#druck{display:none}
+@media(max-width:560px){.chips{display:none}.zwei{grid-template-columns:1fr}select.fil{flex:1 1 40%;min-width:0}.such{min-width:100%}.shell{padding-left:12px;padding-right:12px}}
+html,body{overflow-x:hidden}
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:#fff}body>*:not(#druck){display:none!important}#druck{display:block!important;font-size:11pt;color:#000}
+  #druck h1{font-size:16pt;color:#2f3b53;margin-bottom:2mm}#druck .kopf{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e25304;padding-bottom:3mm;margin-bottom:5mm}
+  #druck .kopf img{height:14mm}#druck .kopf small{font-size:9pt;color:#485468;text-align:right}
+  #druck table{width:100%;border-collapse:collapse;font-size:9.5pt}#druck th,#druck td{border:1px solid #c9ced8;padding:1.4mm 2mm;text-align:left;vertical-align:top}#druck th{background:#eef0f4}
+  #druck thead{display:table-header-group}#druck tr{break-inside:avoid}
+  #druck .feld{display:grid;grid-template-columns:42mm 1fr;gap:1.5mm 4mm;margin-bottom:5mm}#druck .feld b{color:#485468;font-weight:600}
+  #druck h2{font-size:12pt;margin:6mm 0 2mm;color:#2f3b53}#druck .unt img{height:28mm;border-bottom:1px solid #000}#druck .unt p{font-size:9pt;color:#485468}
+  #druck .fuss{margin-top:10mm;font-size:8.5pt;color:#8491a3}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="zur" href="index.html" aria-label="Zur Startseite">‹</a>
+  <div><b>Schlüssel</b><small id="rolleTxt"></small></div>
+  <div class="sp"></div>
+  <button class="btn sec sm" id="mehrBtn">Mehr</button>
+  <button class="btn cta sm" id="neuBtn" hidden>+ Schlüssel</button>
+</header>
+<main class="shell">
+  <div id="boot">Lädt …</div>
+  <div id="app" hidden>
+    <div id="meine"></div>
+    <div class="leiste">
+      <div class="seg" id="tabs">
+        <button data-t="liste">Schlüssel</button><button data-t="unterwegs">Unterwegs</button><button data-t="kasten">Kasten</button><button data-t="buchungen">Buchungen</button><button data-t="archiv">Archiv</button>
+      </div>
+    </div>
+    <div class="leiste" id="filterLeiste">
+      <label class="such"><input type="search" id="suche" placeholder="Nr., Kunde, Kd.-Nr., Straße …" autocomplete="off"></label>
+      <select class="fil" id="artFil" aria-label="Art">
+        <option value="">Alle Arten</option><option value="haustuer">Haustür</option><option value="heizraum">Heizraum</option><option value="beides">Haustür + Heizraum</option><option value="sonstiges">Sonstiges</option><option value="unbekannt">Art offen</option>
+      </select>
+      <select class="fil" id="blockFil" aria-label="Bereich"></select>
+    </div>
+    <div id="ansicht"></div>
+  </div>
+</main>
+<div id="druck"></div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+/* ===================== Anmeldung (gemeinsame Sitzung heiseSession) ===================== */
+const SB = 'https://bbjzfoirefcsqqgztjpt.supabase.co', KEY = 'sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H', SESS_KEY = 'heiseSession';
+const AUTH = { access: null, refresh: null, exp: 0 }; let refreshP = null;
+const storedRefresh = () => { try { return (JSON.parse(localStorage.getItem(SESS_KEY) || 'null') || {}).r || null } catch (e) { return null } };
+function authSave(j) { AUTH.access = j.access_token; AUTH.refresh = j.refresh_token; AUTH.exp = j.expires_at ? j.expires_at * 1000 : Date.now() + (j.expires_in || 3600) * 1000; try { localStorage.setItem(SESS_KEY, JSON.stringify({ r: AUTH.refresh })) } catch (e) { } }
+function toLogin() { location.replace('index.html?next=' + encodeURIComponent('schluessel.html')) }
+async function refresh() {
+  let r; try { r = await fetch(`${SB}/auth/v1/token?grant_type=refresh_token`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ refresh_token: AUTH.refresh }) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { try { localStorage.removeItem(SESS_KEY) } catch (e) { } toLogin(); throw new Error('Sitzung abgelaufen') }
+  authSave(j);
+}
+async function token() {
+  if (AUTH.access && AUTH.exp - Date.now() > 60000) return AUTH.access;
+  const r = storedRefresh() || AUTH.refresh; if (!r) { toLogin(); throw new Error('Nicht angemeldet') }
+  AUTH.refresh = r; if (!refreshP) refreshP = refresh().finally(() => { refreshP = null }); await refreshP; return AUTH.access;
+}
+async function rpc(name, args) {
+  const t = await token(); let r;
+  try { r = await fetch(`${SB}/rest/v1/rpc/${name}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + t }, body: JSON.stringify(args || {}) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => null);
+  if (!r.ok) { const m = (j && j.message) || r.statusText || 'Fehler'; if (r.status === 401) AUTH.access = null; throw new Error(/42501|permission denied/i.test(m) && !/dürfen/.test(m) ? 'Dafür fehlt dir die Berechtigung' : m) }
+  return j;
+}
+window.addEventListener('storage', e => { if (e.key === SESS_KEY && !e.newValue) location.replace('index.html') });
+
+/* ===================== Hilfen ===================== */
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const zwei = n => String(n).padStart(2, '0');
+const dZeit = s => { if (!s) return ''; const d = new Date(s); return `${zwei(d.getDate())}.${zwei(d.getMonth() + 1)}.${d.getFullYear()} ${zwei(d.getHours())}:${zwei(d.getMinutes())}` };
+const dTag = s => { if (!s) return ''; const d = new Date(s); return `${zwei(d.getDate())}.${zwei(d.getMonth() + 1)}.${d.getFullYear()}` };
+const isoTag = d => `${d.getFullYear()}-${zwei(d.getMonth() + 1)}-${zwei(d.getDate())}`;
+const tageSeit = s => Math.floor((Date.now() - new Date(s)) / 864e5);
+const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem('sk_' + k); localStorage.setItem('sk_' + k, v) } catch (e) { return null } };
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3200) }
+const ART = { haustuer: 'Haustür', heizraum: 'Heizraum', beides: 'Haustür + Heizraum', sonstiges: 'Sonstiges', unbekannt: 'Art offen' };
+const STATUS = { kasten: 'Im Kasten', mitarbeiter: 'Unterwegs', extern: 'Extern abgeholt', kunde: 'An Kunden zurückgegeben', geloescht: 'Gelöscht' };
+const artTxt = k => k.art === 'sonstiges' ? (k.art_text || 'Sonstiges') : ART[k.art] || '';
+const aktiv = k => k.status !== 'kunde' && k.status !== 'geloescht';
+const adr = k => [k.strasse, k.plz_ort].filter(Boolean).join(', ');
+
+/* ===================== Daten ===================== */
+let D = { rolle: null, ich: {}, max_nr: 599, bloecke: [], schluessel: [], personen: [] };
+let TAB = ls('tab') || 'liste', ANZ = 80;
+const darf = () => D.rolle === 'verwalter' || D.rolle === 'admin';
+async function laden() {
+  const j = await rpc('sk_laden'); D = Object.assign({ bloecke: [], schluessel: [], personen: [] }, j);
+}
+const blockVon = nr => D.bloecke.find(b => nr >= b.von && nr <= b.bis);
+const belegt = () => { const m = new Map(); D.schluessel.forEach(k => { if (aktiv(k)) m.set(k.nr, k) }); return m };
+function freieNummern(blockId, eigeneNr) {
+  const B = belegt(), res = [];
+  const b = blockId ? D.bloecke.find(x => x.id === +blockId) : null;
+  const von = b ? b.von : 1, bis = b ? b.bis : D.max_nr;
+  for (let n = von; n <= bis; n++) {
+    if (!b && blockVon(n)) continue;
+    if (!B.has(n) || n === eigeneNr) res.push(n);
+  }
+  return res;
+}
+
+/* ===================== Anzeige ===================== */
+function nrBox(k) { return `<span class="nr ${k.status}">${k.nr}</span>` }
+function chips(k) {
+  const c = [];
+  if (k.art === 'haustuer' || k.art === 'beides') c.push('<span class="chip h">Haustür</span>');
+  if (k.art === 'heizraum' || k.art === 'beides') c.push('<span class="chip z">Heizraum</span>');
+  if (k.art === 'sonstiges') c.push(`<span class="chip o">${esc(k.art_text || 'Sonstiges')}</span>`);
+  if (k.art === 'unbekannt') c.push('<span class="chip">Art offen</span>');
+  if (k.anzahl > 1) c.push(`<span class="chip">${k.anzahl} Stück</span>`);
+  if (k.wartung) c.push('<span class="chip w">Wartung</span>');
+  return c.join('');
+}
+function statusZeile(k) {
+  if (k.status === 'mitarbeiter') { const t = tageSeit(k.seit); return `<em>Bei ${esc(k.bei_name)} seit ${dZeit(k.seit)}${k.bei_zweck ? ' · ' + esc(k.bei_zweck) : ''}${t >= 7 ? ` <span class="chip alt">${t} Tage</span>` : ''}</em>` }
+  if (k.status === 'extern') { const t = tageSeit(k.seit); return `<em class="ext">Abgeholt von ${esc(k.bei_name)}${k.bei_firma ? ' (' + esc(k.bei_firma) + ')' : ''} am ${dZeit(k.seit)}${t >= 7 ? ` <span class="chip alt">${t} Tage</span>` : ''}</em>` }
+  if (k.status === 'kunde') return `<em class="gr">An Kunden zurückgegeben${k.seit ? ' am ' + dTag(k.seit) : ''}${k.bei_name ? ' · ' + esc(k.bei_name) : ''}</em>`;
+  if (k.status === 'geloescht') return `<em class="gr">Gelöscht${k.seit ? ' am ' + dTag(k.seit) : ''}</em>`;
+  return '';
+}
+function zeile(k) {
+  return `<button class="k" data-id="${k.id}">${nrBox(k)}<div class="tx"><b>${esc(k.kunde || '(ohne Kunde)')}${k.kd_nr ? ` <small style="color:var(--ink-3);font-weight:600">· ${esc(k.kd_nr)}</small>` : ''}</b><span>${esc(adr(k) || '–')}</span>${statusZeile(k)}</div><div class="chips">${chips(k)}</div></button>`;
+}
+function passt(k, q) {
+  if (!q) return true;
+  const qs = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const h = `${k.nr} ${k.kd_nr} ${k.kunde} ${k.strasse} ${k.plz_ort} ${k.notiz} ${k.bei_name || ''} ${k.bei_firma || ''} ${artTxt(k)}`.toLowerCase();
+  return qs.every(x => /^\d+$/.test(x) && x.length <= 3 ? (String(k.nr) === x || h.includes(' ' + x) || k.kd_nr.includes(x)) : h.includes(x));
+}
+function gefiltert(basis) {
+  const q = $('#suche').value.trim(), a = $('#artFil').value, b = $('#blockFil').value;
+  let L = basis.filter(k => passt(k, q) && (!a || k.art === a));
+  if (b === 'frei') L = L.filter(k => !blockVon(k.nr)); else if (b) L = L.filter(k => blockVon(k.nr)?.id === +b);
+  if (q && /^\d+$/.test(q)) L.sort((x, y) => (String(y.nr) === q) - (String(x.nr) === q) || x.nr - y.nr);
+  return L;
+}
+function rMeine() {
+  const M = D.schluessel.filter(k => k.status === 'mitarbeiter' && k.bei_benutzer_id === D.ich.id);
+  $('#meine').innerHTML = M.length ? `<div class="meine"><h4>Bei dir: ${M.length} ${M.length === 1 ? 'Schlüssel' : 'Schlüssel'}</h4>${M.map(k => `<div class="zl">${nrBox(k)}<div><b>${esc(k.kunde)}</b><small>${esc(adr(k))} · seit ${dZeit(k.seit)}</small></div><button class="btn ok sm" data-zurueck="${k.id}">Zurück in den Kasten</button></div>`).join('')}</div>` : '';
+}
+function rListe(basis, leerText) {
+  const L = gefiltert(basis);
+  $('#ansicht').innerHTML = L.length ? `<div class="liste">${L.slice(0, ANZ).map(zeile).join('')}</div>${L.length > ANZ ? `<div class="mehr"><button class="btn sec sm" id="mehrZeigen">Weitere ${L.length - ANZ} anzeigen</button></div>` : ''}<div class="leg"><span>${L.length} ${L.length === 1 ? 'Schlüssel' : 'Schlüssel'}</span></div>`
+    : `<div class="leer">${leerText}</div>`;
+}
+function rKasten() {
+  const B = belegt(); let h = '', aktB = null;
+  for (let n = 1; n <= D.max_nr; n++) {
+    const b = blockVon(n) || null;
+    if (n === 1 || b !== aktB) { aktB = b; h += `<div class="bt">${b ? esc(b.name) + ` (${b.von}–${b.bis})` : `Nummern${n > 1 ? ' ab ' + n : ''}`}</div>` }
+    const k = B.get(n);
+    h += k ? `<button class="${k.status}" data-id="${k.id}" title="${esc(k.kunde + ' · ' + adr(k))}">${n}</button>` : `<button class="${b ? 'res' : 'frei'}" data-frei="${n}" title="frei${b ? ' (reserviert ' + esc(b.name) + ')' : ''}">${n}</button>`;
+  }
+  const frei = freieNummern(null).length;
+  $('#ansicht').innerHTML = `<div class="kasten">${h}</div><div class="leg"><span><i style="background:var(--ok-bg)"></i>im Kasten</span><span><i style="background:var(--accent)"></i>unterwegs</span><span><i style="background:var(--ext)"></i>extern abgeholt</span><span><i style="outline:1.5px dashed var(--ink-3);outline-offset:-2px"></i>frei (${frei})</span><span><i style="background:repeating-linear-gradient(45deg,#e3e7ee 0 3px,#fff 3px 6px)"></i>reserviert, frei</span></div>`;
+}
+const BU_TXT = { import: 'Aus Excel übernommen', angelegt: 'Angelegt', geaendert: 'Geändert', entnahme: 'Entnommen', entnahme_extern: 'Extern abgeholt', rueckgabe: 'Zurück in den Kasten', an_kunde: 'An Kunden zurückgegeben', geloescht: 'Gelöscht' };
+function buText(b) {
+  const p = esc(b.person || ''), f = b.firma ? ` (${esc(b.firma)})` : '';
+  switch (b.art) {
+    case 'entnahme': return `Entnommen: ${p}${b.zweck ? ' · ' + esc(b.zweck) : ''}`;
+    case 'entnahme_extern': return `Extern abgeholt: ${p}${f}${b.zweck ? ' · ' + esc(b.zweck) : ''}`;
+    case 'rueckgabe': return `Zurück in den Kasten${p ? ': ' + p : ''}${b.notiz ? ' · ' + esc(b.notiz) : ''}`;
+    case 'an_kunde': return `An Kunden zurückgegeben${p ? ': ' + p : ''}${b.notiz ? ' · ' + esc(b.notiz) : ''}`;
+    case 'import': return esc(b.notiz || BU_TXT.import);
+    default: return `${BU_TXT[b.art] || b.art}${b.notiz ? ': ' + esc(b.notiz) : ''}`;
+  }
+}
+let BU_VON = isoTag(new Date(Date.now() - 30 * 864e5)), BU_BIS = isoTag(new Date());
+async function rBuchungen() {
+  $('#ansicht').innerHTML = `<div class="leiste"><label class="schw">von <input type="date" class="inp" id="buVon" value="${BU_VON}" style="width:auto;min-height:40px"></label><label class="schw">bis <input type="date" class="inp" id="buBis" value="${BU_BIS}" style="width:auto;min-height:40px"></label><button class="btn sec sm" id="buCsv">CSV</button></div><div id="buListe"><div class="leer">Lädt …</div></div>`;
+  $('#buVon').onchange = e => { BU_VON = e.target.value; rBuchungen() }; $('#buBis').onchange = e => { BU_BIS = e.target.value; rBuchungen() };
+  let L; try { L = await rpc('sk_buchungen_liste', { p_von: BU_VON, p_bis: BU_BIS }) } catch (e) { $('#buListe').innerHTML = `<div class="leer">${esc(e.message)}</div>`; return }
+  const q = $('#suche').value.trim().toLowerCase();
+  if (q) L = L.filter(b => `${b.nr} ${b.kunde} ${b.strasse} ${b.person} ${b.firma} ${b.gebucht_von}`.toLowerCase().includes(q));
+  $('#buCsv').onclick = () => csv('Schluessel_Buchungen_' + BU_VON + '_' + BU_BIS + '.csv', ['Zeit', 'Nr.', 'Kunde', 'Straße', 'Vorgang', 'Person', 'Firma', 'Zweck', 'Notiz', 'Unterschrift', 'Gebucht von'],
+    L.map(b => [dZeit(b.zeit), b.nr, b.kunde, b.strasse, BU_TXT[b.art] || b.art, b.person, b.firma, b.zweck, b.notiz, b.sig ? 'ja' : '', b.gebucht_von]));
+  $('#buListe').innerHTML = L.length ? `<div class="bu">${L.map(b => `<div class="bz"><span class="zt">${dZeit(b.zeit).replace(' ', '<br>')}</span><span class="bnr">${b.nr ?? ''}</span><div class="bt2">${buText(b)}<small>${esc(b.kunde || '')}${b.strasse ? ', ' + esc(b.strasse) : ''} · gebucht von ${esc(b.gebucht_von || '')}</small></div>${b.sig ? `<button class="btn sec sm" data-quittung="${b.id}">Quittung</button>` : ''}</div>`).join('')}</div>`
+    : '<div class="leer">Keine Buchungen in diesem Zeitraum.</div>';
+}
+function zeigen() {
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === TAB));
+  const unterwegs = D.schluessel.filter(k => k.status === 'mitarbeiter' || k.status === 'extern');
+  $('#tabs [data-t=unterwegs]').innerHTML = 'Unterwegs' + (unterwegs.length ? `<i>${unterwegs.length}</i>` : '');
+  $('#filterLeiste').hidden = TAB === 'kasten';
+  $('#artFil').hidden = $('#blockFil').hidden = TAB === 'buchungen';
+  rMeine();
+  if (TAB === 'liste') rListe(D.schluessel.filter(aktiv), 'Keine Schlüssel gefunden.');
+  else if (TAB === 'unterwegs') rListe(unterwegs.sort((a, b) => new Date(a.seit) - new Date(b.seit)), 'Alle Schlüssel hängen im Kasten.');
+  else if (TAB === 'archiv') rListe(D.schluessel.filter(k => !aktiv(k)).sort((a, b) => new Date(b.seit || 0) - new Date(a.seit || 0)), 'Noch keine zurückgegebenen oder gelöschten Schlüssel.');
+  else if (TAB === 'kasten') rKasten();
+  else rBuchungen();
+}
+function blockOptionen() {
+  const v = $('#blockFil').value;
+  $('#blockFil').innerHTML = `<option value="">Alle Bereiche</option>${D.bloecke.map(b => `<option value="${b.id}">${esc(b.name)} (${b.von}–${b.bis})</option>`).join('')}<option value="frei">Ohne Bereich</option>`;
+  $('#blockFil').value = v;
+}
+async function neuLaden() { await laden(); blockOptionen(); zeigen() }
+
+/* ===================== Fenster ===================== */
+function fenster(html) {
+  const bd = document.createElement('div'); bd.className = 'bd'; bd.innerHTML = `<div class="sh" role="dialog">${html}</div>`;
+  bd.addEventListener('click', e => { if (e.target === bd) bd.remove() }); document.body.appendChild(bd);
+  const zu = () => bd.remove(); bd.querySelectorAll('[data-zu]').forEach(b => b.onclick = zu); return { el: bd, zu, q: s => bd.querySelector(s) };
+}
+async function ausfuehren(btn, fn, errEl) {
+  btn.disabled = true; if (errEl) errEl.textContent = '';
+  try { await fn(); return true } catch (e) { if (errEl) errEl.textContent = e.message; else toast(e.message); return false } finally { btn.disabled = false }
+}
+
+/* ---------- Unterschrift ---------- */
+function unterschriftFeld(el) {
+  el.innerHTML = '<canvas></canvas><div class="linie"></div><span class="ph">Hier unterschreiben</span><button type="button" class="x">Löschen</button>';
+  const c = el.querySelector('canvas'), ctx = c.getContext('2d'); let striche = 0, zeichnet = false, last = null;
+  const groesse = () => { const r = c.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1); c.width = r.width * dpr; c.height = r.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0d1524'; striche = 0 };
+  requestAnimationFrame(groesse);
+  const pos = e => { const r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top] };
+  c.addEventListener('pointerdown', e => { zeichnet = true; last = pos(e); c.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.arc(last[0], last[1], 1.1, 0, 7); ctx.fillStyle = '#0d1524'; ctx.fill(); striche++; el.querySelector('.ph').hidden = true });
+  c.addEventListener('pointermove', e => { if (!zeichnet) return; const p = pos(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); last = p; striche++ });
+  const ende = () => { zeichnet = false }; c.addEventListener('pointerup', ende); c.addEventListener('pointercancel', ende);
+  el.querySelector('.x').onclick = () => { ctx.clearRect(0, 0, c.width, c.height); striche = 0; el.querySelector('.ph').hidden = false };
+  return { leer: () => striche < 6, bild: () => {
+    // auf weißen Hintergrund, verkleinert (spart Platz in der Datenbank)
+    const o = document.createElement('canvas'), w = Math.min(600, c.width); o.width = w; o.height = Math.round(c.height * w / c.width);
+    const x = o.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, o.width, o.height); x.drawImage(c, 0, 0, o.width, o.height); return o.toDataURL('image/png') } };
+}
+
+/* ---------- Detail ---------- */
+async function detail(id) {
+  const k = D.schluessel.find(x => x.id === id); if (!k) return;
+  const b = blockVon(k.nr);
+  const f = fenster(`<h3>${nrBox(k)}<span>${esc(k.kunde || '(ohne Kunde)')}</span></h3>
+    <div class="sub">${esc(STATUS[k.status])}${k.status !== 'kasten' && k.bei_name ? ' · ' + esc(k.bei_name) + (k.bei_firma ? ' (' + esc(k.bei_firma) + ')' : '') : ''}${k.seit && k.status !== 'kasten' ? ' · ' + dZeit(k.seit) : ''}</div>
+    <dl class="dl"><dt>Nr.</dt><dd>${k.nr}${b ? ' · ' + esc(b.name) : ''}</dd><dt>Kd.-Nr.</dt><dd>${esc(k.kd_nr || '–')}</dd><dt>Adresse</dt><dd>${esc(adr(k) || '–')}</dd>
+      <dt>Für</dt><dd>${esc(artTxt(k))}${k.anzahl > 1 ? ' · ' + k.anzahl + ' Stück' : ''}</dd>${k.wartung ? '<dt>Wartung</dt><dd>Wartungskunde</dd>' : ''}${k.notiz ? `<dt>Notiz</dt><dd>${esc(k.notiz)}</dd>` : ''}${k.bei_zweck ? `<dt>Zweck</dt><dd>${esc(k.bei_zweck)}</dd>` : ''}</dl>
+    <div class="knoepfe" id="dKn"></div>
+    <div class="vl"><h4>Verlauf</h4><div id="dVl" style="display:block;border:0">Lädt …</div></div>
+    <div class="knoepfe" style="margin-top:14px"><button class="btn sec" data-zu>Schließen</button></div>`);
+  const kn = [];
+  if (k.status === 'kasten') kn.push(`<button class="btn cta" id="dIch">Ich nehme ihn mit</button><button class="btn sec" id="dAnders">Kollege / Externer</button>`);
+  if (k.status === 'mitarbeiter' || k.status === 'extern') kn.push(`<button class="btn ok" id="dZur">Zurück in den Kasten</button>`);
+  if (aktiv(k)) kn.push(`<button class="btn sec" id="dKunde">An Kunden zurückgeben</button>`);
+  if (darf() && aktiv(k)) kn.push(`<button class="btn sec" id="dBearb">Bearbeiten</button>`);
+  if (darf() && k.status === 'kasten') kn.push(`<button class="btn del" id="dLoe">Löschen</button>`);
+  f.q('#dKn').innerHTML = kn.join('');
+  const on = (s, fn) => { const e = f.q(s); if (e) e.onclick = fn };
+  on('#dIch', e => ausfuehren(e.target, async () => { await rpc('sk_entnehmen', { p_id: k.id, p_art: 'mitarbeiter', p_benutzer: null, p_name: null, p_firma: null, p_zweck: null, p_unterschrift: null }); f.zu(); toast(`Nr. ${k.nr} ist jetzt bei dir`); await neuLaden() }));
+  on('#dAnders', () => { f.zu(); entnehmenFenster(k) });
+  on('#dZur', () => { f.zu(); zurueckFenster(k) });
+  on('#dKunde', () => { f.zu(); kundeFenster(k) });
+  on('#dBearb', () => { f.zu(); formular(k) });
+  on('#dLoe', () => { f.zu(); loeschenFenster(k) });
+  try {
+    const V = await rpc('sk_verlauf', { p_id: k.id });
+    f.q('#dVl').innerHTML = V.length ? V.map(v => `<div><span>${dZeit(v.zeit)}</span><p>${buText(v)}<br><small style="color:var(--ink-3)">${esc(v.gebucht_von || '')}${v.nr !== k.nr ? ' · damals Nr. ' + v.nr : ''}</small></p>${v.sig ? `<button class="q" data-quittung="${v.id}">Quittung</button>` : ''}</div>`).join('') : '<p style="color:var(--ink-3)">Noch keine Einträge.</p>';
+  } catch (e) { f.q('#dVl').textContent = e.message }
+}
+
+/* ---------- Entnehmen ---------- */
+function entnehmenFenster(k, art) {
+  art = art || 'kollege';
+  const f = fenster(`<h3>${nrBox(k)}<span>Schlüssel entnehmen</span></h3><div class="sub">${esc(k.kunde)} · ${esc(adr(k))}</div>
+    <div class="f"><label>Wer nimmt den Schlüssel?</label><div class="wahl" id="eArt"><button data-a="ich">Ich</button><button data-a="kollege">Kollege</button><button data-a="extern">Externer (mit Unterschrift)</button></div></div>
+    <div id="eKol" class="f"><label>Mitarbeiter</label><select class="inp" id="ePers">${D.personen.map(p => `<option value="${p.id}"${p.id === D.ich.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</select></div>
+    <div id="eExt"><div class="zwei"><div class="f"><label>Name *</label><input class="inp" id="eName" autocomplete="off"></div><div class="f"><label>Firma</label><input class="inp" id="eFirma" autocomplete="off"></div></div></div>
+    <div class="f"><label>Zweck (optional)</label><input class="inp" id="eZweck" placeholder="z. B. Wartung, Auftrag, Zählertausch" autocomplete="off"></div>
+    <div id="eSigW" class="f"><label>Unterschrift der abholenden Person *</label><div class="sig" id="eSig"></div></div>
+    <p class="err" id="eErr"></p>
+    <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn cta" id="eOk">Entnehmen</button></div>`);
+  let sig = null;
+  const setze = a => {
+    art = a; f.q('#eArt').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.a === a));
+    f.q('#eKol').hidden = a !== 'kollege'; f.q('#eExt').hidden = f.q('#eSigW').hidden = a !== 'extern';
+    if (a === 'extern' && !sig) sig = unterschriftFeld(f.q('#eSig'));
+    f.q('#eOk').textContent = a === 'extern' ? 'Abholung bestätigen' : 'Entnehmen';
+  };
+  f.q('#eArt').onclick = e => { const b = e.target.closest('button'); if (b) setze(b.dataset.a) };
+  setze(art);
+  f.q('#eOk').onclick = e => ausfuehren(e.target, async () => {
+    const z = f.q('#eZweck').value;
+    if (art === 'extern') {
+      if (!f.q('#eName').value.trim()) throw new Error('Bitte den Namen der abholenden Person eingeben.');
+      if (sig.leer()) throw new Error('Bitte unterschreiben lassen.');
+      const bid = await rpc('sk_entnehmen', { p_id: k.id, p_art: 'extern', p_benutzer: null, p_name: f.q('#eName').value, p_firma: f.q('#eFirma').value, p_zweck: z, p_unterschrift: sig.bild() });
+      f.zu(); await neuLaden(); toast(`Nr. ${k.nr} an ${f.q('#eName').value.trim()} ausgegeben`); quittungFrage(bid);
+    } else {
+      const p = art === 'ich' ? D.ich.id : f.q('#ePers').value;
+      await rpc('sk_entnehmen', { p_id: k.id, p_art: 'mitarbeiter', p_benutzer: p, p_name: null, p_firma: null, p_zweck: z, p_unterschrift: null });
+      f.zu(); await neuLaden(); toast(`Nr. ${k.nr} ausgebucht an ${D.personen.find(x => x.id === p)?.name || ''}`);
+    }
+  }, f.q('#eErr'));
+}
+function quittungFrage(bid) {
+  const f = fenster(`<h3>Quittung</h3><div class="sub">Gebucht und unterschrieben. Möchtest du eine Quittung drucken oder als PDF speichern?</div><div class="knoepfe"><button class="btn sec" data-zu>Nein, danke</button><button class="btn" id="qJa">Quittung öffnen</button></div>`);
+  f.q('#qJa').onclick = () => { f.zu(); quittung(bid) };
+}
+
+/* ---------- Zurückbuchen ---------- */
+function zurueckFenster(k) {
+  const ext = k.status === 'extern';
+  const f = fenster(`<h3>${nrBox(k)}<span>Zurück in den Kasten</span></h3><div class="sub">${esc(k.kunde)} · ${esc(adr(k))}<br>${ext ? 'Abgeholt von' : 'Bei'} ${esc(k.bei_name)}${k.bei_firma ? ' (' + esc(k.bei_firma) + ')' : ''} seit ${dZeit(k.seit)}</div>
+    ${ext ? `<div class="f"><label>Wer bringt den Schlüssel zurück? *</label><input class="inp" id="zName" value="${esc(k.bei_name)}" autocomplete="off"></div><div class="f"><label>Unterschrift *</label><div class="sig" id="zSig"></div></div>` : ''}
+    <div class="f"><label>Notiz (optional)</label><input class="inp" id="zNotiz" placeholder="z. B. zweiter Schlüssel fehlt" autocomplete="off"></div>
+    <div class="info">Bitte den Schlüssel an Haken Nr. <b>${k.nr}</b> hängen.</div>
+    <p class="err" id="zErr"></p>
+    <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn ok" id="zOk">Zurückbuchen</button></div>`);
+  const sig = ext ? unterschriftFeld(f.q('#zSig')) : null;
+  f.q('#zOk').onclick = e => ausfuehren(e.target, async () => {
+    if (ext && !f.q('#zName').value.trim()) throw new Error('Bitte den Namen eingeben.');
+    if (ext && sig.leer()) throw new Error('Bitte unterschreiben lassen.');
+    const bid = await rpc('sk_zurueck', { p_id: k.id, p_name: ext ? f.q('#zName').value : null, p_unterschrift: ext ? sig.bild() : null, p_notiz: f.q('#zNotiz').value });
+    f.zu(); await neuLaden(); toast(`Nr. ${k.nr} hängt wieder im Kasten`); if (ext) quittungFrage(bid);
+  }, f.q('#zErr'));
+}
+
+/* ---------- An Kunden zurückgeben ---------- */
+function kundeFenster(k) {
+  const f = fenster(`<h3>${nrBox(k)}<span>An Kunden zurückgeben</span></h3><div class="sub">${esc(k.kunde)} · ${esc(adr(k))}</div>
+    <div class="warn">Der Schlüssel geht endgültig zurück. Danach ist Nr. ${k.nr} frei und kann neu vergeben werden. Der Verlauf bleibt im Archiv.</div>
+    <div class="f"><label>Name der Person, die den Schlüssel erhält *</label><input class="inp" id="kName" autocomplete="off"></div>
+    <div class="f"><label>Unterschrift *</label><div class="sig" id="kSig"></div></div>
+    <div class="f"><label>Notiz (optional)</label><input class="inp" id="kNotiz" placeholder="z. B. auf Kundenwunsch, Wartungsvertrag beendet" autocomplete="off"></div>
+    <p class="err" id="kErr"></p>
+    <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn" id="kOk">Rückgabe bestätigen</button></div>`);
+  const sig = unterschriftFeld(f.q('#kSig'));
+  f.q('#kOk').onclick = e => ausfuehren(e.target, async () => {
+    if (!f.q('#kName').value.trim()) throw new Error('Bitte den Namen eingeben.');
+    if (sig.leer()) throw new Error('Bitte unterschreiben lassen.');
+    const bid = await rpc('sk_an_kunden', { p_id: k.id, p_name: f.q('#kName').value, p_unterschrift: sig.bild(), p_notiz: f.q('#kNotiz').value });
+    f.zu(); await neuLaden(); toast(`Nr. ${k.nr} an Kunden zurückgegeben, Nummer ist frei`); quittungFrage(bid);
+  }, f.q('#kErr'));
+}
+
+/* ---------- Anlegen / Bearbeiten (Verwalter) ---------- */
+function formular(k, nrVorschlag) {
+  const neu = !k; k = k || { nr: nrVorschlag || null, kd_nr: '', kunde: '', strasse: '', plz_ort: '', art: 'unbekannt', art_text: '', anzahl: 1, wartung: false, notiz: '' };
+  let blockId = k.nr ? (blockVon(k.nr)?.id || '') : '';
+  const f = fenster(`<h3>${neu ? 'Neuer Schlüssel' : 'Schlüssel bearbeiten'}</h3><div class="sub">${neu ? 'Es werden nur freie Nummern angeboten.' : 'Eine andere Nummer wählen, um den Schlüssel umzuhängen.'}</div>
+    <div class="zwei"><div class="f"><label>Hausverwaltung / Bereich</label><select class="inp" id="fBlock"><option value="">Kein Bereich</option>${D.bloecke.map(b => `<option value="${b.id}">${esc(b.name)} (${b.von}–${b.bis})</option>`).join('')}</select></div>
+      <div class="f"><label>Nummer *</label><select class="inp" id="fNr"></select></div></div>
+    <div class="zwei"><div class="f"><label>Kd.-Nr.</label><input class="inp" id="fKd" value="${esc(k.kd_nr)}" inputmode="numeric" autocomplete="off"></div>
+      <div class="f"><label>Kunde / Eigentümer *</label><input class="inp" id="fKunde" value="${esc(k.kunde)}" autocomplete="off"></div></div>
+    <div id="fKdHin"></div>
+    <div class="zwei"><div class="f"><label>Straße / Objekt</label><input class="inp" id="fStr" value="${esc(k.strasse)}" autocomplete="off"></div>
+      <div class="f"><label>PLZ Ort</label><input class="inp" id="fOrt" value="${esc(k.plz_ort)}" placeholder="38700 Braunlage" autocomplete="off"></div></div>
+    <div class="f"><label>Wofür ist der Schlüssel?</label><div class="wahl" id="fArt">${Object.entries(ART).map(([a, t]) => `<button type="button" data-a="${a}">${t === 'Art offen' ? 'Noch offen' : t}</button>`).join('')}</div></div>
+    <div class="f" id="fArtTW"><label>Sonstiges, und zwar *</label><input class="inp" id="fArtT" value="${esc(k.art_text)}" placeholder="z. B. Garage, Technikraum, Schaltschrank" autocomplete="off"></div>
+    <div class="zwei"><div class="f"><label>Anzahl Schlüssel am Haken</label><input class="inp" id="fAnz" type="number" min="1" max="50" value="${k.anzahl || 1}"></div><div class="f"><label>&nbsp;</label><label class="chk"><input type="checkbox" id="fWart"${k.wartung ? ' checked' : ''}> Wartungskunde</label></div></div>
+    <div class="f"><label>Notiz</label><textarea class="inp" id="fNotiz">${esc(k.notiz)}</textarea></div>
+    <p class="err" id="fErr"></p>
+    <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn cta" id="fOk">Speichern</button></div>`);
+  let art = k.art;
+  const setArt = a => { art = a; f.q('#fArt').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.a === a)); f.q('#fArtTW').hidden = a !== 'sonstiges' };
+  f.q('#fArt').onclick = e => { const b = e.target.closest('button'); if (b) setArt(b.dataset.a) }; setArt(art);
+  const nummern = () => {
+    const L = freieNummern(blockId, neu ? null : k.nr), cur = +f.q('#fNr').value || k.nr;
+    f.q('#fNr').innerHTML = L.length ? L.map(n => `<option value="${n}"${n === cur ? ' selected' : ''}>${n}${!neu && n === k.nr ? ' (bisher)' : ''}</option>`).join('') : '<option value="">keine Nummer frei</option>';
+  };
+  f.q('#fBlock').value = blockId; nummern();
+  f.q('#fBlock').onchange = e => {
+    blockId = e.target.value; nummern();
+    const b = D.bloecke.find(x => x.id === +blockId);
+    if (b && !f.q('#fKunde').value.trim()) f.q('#fKunde').value = b.name;
+    if (b && b.kd_nr && !f.q('#fKd').value.trim()) f.q('#fKd').value = b.kd_nr;
+  };
+  f.q('#fKd').oninput = () => {
+    const kd = f.q('#fKd').value.trim(), t = kd && D.schluessel.find(x => x.kd_nr === kd && x.id !== k.id);
+    f.q('#fKdHin').innerHTML = t ? `<div class="info">Kd.-Nr. ${esc(kd)} gibt es schon: <b>${esc(t.kunde)}</b> (Nr. ${t.nr}, ${esc(adr(t))}). ${f.q('#fKunde').value.trim() !== t.kunde ? '<button class="btn sec sm" id="fKdUe" type="button">Namen übernehmen</button>' : ''}</div>` : '';
+    const u = f.q('#fKdUe'); if (u) u.onclick = () => { f.q('#fKunde').value = t.kunde; f.q('#fKdHin').innerHTML = '' };
+  };
+  f.q('#fOk').onclick = e => ausfuehren(e.target, async () => {
+    const nr = +f.q('#fNr').value; if (!nr) throw new Error('Bitte eine Nummer wählen.');
+    const id = await rpc('sk_speichern', { p: { id: neu ? null : k.id, nr, kd_nr: f.q('#fKd').value, kunde: f.q('#fKunde').value, strasse: f.q('#fStr').value, plz_ort: f.q('#fOrt').value,
+      art, art_text: f.q('#fArtT').value, anzahl: +f.q('#fAnz').value || 1, wartung: f.q('#fWart').checked, notiz: f.q('#fNotiz').value } });
+    f.zu(); await neuLaden(); toast(neu ? `Schlüssel Nr. ${nr} angelegt` : 'Gespeichert'); detail(id);
+  }, f.q('#fErr'));
+}
+function loeschenFenster(k) {
+  const f = fenster(`<h3>${nrBox(k)}<span>Schlüssel löschen</span></h3><div class="sub">${esc(k.kunde)} · ${esc(adr(k))}</div>
+    <div class="warn">Nur löschen, wenn der Schlüssel nicht mehr da ist oder falsch angelegt wurde. Wird er dem Kunden übergeben, bitte „An Kunden zurückgeben“ mit Unterschrift nutzen. Nr. ${k.nr} ist danach frei.</div>
+    <div class="f"><label>Grund *</label><input class="inp" id="lGrund" autocomplete="off"></div><p class="err" id="lErr"></p>
+    <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button><button class="btn del" id="lOk">Löschen</button></div>`);
+  f.q('#lOk').onclick = e => ausfuehren(e.target, async () => { await rpc('sk_loeschen', { p_id: k.id, p_grund: f.q('#lGrund').value }); f.zu(); await neuLaden(); toast(`Nr. ${k.nr} gelöscht`) }, f.q('#lErr'));
+}
+
+/* ---------- Nummernbereiche (Verwalter) ---------- */
+function bereicheFenster() {
+  const B = belegt();
+  const f = fenster(`<h3>Nummernbereiche</h3><div class="sub">Reservierte Bereiche für Hausverwaltungen. Freie Nummern darin werden nur angeboten, wenn beim Anlegen der Bereich gewählt ist.</div>
+    <table class="btab"><thead><tr><th>Bereich</th><th>Nummern</th><th>belegt</th><th></th></tr></thead><tbody>${D.bloecke.map(b => { let n = 0; for (let i = b.von; i <= b.bis; i++) if (B.has(i)) n++; return `<tr><td><b>${esc(b.name)}</b>${b.kd_nr ? '<br><small>Kd.-Nr. ' + esc(b.kd_nr) + '</small>' : ''}</td><td>${b.von}–${b.bis}</td><td>${n} von ${b.bis - b.von + 1}</td><td><button class="btn sec sm" data-b="${b.id}">Ändern</button></td></tr>` }).join('')}</tbody></table>
+    <div class="knoepfe" style="margin-bottom:16px"><button class="btn sec" id="bNeu">+ Bereich</button></div>
+    <div class="zwei"><div class="f"><label>Höchste Nummer im Kasten</label><input class="inp" id="bMax" type="number" min="1" value="${D.max_nr}"></div><div class="f"><label>&nbsp;</label><button class="btn sec" id="bMaxOk">Übernehmen</button></div></div>
+    <p class="err" id="bErr"></p><div class="knoepfe"><button class="btn sec" data-zu>Schließen</button></div>`);
+  f.q('.btab').onclick = e => { const b = e.target.closest('[data-b]'); if (b) { f.zu(); bereichFenster(D.bloecke.find(x => x.id === +b.dataset.b)) } };
+  f.q('#bNeu').onclick = () => { f.zu(); bereichFenster(null) };
+  f.q('#bMaxOk').onclick = e => ausfuehren(e.target, async () => { await rpc('sk_max_setzen', { p_max: +f.q('#bMax').value }); f.zu(); await neuLaden(); toast('Höchste Nummer gespeichert') }, f.q('#bErr'));
+}
+function bereichFenster(b) {
+  const neu = !b; b = b || { name: '', von: '', bis: '', kd_nr: '', notiz: '' };
+  const f = fenster(`<h3>${neu ? 'Neuer Bereich' : 'Bereich ändern'}</h3>
+    <div class="f"><label>Name (Hausverwaltung) *</label><input class="inp" id="rName" value="${esc(b.name)}"></div>
+    <div class="zwei"><div class="f"><label>von Nr. *</label><input class="inp" id="rVon" type="number" min="1" value="${b.von}"></div><div class="f"><label>bis Nr. *</label><input class="inp" id="rBis" type="number" min="1" value="${b.bis}"></div></div>
+    <div class="f"><label>Kd.-Nr. (wird beim Anlegen vorgeschlagen)</label><input class="inp" id="rKd" value="${esc(b.kd_nr)}"></div>
+    <p class="err" id="rErr"></p>
+    <div class="knoepfe"><button class="btn sec" data-zu>Abbrechen</button>${neu ? '' : '<button class="btn del" id="rLoe">Bereich auflösen</button>'}<button class="btn cta" id="rOk">Speichern</button></div>`);
+  f.q('#rOk').onclick = e => ausfuehren(e.target, async () => { await rpc('sk_block_speichern', { p: { id: neu ? null : b.id, name: f.q('#rName').value, von: +f.q('#rVon').value, bis: +f.q('#rBis').value, kd_nr: f.q('#rKd').value } }); f.zu(); await neuLaden(); bereicheFenster() }, f.q('#rErr'));
+  if (!neu) f.q('#rLoe').onclick = e => { if (confirm(`Bereich „${b.name}“ auflösen? Die Schlüssel bleiben, die freien Nummern sind danach für alle wählbar.`)) ausfuehren(e.target, async () => { await rpc('sk_block_loeschen', { p_id: b.id }); f.zu(); await neuLaden(); bereicheFenster() }, f.q('#rErr')) };
+}
+
+/* ---------- Drucken / Export ---------- */
+function drucken(html) { $('#druck').innerHTML = html; setTimeout(() => window.print(), 60) }
+window.addEventListener('afterprint', () => { $('#druck').innerHTML = '' });
+const kopf = t => `<div class="kopf"><div><h1>${t}</h1></div><div style="text-align:right"><img src="logo-heise.png" alt=""><br><small>Heise Haustechnik GmbH &amp; Co. KG · Braunlage</small></div></div>`;
+async function quittung(bid) {
+  let q; try { q = await rpc('sk_quittung', { p_buchung: bid }) } catch (e) { toast(e.message); return }
+  const s = q.schluessel, b = q.buchung, a = q.abholung;
+  const titel = { entnahme_extern: 'Quittung Schlüsselabholung', rueckgabe: 'Quittung Schlüsselrückgabe', an_kunde: 'Quittung Schlüsselrückgabe an den Kunden', entnahme: 'Schlüsselentnahme' }[b.art] || 'Schlüsselquittung';
+  const block = (t, x) => x ? `<h2>${t}</h2><div class="feld"><b>Datum, Uhrzeit</b><span>${dZeit(x.zeit)}</span><b>Name</b><span>${esc(x.person || '')}</span>${x.firma ? `<b>Firma</b><span>${esc(x.firma)}</span>` : ''}${x.zweck ? `<b>Zweck</b><span>${esc(x.zweck)}</span>` : ''}${x.notiz ? `<b>Notiz</b><span>${esc(x.notiz)}</span>` : ''}<b>Gebucht von</b><span>${esc(x.gebucht_von || '')}</span></div>${x.unterschrift ? `<div class="unt"><img src="${x.unterschrift}" alt="Unterschrift"><p>Unterschrift ${esc(x.person || '')}</p></div>` : ''}` : '';
+  drucken(`${kopf(titel)}<div class="feld"><b>Schlüssel-Nr.</b><span>${s.nr}</span><b>Kunde</b><span>${esc(s.kunde || '')}${s.kd_nr ? ' (Kd.-Nr. ' + esc(s.kd_nr) + ')' : ''}</span><b>Objekt</b><span>${esc([s.strasse, s.plz_ort].filter(Boolean).join(', '))}</span>${s.art !== 'unbekannt' || s.anzahl > 1 ? `<b>Für</b><span>${esc(s.art === 'sonstiges' ? s.art_text : s.art === 'unbekannt' ? '' : ART[s.art])}${s.anzahl > 1 ? (s.art !== 'unbekannt' ? ', ' : '') + s.anzahl + ' Stück' : ''}</span>` : ''}</div>
+    ${b.art === 'rueckgabe' ? block('Abholung', a) + block('Rückgabe', b) : block(b.art === 'an_kunde' ? 'Übergabe an den Kunden' : 'Abholung', b)}
+    <p style="margin-top:6mm;font-size:9.5pt">${b.art === 'an_kunde' ? 'Der Schlüssel wurde dem Kunden bzw. der genannten Person endgültig übergeben.' : b.art === 'rueckgabe' ? 'Der Schlüssel wurde vollständig zurückgegeben.' : 'Der Schlüssel wurde an die genannte Person ausgegeben. Bitte nach Gebrauch zurückbringen.'}</p>
+    <div class="fuss">Erstellt mit My Heise App am ${dZeit(new Date())}</div>`);
+}
+function listeDrucken() {
+  const L = gefiltert(D.schluessel.filter(aktiv)).sort((a, b) => a.nr - b.nr);
+  drucken(`${kopf('Schlüsselkasten')}<p style="margin-bottom:3mm;font-size:9.5pt">Stand ${dZeit(new Date())} · ${L.length} Schlüssel</p><table><thead><tr><th>Nr.</th><th>Kd.-Nr.</th><th>Kunde</th><th>Straße / Objekt</th><th>Für</th><th>Status</th></tr></thead><tbody>${L.map(k => `<tr><td><b>${k.nr}</b></td><td>${esc(k.kd_nr)}</td><td>${esc(k.kunde)}</td><td>${esc(adr(k))}</td><td>${esc(k.art === 'unbekannt' ? '' : artTxt(k))}${k.anzahl > 1 ? ' (' + k.anzahl + ')' : ''}</td><td>${k.status === 'kasten' ? '' : esc(STATUS[k.status] + ': ' + k.bei_name)}</td></tr>`).join('')}</tbody></table>`);
+}
+function csv(name, kopfzeile, zeilen) {
+  const z = v => { const s = String(v ?? ''); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s };
+  const txt = '﻿' + [kopfzeile, ...zeilen].map(r => r.map(z).join(';')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 500);
+}
+function listeCsv() {
+  csv('Schluesselliste_' + isoTag(new Date()) + '.csv', ['Nr.', 'Kd.-Nr.', 'Kunde', 'Straße / Objekt', 'PLZ Ort', 'Haustür', 'Heizraum', 'Sonstiges', 'Anzahl', 'Wartungskunde', 'Status', 'Bei', 'Seit', 'Notiz'],
+    D.schluessel.filter(aktiv).sort((a, b) => a.nr - b.nr).map(k => [k.nr, k.kd_nr, k.kunde, k.strasse, k.plz_ort, /haustuer|beides/.test(k.art) ? 'x' : '', /heizraum|beides/.test(k.art) ? 'x' : '', k.art === 'sonstiges' ? k.art_text : '', k.anzahl, k.wartung ? 'ja' : '', STATUS[k.status], k.bei_name || '', k.status === 'kasten' ? '' : dZeit(k.seit), k.notiz]));
+}
+function mehrFenster() {
+  const f = fenster(`<h3>Mehr</h3><div class="menue">
+    <button class="btn sec" id="mDruck">Schlüsselliste drucken / PDF</button><button class="btn sec" id="mCsv">Schlüsselliste als CSV (Excel)</button>
+    ${darf() ? '<button class="btn sec" id="mBer">Nummernbereiche und höchste Nummer</button>' : ''}
+    <button class="btn sec" data-zu>Schließen</button></div>`);
+  f.q('#mDruck').onclick = () => { f.zu(); listeDrucken() }; f.q('#mCsv').onclick = () => { f.zu(); listeCsv() };
+  if (darf()) f.q('#mBer').onclick = () => { f.zu(); bereicheFenster() };
+}
+
+/* ===================== Ereignisse ===================== */
+$('#tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; TAB = b.dataset.t; ls('tab', TAB); ANZ = 80; zeigen() };
+let suchT; $('#suche').oninput = () => { clearTimeout(suchT); suchT = setTimeout(() => { ANZ = 80; zeigen() }, TAB === 'buchungen' ? 300 : 80) };
+$('#artFil').onchange = $('#blockFil').onchange = () => { ANZ = 80; zeigen() };
+$('#neuBtn').onclick = () => formular(null);
+$('#mehrBtn').onclick = mehrFenster;
+document.addEventListener('click', e => {
+  const z = e.target.closest('[data-zurueck]'); if (z) { const k = D.schluessel.find(x => x.id === z.dataset.zurueck); if (k) zurueckFenster(k); return }
+  const q = e.target.closest('[data-quittung]'); if (q) { quittung(q.dataset.quittung); return }
+  if (e.target.closest('.bd')) return;
+  if (e.target.id === 'mehrZeigen') { ANZ += 200; zeigen(); return }
+  const k = e.target.closest('[data-id]'); if (k) { detail(k.dataset.id); return }
+  const fr = e.target.closest('[data-frei]');
+  if (fr) { if (darf()) formular(null, +fr.dataset.frei); else toast(`Nr. ${fr.dataset.frei} ist frei`) }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { const b = document.querySelector('.bd:last-of-type'); if (b) b.remove() } });
+let weg = 0;
+document.addEventListener('visibilitychange', () => { if (document.hidden) { weg = Date.now(); return } if (Date.now() - weg > 60000 && !document.querySelector('.bd')) neuLaden().catch(e => toast(e.message)) });
+
+(async function start() {
+  if (!storedRefresh()) return toLogin();
+  try { await laden() } catch (e) { $('#boot').textContent = e.message; return }
+  if (!D.rolle) { $('#boot').textContent = 'Für dieses Konto ist kein Benutzerprofil hinterlegt.'; return }
+  $('#rolleTxt').textContent = { admin: 'Admin', verwalter: 'Verwalter', nutzer: 'Entnehmen und zurückbuchen' }[D.rolle] || '';
+  $('#neuBtn').hidden = !darf();
+  blockOptionen();
+  $('#boot').hidden = true; $('#app').hidden = false; zeigen();
+})();
+</script>
+</body>
+</html>
