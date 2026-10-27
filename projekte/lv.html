@@ -41,6 +41,7 @@
 .ps .r small{display:block;font-weight:650;color:var(--blue);font-size:11.5px;margin-top:2px}
 .ps mark{background:color-mix(in srgb,var(--accent) 22%,transparent);color:inherit;border-radius:3px;padding:0 1px}
 .nl{display:inline-block;font-size:11px;font-weight:700;color:var(--ink-3);background:var(--surface-2);border-radius:6px;padding:1px 6px;margin-left:4px}
+.nl.kn{color:#8a4b00;background:#fff1dc}.ltx{white-space:pre-wrap;font-size:14px;line-height:1.5;background:var(--surface-2);border-radius:12px;padding:10px 12px;margin-top:6px;overflow-wrap:anywhere}.lthin{font-size:12px;color:var(--ink-3);margin-top:2px}
 .det dt{font-size:12px;font-weight:700;color:var(--ink-3);margin-top:12px}
 .det dd{margin:2px 0 0;font-size:15px}
 .ov{position:fixed;inset:0;background:rgba(8,13,21,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:50;display:none}
@@ -109,12 +110,12 @@ function gliedern(){
 const pos=()=>LV.filter(o=>o.k==='P');
 const sollH=items=>items.filter(o=>o.k==='P'&&o.z>0).reduce((a,o)=>a+o.z*(o.m||0)/60,0);
 const norm=s=>String(s||'').toLowerCase();
-function treffer(o,terms){ const t=norm(o.p+' '+o.b+' '+o.me), t2=t.replace(/\s+/g,''); return terms.every(w=>t.includes(w)||t2.includes(w.replace(/\s+/g,''))); }
+function treffer(o,terms){ const t=norm(o.p+' '+o.b+' '+o.me+' '+(o.lt||'')), t2=t.replace(/\s+/g,''); /* GAEB_V1 */ return terms.every(w=>t.includes(w)||t2.includes(w.replace(/\s+/g,''))); }
 function hl(s,terms){ let h=esc(s); terms.filter(w=>w.length>1).forEach(w=>{ const re=new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'); h=h.replace(re,'<mark>$1</mark>'); }); return h; }
 
 function posZeile(o,terms){
   const on=SEL&&SEL.has(o.p);
-  return `<button class="ps${on?' on':''}" data-i="${o.i}" ${SEL?`role="checkbox" aria-checked="${on}"`:''}>${SEL?`<span class="ck">${on?IC('check','sm'):''}</span>`:''}<div class="l"><div class="nr">${esc(o.p)}${o.v?'':'<span class="nl">nicht in Aufmaß-Liste</span>'}</div><div class="bz">${terms?hl(o.b,terms):esc(o.b)}</div></div>
+  return `<button class="ps${on?' on':''}" data-i="${o.i}" ${SEL?`role="checkbox" aria-checked="${on}"`:''}>${SEL?`<span class="ck">${on?IC('check','sm'):''}</span>`:''}<div class="l"><div class="nr">${esc(o.p)}${o.kn?`<span class="nl kn">${o.kn==='alternativ'?'Alternativposition':'Bedarfsposition'}</span>`:''}${o.v||o.kn?'':'<span class="nl">nicht in Aufmaß-Liste</span>'}</div><div class="bz">${terms?hl(o.b,terms):esc(o.b)}</div>${o.lt&&terms&&!treffer({p:o.p,b:o.b,me:o.me},terms)?'<div class="lthin">Treffer im Langtext</div>':''}</div>
     <div class="r">${nf(o.m)} ${esc(o.me)}${ZEIT_ON&&o.z>0?`<small>${fmtMin(o.z)}/${esc(o.me)}</small>`:''}</div></button>`;
 }
 function render(){
@@ -203,7 +204,9 @@ function detail(i){
       <dt>Menge laut LV</dt><dd>${nf(o.m)} ${esc(o.me)}</dd>
       ${ZEIT_ON&&o.z>0?`<dt>Soll-Zeit (Kalkulation)</dt><dd>${fmtMin(o.z)} je ${esc(o.me)} · ${fmtH(o.z*(o.m||0)/60)} für die LV-Menge</dd>`:''}
       <dt>Aufmaß-Liste</dt><dd>${o.v?'ja':'nein, nur im gesamten LV'}</dd>
+      ${o.kn?`<dt>Kennung</dt><dd>${o.kn==='alternativ'?'Alternativposition (nur auf Anordnung ausführen)':'Bedarfsposition'}</dd>`:''}
     </dl>
+    ${o.lt?`<div class="hint" style="font-weight:700;margin-top:14px">Langtext</div><div class="ltx">${esc(o.lt)}</div>`:''}
     <button class="btn ghost block" style="margin-top:18px" onclick="schliessen()">Schließen</button>`;
   $('#ov').classList.add('on'); $('#sheet').classList.add('on');
 }
@@ -226,6 +229,7 @@ $('#ov').onclick=schliessen;
   PJS.set({seite:'lv',pid:PID,pname:PROJ?.name||'',erfassen:false});
   if(new URLSearchParams(location.search).get('auswahl')==='1'&&PJ.leitung()) SEL=new Set();
   const q=Q; render(); if(q){ $('#q').value=q; }
+  if(PJ.lvTexte) PJ.lvTexte(PID).then(t=>{ if(!t||!t.length) return; t.forEach(x=>{ const o=LV[x.idx]; if(o){ o.lt=x.langtext||null; o.kn=x.kennung||null; } }); render(); }); // GAEB_V1
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
 </script>

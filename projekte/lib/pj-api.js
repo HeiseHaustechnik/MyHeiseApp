@@ -140,7 +140,14 @@
     if (!r.ok || j.error) { const e = new Error(j.error || ('Fehler ' + r.status)); e.daten = j; e.status = r.status; throw e; }
     return j;
   }
-  const PJ = window.PJ = { api, rpc, za, pr, mail, fn, test: TEST, rolle: null, me: null, portal: PORTAL, logout() { authClear(); location.replace(PORTAL) } };
+  /* Langtexte und Kennungen (Alternativ/Bedarf) eines LV, mit Zwischenspeicher für offline. GAEB_V1 */
+  async function lvTexte(pid) {
+    const k = 'pj_lt_' + (TEST ? 't_' : '') + pid; let c = null;
+    try { c = JSON.parse(localStorage.getItem(k) || 'null') } catch (e) { }
+    try { const r = await rpc('pj_lv_texte', { p_projekt: pid }) || []; try { localStorage.setItem(k, JSON.stringify(r)) } catch (e) { } return r }
+    catch (e) { return c || [] }
+  }
+  const PJ = window.PJ = { api, rpc, za, pr, mail, fn, lvTexte, test: TEST, rolle: null, me: null, portal: PORTAL, logout() { authClear(); location.replace(PORTAL) } };
   PJ.setTest = on => { try { on ? localStorage.setItem('pj_test', '1') : localStorage.removeItem('pj_test') } catch (e) { } location.replace(location.pathname + '?bereich=' + (on ? 'test#pds' : 'echt')) };
   // Hinweisleiste im Testbereich
   if (TEST) {
