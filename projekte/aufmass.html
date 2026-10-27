@@ -269,6 +269,7 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
       </div>
       <button class="btn sec block" id="btnShare" style="margin-top:10px;display:none">PDF + Excel teilen (Mail, Teams …)</button>
       <button class="btn sec block nur-leitung" id="btnX31" style="margin-top:10px">X31 für pds (Aufmaß plus)</button>
+      <label class="btn sec block nur-leitung" style="margin-top:10px;cursor:pointer">Mengen aus Excel übernehmen<input type="file" id="xlF" accept=".xlsx" hidden></label>
       <p class="hint">Die Dateien landen im Download-Ordner des Geräts.</p>
     </div>
 
@@ -1115,6 +1116,80 @@ async function x31Erstellen(g,btn){
   }catch(e){ toast(/pj_kr|function/i.test(e.message)?'Datenbank-Erweiterung pj_kriterien_x31.sql fehlt':e.message); btn.disabled=false; btn.textContent=t; }
 }
 $('#btnX31').onclick=()=>openX31();
+
+/* ---------- Mengen aus Excel übernehmen (EXCEL_IMPORT_V1) ----------
+   Für Projekte, deren bisherige Aufmaße in einer Excel-Liste stehen: Blatt, Spalte mit der Pos.-Nr. und Spalte mit den
+   Mengen wählen (z. B. „Aufmaß 1 bis 29.07.26“). Jede Zeile mit Menge wird ein Eintrag in diesem Aufmaß. Die Positionen
+   werden über die Pos.-Nr. dem LV zugeordnet (führende Nullen egal). Nichts wird gespeichert, bevor „Übernehmen“ gedrückt ist. */
+const xlNorm=p=>String(p??'').trim().replace(/\.$/,'').split('.').map(s=>s.trim().replace(/^0+(?=\d)/,'')).join('.');
+const xlWert=v=>{ if(v==null) return ''; if(typeof v==='object'){ if(v instanceof Date) return v; if('result' in v) return xlWert(v.result); if(v.richText) return v.richText.map(x=>x.text).join(''); if('text' in v) return v.text; return ''; } return v; };
+const xlZahl=v=>{ v=xlWert(v); if(typeof v==='number') return v; const s=String(v).trim().replace(/\s/g,''); if(!s) return null; const n=Number(/,\d{1,3}$/.test(s)?s.replace(/\./g,'').replace(',','.'):s.replace(',','.')); return isFinite(n)?n:null; };
+let XL=null;
+$('#xlF').onchange=async ev=>{
+  const f=ev.target.files[0]; ev.target.value=''; if(!f) return;
+  try{ const wb=new ExcelJS.Workbook(); await wb.xlsx.load(await f.arrayBuffer());
+    XL={name:f.name, blaetter:wb.worksheets.map(ws=>{ const rows=[]; for(let i=1;i<=ws.rowCount;i++){ const row=ws.getRow(i), z=[]; for(let c=1;c<=Math.max(ws.columnCount,row.cellCount);c++) z.push(xlWert(row.getCell(c).value)); rows.push(z); } return {name:ws.name,rows}; })};
+    xlDialog();
+  }catch(e){ toast('Excel nicht lesbar: '+e.message); }
+};
+function xlKopf(rows){ for(let i=0;i<Math.min(30,rows.length);i++){ if(rows[i].some(v=>/^pos/i.test(String(v).trim()))) return i; } return -1; }
+function xlDialog(){
+  // Vorauswahl: das Blatt mit den meisten Mengen in Spalten „Aufmaß …“
+  const B=XL.blaetter, punkte=b=>{ const k=xlKopf(b.rows); if(k<0) return -1; let n=0; b.rows[k].forEach((h,i)=>{ if(/aufma/i.test(String(h||''))) b.rows.slice(k+1).forEach(r=>{ const z=xlZahl(r[i]); if(z!==null&&z!==0) n++; }); }); return n; };
+  let bi0=0; B.forEach((b,i)=>{ if(punkte(b)>punkte(B[bi0])) bi0=i; });
+  $('#sheet').innerHTML=`<div class="hd"><div class="t"><div class="nr">${esc(XL.name)}</div><h3>Mengen aus Excel übernehmen</h3></div><button class="icon" onclick="closeSheet()" aria-label="Schließen">${IC('x')}</button></div>
+    <div class="card"><label for="xl_b">Blatt</label><select class="f" id="xl_b">${B.map((b,i)=>`<option value="${i}"${i===bi0?' selected':''}>${esc(b.name)}</option>`).join('')}</select>
+      <div id="xl_sp"></div></div><div id="xl_vs"></div>`;
+  $('#ov').classList.add('on'); $('#sheet').classList.add('on');
+  $('#xl_b').onchange=xlSpalten; xlSpalten();
+}
+function xlSpalten(){
+  const b=XL.blaetter[+$('#xl_b').value], k=xlKopf(b.rows);
+  if(k<0){ $('#xl_sp').innerHTML='<p class="hint">In diesem Blatt gibt es keine Kopfzeile mit „Pos.-Nr.“.</p>'; $('#xl_vs').innerHTML=''; return; }
+  const H=b.rows[k].map((h,i)=>({i,h:String(h||'').replace(/\s+/g,' ').trim()})).filter(x=>x.h);
+  const zahlen=i=>b.rows.slice(k+1).filter(r=>{ const z=xlZahl(r[i]); return z!==null&&z!==0; }).length;
+  const posI=(H.find(x=>/^pos\.?-?\s*nr/i.test(x.h))||H.find(x=>/^pos/i.test(x.h))).i;
+  const mengen=H.filter(x=>x.i!==posI&&/aufma|menge/i.test(x.h)&&!/^menge$/i.test(x.h)&&zahlen(x.i)>0);
+  const raumI=(H.find(x=>/^(raum|ort|raum \/ ort|bereich)$/i.test(x.h))||{}).i;
+  $('#xl_sp').innerHTML=`<div class="row"><div><label for="xl_p">Spalte Pos.-Nr.</label><select class="f" id="xl_p">${H.map(x=>`<option value="${x.i}"${x.i===posI?' selected':''}>${esc(x.h)}</option>`).join('')}</select></div>
+      <div><label for="xl_m">Spalte mit den Mengen</label><select class="f" id="xl_m">${(mengen.length?mengen:H).map(x=>`<option value="${x.i}">${esc(x.h)} (${zahlen(x.i)})</option>`).join('')}</select></div></div>
+    <label for="xl_r">Spalte Raum (optional)</label><select class="f" id="xl_r"><option value="">ohne Raum</option>${H.map(x=>`<option value="${x.i}"${x.i===raumI?' selected':''}>${esc(x.h)}</option>`).join('')}</select>
+    <label for="xl_t">Bemerkung an jedem Eintrag</label><input class="f" id="xl_t" autocomplete="off">
+    <label style="display:flex;gap:10px;align-items:center;margin-top:10px;font-weight:600"><input type="checkbox" id="xl_f" style="width:20px;height:20px;accent-color:var(--accent)"> Positionen, die nicht im LV stehen, als freie Position anlegen</label>`;
+  const bem=()=>{ const h=H.find(x=>x.i===+$('#xl_m').value); $('#xl_t').value='aus Excel: '+(h?h.h:''); };
+  $('#xl_m').onchange=()=>{ bem(); xlVorschau(); }; bem();
+  ['xl_p','xl_r','xl_f'].forEach(id=>$('#'+id).onchange=xlVorschau);
+  xlVorschau();
+}
+function xlPlan(){
+  const b=XL.blaetter[+$('#xl_b').value], k=xlKopf(b.rows), pi=+$('#xl_p').value, mi=+$('#xl_m').value, ri=$('#xl_r').value===''?-1:+$('#xl_r').value;
+  const kopf=b.rows[k].map(h=>String(h||'').replace(/\s+/g,' ').trim()), bzI=kopf.findIndex(h=>/^bezeichnung \(lv\)/i.test(h))>=0?kopf.findIndex(h=>/^bezeichnung \(lv\)/i.test(h)):kopf.findIndex(h=>/^bezeichnung/i.test(h)), meI=kopf.findIndex(h=>/^(me|einheit)$/i.test(h));
+  const lv=new Map(); Object.keys(POS).forEach(p=>lv.set(xlNorm(p),p)); S.free.forEach(f=>lv.set(xlNorm(f.p),f.p));
+  const ok=[], fremd=[];
+  b.rows.slice(k+1).forEach(r=>{ const pos=String(r[pi]??'').trim(), q=xlZahl(r[mi]);
+    if(!/^\d+(\.\d+)*\.?$/.test(pos)||q===null||q===0) return;
+    const key=lv.get(xlNorm(pos)), ort=ri>=0?String(r[ri]??'').trim():'';
+    const txt=bzI>=0?String(r[bzI]??'').split('\n')[0].trim().slice(0,200):'', me=meI>=0?String(r[meI]??'').trim():'';
+    (key?ok:fremd).push({pos,key,q:Math.round(q*1000)/1000,ort,txt,me}); });
+  return {ok,fremd};
+}
+function xlVorschau(){
+  const {ok,fremd}=xlPlan(), frei=$('#xl_f').checked, bem=$('#xl_t').value.trim();
+  const schon=S.entries.filter(e=>bem&&e.bem===bem).length;
+  $('#xl_vs').innerHTML=`<div class="card"><h2 style="margin-bottom:4px">Vorschau</h2>
+      <p class="hint" style="margin-top:0">${ok.length} Zeilen mit Menge passen zum LV${fremd.length?`, ${fremd.length} nicht im LV${frei?' (werden freie Positionen)':' (werden übersprungen)'}`:''}.</p>
+      ${schon?`<p class="hint" style="color:var(--amber)">In diesem Aufmaß gibt es schon ${schon} Einträge mit der Bemerkung „${esc(bem)}“. Wurde die Spalte schon übernommen?</p>`:''}
+      <div style="max-height:34vh;overflow:auto;margin-top:6px">${ok.map(x=>`<div class="ent"><div class="q">${nf(x.q)} ${esc((POS[x.key]||posOf(x.key)||{}).me||'')}</div><div class="o"><b>${esc(x.key)}</b> ${esc((POS[x.key]||posOf(x.key)||{}).b||'')}${x.ort?`<small>${esc(x.ort)}</small>`:''}</div></div>`).join('')}
+        ${fremd.map(x=>`<div class="ent" style="opacity:${frei?1:.55}"><div class="q">${nf(x.q)}</div><div class="o"><b>${esc(x.pos)}</b> nicht im LV · ${esc(x.txt.slice(0,70))}</div></div>`).join('')}</div>
+      <div class="row" style="margin-top:12px"><button class="btn sec" onclick="closeSheet()">Abbrechen</button><button class="btn cta" id="xl_ok"${ok.length||(frei&&fremd.length)?'':' disabled'}>${ok.length+(frei?fremd.length:0)} Einträge übernehmen</button></div></div>`;
+  $('#xl_ok').onclick=()=>{ const t=new Date().toISOString(), {ok,fremd}=xlPlan(), bem=$('#xl_t').value.trim();
+    if(schon&&!confirm(`Es gibt schon ${schon} Einträge mit dieser Bemerkung. Trotzdem noch einmal übernehmen?`)) return;
+    let n=0;
+    ok.forEach(x=>{ S.entries.push({id:uid(),key:x.key,qty:x.q,ort:x.ort,bem,kr:raumKr(x.ort),ts:t}); n++; });
+    if($('#xl_f').checked) fremd.forEach(x=>{ let f=S.free.find(y=>xlNorm(y.p)===xlNorm(x.pos)); if(!f){ f={id:uid(),p:x.pos,b:x.txt||('Position '+x.pos+' aus Excel'),me:/^st(c?k|\.)?$/i.test(x.me)?'Stck':x.me,ref:'aus Excel',t:''}; S.free.push(f); }
+      S.entries.push({id:uid(),key:f.p,qty:x.q,ort:x.ort,bem,kr:raumKr(x.ort),ts:t}); n++; });
+    closeSheet(); dataChanged(); toast(n+' Einträge übernommen'); };
+}
 
 function renderAll(){ PJS.set({seite:'aufmass',pid:PROJ?.id||null,pname:PROJ?.name||'',erfassen:true}); renderKrInfo(); renderCtx(); ortHinweis(); renderPos(); renderSum(); renderHdr(); sigText(); if(typeof renderEntwurf==='function') renderEntwurf(); }
 
