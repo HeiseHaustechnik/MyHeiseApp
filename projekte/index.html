@@ -53,6 +53,24 @@ input[type=file].inp{padding:12px 14px}
 .pdssys .ic{flex:0 0 auto;margin-top:1px}
 .sec-title .lnk{float:right;font-size:13px;font-weight:650;color:var(--accent);background:none;border:0;cursor:pointer}
 @media(max-width:720px){.mrow{grid-template-columns:28px 1fr 40px}.mrow .field{grid-column:2/3}.mrow .delbtn{grid-column:3;grid-row:1}.mhint{grid-column:2/3}}
+/* EINRICHTEN_V1: Projekt einrichten */
+details.setup{background:var(--surface);border-radius:22px;box-shadow:var(--shadow);margin:0 0 16px;padding:0 16px;border:2px solid var(--accent)}
+details.setup.fertig{border-color:transparent}
+details.setup>summary{list-style:none;cursor:pointer;padding:15px 0;display:flex;align-items:center;gap:10px;font-weight:720;color:var(--brand)}
+details.setup>summary::-webkit-details-marker{display:none}
+details.setup>summary b{flex:1}
+details.setup>summary .sc{font-size:12.5px;font-weight:700;color:var(--accent-2);background:var(--amber-bg);border-radius:10px;padding:3px 9px}
+details.setup.fertig>summary .sc{color:var(--ok);background:var(--ok-bg)}
+.setup .sl{padding:0 0 12px}
+.setup .ss{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.setup .si{width:30px;height:30px;border-radius:15px;display:grid;place-items:center;flex:0 0 auto;background:var(--surface-2);color:var(--ink-3);font-weight:800;font-size:13px}
+.setup .ss.ok .si{background:var(--ok-bg);color:var(--ok)}
+.setup .ss.warn .si{background:var(--amber-bg);color:var(--amber)}
+.setup .st{flex:1;min-width:0}
+.setup .st b{display:block;font-size:14.5px}
+.setup .st small{display:block;color:var(--ink-3);font-size:12.5px;line-height:1.35;margin-top:1px}
+.setup .ss.ok .st b{color:var(--ink-2)}
+.setup .hin{font-size:12.5px;color:var(--ink-3);margin:2px 0 4px}
 </style>
 </head>
 <body>
@@ -326,6 +344,7 @@ async function showProjekt(id){
   const offen=am.reduce((a,x)=>a+(x.anz_ungeprueft||0),0);
   app.innerHTML=`
     <div class="pagehead"><a class="iconbtn" href="#" aria-label="Zurück">${IC('back')}</a><div style="min-width:0"><h1>${esc(p.name)}</h1><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}${p.status==='archiv'?' · archiviert':''}</small></div></div>
+    ${PJ.leitung()?einrichtenKarte(id,p,d,am):''}
     <div class="apps">
       <button class="app" style="--g1:#4a5a7a;--g2:#2f3b53" onclick="document.getElementById('amList').scrollIntoView({behavior:'smooth'})">
         ${offen?`<span class="app-n">${offen}</span>`:''}<div class="app-ico">${IC('ruler')}</div><div><b>Aufmaß</b><span>${plural(am.length,'Aufmaß','Aufmaße')} · ${nP} LV-Positionen</span></div></button>
@@ -344,12 +363,12 @@ async function showProjekt(id){
         <button class="delbtn nur-leitung" title="Löschen" onclick="event.stopPropagation();delAufmass('${a.id}','${esc(a.bez).replace(/'/g,'')}')">${IC('trash','sm')}</button>
         <span class="chev">${IC('chev')}</span></div>`).join('')
       :`<div class="empty">${IC('clip')}<div>Noch kein Aufmaß angelegt.</div></div>`}
-    <details class="fold" style="margin-top:12px"><summary>${IC('plus')}Neues Aufmaß</summary><div class="fold-b">
+    <details class="fold" id="naFold" style="margin-top:12px"><summary>${IC('plus')}Neues Aufmaß</summary><div class="fold-b">
       <div class="field"><label>Bezeichnung *</label><input class="inp" id="na_bez" placeholder="z. B. Aufmaß 2 – Trinkwasser OG"></div>
       <div class="row2"><div class="field"><label>Datum</label><input class="inp" type="date" id="na_dat" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Monteur</label><input class="inp" id="na_mon"></div></div>
       <button class="btn cta block" id="na_ok" ${nP?'':'disabled'}>Anlegen und öffnen</button>${nP?'':'<p class="hint">Zuerst das LV importieren.</p>'}</div></details>
     <div class="sec-title nur-leitung">Projekt</div>
-    <details class="fold nur-leitung"><summary>${IC('edit')}Projektdaten bearbeiten</summary><div class="fold-b">
+    <details class="fold nur-leitung" id="epFold"><summary>${IC('edit')}Projektdaten bearbeiten</summary><div class="fold-b">
       <div class="row2"><div class="field"><label>Projekt-Nr.</label><input class="inp" id="ep_nr" value="${esc(p.nr)}"></div><div class="field"><label>Name *</label><input class="inp" id="ep_name" value="${esc(p.name)}"></div></div>
       <div class="field"><label>Adresse</label><input class="inp" id="ep_adr" value="${esc(p.adresse)}"></div>
       <button class="btn cta block" id="ep_ok">Speichern</button>
@@ -361,18 +380,57 @@ async function showProjekt(id){
       <button class="btn ghost block danger ${am.length||bt.length?'nur-admin':''}" id="ep_del">${IC('trash','sm')}Projekt löschen</button></div></details>
     <div class="sec-title nur-leitung">Team und Empfänger</div>
     <details class="fold nur-leitung" id="teamFold"><summary>${IC('users')}Team (wer sieht das Projekt unter „Meine Projekte“)</summary><div class="fold-b" id="teamBox"><p class="hint">Lädt …</p></div></details>
-    <details class="fold nur-leitung"><summary>${IC('mail')}E-Mail-Empfänger für Bautagebücher (${empfListe(p).length})</summary><div class="fold-b">
+    <details class="fold nur-leitung" id="emFold"><summary>${IC('mail')}E-Mail-Empfänger für Bautagebücher (${empfListe(p).length})</summary><div class="fold-b">
       <p class="hint" style="margin-bottom:10px">Diese Adressen stehen beim Senden eines Bautagebuchs zur Auswahl, z. B. Bauherr, Architekt oder Planungsbüro.</p>
       <div id="emList"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn ghost sm" id="emAdd">${IC('plus','sm')}Empfänger hinzufügen</button><button class="btn cta sm" id="emSave">Speichern</button></div></div></details>
     <div class="sec-title nur-leitung">Leistungsverzeichnis</div>
-    <details class="fold nur-leitung"><summary>${IC('sheet')}${nP? `${nP} Positionen · ${nL} in der Aufmaß-Liste` : 'Noch kein LV importiert'}</summary><div class="fold-b">
+    <details class="fold nur-leitung" id="lvFold"><summary>${IC('sheet')}${nP? `${nP} Positionen · ${nL} in der Aufmaß-Liste` : 'Noch kein LV importiert'}</summary><div class="fold-b">
       <p class="hint" style="margin-bottom:10px">LV aus GAEB (.x86, .x83, .x81, mit Langtexten), der Kalkulations-Excel, dem Addison-Export (.xlsx, .xls) oder dem pds-Export „pds XML ohne Anhang“ (.xml) importieren${nP?', ersetzt das bestehende':''}. Erwartet die Spalten Typ (Los / Titel / Text-Pos. / Position), Pos.-Nr., Bezeichnung, Menge, ME. Ausgeblendete Zeilen landen im „Gesamten LV“, sichtbare in der „Aufmaß-Liste“. Eine Spalte „Zeit“ (Minuten je Einheit) wird als Soll-Zeit für das Team übernommen, Preise nicht.</p>
       <div class="field"><input type="file" class="inp" id="lv_f" accept=".xlsx,.xls,.xml,.x81,.x83,.x86,.x84"></div><div id="lv_sheet" class="field"></div><div id="lv_msg"></div></div></details>`;
   $('#na_ok').onclick=async()=>{ const bez=$('#na_bez').value.trim(); if(!bez) return toast('Bitte eine Bezeichnung eintragen');
     try{ const r=await api('projekte/'+id+'/aufmasse',{method:'POST',body:JSON.stringify({bez,datum:$('#na_dat').value,monteur:$('#na_mon').value.trim()})}); location.href='aufmass.html?id='+r.id; }catch(e){ toast(e.message); } };
   $('#lv_f').onchange=()=>lvImport(id);
-  if(PJ.leitung()){ teamSetup(id); empfSetup(id,p); projektSetup(id,p,am.length+bt.length>0); }
+  if(PJ.leitung()){ teamSetup(id); empfSetup(id,p); projektSetup(id,p,am.length+bt.length>0); einrichtenTeam(id); }
+}
+/* ---------- Projekt einrichten (EINRICHTEN_V1) ----------
+   Checkliste für die Projektleitung. Der Stand wird aus den Projektdaten erkannt, nichts muss abgehakt werden. */
+function ortAusAdresse(a){ a=String(a||''); const m=a.match(/\b\d{5}\s+([^,;\n]+)/); return m?m[1].trim():''; }
+let EINR=null;
+function einrichtenSchritte(id,p,d,am,team){
+  const nP=d.lv.filter(o=>o.typ==='P').length, nL=d.lv.filter(o=>o.typ==='P'&&o.in_liste).length;
+  const R=d.bereiche||[], K=(p.kriterien||[]).filter(k=>k&&k.n), ohneZu=K.length?R.filter(b=>!b.kr||!Object.keys(b.kr).length).length:0;
+  const fehlt=[!p.nr&&'Projekt-Nr.',!ortAusAdresse(p.adresse)&&'Adresse mit PLZ und Ort'].filter(Boolean);
+  const em=empfListe(p).length;
+  return [
+    {ok:!fehlt.length, t:'Projektdaten vollständig', s:fehlt.length?`Es fehlt: ${fehlt.join(', ')}. Der Ort aus der Adresse steht im Aufmaß-PDF bei den Unterschriften.`:`${p.nr} · ${ortAusAdresse(p.adresse)}`, z:'#epFold'},
+    {ok:nP>0, warn:nP>0&&!nL, t:'LV importiert', s:nP?`${nP} Positionen, ${nL} in der Aufmaß-Liste${nL?'':' (Aufmaß-Liste ist leer, Monteure sehen dann nur „Gesamtes LV“)'}`:'GAEB (X83/X86), Kalkulations-Excel oder pds-Export einlesen.', z:'#lvFold'},
+    {ok:R.length>0, warn:ohneZu>0, t:'Räume und Kriterien angelegt', s:R.length?`${R.length} Räume${K.length?' · '+K.map(k=>k.n).join(', '):''}${ohneZu?` · ${ohneZu} Räume ohne Zuordnung`:''}`:'Räume und Geschosse aus den Plänen anlegen. Claude kann sie aus den CAD-PDFs herauslesen.', h:'kriterien.html?p='+encodeURIComponent(id)},
+    {ok:team===null?null:team>0, t:'Team zugeordnet', s:team===null?'wird geprüft …':team?`${team} ${team===1?'Person':'Personen'} zugeordnet`:'Wer am Projekt arbeitet, sieht es dann unter „Meine Projekte“.', z:'#teamFold'},
+    {ok:em>0, t:'E-Mail-Empfänger eingetragen', s:em?`${em} Empfänger`:'Bauherr, Bauleitung oder Planer für Bautagebücher und Aufmaße.', z:'#emFold'},
+    {ok:am.length>0, t:'Erstes Aufmaß angelegt', s:am.length?`${am.length} ${am.length===1?'Aufmaß':'Aufmaße'}`:'Leeres Aufmaß anlegen oder einen Aufmaß-Entwurf aus dem LV erstellen.', z:'#naFold'}
+  ];
+}
+function einrichtenHtml(id,S){
+  const n=S.filter(x=>x.ok).length, fertig=n===S.length;
+  let zu=null; try{ zu=localStorage.getItem('pj_einr_'+id); }catch(e){}
+  const offen=zu===null?!fertig:zu==='auf';
+  return `<details class="setup${fertig?' fertig':''}" id="setupFold"${offen?' open':''}><summary>${IC(fertig?'check':'clip')}<b>Projekt einrichten</b><span class="sc">${fertig?'fertig':n+' von '+S.length}</span></summary><div class="sl">
+    <p class="hin">Einmal am Anfang durchgehen, dann ist das Projekt für Aufmaß, Bautagebuch und pds vorbereitet. Erledigtes wird von selbst erkannt.</p>
+    ${S.map((x,i)=>`<div class="ss${x.ok?' ok':x.warn?' warn':''}"><span class="si">${x.ok?IC('check','sm'):i+1}</span><div class="st"><b>${esc(x.t)}</b><small>${esc(x.s)}</small></div>${x.h?`<a class="btn ghost sm" href="${x.h}">Öffnen</a>`:`<button class="btn ghost sm" data-ez="${x.z}">${x.ok?'Ansehen':'Erledigen'}</button>`}</div>`).join('')}</div></details>`;
+}
+function einrichtenKarte(id,p,d,am){ EINR={id,p,d,am,team:null}; return einrichtenHtml(id,einrichtenSchritte(id,p,d,am,null)); }
+function einrichtenBinden(){
+  const f=$('#setupFold'); if(!f||!EINR) return;
+  f.querySelector('summary').addEventListener('click',()=>setTimeout(()=>{ try{ localStorage.setItem('pj_einr_'+EINR.id,f.open?'auf':'zu'); }catch(e){} },0));
+  f.querySelectorAll('[data-ez]').forEach(b=>b.onclick=()=>{ const z=$(b.dataset.ez); if(!z) return; z.open=true; setTimeout(()=>z.scrollIntoView({behavior:'smooth',block:'start'}),60); });
+}
+async function einrichtenTeam(id){
+  einrichtenBinden();
+  try{ const t=await api('projekte/'+id+'/team'); if(!EINR||EINR.id!==id) return; EINR.team=t.filter(u=>u.zugeordnet).length; }catch(e){ return; }
+  const alt=$('#setupFold'); if(!alt) return;
+  const w=document.createElement('div'); w.innerHTML=einrichtenHtml(id,einrichtenSchritte(id,EINR.p,EINR.d,EINR.am,EINR.team));
+  alt.replaceWith(w.firstElementChild); einrichtenBinden();
 }
 /* ---------- Team (nur Ansicht, keine Sperre) ---------- */
 function teamSetup(pid){
