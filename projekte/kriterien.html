@@ -144,9 +144,11 @@ function render(){
       ${L&&K.length?`<p class="hint" style="margin-top:6px">Neue Räume übernehmen die Werte, die du hier wählst:</p><div class="zs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${K.map((k,i)=>`<select class="inp" style="min-height:40px;max-width:200px;font-size:14px" data-nz="${esc(k.n)}"><option value="">${esc(k.n)}: –</option>${k.w.map(w=>`<option>${esc(w)}</option>`).join('')}</select>`).join('')}</div>`:''}
     </div></div>`;
 
-  const imp=L?`<details class="fold"><summary>${IC('upload')}Aus pds Aufmaß plus übernehmen</summary><div class="fold-b" style="padding-bottom:16px">
-      <p class="hint" style="margin-bottom:10px">X31- oder DA11-Datei aus Aufmaß plus wählen. Raum-Werte werden Räume, alle anderen Kriterien mit ihren Werten werden ergänzt. AZ (Abschlag) wird übersprungen. Danach speichern.</p>
-      <input class="inp" type="file" id="impF" accept=".x31,.X31,.d11,.D11,.d11s,.D11S,.xml" style="padding-top:12px"></div></details>`:'';
+  const imp=L?`<details class="fold"${R.length?'':' open'}><summary>${IC('upload')}Aus Datei übernehmen</summary><div class="fold-b" style="padding-bottom:16px">
+      <p class="hint" style="margin-bottom:6px"><b>Raumliste aus der Projektvorbereitung</b> (CSV im Ordner „Projektvorbereitung“ des Projekts): Räume werden angelegt und die Werte aus den übrigen Spalten (z. B. Geschoss) gleich zugeordnet. Fehlende Kriterien und Werte werden ergänzt. Bei Räumen, die es schon gibt, werden die Werte aus der Datei gesetzt.</p>
+      <p class="hint" style="margin-bottom:10px"><b>Datei aus pds Aufmaß plus</b> (X31 oder DA11): Raum-Werte werden Räume, alle anderen Kriterien werden ergänzt, AZ wird übersprungen.</p>
+      <p class="hint" style="margin-bottom:10px">Danach alles prüfen, bei Bedarf ändern und speichern. Vorher ist nichts gespeichert.</p>
+      <input class="inp" type="file" id="impF" accept=".csv,.CSV,.x31,.X31,.d11,.D11,.d11s,.D11S,.xml" style="padding-top:12px"></div></details>`:'';
 
   app.innerHTML=`<div class="card intro">${L
       ?'Hier legst du einmal für das ganze Projekt fest, wonach aufgemessen wird. <b>Raum</b> ist immer das erste Kriterium, dazu z. B. Geschoss, Achse oder Bauteil. Einem Raum kannst du feste Werte zuordnen (Raum 001 → Geschoss EG). Im Aufmaß werden sie dann automatisch gesetzt und gehen mit dem X31-Export nach pds.'
@@ -256,10 +258,40 @@ window.addEventListener('beforeunload',e=>{ if(darf()&&dirty()){ e.preventDefaul
 
 /* ---------- Übernahme aus pds Aufmaß plus (X31 / DA11) ---------- */
 const CP850={0x81:'ü',0x84:'ä',0x94:'ö',0x8E:'Ä',0x99:'Ö',0x9A:'Ü',0xE1:'ß',0x82:'é',0x85:'à',0x8A:'è',0xF8:'°'};
+// RAUMLISTE_V1: CSV mit Semikolon. Spalte „Raum (für die App)“ oder „Raum“ = Raum, jede weitere Spalte außer
+// Raumnummer, Raumname, Fläche und Hinweis ist ein Kriterium, dessen Wert dem Raum fest zugeordnet wird.
+function csvZeilen(txt){
+  const z=[]; let f='', row=[], q=false;
+  for(let i=0;i<txt.length;i++){ const c=txt[i];
+    if(q){ if(c==='"'){ if(txt[i+1]==='"'){ f+='"'; i++; } else q=false; } else f+=c; continue; }
+    if(c==='"') q=true; else if(c===';'){ row.push(f); f=''; } else if(c==='\n'||c==='\r'){ if(c==='\r'&&txt[i+1]==='\n') i++; row.push(f); f=''; if(row.some(x=>x.trim())) z.push(row); row=[]; } else f+=c; }
+  row.push(f); if(row.some(x=>x.trim())) z.push(row);
+  return z.map(r=>r.map(x=>x.trim()));
+}
+function raumlisteUebernehmen(txt){
+  const Z=csvZeilen(txt.replace(/^\uFEFF/,'')); if(Z.length<2) return toast('Die Datei enthält keine Räume');
+  const kopf=Z[0], iR=kopf.findIndex(h=>/^raum \(für die app\)$/i.test(h)), iR2=kopf.findIndex(h=>/^raum$/i.test(h)), ir=iR>=0?iR:iR2;
+  if(ir<0) return toast('Spalte „Raum“ fehlt in der Datei');
+  const ohne=/^(raumnummer|raumname|nr\.?|name|fläche.*|flaeche.*|hinweis|bemerkung|raum.*)$/i;
+  const kSp=kopf.map((h,i)=>({h:h.slice(0,40),i})).filter(x=>x.i!==ir&&x.h&&!ohne.test(x.h)&&!/^(az)$/i.test(x.h));
+  const zeilen=Z.slice(1).map(r=>({n:(r[ir]||'').slice(0,60),kr:Object.fromEntries(kSp.map(k=>[k.h,(r[k.i]||'').slice(0,60)]).filter(([,v])=>v))})).filter(x=>x.n);
+  if(!zeilen.length) return toast('Die Datei enthält keine Räume');
+  const neu=zeilen.filter(z=>!R.some(r=>gleich(r.n,z.n))).length, geaendert=zeilen.filter(z=>{ const r=R.find(x=>gleich(x.n,z.n)); return r&&Object.entries(z.kr).some(([k,v])=>r.kr[k]!==v); }).length;
+  const nk=kSp.filter(k=>!K.some(x=>gleich(x.n,k.h))).map(k=>k.h);
+  if(!confirm(`Raumliste übernehmen?\n\n${zeilen.length} Räume in der Datei: ${neu} neu${geaendert?`, ${geaendert} vorhandene mit geänderten Werten`:''}.\n${kSp.length?'Zugeordnet wird: '+kSp.map(k=>k.h).join(', ')+'.':'Die Datei hat keine weiteren Kriterien.'}${nk.length?'\nNeue Kriterien: '+nk.join(', ')+'.':''}\n\nDanach prüfen und speichern.`)) return;
+  let nw=0;
+  zeilen.forEach(z=>{
+    let r=R.find(x=>gleich(x.n,z.n)); if(!r){ r={n:z.n,kr:{}}; R.push(r); }
+    Object.entries(z.kr).forEach(([kn,v])=>{ let k=K.find(x=>gleich(x.n,kn)); if(!k){ k={n:kn,w:[]}; K.push(k); }
+      let w=k.w.find(x=>gleich(x,v)); if(!w){ k.w.push(v); w=v; nw++; } r.kr[k.n]=w; });
+  });
+  SEL=new Set(); render(); toast(`Übernommen: ${neu} neue Räume${nk.length?', '+nk.length+' Kriterien':''}${nw?', '+nw+(nw===1?' Wert':' Werte'):''}. Bitte prüfen und speichern.`);
+}
 async function imp(ev){
   const f=ev.target.files[0]; if(!f) return; ev.target.value='';
   const roh=new Uint8Array(await f.arrayBuffer());
   const gef={}; const txt=new TextDecoder('utf-8').decode(roh);
+  if(/\.csv$/i.test(f.name)||/^\uFEFF?[^\n]*raum[^\n]*;/i.test(txt)) return raumlisteUebernehmen(/\uFFFD/.test(txt)?new TextDecoder('windows-1252').decode(roh):txt);
   try{
     if(/<GAEB[\s>]/.test(txt)){
       const doc=new DOMParser().parseFromString(txt,'application/xml');
