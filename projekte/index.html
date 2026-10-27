@@ -70,7 +70,16 @@ details.setup.fertig>summary .sc{color:var(--ok);background:var(--ok-bg)}
 .setup .st b{display:block;font-size:14.5px}
 .setup .st small{display:block;color:var(--ink-3);font-size:12.5px;line-height:1.35;margin-top:1px}
 .setup .ss.ok .st b{color:var(--ink-2)}
+.setup .ss.opt .st b{color:var(--ink-2);font-weight:650}
 .setup .hin{font-size:12.5px;color:var(--ink-3);margin:2px 0 4px}
+/* TEAM_ROLLEN_V1 */
+.trow{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line)}
+.trow b{flex:1;min-width:0;font-size:14.5px}
+.trow b small{display:block;font-weight:600;font-size:11.5px;color:var(--amber)}
+.trow select{min-height:40px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);padding:0 8px;font-size:14px;max-width:170px}
+.trow.pl select{border-color:var(--accent);color:var(--accent-2);font-weight:700}
+.trow.om select{border-color:var(--blue);color:var(--blue);font-weight:650}
+.pkopf{display:block;color:var(--ink-2);font-size:13px;font-weight:650;margin-top:2px}
 </style>
 </head>
 <body>
@@ -343,7 +352,7 @@ async function showProjekt(id){
   const nP=d.lv.filter(o=>o.typ==='P').length, nL=d.lv.filter(o=>o.typ==='P'&&o.in_liste).length;
   const offen=am.reduce((a,x)=>a+(x.anz_ungeprueft||0),0);
   app.innerHTML=`
-    <div class="pagehead"><a class="iconbtn" href="#" aria-label="Zurück">${IC('back')}</a><div style="min-width:0"><h1>${esc(p.name)}</h1><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}${p.status==='archiv'?' · archiviert':''}</small></div></div>
+    <div class="pagehead"><a class="iconbtn" href="#" aria-label="Zurück">${IC('back')}</a><div style="min-width:0"><h1>${esc(p.name)}</h1><small>${esc([p.nr,p.adresse].filter(Boolean).join(' · '))}${p.status==='archiv'?' · archiviert':''}</small>${teamKopf(d)}</div></div>
     ${PJ.leitung()?einrichtenKarte(id,p,d,am):''}
     <div class="apps">
       <button class="app" style="--g1:#4a5a7a;--g2:#2f3b53" onclick="document.getElementById('amList').scrollIntoView({behavior:'smooth'})">
@@ -379,7 +388,7 @@ async function showProjekt(id){
       <p class="hint" style="margin-bottom:10px">${am.length||bt.length?`Das Projekt enthält ${plural(am.length,'Aufmaß','Aufmaße')} und ${plural(bt.length,'Bautagebuch-Eintrag','Bautagebuch-Einträge')}. Löschen kann es nur ein Admin, alle Daten gehen dabei endgültig verloren. Besser archivieren.`:'Das Projekt ist noch leer und kann gelöscht werden.'}</p>
       <button class="btn ghost block danger ${am.length||bt.length?'nur-admin':''}" id="ep_del">${IC('trash','sm')}Projekt löschen</button></div></details>
     <div class="sec-title nur-leitung">Team und Empfänger</div>
-    <details class="fold nur-leitung" id="teamFold"><summary>${IC('users')}Team (wer sieht das Projekt unter „Meine Projekte“)</summary><div class="fold-b" id="teamBox"><p class="hint">Lädt …</p></div></details>
+    <details class="fold nur-leitung" id="teamFold"><summary>${IC('users')}Projektleitung und Team</summary><div class="fold-b" id="teamBox"><p class="hint">Lädt …</p></div></details>
     <details class="fold nur-leitung" id="emFold"><summary>${IC('mail')}E-Mail-Empfänger für Bautagebücher (${empfListe(p).length})</summary><div class="fold-b">
       <p class="hint" style="margin-bottom:10px">Diese Adressen stehen beim Senden eines Bautagebuchs zur Auswahl, z. B. Bauherr, Architekt oder Planungsbüro.</p>
       <div id="emList"></div>
@@ -406,18 +415,27 @@ function einrichtenSchritte(id,p,d,am,team){
     {ok:!fehlt.length, t:'Projektdaten vollständig', s:fehlt.length?`Es fehlt: ${fehlt.join(', ')}. Der Ort aus der Adresse steht im Aufmaß-PDF bei den Unterschriften.`:`${p.nr} · ${ortAusAdresse(p.adresse)}`, z:'#epFold'},
     {ok:nP>0, warn:nP>0&&!nL, t:'LV importiert', s:nP?`${nP} Positionen, ${nL} in der Aufmaß-Liste${nL?'':' (Aufmaß-Liste ist leer, Monteure sehen dann nur „Gesamtes LV“)'}`:'GAEB (X83/X86), Kalkulations-Excel oder pds-Export einlesen.', z:'#lvFold'},
     {ok:R.length>0, warn:ohneZu>0, t:'Räume und Kriterien angelegt', s:R.length?`${R.length} Räume${K.length?' · '+K.map(k=>k.n).join(', '):''}${ohneZu?` · ${ohneZu} Räume ohne Zuordnung`:''}`:'Räume und Geschosse aus den Plänen anlegen. Claude kann sie aus den CAD-PDFs herauslesen.', h:'kriterien.html?p='+encodeURIComponent(id)},
-    {ok:team===null?null:team>0, t:'Team zugeordnet', s:team===null?'wird geprüft …':team?`${team} ${team===1?'Person':'Personen'} zugeordnet`:'Wer am Projekt arbeitet, sieht es dann unter „Meine Projekte“.', z:'#teamFold'},
-    {ok:em>0, t:'E-Mail-Empfänger eingetragen', s:em?`${em} Empfänger`:'Bauherr, Bauleitung oder Planer für Bautagebücher und Aufmaße.', z:'#emFold'},
+    teamSchritt(d,team),
+    {ok:em>0, opt:true, t:'E-Mail-Empfänger (optional)', s:em?`${em} Empfänger`:'Nur wenn Bautagebücher direkt an Externe gehen sollen. Sonst prüft das Büro und leitet weiter.', z:'#emFold'},
     {ok:am.length>0, t:'Erstes Aufmaß angelegt', s:am.length?`${am.length} ${am.length===1?'Aufmaß':'Aufmaße'}`:'Leeres Aufmaß anlegen oder einen Aufmaß-Entwurf aus dem LV erstellen.', z:'#naFold'}
   ];
 }
+// Team mit Rollen (pj_raeume_kriterien.sql liefert d.team), sonst nur die Anzahl wie bisher
+function teamSchritt(d,team){
+  const T=Array.isArray(d.team)?d.team:null;
+  if(!T) return {ok:team===null?null:team>0, t:'Team zugeordnet', s:team===null?'wird geprüft …':team?`${team} ${team===1?'Person':'Personen'} zugeordnet`:'Wer am Projekt arbeitet, sieht es dann unter „Meine Projekte“.', z:'#teamFold'};
+  const pl=T.filter(x=>x.rolle==='projektleitung'), om=T.filter(x=>x.rolle==='obermonteur');
+  return {ok:pl.length>0, warn:T.length>0&&!pl.length, t:'Projektleitung und Team festgelegt',
+    s:pl.length?[`PL: ${pl.map(x=>x.name).join(', ')}`,om.length?`OM: ${om.map(x=>x.name).join(', ')}`:'',`${T.length} im Team`].filter(Boolean).join(' · ')
+      :T.length?`${T.length} im Team, aber keine Projektleitung eingetragen`:'Projektleitung, Obermonteur und Team festlegen. Die Projektleitung bekommt z. B. die Mail bei „Niemand vor Ort“.', z:'#teamFold'};
+}
 function einrichtenHtml(id,S){
-  const n=S.filter(x=>x.ok).length, fertig=n===S.length;
+  const P=S.filter(x=>!x.opt), n=P.filter(x=>x.ok).length, fertig=n===P.length; // optionale Schritte zählen nicht
   let zu=null; try{ zu=localStorage.getItem('pj_einr_'+id); }catch(e){}
   const offen=zu===null?!fertig:zu==='auf';
-  return `<details class="setup${fertig?' fertig':''}" id="setupFold"${offen?' open':''}><summary>${IC(fertig?'check':'clip')}<b>Projekt einrichten</b><span class="sc">${fertig?'fertig':n+' von '+S.length}</span></summary><div class="sl">
+  return `<details class="setup${fertig?' fertig':''}" id="setupFold"${offen?' open':''}><summary>${IC(fertig?'check':'clip')}<b>Projekt einrichten</b><span class="sc">${fertig?'fertig':n+' von '+P.length}</span></summary><div class="sl">
     <p class="hin">Einmal am Anfang durchgehen, dann ist das Projekt für Aufmaß, Bautagebuch und pds vorbereitet. Erledigtes wird von selbst erkannt.</p>
-    ${S.map((x,i)=>`<div class="ss${x.ok?' ok':x.warn?' warn':''}"><span class="si">${x.ok?IC('check','sm'):i+1}</span><div class="st"><b>${esc(x.t)}</b><small>${esc(x.s)}</small></div>${x.h?`<a class="btn ghost sm" href="${x.h}">Öffnen</a>`:`<button class="btn ghost sm" data-ez="${x.z}">${x.ok?'Ansehen':'Erledigen'}</button>`}</div>`).join('')}</div></details>`;
+    ${S.map((x,i)=>`<div class="ss${x.ok?' ok':x.warn?' warn':''}${x.opt?' opt':''}"><span class="si">${x.ok?IC('check','sm'):x.opt?'–':i+1}</span><div class="st"><b>${esc(x.t)}</b><small>${esc(x.s)}</small></div>${x.h?`<a class="btn ghost sm" href="${x.h}">Öffnen</a>`:`<button class="btn ghost sm" data-ez="${x.z}">${x.ok?'Ansehen':x.opt?'Öffnen':'Erledigen'}</button>`}</div>`).join('')}</div></details>`;
 }
 function einrichtenKarte(id,p,d,am){ EINR={id,p,d,am,team:null}; return einrichtenHtml(id,einrichtenSchritte(id,p,d,am,null)); }
 function einrichtenBinden(){
@@ -427,24 +445,33 @@ function einrichtenBinden(){
 }
 async function einrichtenTeam(id){
   einrichtenBinden();
+  if(EINR&&Array.isArray(EINR.d.team)) return; // Team mit Rollen ist schon in den Projektdaten
   try{ const t=await api('projekte/'+id+'/team'); if(!EINR||EINR.id!==id) return; EINR.team=t.filter(u=>u.zugeordnet).length; }catch(e){ return; }
   const alt=$('#setupFold'); if(!alt) return;
   const w=document.createElement('div'); w.innerHTML=einrichtenHtml(id,einrichtenSchritte(id,EINR.p,EINR.d,EINR.am,EINR.team));
   alt.replaceWith(w.firstElementChild); einrichtenBinden();
 }
 /* ---------- Team (nur Ansicht, keine Sperre) ---------- */
+// TEAM_ROLLEN_V1: Rollen im Projekt. Projektleitung bekommt E-Mails wie „Niemand vor Ort“, zusätzlich zu den Büro-Empfängern.
+const T_ROLLEN=[['','nicht im Team'],['team','Team'],['obermonteur','Obermonteur'],['projektleitung','Projektleitung']];
+function teamKopf(d){ const T=Array.isArray(d&&d.team)?d.team:[]; const pl=T.filter(x=>x.rolle==='projektleitung'), om=T.filter(x=>x.rolle==='obermonteur');
+  return pl.length||om.length?`<span class="pkopf">${[pl.length?'PL: '+pl.map(x=>esc(x.name)).join(', '):'',om.length?'OM: '+om.map(x=>esc(x.name)).join(', '):''].filter(Boolean).join(' · ')}</span>`:''; }
 function teamSetup(pid){
   const fold=$('#teamFold'); let geladen=false;
   fold.addEventListener('toggle',async()=>{ if(!fold.open||geladen) return; geladen=true;
     const box=$('#teamBox');
-    try{
-      const t=await api('projekte/'+pid+'/team');
-      box.innerHTML=(t.length? t.map(u=>`<label class="chk"><input type="checkbox" value="${esc(u.id)}" ${u.zugeordnet?'checked':''}><b>${esc(u.name)}</b></label>`).join('') : '<p class="hint">Noch niemand hat Zugriff auf das Modul Projekte.</p>')
-        +`<p class="hint" style="margin:10px 0">Zugeordnete Personen sehen das Projekt unter „Meine Projekte“. Ohne Zuordnung sehen alle das Projekt. Über „Alle“ bleibt jedes Projekt erreichbar.</p><button class="btn cta sm" id="teamSave">Team speichern</button>`;
-      if(t.length) $('#teamSave').onclick=async()=>{ const ids=[...box.querySelectorAll('input:checked')].map(c=>c.value);
-        try{ await api('projekte/'+pid+'/team',{method:'PUT',body:JSON.stringify(ids)}); toast('Team gespeichert'); }catch(e){ toast(e.message); } };
-      else $('#teamSave').remove();
-    }catch(e){ box.innerHTML=`<div class="err">${esc(e.message)}</div>`; geladen=false; }
+    let t;
+    try{ t=await PJ.rpc('pj_kr',{p:{aktion:'team',projekt_id:pid}}); }
+    catch(e){ if(/Unbekannte Aktion|pj_kr/i.test(e.message)){ box.innerHTML='<div class="err">Für Rollen im Team fehlt die Datenbank-Erweiterung pj_raeume_kriterien.sql.</div>'; } else { box.innerHTML=`<div class="err">${esc(e.message)}</div>`; geladen=false; } return; }
+    const zeichne=()=>{ box.innerHTML=(t.length? t.map((u,i)=>`<div class="trow${u.rolle==='projektleitung'?' pl':u.rolle==='obermonteur'?' om':''}"><b>${esc(u.name)}${u.rolle==='projektleitung'&&!u.email?'<small>keine E-Mail-Adresse hinterlegt</small>':''}</b><select data-ti="${i}" aria-label="Rolle von ${esc(u.name)}">${T_ROLLEN.map(([k,l])=>`<option value="${k}"${(u.rolle||'')===k?' selected':''}>${l}</option>`).join('')}</select></div>`).join('') : '<p class="hint">Noch niemand hat Zugriff auf das Modul Projekte.</p>')
+        +`<p class="hint" style="margin:10px 0">Die Projektleitung bekommt E-Mails zum Projekt, z. B. wenn ein Monteur ein Aufmaß ohne Unterschrift des Auftraggebers abschließt, zusätzlich zu den Büro-Empfängern. Wer im Team ist, sieht das Projekt unter „Meine Projekte“.</p><button class="btn cta sm" id="teamSave">Speichern</button>`;
+      box.querySelectorAll('[data-ti]').forEach(s=>s.onchange=()=>{ t[+s.dataset.ti].rolle=s.value||null; zeichne(); });
+      const sb=$('#teamSave'); if(!t.length){ sb.remove(); return; }
+      sb.onclick=async()=>{ const team=t.filter(u=>u.rolle).map(u=>({id:u.id,rolle:u.rolle}));
+        if(team.length&&!team.some(u=>u.rolle==='projektleitung')&&!confirm('Es ist keine Projektleitung eingetragen. Trotzdem speichern?')) return;
+        try{ await PJ.rpc('pj_kr',{p:{aktion:'team_speichern',projekt_id:pid,team}}); toast('Team gespeichert'); showProjekt(pid); }catch(e){ toast(e.message); } };
+    };
+    zeichne();
   });
 }
 /* ---------- E-Mail-Empfänger für Bautagebücher ---------- */
