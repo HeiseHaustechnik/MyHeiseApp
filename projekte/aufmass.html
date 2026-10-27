@@ -187,7 +187,7 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
 </head>
 <body>
 <header class="topbar">
-  <a href="index.html" class="iconbtn" id="backBtn" aria-label="Zur Projektübersicht"></a>
+  <a href="index.html" class="iconbtn" id="backBtn" aria-label="Zurück zum Projekt"></a>
   <div class="brand"><div class="lt"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div><div style="min-width:0"><b id="hdrTitle">Aufmaß</b><small id="hdrSub"></small></div></div>
   <span class="sync" id="saveState"></span>
 </header>
@@ -287,7 +287,7 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
         <button class="btn sec" id="btnSync">Jetzt abgleichen</button>
         <button class="btn sec" id="btnBak">Sicherungsdatei speichern</button>
       </div>
-      <a class="btn ghost" href="index.html" style="display:inline-block;margin-top:10px;text-decoration:none">← Zur Projektübersicht</a>
+      <a class="btn ghost" href="index.html" id="backBtn2" style="display:inline-block;margin-top:10px;text-decoration:none">← Zum Projekt</a>
     </div>
   </section>
 </main>
@@ -848,7 +848,9 @@ function sigOrt(){ return (S.head.ort||'').trim()||ortAusAdresse(PROJ&&PROJ.adre
 function ortHinweis(){ const el=$('#h_ort'); if(el) el.placeholder=ortAusAdresse(PROJ&&PROJ.adresse)?'leer = '+ortAusAdresse(PROJ&&PROJ.adresse)+' (aus der Projektadresse)':'z. B. Clausthal-Zellerfeld'; }
 Object.entries(HF).forEach(([id,k])=>{ const el=$('#'+id); el.addEventListener('input',()=>{ S.head[k]=el.value; save(); renderHdr(); }); });
 function fillHead(){ Object.entries(HF).forEach(([id,k])=>{ const el=$('#'+id); if(document.activeElement!==el) el.value=S.head[k]||''; }); }
-function renderHdr(){ $('#hdrSub').textContent=(S.head.bez||'Aufmaß')+(S.head.dat?' · '+new Date(S.head.dat).toLocaleDateString('de-DE'):''); }
+// ZURUECK_PROJEKT_V1: beide Zurück-Links zeigen auf das Projekt, sobald es bekannt ist
+function zurueckLinks(){ const h=PROJ&&PROJ.id?'index.html#p='+encodeURIComponent(PROJ.id):'index.html'; ['backBtn','backBtn2'].forEach(i=>{ const a=document.getElementById(i); if(a) a.href=h; }); }
+function renderHdr(){ zurueckLinks(); $('#hdrSub').textContent=(S.head.bez||'Aufmaß')+(S.head.dat?' · '+new Date(S.head.dat).toLocaleDateString('de-DE'):''); }
 
 /* ---------- Unterschrift ---------- */
 function setupSig(id){

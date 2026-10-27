@@ -685,7 +685,7 @@ $('#ov').onclick=closeSheet;
 /* ================= Start ================= */
 (async function(){
   if(!PID){ $('#app').innerHTML='<div class="empty">Kein Projekt gewählt. <a href="index.html">Zur Projektübersicht</a></div>'; return; }
-  try{ await loadBase(); }catch(e){ $('#app').innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="index.html">Zur Projektübersicht</a>`; return; }
+  try{ await loadBase(); }catch(e){ $('#app').innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="index.html#p=${encodeURIComponent(PID)}">Zum Projekt</a>`; return; } // ZURUECK_PROJEKT_V1
   const id=Q.get('id');
   if(id){ try{ E=await loadEntry(id); E.personen=E.personen||[]; renderEntry(); }catch(e){ $('#app').innerHTML=`<div class="err">Eintrag nicht gefunden.</div><a class="btn ghost" href="?p=${PID}">Zurück</a>`; } }
   else renderList();
