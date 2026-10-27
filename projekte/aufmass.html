@@ -1154,15 +1154,16 @@ function xlSpalten(){
   $('#xl_sp').innerHTML=`<div class="row"><div><label for="xl_p">Spalte Pos.-Nr.</label><select class="f" id="xl_p">${H.map(x=>`<option value="${x.i}"${x.i===posI?' selected':''}>${esc(x.h)}</option>`).join('')}</select></div>
       <div><label for="xl_m">Spalte mit den Mengen</label><select class="f" id="xl_m">${(mengen.length?mengen:H).map(x=>`<option value="${x.i}">${esc(x.h)} (${zahlen(x.i)})</option>`).join('')}</select></div></div>
     <label for="xl_r">Spalte Raum (optional)</label><select class="f" id="xl_r"><option value="">ohne Raum</option>${H.map(x=>`<option value="${x.i}"${x.i===raumI?' selected':''}>${esc(x.h)}</option>`).join('')}</select>
+    <label for="xl_bs">Spalte Bemerkung (optional, wird angehängt)</label><select class="f" id="xl_bs"><option value="">keine</option>${H.map(x=>`<option value="${x.i}"${/^bemerk/i.test(x.h)?' selected':''}>${esc(x.h)}</option>`).join('')}</select>
     <label for="xl_t">Bemerkung an jedem Eintrag</label><input class="f" id="xl_t" autocomplete="off">
     <label style="display:flex;gap:10px;align-items:center;margin-top:10px;font-weight:600"><input type="checkbox" id="xl_f" style="width:20px;height:20px;accent-color:var(--accent)"> Positionen, die nicht im LV stehen, als freie Position anlegen</label>`;
   const bem=()=>{ const h=H.find(x=>x.i===+$('#xl_m').value); $('#xl_t').value='aus Excel: '+(h?h.h:''); };
   $('#xl_m').onchange=()=>{ bem(); xlVorschau(); }; bem();
-  ['xl_p','xl_r','xl_f'].forEach(id=>$('#'+id).onchange=xlVorschau);
+  ['xl_p','xl_r','xl_f','xl_bs'].forEach(id=>$('#'+id).onchange=xlVorschau);
   xlVorschau();
 }
 function xlPlan(){
-  const b=XL.blaetter[+$('#xl_b').value], k=xlKopf(b.rows), pi=+$('#xl_p').value, mi=+$('#xl_m').value, ri=$('#xl_r').value===''?-1:+$('#xl_r').value;
+  const b=XL.blaetter[+$('#xl_b').value], k=xlKopf(b.rows), pi=+$('#xl_p').value, mi=+$('#xl_m').value, ri=$('#xl_r').value===''?-1:+$('#xl_r').value, bsI=$('#xl_bs').value===''?-1:+$('#xl_bs').value;
   const kopf=b.rows[k].map(h=>String(h||'').replace(/\s+/g,' ').trim()), bzI=kopf.findIndex(h=>/^bezeichnung \(lv\)/i.test(h))>=0?kopf.findIndex(h=>/^bezeichnung \(lv\)/i.test(h)):kopf.findIndex(h=>/^bezeichnung/i.test(h)), meI=kopf.findIndex(h=>/^(me|einheit)$/i.test(h));
   const lv=new Map(); Object.keys(POS).forEach(p=>lv.set(xlNorm(p),p)); S.free.forEach(f=>lv.set(xlNorm(f.p),f.p));
   const ok=[], fremd=[];
@@ -1170,24 +1171,26 @@ function xlPlan(){
     if(!/^\d+(\.\d+)*\.?$/.test(pos)||q===null||q===0) return;
     const key=lv.get(xlNorm(pos)), ort=ri>=0?String(r[ri]??'').trim():'';
     const txt=bzI>=0?String(r[bzI]??'').split('\n')[0].trim().slice(0,200):'', me=meI>=0?String(r[meI]??'').trim():'';
-    (key?ok:fremd).push({pos,key,q:Math.round(q*1000)/1000,ort,txt,me}); });
+    const zbem=bsI>=0?String(r[bsI]??'').replace(/\s+/g,' ').trim():'';
+    (key?ok:fremd).push({pos,key,q:Math.round(q*1000)/1000,ort,txt,me,zbem}); });
   return {ok,fremd};
 }
 function xlVorschau(){
   const {ok,fremd}=xlPlan(), frei=$('#xl_f').checked, bem=$('#xl_t').value.trim();
-  const schon=S.entries.filter(e=>bem&&e.bem===bem).length;
+  const schon=S.entries.filter(e=>bem&&(e.bem===bem||String(e.bem||'').startsWith(bem+' · '))).length;
   $('#xl_vs').innerHTML=`<div class="card"><h2 style="margin-bottom:4px">Vorschau</h2>
       <p class="hint" style="margin-top:0">${ok.length} Zeilen mit Menge passen zum LV${fremd.length?`, ${fremd.length} nicht im LV${frei?' (werden freie Positionen)':' (werden übersprungen)'}`:''}.</p>
       ${schon?`<p class="hint" style="color:var(--amber)">In diesem Aufmaß gibt es schon ${schon} Einträge mit der Bemerkung „${esc(bem)}“. Wurde die Spalte schon übernommen?</p>`:''}
-      <div style="max-height:34vh;overflow:auto;margin-top:6px">${ok.map(x=>`<div class="ent"><div class="q">${nf(x.q)} ${esc((POS[x.key]||posOf(x.key)||{}).me||'')}</div><div class="o"><b>${esc(x.key)}</b> ${esc((POS[x.key]||posOf(x.key)||{}).b||'')}${x.ort?`<small>${esc(x.ort)}</small>`:''}</div></div>`).join('')}
+      <div style="max-height:34vh;overflow:auto;margin-top:6px">${ok.map(x=>`<div class="ent"><div class="q">${nf(x.q)} ${esc((POS[x.key]||posOf(x.key)||{}).me||'')}</div><div class="o"><b>${esc(x.key)}</b> ${esc((POS[x.key]||posOf(x.key)||{}).b||'')}${x.ort?`<small>${esc(x.ort)}</small>`:''}${x.zbem?`<small>${esc(x.zbem)}</small>`:''}</div></div>`).join('')}
         ${fremd.map(x=>`<div class="ent" style="opacity:${frei?1:.55}"><div class="q">${nf(x.q)}</div><div class="o"><b>${esc(x.pos)}</b> nicht im LV · ${esc(x.txt.slice(0,70))}</div></div>`).join('')}</div>
       <div class="row" style="margin-top:12px"><button class="btn sec" onclick="closeSheet()">Abbrechen</button><button class="btn cta" id="xl_ok"${ok.length||(frei&&fremd.length)?'':' disabled'}>${ok.length+(frei?fremd.length:0)} Einträge übernehmen</button></div></div>`;
   $('#xl_ok').onclick=()=>{ const t=new Date().toISOString(), {ok,fremd}=xlPlan(), bem=$('#xl_t').value.trim();
     if(schon&&!confirm(`Es gibt schon ${schon} Einträge mit dieser Bemerkung. Trotzdem noch einmal übernehmen?`)) return;
     let n=0;
-    ok.forEach(x=>{ S.entries.push({id:uid(),key:x.key,qty:x.q,ort:x.ort,bem,kr:raumKr(x.ort),ts:t}); n++; });
+    const bemV=x=>[bem,x.zbem].filter(Boolean).join(' · ');
+    ok.forEach(x=>{ S.entries.push({id:uid(),key:x.key,qty:x.q,ort:x.ort,bem:bemV(x),kr:raumKr(x.ort),ts:t}); n++; });
     if($('#xl_f').checked) fremd.forEach(x=>{ let f=S.free.find(y=>xlNorm(y.p)===xlNorm(x.pos)); if(!f){ f={id:uid(),p:x.pos,b:x.txt||('Position '+x.pos+' aus Excel'),me:/^st(c?k|\.)?$/i.test(x.me)?'Stck':x.me,ref:'aus Excel',t:''}; S.free.push(f); }
-      S.entries.push({id:uid(),key:f.p,qty:x.q,ort:x.ort,bem,kr:raumKr(x.ort),ts:t}); n++; });
+      S.entries.push({id:uid(),key:f.p,qty:x.q,ort:x.ort,bem:bemV(x),kr:raumKr(x.ort),ts:t}); n++; });
     closeSheet(); dataChanged(); toast(n+' Einträge übernommen'); };
 }
 
