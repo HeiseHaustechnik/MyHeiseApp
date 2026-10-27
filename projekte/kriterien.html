@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f8">
+<title>Räume und Kriterien</title>
+<link rel="stylesheet" href="lib/heise-ui.css">
+<style>
+/* RAEUME_KRITERIEN_V1: Räume und Kriterien eines Projekts (pj_raeume_kriterien.sql) */
+.sync{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:650;color:var(--ink-3);text-align:right;line-height:1.25;max-width:42%}
+.sync .ic{width:16px;height:16px}
+.intro{font-size:14px;line-height:1.5;color:var(--ink-2)}
+.intro b{color:var(--ink)}
+.kk{border-top:1px solid var(--line);padding:14px 0 6px}
+.kk:first-of-type{border-top:0;padding-top:4px}
+.kh{display:flex;align-items:center;gap:8px}
+.kh b{flex:1;min-width:0;font-size:15.5px}
+.kh small{color:var(--ink-3);font-weight:650;font-size:12px}
+.ib{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:var(--ink-2)}
+.ib:active{background:var(--surface-2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;align-items:center;gap:2px;background:var(--surface-2);border-radius:10px;padding:3px 3px 3px 10px;font-size:13.5px;font-weight:650;max-width:100%}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip small{color:var(--ink-3);font-weight:650;margin-left:4px;font-size:11.5px}
+.chip button{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--ink-3)}
+.chip.ro{padding-right:10px}
+.chip.fix{background:var(--blue-bg);color:var(--blue);padding-right:10px}
+.add{display:flex;gap:8px;margin-top:6px}
+.add .inp{min-height:44px;font-size:15px}
+.add .btn{min-height:44px}
+.rsuche{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.rsuche .inp{min-height:44px}
+.rtools{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;margin:0 2px 8px}
+.rtools button{color:var(--brand-2);font-weight:650;padding:4px 0}
+.rl{display:flex;flex-direction:column}
+.rr{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:9px 2px;border-top:1px solid var(--line)}
+.rr:first-child{border-top:0}
+.rr .ck{width:22px;height:22px;accent-color:var(--accent);flex:0 0 auto}
+.rr .rn{flex:1 1 120px;min-width:0;font-weight:700;font-size:15px;text-align:left;overflow-wrap:anywhere}
+.rr .rn small{display:block;font-weight:600;color:var(--ink-3);font-size:11.5px}
+.rr .zs{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 260px;justify-content:flex-end}
+.rr select{min-height:38px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);padding:0 8px;font-size:14px;max-width:170px}
+.rr select.leer{color:var(--ink-3)}
+.rr.on{background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+.bulk{position:sticky;top:calc(64px + var(--safe-t));z-index:15;background:var(--brand);color:#fff;border-radius:16px;padding:10px 12px;margin:0 0 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bulk b{font-size:14px;margin-right:auto}
+.bulk select{min-height:38px;border-radius:10px;border:0;padding:0 8px;font-size:14px;color:var(--ink)}
+.bulk .btn{min-height:38px}
+.bulk .lk{color:#fff;opacity:.85;font-weight:650;font-size:13px;padding:6px 4px}
+.savebar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);box-shadow:0 -10px 30px -12px rgba(0,0,0,.35);padding:10px 16px calc(10px + var(--safe-b));display:flex;gap:10px;align-items:center;justify-content:flex-end}
+.savebar b{flex:1;font-size:14px;color:var(--accent-2)}
+body.dirty .shell{padding-bottom:110px}
+.leerhin{font-size:13.5px;color:var(--ink-3);padding:6px 0}
+.mehr{font-size:13px;color:var(--ink-3);text-align:center;padding:8px 0}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="index.html" class="iconbtn" id="backBtn" aria-label="Zurück zum Projekt"></a>
+  <div class="brand"><div class="lt"><img src="lib/heise-logo.svg" alt="Heise Haustechnik"></div><div style="min-width:0"><b>Räume und Kriterien</b><small id="hSub"></small></div></div>
+  <span class="sync" id="syncState"></span>
+</header>
+<main class="shell" id="app"><div class="empty">Lädt …</div></main>
+<div class="savebar bottombar" id="saveBar" hidden><b>Ungespeicherte Änderungen</b><button class="btn ghost sm" id="sbVerw">Verwerfen</button><button class="btn cta sm" id="sbSave">Speichern</button></div>
+<div class="toast" id="toast"></div>
+<script src="lib/heise-icons.js"></script>
+<script src="lib/pj-api.js"></script>
+<script src="lib/pj-shell.js"></script>
+<script>
+/* =====================================================================
+   Räume und Kriterien eines Projekts. Raum ist immer das erste Kriterium.
+   Projektleitung: Kriterien, Werte und Räume anlegen, umbenennen, löschen,
+   Räumen feste Werte zuordnen (z. B. Raum 001 → Geschoss EG).
+   Monteur: ansehen und Räume bzw. Werte ergänzen.
+   Speichern über pj_kr('stamm' | 'wert_ergaenzen'), Verwendung über 'stamm_info'.
+   ===================================================================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2600); }
+const ls={ get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
+const PID=new URLSearchParams(location.search).get('p');
+const CK='pj_kr_'+PID;
+let PROJ=null;
+let K=[], R=[], REN=[];          // Kriterien [{n,w}], Räume [{n,kr}], Umbenennungen
+let ORIG='';                      // gespeicherter Stand zum Vergleich
+let INFO={orte:{},werte:{}};      // Verwendung in den Aufmaßen
+let SEL=new Set(), Q='', ALLE=false, BK='';
+const MAXR=150;                   // so viele Räume ohne Suche anzeigen
+const darf=()=>PJ.leitung();
+const online=()=>navigator.onLine;
+const kopie=o=>JSON.parse(JSON.stringify(o));
+const stand=()=>JSON.stringify([K,R]);
+const dirty=()=>stand()!==ORIG||REN.length>0;
+const gleich=(a,b)=>String(a).trim().toLowerCase()===String(b).trim().toLowerCase();
+const nutzR=n=>INFO.orte[n]||0, nutzW=(k,w)=>(INFO.werte[k]||{})[w]||0;
+
+function setzeStand(st){
+  K=(st.kriterien||[]).filter(k=>k&&k.n).map(k=>({n:String(k.n),w:(k.w||[]).map(String)}));
+  R=(st.raeume||[]).map(r=>({n:String(r.n),kr:Object.assign({},r.kr||{})}));
+  REN=[]; ORIG=stand();
+}
+function ausServer(d){ return {kriterien:(d.projekt&&d.projekt.kriterien)||[], raeume:(d.bereiche||[]).map(b=>({n:b.name,kr:b.kr||{}}))}; }
+function zeigeSync(t,err){ $('#syncState').innerHTML=(err?IC('cloudoff'):'')+`<span>${esc(t)}</span>`; $('#syncState').style.color=err?'var(--amber)':''; }
+
+/* ---------- Anzeige ---------- */
+function render(){
+  const L=darf();
+  document.body.classList.toggle('dirty',L&&dirty());
+  $('#saveBar').hidden=!(L&&dirty());
+  const fokus=document.activeElement&&document.activeElement.id; // Fokus nach dem Neuzeichnen wiederherstellen
+  const app=$('#app');
+  const krCard=`<div class="card"><h2>Kriterien</h2>
+    <div class="kk"><div class="kh"><b>Raum</b><small>${R.length} ${R.length===1?'Wert':'Werte'} · immer das erste Kriterium</small></div></div>
+    ${K.map((k,i)=>`<div class="kk"><div class="kh"><b>${esc(k.n)}</b><small>${k.w.length} ${k.w.length===1?'Wert':'Werte'}</small>
+        ${L?`<button class="ib" data-kren="${i}" aria-label="Kriterium umbenennen">${IC('edit')}</button><button class="ib" data-kdel="${i}" aria-label="Kriterium löschen">${IC('trash')}</button>`:''}</div>
+      <div class="chips">${k.w.map((w,j)=>`<span class="chip${L?'':' ro'}"><span>${esc(w)}</span>${nutzW(k.n,w)?`<small>${nutzW(k.n,w)}×</small>`:''}${L?`<button data-wren="${i}:${j}" aria-label="Wert umbenennen">${IC('edit','sm')}</button><button data-wdel="${i}:${j}" aria-label="Wert löschen">${IC('x','sm')}</button>`:''}</span>`).join('')||'<span class="leerhin">noch keine Werte</span>'}</div>
+      <div class="add"><input class="inp" id="wn${i}" data-wadd="${i}" placeholder="${esc(k.n)} ergänzen, z. B. ${esc(beispiel(k.n))}" autocomplete="off"><button class="btn sec" data-wbtn="${i}" aria-label="Wert hinzufügen">${IC('plus')}</button></div></div>`).join('')}
+    ${L?`<div class="kk"><div class="add"><input class="inp" id="kNeu" placeholder="Neues Kriterium, z. B. Geschoss, Achse, Bauteil" autocomplete="off"><button class="btn sec" id="kAdd">Anlegen</button></div></div>`:''}
+  </div>`;
+
+  const q=Q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const passt=r=>q.every(w=>(r.n+' '+Object.values(r.kr).join(' ')).toLowerCase().includes(w));
+  const idx=R.map((r,i)=>i).filter(i=>passt(R[i]));
+  const zeig=ALLE||q.length?idx:idx.slice(0,MAXR);
+  const zeile=i=>{ const r=R[i];
+    const zs=K.map(k=>{ const v=r.kr[k.n]||'';
+      if(!L) return v?`<span class="chip fix">${esc(k.n)}: ${esc(v)}</span>`:'';
+      return `<select data-rz="${i}" data-k="${esc(k.n)}" class="${v?'':'leer'}" aria-label="${esc(k.n)} für ${esc(r.n)}"><option value="">${esc(k.n)}: –</option>${k.w.map(w=>`<option value="${esc(w)}"${w===v?' selected':''}>${esc(k.n)}: ${esc(w)}</option>`).join('')}</select>`; }).join('');
+    return `<div class="rr${SEL.has(i)?' on':''}">${L?`<input type="checkbox" class="ck" data-rsel="${i}"${SEL.has(i)?' checked':''} aria-label="${esc(r.n)} auswählen">`:''}
+      <button class="rn" ${L?`data-rren="${i}"`:''}>${esc(r.n)}${nutzR(r.n)?`<small>${nutzR(r.n)} ${nutzR(r.n)===1?'Messzeile':'Messzeilen'}</small>`:''}</button>
+      <div class="zs">${zs}</div>${L?`<button class="ib" data-rdel="${i}" aria-label="Raum löschen">${IC('trash')}</button>`:''}</div>`; };
+  const bulk=L&&SEL.size?`<div class="bulk"><b>${SEL.size} ausgewählt</b>
+      ${K.length?`<select id="bK">${K.map(k=>`<option${k.n===BK?' selected':''}>${esc(k.n)}</option>`).join('')}</select><select id="bW"></select><button class="btn cta sm" id="bOk">Zuordnen</button>`:''}
+      <button class="lk" id="bDel">Löschen</button><button class="lk" id="bAus">Auswahl aufheben</button></div>`:'';
+  const rCard=`<div class="card"><h2>Räume (${R.length})</h2>
+    ${R.length>8?`<div class="rsuche"><input class="inp" id="rQ" type="search" placeholder="Räume filtern, z. B. 0, EG, Halle" value="${esc(Q)}" autocomplete="off"></div>`:''}
+    ${L&&R.length?`<div class="rtools"><button id="rAll">${q.length?'Alle gefilterten':'Alle'} auswählen</button><button id="rSort">Nach Name sortieren</button></div>`:''}
+    ${bulk}
+    <div class="rl">${zeig.map(zeile).join('')||`<div class="leerhin">${R.length?'Kein Raum gefunden.':'Noch keine Räume angelegt.'}</div>`}</div>
+    ${zeig.length<idx.length?`<div class="mehr">${idx.length-zeig.length} weitere · <button class="lnk" id="rMehr" style="color:var(--brand-2);font-weight:650">alle anzeigen</button> oder oben filtern</div>`:''}
+    <div class="kk"><label class="hint" for="rNeu" style="display:block;margin-bottom:6px">${L?'Neue Räume, einer je Zeile (aus Excel einfügen geht auch)':'Raum ergänzen'}</label>
+      <div class="add">${L?`<textarea class="inp" id="rNeu" rows="2" style="min-height:60px;padding:10px 14px" placeholder="001&#10;002"></textarea>`:`<input class="inp" id="rNeu" placeholder="z. B. 014" autocomplete="off">`}<button class="btn sec" id="rAdd">Hinzufügen</button></div>
+      ${L&&K.length?`<p class="hint" style="margin-top:6px">Neue Räume übernehmen die Werte, die du hier wählst:</p><div class="zs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${K.map((k,i)=>`<select class="inp" style="min-height:40px;max-width:200px;font-size:14px" data-nz="${esc(k.n)}"><option value="">${esc(k.n)}: –</option>${k.w.map(w=>`<option>${esc(w)}</option>`).join('')}</select>`).join('')}</div>`:''}
+    </div></div>`;
+
+  const imp=L?`<details class="fold"><summary>${IC('upload')}Aus pds Aufmaß plus übernehmen</summary><div class="fold-b" style="padding-bottom:16px">
+      <p class="hint" style="margin-bottom:10px">X31- oder DA11-Datei aus Aufmaß plus wählen. Raum-Werte werden Räume, alle anderen Kriterien mit ihren Werten werden ergänzt. AZ (Abschlag) wird übersprungen. Danach speichern.</p>
+      <input class="inp" type="file" id="impF" accept=".x31,.X31,.d11,.D11,.d11s,.D11S,.xml" style="padding-top:12px"></div></details>`:'';
+
+  app.innerHTML=`<div class="card intro">${L
+      ?'Hier legst du einmal für das ganze Projekt fest, wonach aufgemessen wird. <b>Raum</b> ist immer das erste Kriterium, dazu z. B. Geschoss, Achse oder Bauteil. Einem Raum kannst du feste Werte zuordnen (Raum 001 → Geschoss EG). Im Aufmaß werden sie dann automatisch gesetzt und gehen mit dem X31-Export nach pds.'
+      :'Diese Räume und Kriterien gelten für alle Aufmaße im Projekt. Fehlt ein Raum oder Wert, kannst du ihn hier oder direkt im Aufmaß ergänzen. Anlegen, umbenennen und zuordnen macht die Projektleitung.'}
+      ${online()?'':'<p style="margin-top:8px;color:var(--amber);font-weight:650">Offline: Anzeige vom letzten Stand. Ändern geht erst wieder mit Netz.</p>'}</div>
+    ${krCard}${rCard}${imp}`;
+  verdrahten();
+  if(fokus&&document.getElementById(fokus)){ const el=document.getElementById(fokus); el.focus(); if(el.setSelectionRange&&el.type!=='file'){ try{ const n=el.value.length; el.setSelectionRange(n,n); }catch(e){} } }
+}
+function beispiel(n){ n=n.toLowerCase(); return n.includes('gescho')||n.includes('etage')?'EG':n.includes('achse')?'A-B':n.includes('bauteil')?'Haus A':'Wert'; }
+
+/* ---------- Bedienung ---------- */
+function verdrahten(){
+  const L=darf(), A=$('#app');
+  // Werte ergänzen (Projektleitung: lokal, Monteur: sofort speichern)
+  const wAdd=async i=>{ const inp=$('#wn'+i); const v=inp.value.trim(); if(!v) return; const k=K[i];
+    if(k.w.some(w=>gleich(w,v))) return toast('Den Wert gibt es schon');
+    if(v.length>60) return toast('Höchstens 60 Zeichen');
+    if(L){ k.w.push(v); inp.value=''; render(); setTimeout(()=>{ const n=$('#wn'+i); if(n) n.focus(); },30); }
+    else await ergaenzen(k.n,v,inp); };
+  A.querySelectorAll('[data-wbtn]').forEach(b=>b.onclick=()=>wAdd(+b.dataset.wbtn));
+  A.querySelectorAll('[data-wadd]').forEach(x=>x.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); wAdd(+x.dataset.wadd); } });
+  // Räume ergänzen
+  $('#rAdd').onclick=async()=>{ const roh=$('#rNeu').value; const namen=roh.split(/\r?\n|\t|;/).map(s=>s.trim()).filter(Boolean);
+    if(!namen.length) return toast('Bitte einen Raum eintragen');
+    if(!L) return ergaenzen('Raum',namen[0],$('#rNeu'));
+    const zu={}; A.querySelectorAll('[data-nz]').forEach(s=>{ if(s.value) zu[s.dataset.nz]=s.value; });
+    let n=0, d=0; namen.forEach(x=>{ if(x.length>60){ d++; return; } if(R.some(r=>gleich(r.n,x))){ d++; return; } R.push({n:x,kr:{...zu}}); n++; });
+    $('#rNeu').value=''; render(); toast(`${n} ${n===1?'Raum':'Räume'} hinzugefügt${d?`, ${d} schon vorhanden oder zu lang`:''}`); };
+  if(!L) $('#rNeu').onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); $('#rAdd').click(); } };
+  if($('#rQ')) $('#rQ').oninput=e=>{ Q=e.target.value; render(); };
+  if($('#rMehr')) $('#rMehr').onclick=()=>{ ALLE=true; render(); };
+  if(!L) return;
+
+  // Kriterien
+  $('#kAdd').onclick=()=>{ const n=$('#kNeu').value.trim(); if(!n) return toast('Bitte einen Namen eintragen');
+    if(/^(raum|az)$/i.test(n)) return toast(/^az$/i.test(n)?'AZ (Abschlag) wird beim Export gesetzt':'Raum ist schon das erste Kriterium');
+    if(n.length>40) return toast('Höchstens 40 Zeichen');
+    if(K.some(k=>gleich(k.n,n))) return toast('Das Kriterium gibt es schon');
+    K.push({n,w:[]}); render(); setTimeout(()=>{ const x=$('#wn'+(K.length-1)); if(x) x.focus(); },30); };
+  $('#kNeu').onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); $('#kAdd').click(); } };
+  A.querySelectorAll('[data-kren]').forEach(b=>b.onclick=()=>{ const k=K[+b.dataset.kren]; const n=(prompt('Kriterium umbenennen:',k.n)||'').trim();
+    if(!n||n===k.n) return; if(/^(raum|az)$/i.test(n)) return toast('Der Name ist reserviert');
+    if(K.some(x=>x!==k&&gleich(x.n,n))) return toast('Das Kriterium gibt es schon');
+    REN.push({art:'kriterium',alt:k.n,neu:n}); R.forEach(r=>{ if(r.kr[k.n]!==undefined){ r.kr[n]=r.kr[k.n]; delete r.kr[k.n]; } });
+    if(INFO.werte[k.n]){ INFO.werte[n]=INFO.werte[k.n]; delete INFO.werte[k.n]; } k.n=n; render(); });
+  A.querySelectorAll('[data-kdel]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.kdel, k=K[i];
+    const nz=R.filter(r=>r.kr[k.n]).length, nm=Object.values(INFO.werte[k.n]||{}).reduce((a,c)=>a+c,0);
+    if(!confirm(`Kriterium „${k.n}“ löschen?${nz?`\n${nz} Räume verlieren ihre Zuordnung.`:''}${nm?`\n${nm} Messzeilen behalten ihren Wert, er steht dann aber nicht mehr in der Liste.`:''}`)) return;
+    K.splice(i,1); R.forEach(r=>delete r.kr[k.n]); render(); });
+  A.querySelectorAll('[data-wren]').forEach(b=>b.onclick=()=>{ const [i,j]=b.dataset.wren.split(':').map(Number), k=K[i], alt=k.w[j];
+    const n=(prompt(`${k.n}: Wert umbenennen`,alt)||'').trim(); if(!n||n===alt) return;
+    if(k.w.some((w,x)=>x!==j&&gleich(w,n))) return toast('Den Wert gibt es schon');
+    REN.push({art:'wert',k:k.n,alt,neu:n}); k.w[j]=n; R.forEach(r=>{ if(r.kr[k.n]===alt) r.kr[k.n]=n; });
+    const iw=INFO.werte[k.n]; if(iw&&iw[alt]){ iw[n]=(iw[n]||0)+iw[alt]; delete iw[alt]; } render(); });
+  A.querySelectorAll('[data-wdel]').forEach(b=>b.onclick=()=>{ const [i,j]=b.dataset.wdel.split(':').map(Number), k=K[i], w=k.w[j];
+    const nz=R.filter(r=>r.kr[k.n]===w).length, nm=nutzW(k.n,w);
+    if((nz||nm)&&!confirm(`Wert „${w}“ löschen?${nz?`\n${nz} Räume verlieren diese Zuordnung.`:''}${nm?`\n${nm} Messzeilen behalten den Wert, er steht dann aber nicht mehr in der Liste.`:''}`)) return;
+    k.w.splice(j,1); R.forEach(r=>{ if(r.kr[k.n]===w) delete r.kr[k.n]; }); render(); });
+
+  // Räume
+  A.querySelectorAll('[data-rz]').forEach(s=>s.onchange=()=>{ const r=R[+s.dataset.rz]; if(s.value) r.kr[s.dataset.k]=s.value; else delete r.kr[s.dataset.k]; render(); });
+  A.querySelectorAll('[data-rsel]').forEach(c=>c.onchange=()=>{ const i=+c.dataset.rsel; c.checked?SEL.add(i):SEL.delete(i); render(); });
+  A.querySelectorAll('[data-rren]').forEach(b=>b.onclick=()=>{ const r=R[+b.dataset.rren]; const n=(prompt('Raum umbenennen:',r.n)||'').trim();
+    if(!n||n===r.n) return; if(n.length>60) return toast('Höchstens 60 Zeichen');
+    if(R.some(x=>x!==r&&gleich(x.n,n))) return toast('Den Raum gibt es schon');
+    REN.push({art:'raum',alt:r.n,neu:n}); if(INFO.orte[r.n]){ INFO.orte[n]=(INFO.orte[n]||0)+INFO.orte[r.n]; delete INFO.orte[r.n]; } r.n=n; render(); });
+  A.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rdel, r=R[i], nm=nutzR(r.n);
+    if(nm&&!confirm(`Raum „${r.n}“ löschen?\n${nm} Messzeilen behalten den Raum, er steht dann aber nicht mehr in der Liste.`)) return;
+    R.splice(i,1); SEL=new Set(); render(); });
+  if($('#rAll')) $('#rAll').onclick=()=>{ const q=Q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    R.forEach((r,i)=>{ if(q.every(w=>(r.n+' '+Object.values(r.kr).join(' ')).toLowerCase().includes(w))) SEL.add(i); }); render(); };
+  if($('#rSort')) $('#rSort').onclick=()=>{ R.sort((a,b)=>a.n.localeCompare(b.n,'de',{numeric:true})); SEL=new Set(); render(); toast('Sortiert, bitte speichern'); };
+  // Mehrfach-Zuordnung
+  if($('#bK')){ const fW=()=>{ const k=K.find(x=>x.n===$('#bK').value); $('#bW').innerHTML=`<option value="">entfernen</option>`+(k?k.w.map(w=>`<option>${esc(w)}</option>`).join(''):''); if(k&&k.w.length) $('#bW').value=k.w[0]; };
+    $('#bK').onchange=()=>{ BK=$('#bK').value; fW(); }; fW();
+    $('#bOk').onclick=()=>{ const kn=$('#bK').value, w=$('#bW').value; BK=kn; SEL.forEach(i=>{ if(w) R[i].kr[kn]=w; else delete R[i].kr[kn]; }); toast(`${SEL.size} Räume: ${kn} ${w?'= '+w:'entfernt'}`); render(); }; }
+  if($('#bDel')) $('#bDel').onclick=()=>{ const L2=[...SEL].map(i=>R[i]), nm=L2.reduce((a,r)=>a+nutzR(r.n),0);
+    if(!confirm(`${L2.length} Räume löschen?${nm?`\n${nm} Messzeilen behalten ihren Raum, er steht dann aber nicht mehr in der Liste.`:''}`)) return;
+    R=R.filter(r=>!L2.includes(r)); SEL=new Set(); render(); };
+  if($('#bAus')) $('#bAus').onclick=()=>{ SEL=new Set(); render(); };
+  if($('#impF')) $('#impF').onchange=imp;
+}
+
+/* ---------- Monteur: Wert sofort ergänzen ---------- */
+async function ergaenzen(kn,v,inp){
+  if(!online()) return toast('Zum Ergänzen wird eine Verbindung gebraucht');
+  try{ const r=await PJ.rpc('pj_kr',{p:{aktion:'wert_ergaenzen',projekt_id:PID,kriterium:kn,wert:v}});
+    setzeStand(r); ls.set(CK,{PROJ,ST:{kriterien:K,raeume:R}}); if(inp) inp.value=''; render(); toast(`${kn==='Raum'?'Raum':kn} „${r.wert}“ ergänzt`); }
+  catch(e){ toast(e.message); }
+}
+
+/* ---------- Speichern (Projektleitung) ---------- */
+async function speichern(){
+  if(!online()) return toast('Zum Speichern wird eine Verbindung gebraucht');
+  const b=$('#sbSave'); b.disabled=true; b.textContent='Speichert …';
+  try{
+    const r=await PJ.rpc('pj_kr',{p:{aktion:'stamm',projekt_id:PID,kriterien:K,raeume:R,umbenennen:REN}});
+    setzeStand(r); SEL=new Set(); ls.set(CK,{PROJ,ST:{kriterien:K,raeume:R}});
+    await infoLaden(); render(); toast('Gespeichert'+(r.zeilen?` · ${r.zeilen} Messzeilen angepasst`:''));
+  }catch(e){ toast(/pj_kr|stamm|Unbekannte Aktion/i.test(e.message)?'Datenbank-Erweiterung pj_raeume_kriterien.sql fehlt':e.message); }
+  b.disabled=false; b.textContent='Speichern';
+}
+$('#sbSave').onclick=speichern;
+$('#sbVerw').onclick=()=>{ if(!confirm('Alle ungespeicherten Änderungen verwerfen?')) return; laden(); };
+window.addEventListener('beforeunload',e=>{ if(darf()&&dirty()){ e.preventDefault(); e.returnValue=''; } });
+
+/* ---------- Übernahme aus pds Aufmaß plus (X31 / DA11) ---------- */
+const CP850={0x81:'ü',0x84:'ä',0x94:'ö',0x8E:'Ä',0x99:'Ö',0x9A:'Ü',0xE1:'ß',0x82:'é',0x85:'à',0x8A:'è',0xF8:'°'};
+async function imp(ev){
+  const f=ev.target.files[0]; if(!f) return; ev.target.value='';
+  const roh=new Uint8Array(await f.arrayBuffer());
+  const gef={}; const txt=new TextDecoder('utf-8').decode(roh);
+  try{
+    if(/<GAEB[\s>]/.test(txt)){
+      const doc=new DOMParser().parseFromString(txt,'application/xml');
+      const el=(n,t)=>[...n.getElementsByTagNameNS('*',t)];
+      const namen={}; el(doc,'Ctlg').forEach(c=>{ const id=(el(c,'CtlgID')[0]||{}).textContent, nm=(el(c,'CtlgName')[0]||{}).textContent; if(id&&nm) namen[id.trim()]=nm.trim(); });
+      Object.values(namen).forEach(n=>gef[n]=gef[n]||new Set());
+      el(doc,'CtlgAssign').forEach(a=>{ const id=((el(a,'CtlgID')[0]||{}).textContent||'').trim(), v=((el(a,'CtlgCode')[0]||{}).textContent||'').trim(); if(namen[id]&&v) gef[namen[id]].add(v); });
+    } else {
+      let t=''; roh.forEach(b=>t+=CP850[b]||String.fromCharCode(b));
+      t.split(/\r?\n/).forEach(z=>{
+        if(/^S1/.test(z)){ const n=z.slice(2,40).trim(); if(n) gef[n]=gef[n]||new Set(); }
+        else if(/^S8Kriterienwert/.test(z)){ const n=z.slice(22,52).trim(), v=z.slice(52).trim(); if(n&&v)(gef[n]=gef[n]||new Set()).add(v); }
+      });
+    }
+  }catch(e){ return toast('Datei nicht lesbar: '+e.message); }
+  const namen=Object.keys(gef); if(!namen.length) return toast('Keine Kriterien in der Datei gefunden');
+  let nk=0, nw=0, nr=0;
+  namen.forEach(n=>{ const werte=[...gef[n]].filter(w=>w.length<=60);
+    if(/^az$/i.test(n)) return;
+    if(/^raum$/i.test(n)){ werte.forEach(w=>{ if(!R.some(r=>gleich(r.n,w))){ R.push({n:w,kr:{}}); nr++; } }); return; }
+    let k=K.find(x=>gleich(x.n,n)); if(!k){ k={n:n.slice(0,40),w:[]}; K.push(k); nk++; }
+    werte.forEach(w=>{ if(!k.w.some(x=>gleich(x,w))){ k.w.push(w); nw++; } });
+  });
+  render(); toast(`Übernommen: ${nr} Räume, ${nk} Kriterien, ${nw} Werte. Bitte speichern.`);
+}
+
+/* ---------- Laden ---------- */
+async function infoLaden(){ try{ const i=await PJ.rpc('pj_kr',{p:{aktion:'stamm_info',projekt_id:PID}}); INFO={orte:i.orte||{},werte:i.werte||{}}; }catch(e){} }
+async function laden(){
+  const c=ls.get(CK,null);
+  try{
+    const d=await PJ.api('projekte/'+PID); PROJ=d.projekt; setzeStand(ausServer(d));
+    ls.set(CK,{PROJ,ST:{kriterien:K,raeume:R}}); await infoLaden(); zeigeSync('');
+  }catch(e){
+    if(!c){ $('#app').innerHTML=`<div class="err">${esc(e.message)}</div><a class="btn ghost" href="index.html#p=${encodeURIComponent(PID)}">Zum Projekt</a>`; return; }
+    PROJ=c.PROJ; setzeStand(c.ST); zeigeSync('offline · letzter Stand',true);
+  }
+  SEL=new Set(); $('#hSub').textContent=PROJ?.name||''; document.title='Räume und Kriterien · '+(PROJ?.name||'');
+  PJS.set({seite:'kr',pid:PID,pname:PROJ?.name||'',erfassen:false});
+  render();
+}
+window.addEventListener('online',()=>{ if(!dirty()) laden(); else render(); });
+window.addEventListener('offline',()=>render());
+
+(async function(){
+  $('#backBtn').innerHTML=IC('back'); $('#backBtn').href='index.html#p='+encodeURIComponent(PID||'');
+  if(!PID){ $('#app').innerHTML='<div class="empty">Kein Projekt gewählt. <a href="index.html">Zur Projektübersicht</a></div>'; return; }
+  if(PJ.ready) await PJ.ready;
+  const c=ls.get(CK,null); if(c){ PROJ=c.PROJ; setzeStand(c.ST); PJS.set({seite:'kr',pid:PID,pname:PROJ?.name||'',erfassen:false}); render(); }
+  await laden();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>

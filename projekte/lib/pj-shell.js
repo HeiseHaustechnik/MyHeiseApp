@@ -102,6 +102,7 @@ body.pjs-tabs .toast{bottom:calc(150px + var(--safe-b,0px))}
       (pid ? `<div class="pjs-sec" title="${esc(S.pname)}">${esc(S.pname || 'Projekt')}</div>` +
         `<a class="pjs-item${onP}" href="index.html#p=${encodeURIComponent(pid)}">${ic('ruler')}Übersicht und Aufmaße</a>` +
         `<a class="pjs-item${on('lv')}" href="lv.html?p=${encodeURIComponent(pid)}">${ic('list')}Leistungsverzeichnis</a>` +
+        `<a class="pjs-item${on('kr')}" href="kriterien.html?p=${encodeURIComponent(pid)}">${ic('pin')}Räume und Kriterien</a>` +
         `<a class="pjs-item${on('btb')}" href="bautagebuch.html?p=${encodeURIComponent(pid)}">${ic('book')}Bautagebuch</a>` +
         `<a class="pjs-item${on('za')}" href="zusatz.html?p=${encodeURIComponent(pid)}">${ic('clock')}Zusätzliche Arbeiten</a>` +
         `<a class="pjs-item${on('pr')}" href="protokoll.html?p=${encodeURIComponent(pid)}">${ic('clip')}Protokolle</a>` : '') +

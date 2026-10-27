@@ -154,6 +154,34 @@ nav.tabs button.on{background:var(--brand);color:#fff}
 nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
 .hint{font-size:13px;color:var(--ink-3);margin-top:8px}
 .ohne{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--amber-bg);color:var(--amber);font-size:14px}.ohne.ok{background:var(--ok-bg);color:var(--ok)}.ohne b{display:block}.ohne span{color:var(--ink-2)}.ohne-btn{margin-top:12px;background:var(--surface-2);color:var(--ink)}
+/* RAEUME_KRITERIEN_V1: Erfassen nach Raum, Raum nur aus der Projektliste */
+.modus{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--surface-2);border-radius:15px;margin-bottom:10px}
+.modus button{min-height:40px;border-radius:12px;font-weight:700;font-size:13.5px;color:var(--ink-2)}
+.modus button.on{background:var(--brand);color:#fff;box-shadow:0 1px 3px rgba(13,21,36,.2)}
+.ctx{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border-radius:16px;padding:8px;margin-bottom:10px;box-shadow:inset 0 0 0 2px var(--accent)}
+.ctx .ctxr{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border-radius:12px;background:var(--amber-bg);color:var(--accent-2);font-weight:750;font-size:15px;max-width:100%}
+.ctx .ctxr b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctx select{min-height:42px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);padding:0 8px;font-size:14px;max-width:180px}
+.ctx .fix{display:inline-flex;align-items:center;min-height:32px;padding:0 10px;border-radius:10px;background:var(--blue-bg);color:var(--blue);font-weight:650;font-size:13px}
+.ctx .ctxh{font-size:12.5px;color:var(--ink-3);flex-basis:100%;padding:0 4px}
+.pos.rm{cursor:default;align-items:center}
+.pos.rm .l{cursor:pointer}
+.pos.rm .r{display:flex;align-items:center;gap:8px}
+.pos.rm .qin{width:96px;min-height:42px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);padding:0 10px;font-size:16px;text-align:right;outline:none}
+.pos.rm .qin:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.pos.rm .qin:disabled{background:var(--surface-2)}
+.pos.rm .me2{font-size:12px;color:var(--ink-3);font-weight:650;min-width:30px}
+.rwahl{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:50px;padding:0 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-size:16px;text-align:left}
+.rwahl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rwahl .leer{color:var(--ink-3)}
+.krrow select:disabled{background:var(--blue-bg);color:var(--blue);opacity:1;border-color:transparent}
+.krrow small{display:block;font-size:11.5px;color:var(--blue);margin-top:2px}
+.pick .neu{display:flex;gap:8px;margin-top:10px}
+.pick .neu input{flex:1;min-height:44px;border-radius:12px;border:1.5px solid var(--line);padding:0 12px;font-size:16px}
+.pi small{color:var(--ink-3);font-size:12px;margin-left:6px}
+.sumf{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.sumf select{flex:1}
+.sumhin{font-size:13px;color:var(--ink-2);margin:-4px 2px 12px}
 </style>
 
 </head>
@@ -168,6 +196,8 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
   <!-- POSITIONEN -->
   <section class="view on" id="v-pos">
     <div class="toolbar">
+      <div class="modus" id="modus"><button data-m="pos">Nach Position</button><button data-m="raum">Nach Raum</button></div>
+      <div id="ctxBox"></div>
       <div class="searchbox"><span id="icSearch"></span><input class="search" id="q" type="search" placeholder="Suchen, z. B. DN 100 Bogen" autocomplete="off"></div>
       <div class="seg">
         <button class="chip on" data-f="list">Aufmaß-Liste</button>
@@ -185,6 +215,8 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
 
   <!-- ERFASST -->
   <section class="view" id="v-sum">
+    <div class="sumf"><select class="f" id="sumF" aria-label="Erfasst filtern"></select></div>
+    <div id="sumHin"></div>
     <div class="stat" id="statBox"></div>
     <div id="sumList"></div>
   </section>
@@ -201,6 +233,8 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
         <div><label for="h_dat">Datum</label><input class="f" id="h_dat" type="date"></div>
         <div><label for="h_mon">Aufgemessen von</label><input class="f" id="h_mon" placeholder="Name Monteur"></div>
       </div>
+      <label for="h_ort">Ort für die Unterschriften</label>
+      <input class="f" id="h_ort" maxlength="80" autocomplete="off" placeholder="leer = Ort aus der Projektadresse">
       <label for="h_ag">Anwesend für Auftraggeber / Bauleitung</label>
       <input class="f" id="h_ag" placeholder="Name, Firma/Funktion">
       <label for="h_bem">Allgemeine Bemerkung</label>
@@ -239,23 +273,10 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
     </div>
 
     <div class="card">
-      <h2>Bereiche (Raum / Ort)</h2>
-      <p class="hint" style="margin-top:0">Die Bereiche gelten für das ganze Projekt und werden mit allen Geräten abgeglichen. Sie können hier gelöscht, ergänzt und umbenannt werden.</p>
-      <div id="areaList"></div>
-      <label for="a_g">Gruppe</label>
-      <input class="f" id="a_g" list="dl_ag" placeholder="z. B. Fahrzeughalle (Achse 11–31)" autocomplete="off"><datalist id="dl_ag"></datalist>
-      <label for="a_n">Neuer Bereich</label>
-      <div class="qwrap"><input class="f" id="a_n" placeholder="z. B. Achse 12, Dachablauf H4.3" autocomplete="off"><button class="btn" id="a_add">Hinzufügen</button></div>
-    </div>
-
-    <div class="card">
-      <h2>Kriterien für das pds-Aufmaß</h2>
-      <p class="hint" style="margin-top:0">Zusätzlich zum Raum (Bereiche oben) kann jede Messzeile weitere Kriterien bekommen, z. B. Geschoss, Achse oder Bauteil. Sie gelten für das ganze Projekt und gehen mit dem X31-Export nach pds Aufmaß plus. Neue Kriterien und Werte legt Aufmaß plus beim Import selbst an.</p>
-      <div id="krList"></div>
-      <label for="kr_n">Neues Kriterium</label>
-      <div class="qwrap"><input class="f" id="kr_n" placeholder="z. B. Geschoss, Achse, Bauteil" autocomplete="off"><button class="btn" id="kr_add">Hinzufügen</button></div>
-      <label for="kr_f" style="margin-top:12px">Kriterien aus pds Aufmaß plus übernehmen (X31- oder DA11-Datei)</label>
-      <input class="f" type="file" id="kr_f" accept=".x31,.X31,.d11,.D11,.d11s,.D11S,.xml">
+      <h2>Räume und Kriterien</h2>
+      <p class="hint" style="margin-top:0">Räume und Kriterien (z. B. Geschoss, Achse, Bauteil) gelten für das ganze Projekt und werden im Projekt gepflegt. Sie gehen mit dem X31-Export nach pds. Fehlt beim Erfassen ein Raum oder Wert, kann er direkt in der Auswahl ergänzt werden.</p>
+      <div id="krInfo" class="hint" style="margin:0 0 10px"></div>
+      <a class="btn sec block" id="krLink" href="#" style="text-decoration:none">Räume und Kriterien öffnen</a>
     </div>
 
     <div class="card">
@@ -299,7 +320,8 @@ const KEY = 'aufmass_'+AID;
 /* ---------- State ---------- */
 const DEF = () => ({
   head:{bv:'', bez:'', dat:'', mon:'', ag:'', bem:''},
-  entries:[], free:[], sig:{sig1:null,sig2:null,ts:null,aend:null}, filter:'list', lastOrt:'', open:{}, areas:[], krit:[], lastKr:{}
+  entries:[], free:[], sig:{sig1:null,sig2:null,ts:null,aend:null}, filter:'list', lastOrt:'', open:{}, areas:[], krit:[], lastKr:{},
+  modus:'pos', ctx:{ort:'',kr:{}}, sumF:''   // RAEUME_KRITERIEN_V1
 });
 let S;
 S = DEF();
@@ -378,8 +400,105 @@ function parseQty(s){
 }
 function sumOf(key){ return S.entries.filter(e=>e.key===key).reduce((a,e)=>a+e.qty,0); }
 function sortKey(key){ const p=POS[key]; if(p) return p.i; const i=S.free.findIndex(f=>f.p===key), f=S.free[i]; return (f&&f.t&&TITEND[f.t]!==undefined)? TITEND[f.t]-0.5+i*0.001 : 100000+i; }
-function areas(){ return S.areas||[]; }
+function areas(){ return (S.areas||[]).filter(a=>a&&a.n).map(a=>({n:a.n,kr:a.kr||{}})); }
 function orte(){ const set=new Set(); S.entries.forEach(e=>e.ort&&set.add(e.ort)); return [...set].sort((a,b)=>a.localeCompare(b,'de')); }
+
+/* ---------- Räume und Kriterien (RAEUME_KRITERIEN_V1) ----------
+   Räume und Kriterien kommen aus dem Projekt (kriterien.html). Raum ist das erste Kriterium,
+   ein Raum kann feste Werte anderer Kriterien haben (z. B. 001 → Geschoss EG).
+   Erfassen „Nach Position“ (wie bisher) oder „Nach Raum“: oben Raum und Werte wählen, dann je Position nur die Menge. */
+const raumMode=()=>S.modus==='raum';
+const NEU='\u0001neu';
+function raumKr(ort){ const a=areas().find(x=>x.n===ort); return a?krSauber(a.kr):{}; }
+function ctxWahl(){ const fix=raumKr(S.ctx.ort), o={}; Object.entries(S.ctx.kr||{}).forEach(([n,v])=>{ if(v&&!fix[n]&&krit().some(k=>k.n===n)) o[n]=v; }); return o; }
+function ctxKr(){ return Object.assign({},ctxWahl(),raumKr(S.ctx.ort)); }
+function inCtx(e){ if(!S.ctx.ort||(e.ort||'')!==S.ctx.ort) return false; const w=ctxWahl(), ek=e.kr||{}; return Object.keys(w).every(n=>ek[n]===w[n]); }
+function ctxSum(key){ return S.entries.filter(e=>e.key===key&&inCtx(e)).reduce((a,e)=>a+e.qty,0); }
+function posRowRaum(p,free){
+  const has=S.entries.some(e=>e.key===p.p&&inCtx(e)), ges=sumOf(p.p);
+  return `<div class="pos rm${free?' free':''}" data-k="${esc(p.p)}"><div class="l"><div class="nr">${esc(p.p)}${free?' · freie Position':''}</div><div class="bz">${esc(p.b)}</div>${ges&&(!has||ges!==ctxSum(p.p))?`<div class="lv">im ganzen Aufmaß ${nf(ges)} ${esc(p.me)}</div>`:''}</div>
+    <div class="r">${has?`<span class="badge">${nf(ctxSum(p.p))} ${esc(p.me)}</span>`:''}<input class="qin" data-q="${esc(p.p)}" inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="+" ${S.ctx.ort?'':'disabled'} aria-label="Menge für ${esc(p.p)}"><span class="me2">${esc(p.me)}</span></div></div>`;
+}
+function renderCtx(){
+  document.querySelectorAll('#modus button').forEach(b=>b.classList.toggle('on',b.dataset.m===(raumMode()?'raum':'pos')));
+  const box=$('#ctxBox'); if(!box) return;
+  if(!raumMode()){ box.innerHTML=''; return; }
+  const fix=raumKr(S.ctx.ort), wahl=S.ctx.kr||{};
+  const sel=krit().map(k=>{ if(fix[k.n]) return `<span class="fix">${esc(k.n)}: ${esc(fix[k.n])}</span>`;
+    const v=wahl[k.n]||''; const ws=v&&!k.w.includes(v)?[v,...k.w]:k.w;
+    return `<select data-ckr="${esc(k.n)}" aria-label="${esc(k.n)}"><option value="">${esc(k.n)}: –</option>${ws.map(w=>`<option value="${esc(w)}"${w===v?' selected':''}>${esc(k.n)}: ${esc(w)}</option>`).join('')}<option value="${NEU}">+ Wert ergänzen …</option></select>`; }).join('');
+  box.innerHTML=`<div class="ctx"><button class="ctxr" id="ctxR">${IC('pin','sm')}<b>${S.ctx.ort?esc(S.ctx.ort):'Raum wählen'}</b>${IC('down','sm')}</button>${S.ctx.ort?sel:''}
+    <div class="ctxh">${S.ctx.ort?'Menge rechts eintragen und mit Enter bestätigen. Sie wird für diesen Raum gespeichert.':'Erst den Raum wählen, dann je Position die Menge eintragen.'}</div></div>`;
+  $('#ctxR').onclick=()=>raumSheet();
+  box.querySelectorAll('[data-ckr]').forEach(s=>s.onchange=async()=>{ const n=s.dataset.ckr; let v=s.value;
+    if(v===NEU){ v=await wertNeu(n); if(!v){ renderCtx(); return; } }
+    S.ctx={ort:S.ctx.ort,kr:{...(S.ctx.kr||{})}}; if(v) S.ctx.kr[n]=v; else delete S.ctx.kr[n]; save(); renderCtx(); renderPos(); });
+}
+document.querySelectorAll('#modus button').forEach(b=>b.onclick=()=>{ S.modus=b.dataset.m; save(); renderCtx(); renderPos(); if(raumMode()&&!S.ctx.ort) raumSheet(); });
+function raumSheet(){
+  cur=null; editId=null;
+  $('#sheet').innerHTML=`<div class="hd"><div class="t"><div class="nr">Erfassen nach Raum</div><h3>Raum wählen</h3></div><button class="icon" onclick="closeSheet()" aria-label="Schließen">${IC('x')}</button></div><div class="pick" style="max-height:62vh">${pickerHtml()}</div>`;
+  $('#ov').classList.add('on'); $('#sheet').classList.add('on');
+  pickerBind(S.ctx.ort, o=>{ S.ctx={ort:o,kr:S.ctx.kr||{}}; closeSheet(); save(); renderCtx(); renderPos(); window.scrollTo(0,0); }, false);
+}
+// Liste der Räume für die Auswahl; dazu frei eingetragene Orte aus früheren Aufmaßen
+function raumListe(q,akt){
+  const t=String(q||'').toLowerCase().split(/\s+/).filter(Boolean), m=s=>t.every(w=>s.toLowerCase().includes(w));
+  const A=areas(), bek=new Set(A.map(a=>a.n));
+  const krTxt=a=>Object.values(krSauber(a.kr)).join(' · ');
+  let h=A.filter(a=>m(a.n+' '+krTxt(a))).map(a=>`<button class="pi${a.n===akt?' u':''}" data-o="${esc(a.n)}">${esc(a.n)}${krTxt(a)?`<small>${esc(krTxt(a))}</small>`:''}</button>`).join('');
+  const alt=orte().filter(o=>!bek.has(o)&&m(o));
+  if(alt.length) h+=`<div class="pg">Bisher verwendet, nicht in der Raumliste</div>`+alt.map(o=>`<button class="pi${o===akt?' u':''}" data-o="${esc(o)}">${esc(o)}</button>`).join('');
+  return h||`<div class="hint" style="padding:8px 4px">${A.length?'Kein Raum gefunden. Unten ergänzen.':'Im Projekt sind noch keine Räume angelegt. Unten ergänzen oder die Projektleitung legt sie unter „Räume und Kriterien“ an.'}</div>`;
+}
+function pickerHtml(){ return `<input class="f" id="pickQ" type="search" placeholder="Raum suchen, z. B. 014 oder EG" autocomplete="off"><div id="pickList"></div>
+  <div class="neu"><input id="pickNeu" placeholder="Raum fehlt? Hier ergänzen" autocomplete="off"><button class="btn sec" id="pickAdd">Ergänzen</button></div>`; }
+function pickerBind(akt,onPick,mitOhne){
+  const zeichne=()=>{ const q=$('#pickQ').value;
+    $('#pickList').innerHTML=(mitOhne&&!q.trim()?`<button class="pi${!akt?' u':''}" data-o="">ohne Raum</button>`:'')+raumListe(q,akt);
+    $('#pickList').querySelectorAll('.pi').forEach(b=>b.onclick=()=>onPick(b.dataset.o)); };
+  $('#pickQ').addEventListener('input',zeichne); zeichne();
+  const add=async()=>{ const v=$('#pickNeu').value.trim(); if(!v) return; const r=await wertErgaenzen('Raum',v); if(r) onPick(r); };
+  $('#pickAdd').onclick=add; $('#pickNeu').onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); add(); } };
+}
+// Raum oder Wert im Projekt ergänzen (geht für alle Rollen, braucht Verbindung)
+async function wertNeu(kn){
+  if(!navigator.onLine){ toast('Zum Ergänzen wird eine Verbindung gebraucht'); return null; }
+  const v=(prompt(kn==='Raum'?'Neuen Raum ergänzen:':`${kn}: neuen Wert ergänzen`)||'').trim(); if(!v) return null;
+  return await wertErgaenzen(kn,v);
+}
+async function wertErgaenzen(kn,v){
+  if(!navigator.onLine){ toast('Zum Ergänzen wird eine Verbindung gebraucht'); return null; }
+  if(!PROJ||!PJ.rpc) return null;
+  try{ const r=await PJ.rpc('pj_kr',{p:{aktion:'wert_ergaenzen',projekt_id:PROJ.id,kriterium:kn,wert:v}});
+    S.areas=(r.raeume||[]).map(x=>({n:x.n,kr:x.kr||{}}));
+    S.krit=(r.kriterien||[]).filter(k=>k&&k.n).map(k=>({n:String(k.n),w:(k.w||[]).map(String)})); PROJ.kriterien=S.krit;
+    save(); renderKrInfo(); toast(`${kn==='Raum'?'Raum':kn} „${r.wert}“ ergänzt`); return r.wert; }
+  catch(e){ toast(/Unbekannte Aktion|pj_kr|Projekt nicht gefunden/i.test(e.message)?'Datenbank-Erweiterung pj_raeume_kriterien.sql fehlt':e.message); return null; }
+}
+function renderKrInfo(){
+  const el=$('#krInfo'); if(!el) return;
+  const A=areas(), K=krit();
+  el.innerHTML=`${A.length?`${A.length} ${A.length===1?'Raum':'Räume'}`:'Noch keine Räume'}${K.length?' · Kriterien: '+K.map(k=>`${esc(k.n)} (${k.w.length})`).join(', '):''}`;
+  const l=$('#krLink'); if(l&&PROJ) l.href='kriterien.html?p='+encodeURIComponent(PROJ.id);
+}
+// Mengen direkt in der Liste (Nach Raum)
+function ctxAdd(inp){
+  const key=inp.dataset.q, raw=inp.value; if(!raw.trim()) return false;
+  if(!S.ctx.ort){ toast('Oben zuerst einen Raum wählen'); return false; }
+  const v=parseQty(raw); if(v===null||isNaN(v)||v===0){ toast('Bitte eine gültige Menge eintragen'); return false; }
+  inp.value='';
+  const kr=ctxKr(); S.entries.push({id:uid(),key,qty:v,ort:S.ctx.ort,bem:'',kr,ts:new Date().toISOString()});
+  S.lastOrt=S.ctx.ort; S.lastKr=kr;
+  dataChanged(); toast('+ '+nf(v)+' '+((posOf(key)||{}).me||'')+' · '+S.ctx.ort);
+  return true;
+}
+$('#posList').addEventListener('keydown',ev=>{ const i=ev.target.closest&&ev.target.closest('.qin'); if(!i||ev.key!=='Enter') return; ev.preventDefault();
+  const alle=[...document.querySelectorAll('#posList .qin')].map(x=>x.dataset.q), nx=alle[alle.indexOf(i.dataset.q)+1]||i.dataset.q;
+  if(ctxAdd(i)){ const z=document.querySelector(`#posList .qin[data-q="${CSS.escape(nx)}"]`); if(z) z.focus(); } else i.select(); });
+let NEUZEICHNEN=false;
+$('#posList').addEventListener('focusout',ev=>{ const i=ev.target.closest&&ev.target.closest('.qin'); if(NEUZEICHNEN||!i||!i.isConnected||!i.value.trim()) return;
+  setTimeout(()=>{ if(i.isConnected) ctxAdd(i); },0); });
 
 /* ---------- Tabs ---------- */
 document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{
@@ -394,6 +513,7 @@ document.querySelectorAll('.chip[data-f]').forEach(c=>c.onclick=()=>{ S.filter=c
 $('#q').addEventListener('input',renderPos);
 
 function posRow(p,free){
+  if(raumMode()) return posRowRaum(p,free);
   const s=sumOf(p.p), has=S.entries.some(e=>e.key===p.p), npre=S.entries.filter(e=>e.key===p.p&&e.pre).length;
   const over = !free && p.m>0 && s>p.m;
   return `<div class="pos${free?' free':''}" data-k="${esc(p.p)}">
@@ -412,7 +532,7 @@ function renderPos(){
   const q=$('#q').value.trim().toLowerCase();
   const terms=q.split(/\s+/).filter(Boolean);
   const match=p=>{ const t=(p.p+' '+p.b+' '+p.me).toLowerCase(); return terms.every(w=>t.includes(w)); };
-  const done=new Set(S.entries.map(e=>e.key));
+  const done=new Set(S.entries.filter(e=>!raumMode()||inCtx(e)).map(e=>e.key)); // Nach Raum: erfasst in diesem Raum
   const show=p=>{
     const pre=new Set(S.entries.filter(e=>e.pre).map(e=>e.key));
     if(S.filter==='pre') return pre.has(p.p) && (!q||match(p));
@@ -473,7 +593,12 @@ function renderPos(){
   }
   if(!n) html=`<div class="empty">${S.filter==='pre'&&!q?'Alle Vorschläge sind geprüft.':S.filter==='done'&&!q?'Noch nichts erfasst.':'Keine Position gefunden.'}<br><br><button class="btn sec" onclick="openFree('${esc($('#q').value).replace(/'/g,'')}')">+ Als freie Position anlegen</button></div>`;
   if(q && S.filter==='list') html=`<div class="hint" style="margin:0 0 6px">Suche läuft über das gesamte LV.</div>`+html;
-  $('#posList').innerHTML=html;
+  // Nach Raum: angefangene Eingaben und Fokus beim Neuzeichnen behalten
+  const fa=document.activeElement, fk=fa&&fa.classList&&fa.classList.contains('qin')?fa.dataset.q:null;
+  const offen={}; document.querySelectorAll('#posList .qin').forEach(x=>{ if(x.value) offen[x.dataset.q]=x.value; });
+  NEUZEICHNEN=true; $('#posList').innerHTML=html; NEUZEICHNEN=false; // beim Ersetzen feuert der Browser „change“ am alten Feld
+  if(raumMode()){ Object.entries(offen).forEach(([k,v])=>{ const n=document.querySelector(`#posList .qin[data-q="${CSS.escape(k)}"]`); if(n) n.value=v; });
+    if(fk){ const n=document.querySelector(`#posList .qin[data-q="${CSS.escape(fk)}"]`); if(n) n.focus({preventScroll:true}); } }
 }
 function toggleAll(v){ const O=S.open[S.filter]||(S.open[S.filter]={}); let t=null,i=0;
   LV.forEach(o=>{ if(o.k==='T'){ O[o.p]=v; t=o.p; i=0; } else if(o.k==='X'&&t){ i++; O['s:'+t+'#'+i]=v; } }); save(); renderPos(); }
@@ -481,7 +606,8 @@ $('#posList').addEventListener('click',e=>{ const b=e.target.closest('.sgrp[data
   const O=S.open[S.filter]||(S.open[S.filter]={}); O['s:'+b.dataset.s]=!b.classList.contains('open'); save(); renderPos(); });
 $('#posList').addEventListener('click',e=>{ const t=e.target.closest('.grp[data-t]'); if(!t) return;
   const O=S.open[S.filter]||(S.open[S.filter]={}); O[t.dataset.t]=!t.classList.contains('open'); save(); renderPos(); });
-$('#posList').addEventListener('click',e=>{ const r=e.target.closest('.pos'); if(r) openPos(r.dataset.k); });
+$('#posList').addEventListener('click',e=>{ if(e.target.closest('.qin')) return; const r=e.target.closest('.pos'); if(!r) return;
+  if(r.classList.contains('rm')&&!e.target.closest('.l,.badge')) return; openPos(r.dataset.k); });
 
 /* ---------- Erfassungs-Sheet ---------- */
 let cur=null, editId=null;
@@ -503,11 +629,11 @@ function openPos(key, eid){
       <div class="qwrap"><input class="f" id="e_q" inputmode="decimal" autocomplete="off" placeholder="z. B. 3,5 oder 2,4+1,8" value="${ed?String(ed.qty).replace('.',','):''}"><span class="me">${esc(p.me)}</span></div>
       <div class="calc" id="e_calc"></div>
       ${p.me.toLowerCase().startsWith('st')?`<div class="stepper"><button data-add="1">+1</button><button data-add="2">+2</button><button data-add="5">+5</button><button data-add="10">+10</button></div>`:''}
-      <label for="e_o">Raum / Ort</label>
-      <div class="qwrap"><input class="f" id="e_o" autocomplete="off" placeholder="Bereich wählen oder frei eintragen" value="${esc(ed?ed.ort:S.lastOrt)}"><button type="button" class="btn sec" id="e_pick" style="white-space:nowrap">Liste ▾</button></div>
+      <label for="e_pick">Raum</label>
+      <input type="hidden" id="e_o" value="">
+      <button type="button" class="rwahl" id="e_pick"><span id="e_ot"></span>${IC('down','sm')}</button>
       <div id="pickPanel" class="pick" hidden></div>
-      ${krit().length?`<div class="krrow">${krit().map(k=>{ const v=ed?(ed.kr||{})[k.n]||'':(S.lastKr||{})[k.n]||''; const ws=k.w.includes(v)||!v?k.w:[v,...k.w];
-        return `<div><label>${esc(k.n)}</label><select class="f" data-kr="${esc(k.n)}"><option value="">–</option>${ws.map(w=>`<option${w===v?' selected':''}>${esc(w)}</option>`).join('')}</select></div>`; }).join('')}</div>`:''}
+      <div class="krrow" id="e_kr"></div>
       <label for="e_b">Bemerkung</label>
       <input class="f" id="e_b" autocomplete="off" placeholder="optional" value="${esc(ed?ed.bem:'')}">
       <div class="row" style="margin-top:12px">
@@ -534,27 +660,33 @@ function openPos(key, eid){
   document.querySelectorAll('.stepper button').forEach(b=>b.onclick=()=>{ const v=parseQty(qi.value)||0; qi.value=String((isNaN(v)?0:v)+(+b.dataset.add)).replace('.',','); upd(); });
   $('#e_add').onclick=addEnt;
   $('#e_pick').onclick=()=>togglePick();
+  { // Raum und Kriterien vorbelegen: beim Bearbeiten aus dem Eintrag, „Nach Raum“ aus der Auswahl oben, sonst wie zuletzt
+    const o0=ed?(ed.ort||''):(raumMode()&&S.ctx.ort?S.ctx.ort:(S.lastOrt||'')), k0=ed?(ed.kr||{}):(raumMode()&&S.ctx.ort?ctxKr():(S.lastKr||{}));
+    $('#e_o').value=o0; ortText(o0); krRow(o0,k0); }
   ['e_q','e_o','e_b'].forEach(id=>$('#'+id).addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); addEnt(); }}));
   if(!ed) setTimeout(()=>qi.focus(),250);
 }
 function togglePick(force){
   const pp=$('#pickPanel'); const show=force!==undefined?force:pp.hidden; pp.hidden=!show; if(!show) return;
-  pp.innerHTML=`<input class="f" id="pickQ" placeholder="Bereich filtern, z. B. WC, Achse 14" autocomplete="off"><div id="pickList"></div>`;
-  $('#pickQ').addEventListener('input',renderPick); renderPick();
+  pp.innerHTML=pickerHtml();
+  pickerBind($('#e_o').value, o=>{ setOrt(o); togglePick(false); }, true);
+  setTimeout(()=>{ const q=$('#pickQ'); if(q&&areas().length>8) q.focus(); },50);
 }
-function renderPick(){
-  const q=($('#pickQ').value||'').toLowerCase().split(/\s+/).filter(Boolean);
-  const m=n=>q.every(w=>n.toLowerCase().includes(w));
-  const used=orte().filter(m);
-  const known=new Set(areas().map(a=>a.n));
-  let html='';
-  const recent=used.filter(o=>!known.has(o));
-  if(recent.length) html+=`<div class="pg">Bereits verwendet</div>`+recent.map(o=>`<button class="pi" data-o="${esc(o)}">${esc(o)}</button>`).join('');
-  const gs=[...new Set(areas().map(a=>a.g))];
-  gs.forEach(g=>{ const it=areas().filter(a=>a.g===g && (m(a.n)||m(g))); if(!it.length) return;
-    html+=`<div class="pg">${esc(g)}</div>`+it.map(a=>`<button class="pi${used.includes(a.n)?' u':''}" data-o="${esc(a.n)}">${esc(a.n)}</button>`).join(''); });
-  $('#pickList').innerHTML=html||'<div class="hint" style="padding:8px 0">Nichts gefunden. Einfach frei ins Feld eintragen.</div>';
-  $('#pickList').querySelectorAll('.pi').forEach(b=>b.onclick=()=>{ $('#e_o').value=b.dataset.o; togglePick(false); $('#e_b').focus(); });
+function ortText(o){ const t=$('#e_ot'); if(t) t.innerHTML=o?esc(o)+(areas().some(a=>a.n===o)?'':' <span class="leer">(nicht in der Raumliste)</span>'):'<span class="leer">Raum wählen</span>'; }
+function leseKr(){ const kr={}; document.querySelectorAll('#sheet select[data-kr]').forEach(x=>{ if(x.value&&x.value!==NEU) kr[x.dataset.kr]=x.value; }); return kr; }
+function setOrt(o){
+  const alt=raumKr($('#e_o').value), cur=leseKr();
+  Object.keys(alt).forEach(n=>{ if(cur[n]===alt[n]) delete cur[n]; }); // feste Werte des alten Raums nicht mitnehmen
+  $('#e_o').value=o; ortText(o); krRow(o,cur);
+}
+// Auswahlfelder der Kriterien; feste Werte des Raums sind gesetzt und gesperrt
+function krRow(ort,cur){
+  const el=$('#e_kr'); if(!el) return; const fix=raumKr(ort);
+  el.style.display=krit().length?'':'none';
+  el.innerHTML=krit().map(k=>{ const f=fix[k.n], v=f||(cur||{})[k.n]||''; const ws=v&&!k.w.includes(v)?[v,...k.w]:k.w;
+    return `<div><label>${esc(k.n)}</label><select class="f" data-kr="${esc(k.n)}"${f?' disabled':''}><option value="">–</option>${ws.map(w=>`<option value="${esc(w)}"${w===v?' selected':''}>${esc(w)}</option>`).join('')}${f?'':`<option value="${NEU}">+ Wert ergänzen …</option>`}</select>${f?'<small>fest beim Raum</small>':''}</div>`; }).join('');
+  el.querySelectorAll('select[data-kr]').forEach(s=>s.onchange=async()=>{ if(s.value!==NEU) return;
+    const n=s.dataset.kr, v=await wertNeu(n), c=leseKr(); if(v) c[n]=v; krRow($('#e_o').value,c); });
 }
 const isSN=rg=>/^SN-\d/.test(rg||'');
 function preHer(ents){ if(ents.length&&ents.every(e=>e.rg==='LV')) return 'aus dem LV-Entwurf'; const sn=ents.some(e=>isSN(e.rg)), rg=ents.some(e=>e.rg&&!isSN(e.rg)&&e.rg!=='LV'); return sn&&rg?'aus Rechnungen und Stundennachweisen':sn?(ents.length>1?'aus Stundennachweisen':'aus Stundennachweis'):(ents.length>1?'aus Rechnungen':'aus Rechnung'); }
@@ -591,7 +723,7 @@ function addEnt(){
   const v=parseQty($('#e_q').value);
   if(v===null||isNaN(v)||v===0){ toast('Bitte eine gültige Menge eintragen'); $('#e_q').focus(); return; }
   const ort=$('#e_o').value.trim(), bem=$('#e_b').value.trim();
-  const kr={}; document.querySelectorAll('#sheet select[data-kr]').forEach(x=>{ if(x.value) kr[x.dataset.kr]=x.value; });
+  const kr=leseKr();
   if(editId){ const e=S.entries.find(x=>x.id===editId); Object.assign(e,{qty:v,ort,bem,kr,pre:false,ts:new Date().toISOString()}); toast('Geändert'); }
   else { S.entries.push({id:uid(),key:cur,qty:v,ort,bem,kr,ts:new Date().toISOString()}); toast('+ '+nf(v)+' '+posOf(cur).me+' erfasst'); }
   S.lastOrt=ort; S.lastKr=kr;
@@ -664,26 +796,55 @@ function openFree(prefill, editKey){
 }
 
 /* ---------- Erfasst / Summen ---------- */
-function groups(){
-  const keys=[...new Set(S.entries.map(e=>e.key))].sort((a,b)=>sortKey(a)-sortKey(b));
-  return keys.map(k=>({p:posOf(k),free:!POS[k],ents:S.entries.filter(e=>e.key===k),sum:sumOf(k)}));
+function groups(fe){ // fe: optionaler Filter der Einträge (Erfasst nach Raum oder Wert)
+  const E=fe?S.entries.filter(fe):S.entries;
+  const keys=[...new Set(E.map(e=>e.key))].sort((a,b)=>sortKey(a)-sortKey(b));
+  return keys.map(k=>{ const ents=E.filter(e=>e.key===k); return {p:posOf(k),free:!POS[k],ents,sum:ents.reduce((a,e)=>a+e.qty,0)}; });
 }
+// Filter „Erfasst“: nach Raum oder nach Wert eines Kriteriums (RAEUME_KRITERIEN_V1)
+function sumFilter(){ const f=S.sumF||'';
+  if(f==='-') return e=>!(e.ort||'');
+  if(f.startsWith('r:')){ const o=f.slice(2); return e=>(e.ort||'')===o; }
+  if(f.startsWith('k:')){ try{ const [n,w]=JSON.parse(f.slice(2)); return e=>(e.kr||{})[n]===w; }catch(e){ return null; } }
+  return null; }
+function renderSumF(){
+  const sel=$('#sumF'); if(!sel) return;
+  const used=new Set(S.entries.map(e=>e.ort||'')), A=areas().map(a=>a.n);
+  const reihe=[...A.filter(n=>used.has(n)),...[...used].filter(o=>o&&!A.includes(o)).sort((a,b)=>a.localeCompare(b,'de',{numeric:true}))];
+  const kw={}; S.entries.forEach(e=>Object.entries(krSauber(e.kr)).forEach(([n,w])=>{ (kw[n]=kw[n]||new Set()).add(w); }));
+  const cnt=fn=>S.entries.filter(fn).length;
+  let h=`<option value="">Alle Räume und Kriterien (${S.entries.length})</option>`;
+  if(reihe.length) h+=`<optgroup label="Raum">${reihe.map(o=>`<option value="r:${esc(o)}">Raum ${esc(o)} (${cnt(e=>(e.ort||'')===o)})</option>`).join('')}${used.has('')?`<option value="-">ohne Raum (${cnt(e=>!(e.ort||''))})</option>`:''}</optgroup>`;
+  const kn=[...krit().map(k=>k.n).filter(n=>kw[n]),...Object.keys(kw).filter(n=>!krit().some(k=>k.n===n))];
+  kn.forEach(n=>{ const K=krit().find(k=>k.n===n), ix=w=>{ const i=K?K.w.indexOf(w):-1; return i<0?9999:i; };
+    const ws=[...kw[n]].sort((a,b)=>ix(a)-ix(b)||a.localeCompare(b,'de',{numeric:true}));
+    h+=`<optgroup label="${esc(n)}">${ws.map(w=>`<option value="k:${esc(JSON.stringify([n,w]))}">${esc(n)}: ${esc(w)} (${cnt(e=>(e.kr||{})[n]===w)})</option>`).join('')}</optgroup>`; });
+  sel.innerHTML=h; sel.value=S.sumF||''; if(sel.value!==(S.sumF||'')){ S.sumF=''; sel.value=''; }
+  sel.parentElement.style.display=S.entries.length?'':'none';
+}
+$('#sumF').onchange=e=>{ S.sumF=e.target.value; save(); renderSum(); window.scrollTo(0,0); };
 function renderSum(){
-  const g=groups();
-  $('#cntTab').textContent=g.length;
-  const np=S.entries.filter(e=>e.pre).length;
-  $('#statBox').innerHTML=`<div><b>${g.length}</b>Positionen</div><div><b>${S.entries.length}</b>Einzelaufmaße</div><div><b>${S.free.length}</b>freie Positionen</div>`+
+  renderSumF();
+  const fe=sumFilter(), g=groups(fe), nE=g.reduce((a,x)=>a+x.ents.length,0);
+  $('#cntTab').textContent=fe?groups().length:g.length;
+  $('#sumHin').innerHTML=fe?`<div class="sumhin">Gefiltert: nur Einträge mit <b>${esc($('#sumF').selectedOptions[0]?$('#sumF').selectedOptions[0].textContent.replace(/\s*\(\d+\)$/,''):'')}</b>. Summen gelten für diese Auswahl. PDF und Excel enthalten immer alles.</div>`:'';
+  const np=(fe?S.entries.filter(fe):S.entries).filter(e=>e.pre).length;
+  $('#statBox').innerHTML=`<div><b>${g.length}</b>Positionen</div><div><b>${nE}</b>Einzelaufmaße</div><div><b>${S.free.length}</b>freie Positionen</div>`+
     (np?`<div class="warn"><b>${np}</b>Vorschläge ${preHer(S.entries.filter(e=>e.pre))} noch nicht geprüft. Menge vor Ort kontrollieren, dann mit Haken bestätigen oder mit Stift anpassen.</div>`:'');
-  if(!g.length){ $('#sumList').innerHTML='<div class="empty">Noch nichts erfasst. Unter „Positionen“ eine Position antippen und Menge eintragen.</div>'; return; }
+  if(!g.length){ $('#sumList').innerHTML=`<div class="empty">${fe?'Für diese Auswahl ist nichts erfasst.':'Noch nichts erfasst. Unter „Positionen“ eine Position antippen und Menge eintragen.'}</div>`; return; }
   $('#sumList').innerHTML=g.map(x=>`<div class="card">
     <div style="display:flex;gap:10px;cursor:pointer" onclick="openPos('${esc(x.p.p)}')"><div style="flex:1;min-width:0"><div class="hint">${esc(x.p.p)}${x.free?' · freie Position · '+(x.p.t?'Zuordnung '+esc(titelOf(x.p.p)):'ohne Zuordnung'):` · LV ${nf(x.p.m)} ${esc(x.p.me)}`}</div><b style="overflow-wrap:anywhere">${esc(x.p.b)}</b></div>
     <div><span class="badge${!x.free&&x.p.m>0&&x.sum>x.p.m?' over':''}">${nf(x.sum)} ${esc(x.p.me)}</span></div></div>
-    <div style="margin-top:6px">${x.ents.map(e=>`<div class="ent"><div class="q">${nf(e.qty)}</div><div class="o">${esc(e.ort)||'<span class="hint">ohne Ort</span>'}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
+    <div style="margin-top:6px">${x.ents.map(e=>`<div class="ent"><div class="q">${nf(e.qty)}</div><div class="o">${esc(e.ort)||'<span class="hint">ohne Raum</span>'}${krTags(e)}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
       <div class="x">${e.pre&&darfOk(e)?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(x.p.p)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')}</div></div>`).join('');
 }
 
 /* ---------- Kopfdaten ---------- */
-const HF={h_bv:'bv',h_bez:'bez',h_dat:'dat',h_mon:'mon',h_ag:'ag',h_bem:'bem'};
+const HF={h_bv:'bv',h_bez:'bez',h_dat:'dat',h_mon:'mon',h_ag:'ag',h_bem:'bem',h_ort:'ort'};
+// Ort für „Ort, Datum“ bei den Unterschriften: eigener Eintrag, sonst Ort aus der Projektadresse (SIG_ORT_V1)
+function ortAusAdresse(a){ a=String(a||''); const m=a.match(/\b\d{5}\s+([^,;\n]+)/); if(m) return m[1].trim(); const t=a.split(/[,;\n]/).map(s=>s.trim()).filter(Boolean); const l=t[t.length-1]||''; return t.length>1&&!/\d/.test(l)?l:''; }
+function sigOrt(){ return (S.head.ort||'').trim()||ortAusAdresse(PROJ&&PROJ.adresse); }
+function ortHinweis(){ const el=$('#h_ort'); if(el) el.placeholder=ortAusAdresse(PROJ&&PROJ.adresse)?'leer = '+ortAusAdresse(PROJ&&PROJ.adresse)+' (aus der Projektadresse)':'z. B. Clausthal-Zellerfeld'; }
 Object.entries(HF).forEach(([id,k])=>{ const el=$('#'+id); el.addEventListener('input',()=>{ S.head[k]=el.value; save(); renderHdr(); }); });
 function fillHead(){ Object.entries(HF).forEach(([id,k])=>{ const el=$('#'+id); if(document.activeElement!==el) el.value=S.head[k]||''; }); }
 function renderHdr(){ $('#hdrSub').textContent=(S.head.bez||'Aufmaß')+(S.head.dat?' · '+new Date(S.head.dat).toLocaleDateString('de-DE'):''); }
@@ -754,7 +915,7 @@ async function makePdf(){
   doc.setFont('helvetica','bold'); doc.setFontSize(11.5);
   let y=doc.lastAutoTable.finalY+10; if(y>265){doc.addPage();y=20;}
   doc.text('2. Einzelaufmaße',M,y);
-  const body=[]; g.forEach(x=>{ x.ents.forEach((e,i)=>body.push([i?'':x.p.p,i?'':x.p.b,nf(e.qty),x.p.me,e.ort||'',[e.bem,e.rg?(e.pre?'UNGEPRÜFT, aus ':'lt. ')+e.rg:''].filter(Boolean).join(' · ')])); body.push([{content:'Summe '+x.p.p,colSpan:2,styles:{fontStyle:'bold',halign:'right'}},{content:nf(x.sum),styles:{fontStyle:'bold',halign:'right'}},{content:x.p.me,styles:{fontStyle:'bold'}},'','']); });
+  const body=[]; g.forEach(x=>{ x.ents.forEach((e,i)=>body.push([i?'':x.p.p,i?'':x.p.b,nf(e.qty),x.p.me,[e.ort||'',Object.entries(krSauber(e.kr)).map(([n,v])=>n+': '+v).join(', ')].filter(Boolean).join('\n'),[e.bem,e.rg?(e.pre?'UNGEPRÜFT, aus ':'lt. ')+e.rg:''].filter(Boolean).join(' · ')])); body.push([{content:'Summe '+x.p.p,colSpan:2,styles:{fontStyle:'bold',halign:'right'}},{content:nf(x.sum),styles:{fontStyle:'bold',halign:'right'}},{content:x.p.me,styles:{fontStyle:'bold'}},'','']); });
   doc.autoTable({startY:y+2,margin:{left:M,right:M},headStyles:hs,styles:{fontSize:8,cellPadding:1.4,valign:'top'},
     head:[['Pos.-Nr.','Bezeichnung','Menge','ME','Raum / Ort','Bemerkung']],
     columnStyles:{0:{cellWidth:22},1:{cellWidth:52},2:{halign:'right',cellWidth:16},3:{cellWidth:11},4:{cellWidth:38}},
@@ -768,7 +929,7 @@ async function makePdf(){
     if(S.sig[id]){ const ip=doc.getImageProperties(S.sig[id]); let h=24, w=h*ip.width/ip.height; if(w>bw){ w=bw; h=w*ip.height/ip.width; } doc.addImage(S.sig[id],'PNG',x,y+33-h,w,h); }
     doc.setDrawColor(60); doc.line(x,y+34,x+bw,y+34);
     doc.setFontSize(8); doc.text(doc.splitTextToSize(lab,bw),x,y+38);
-    doc.text('Ort, Datum: Ebergötzen, '+(S.sig[id]?tsDE(S.sig.ts):'____________'),x,y+(doc.splitTextToSize(lab,bw).length*3.5)+39);
+    doc.text('Ort, Datum: '+(sigOrt()?sigOrt()+', ':'')+(S.sig[id]?tsDE(S.sig.ts):'____________'),x,y+(doc.splitTextToSize(lab,bw).length*3.5)+39);
   });
   if(S.sig.aend&&S.sig.sig2){
     const t='Nach der Unterschrift des Auftraggebers geändert am '+tsDE(S.sig.aend.ts)+(S.sig.aend.text&&S.sig.aend.text.trim()?': '+S.sig.aend.text.trim():'');
@@ -780,6 +941,8 @@ async function makePdf(){
   return doc.output('blob');
 }
 
+// Kriterien, die im Aufmaß vorkommen (Reihenfolge wie im Projekt)
+function xlKrit(){ const s=new Set(); S.entries.forEach(e=>Object.keys(krSauber(e.kr)).forEach(n=>s.add(n))); return [...krit().map(k=>k.n).filter(n=>s.has(n)),...[...s].filter(n=>!krit().some(k=>k.n===n))]; }
 function xlDate(iso){ const d=new Date(iso); return new Date(d.getTime()-d.getTimezoneOffset()*60000); }
 function imgSize(src){ return new Promise(r=>{ const i=new Image(); i.onload=()=>r({w:i.naturalWidth,h:i.naturalHeight}); i.onerror=()=>r({w:400,h:170}); i.src=src; }); }
 async function makeXlsx(){
@@ -819,18 +982,18 @@ async function makeXlsx(){
   for(const [id,lab,col] of sigs){
     if(S.sig[id]){ const d=await imgSize(S.sig[id]); const h=110, w=Math.min(380,h*d.w/d.h); const img=wb.addImage({base64:S.sig[id],extension:'png'}); ws.addImage(img,{tl:{col:col,row:sy},ext:{width:w,height:w*d.h/d.w}}); }
     const c=ws.getCell(sy+7,col+1); c.value=lab; c.border={top:{style:'thin'}}; c.font={size:9};
-    ws.getCell(sy+8,col+1).value=S.sig[id]?'unterschrieben am '+tsDE(S.sig.ts):'nicht unterschrieben'; ws.getCell(sy+8,col+1).font={size:9,color:{argb:'FF666666'}};
+    ws.getCell(sy+8,col+1).value=S.sig[id]?'unterschrieben '+(sigOrt()?'in '+sigOrt()+' ':'')+'am '+tsDE(S.sig.ts):'nicht unterschrieben'; ws.getCell(sy+8,col+1).font={size:9,color:{argb:'FF666666'}};
   }
   if(S.sig.aend&&S.sig.sig2){ const c=ws.getCell(sy+10,2); c.value='Nach der Unterschrift des Auftraggebers geändert am '+tsDE(S.sig.aend.ts)+(S.sig.aend.text&&S.sig.aend.text.trim()?': '+S.sig.aend.text.trim():''); c.font={size:9,italic:true,color:{argb:'FF965000'}}; }
 
   // Blatt 2: Einzelaufmaße
   const w2=wb.addWorksheet('Einzelaufmaße',{views:[{state:'frozen',ySplit:1}],pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0}});
-  w2.columns=[{header:'Pos.-Nr.',width:14},{header:'Bezeichnung',width:55},{header:'Menge',width:11},{header:'ME',width:7},{header:'Raum / Ort',width:32},{header:'Bemerkung',width:40},{header:'Erfasst am',width:17},{header:'Art',width:12},{header:'LV-Titel / Zuordnung',width:40},{header:'Quelle',width:22},{header:'Rechnung',width:26}];
+  w2.columns=[{header:'Pos.-Nr.',width:14},{header:'Bezeichnung',width:55},{header:'Menge',width:11},{header:'ME',width:7},{header:'Raum / Ort',width:32},{header:'Bemerkung',width:40},{header:'Erfasst am',width:17},{header:'Art',width:12},{header:'LV-Titel / Zuordnung',width:40},{header:'Quelle',width:22},{header:'Rechnung',width:26}].concat(xlKrit().map(n=>({header:n,width:16})));
   styleHead(w2.getRow(1));
-  g.forEach(x=>x.ents.forEach(e=>{ const r=w2.addRow([x.p.p,x.p.b,e.qty,x.p.me,e.ort,e.bem,xlDate(e.ts),x.free?'frei':'LV',titelOf(x.p.p)||(x.free?'ohne Zuordnung':''),e.rg?(isSN(e.rg)?'Stundennachweis':'Rechnung')+(e.pre?', UNGEPRÜFT':', geprüft'):'Aufmaß vor Ort',e.rg||'']);
+  g.forEach(x=>x.ents.forEach(e=>{ const r=w2.addRow([x.p.p,x.p.b,e.qty,x.p.me,e.ort,e.bem,xlDate(e.ts),x.free?'frei':'LV',titelOf(x.p.p)||(x.free?'ohne Zuordnung':''),e.rg?(isSN(e.rg)?'Stundennachweis':'Rechnung')+(e.pre?', UNGEPRÜFT':', geprüft'):'Aufmaß vor Ort',e.rg||''].concat(xlKrit().map(n=>krSauber(e.kr)[n]||'')));
     if(e.pre) r.eachCell(c=>c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF4E0'}});
     r.getCell(3).numFmt=numFmt; r.getCell(7).numFmt='dd.mm.yyyy hh:mm'; r.eachCell({includeEmpty:true},c=>{c.border=bd;c.alignment={vertical:'top',wrapText:true};}); }));
-  w2.autoFilter={from:'A1',to:'K1'};
+  w2.autoFilter={from:'A1',to:w2.getRow(1).getCell(11+xlKrit().length).address};
 
   const buf=await wb.xlsx.writeBuffer();
   return new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -852,78 +1015,8 @@ $('#btnShare').onclick=e=>{ if(checkReady()) busy(e.target,async()=>{
 /* ---------- Sicherung ---------- */
 $('#btnBak').onclick=()=>dl(new Blob([JSON.stringify(S)],{type:'application/json'}),fileBase()+'_Sicherung.json');
 
-function renderAreas(){
-  const A=areas(); const gs=[...new Set(A.map(a=>a.g))];
-  const openG=new Set([...document.querySelectorAll('details.ag[open]')].map(d=>d.dataset.g));
-  $('#areaList').innerHTML=gs.map(g=>`<details class="ag" data-g="${esc(g)}" ${openG.has(g)?'open':''}><summary>${esc(g)} <span class="hint">(${A.filter(a=>a.g===g).length})</span></summary>`+
-    A.map((a,i)=>a.g!==g?'':`<div class="al"><span>${esc(a.n)}</span><button class="icon" data-ren="${i}" aria-label="Umbenennen">${IC('edit')}</button><button class="icon" data-del="${i}" aria-label="Löschen">${IC('x')}</button></div>`).join('')+`</details>`).join('');
-  $('#dl_ag').innerHTML=gs.map(g=>`<option value="${esc(g)}">`).join('');
-  $('#areaList').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ const A2=areas().slice(); A2.splice(+b.dataset.del,1); S.areas=A2; save(); renderAreas(); });
-  $('#areaList').querySelectorAll('[data-ren]').forEach(b=>b.onclick=()=>{ const A2=areas().map(a=>({...a})); const a=A2[+b.dataset.ren]; const n=prompt('Bereich umbenennen:',a.n); if(n&&n.trim()){ a.n=n.trim(); S.areas=A2; save(); renderAreas(); } });
-}
-$('#a_add').onclick=()=>{ const n=$('#a_n').value.trim(); if(!n){ toast('Bitte einen Namen eintragen'); return; } const g=$('#a_g').value.trim()||'Eigene Bereiche';
-  const A2=areas().slice(); let idx=-1; A2.forEach((a,i)=>{ if(a.g===g) idx=i; }); const it={g,n}; if(idx<0) A2.push(it); else A2.splice(idx+1,0,it);
-  S.areas=A2; save(); $('#a_n').value=''; renderAreas(); toast('Bereich hinzugefügt'); };
-/* ---------- Kriterien (X31_V1) ---------- */
+/* ---------- Kriterien (X31_V1, Pflege jetzt im Projekt: kriterien.html) ---------- */
 function krTags(e){ const o=krSauber(e.kr); const k=Object.keys(o); return k.length?`<div>${k.map(n=>`<span class="krtag">${esc(n)}: ${esc(o[n])}</span>`).join('')}</div>`:''; }
-function renderKrit(){
-  const el=$('#krList'); if(!el) return;
-  const K=krit();
-  el.innerHTML=K.length?K.map((k,i)=>`<div class="krk"><div class="kh"><b>${esc(k.n)}</b><span><button class="icon" data-krren="${i}" aria-label="Umbenennen">${IC('edit')}</button><button class="icon" data-krdel="${i}" aria-label="Kriterium löschen">${IC('trash')}</button></span></div>
-      <div class="krw">${k.w.map((w,j)=>`<span>${esc(w)}<button data-krwdel="${i}:${j}" aria-label="Wert löschen">${IC('x')}</button></span>`).join('')||'<span class="hint">noch keine Werte</span>'}</div>
-      <div class="qwrap"><input class="f" data-krwin="${i}" placeholder="Wert hinzufügen, z. B. EG" autocomplete="off"><button class="btn sec" data-krwadd="${i}">+</button></div></div>`).join('')
-    :'<p class="hint">Noch keine weiteren Kriterien.</p>';
-  const setK=K2=>{ S.krit=K2; save(); renderKrit(); };
-  const kopie=()=>krit().map(k=>({n:k.n,w:k.w.slice()}));
-  el.querySelectorAll('[data-krdel]').forEach(b=>b.onclick=()=>{ const K2=kopie(); const k=K2[+b.dataset.krdel];
-    if(!confirm(`Kriterium „${k.n}“ löschen? Bereits erfasste Werte bleiben an den Messzeilen erhalten.`)) return; K2.splice(+b.dataset.krdel,1); setK(K2); });
-  el.querySelectorAll('[data-krren]').forEach(b=>b.onclick=()=>{ const K2=kopie(); const k=K2[+b.dataset.krren]; const n=(prompt('Kriterium umbenennen:',k.n)||'').trim();
-    if(!n||n===k.n) return; if(K2.some(x=>x.n===n)){ toast('Das Kriterium gibt es schon'); return; }
-    S.entries.forEach(e=>{ if(e.kr&&e.kr[k.n]!==undefined){ e.kr={...e.kr,[n]:e.kr[k.n]}; delete e.kr[k.n]; } }); k.n=n; S.krit=K2; dataChanged(); });
-  el.querySelectorAll('[data-krwdel]').forEach(b=>b.onclick=()=>{ const [i,j]=b.dataset.krwdel.split(':').map(Number); const K2=kopie(); K2[i].w.splice(j,1); setK(K2); });
-  const addW=i=>{ const inp=el.querySelector(`[data-krwin="${i}"]`); const v=inp.value.trim(); if(!v) return; const K2=kopie();
-    if(K2[i].w.includes(v)){ toast('Den Wert gibt es schon'); return; } K2[i].w.push(v); setK(K2); setTimeout(()=>{ const n=$(`#krList [data-krwin="${i}"]`); if(n) n.focus(); },50); };
-  el.querySelectorAll('[data-krwadd]').forEach(b=>b.onclick=()=>addW(+b.dataset.krwadd));
-  el.querySelectorAll('[data-krwin]').forEach(x=>x.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); addW(+x.dataset.krwin); } });
-}
-$('#kr_add').onclick=()=>{ const n=$('#kr_n').value.trim(); if(!n){ toast('Bitte einen Namen eintragen'); return; }
-  if(/^(raum|az)$/i.test(n)){ toast(n.toUpperCase()==='AZ'?'AZ (Abschlag) wird beim Export gesetzt':'Der Raum kommt aus den Bereichen oben'); return; }
-  if(krit().some(k=>k.n===n)){ toast('Das Kriterium gibt es schon'); return; }
-  S.krit=[...krit().map(k=>({n:k.n,w:k.w.slice()})),{n,w:[]}]; $('#kr_n').value=''; save(); renderKrit(); toast('Kriterium angelegt'); };
-$('#kr_n').onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); $('#kr_add').click(); } };
-// Kriterien aus einer Datei von pds Aufmaß plus (X31 oder DA11) übernehmen. Raum-Werte werden Bereiche, AZ wird übersprungen.
-const CP850={0x81:'ü',0x84:'ä',0x94:'ö',0x8E:'Ä',0x99:'Ö',0x9A:'Ü',0xE1:'ß',0x82:'é',0x85:'à',0x8A:'è',0xF8:'°'};
-$('#kr_f').onchange=async ev=>{
-  const f=ev.target.files[0]; if(!f) return; ev.target.value='';
-  const roh=new Uint8Array(await f.arrayBuffer());
-  const gef={}; // Kriterium -> Set(Werte)
-  const txt=new TextDecoder('utf-8').decode(roh);
-  try{
-    if(/<GAEB[\s>]/.test(txt)){
-      const doc=new DOMParser().parseFromString(txt,'application/xml');
-      const el=(n,t)=>[...n.getElementsByTagNameNS('*',t)];
-      const namen={}; el(doc,'Ctlg').forEach(c=>{ const id=(el(c,'CtlgID')[0]||{}).textContent, nm=(el(c,'CtlgName')[0]||{}).textContent; if(id&&nm) namen[id.trim()]=nm.trim(); });
-      Object.values(namen).forEach(n=>gef[n]=gef[n]||new Set());
-      el(doc,'CtlgAssign').forEach(a=>{ const id=((el(a,'CtlgID')[0]||{}).textContent||'').trim(), v=((el(a,'CtlgCode')[0]||{}).textContent||'').trim(); if(namen[id]&&v) gef[namen[id]].add(v); });
-    } else {
-      let t=''; roh.forEach(b=>t+=CP850[b]||String.fromCharCode(b));
-      t.split(/\r?\n/).forEach(z=>{
-        if(/^S1/.test(z)){ const n=z.slice(2,40).trim(); if(n) gef[n]=gef[n]||new Set(); }
-        else if(/^S8Kriterienwert/.test(z)){ const n=z.slice(22,52).trim(), v=z.slice(52).trim(); if(n&&v)(gef[n]=gef[n]||new Set()).add(v); }
-      });
-    }
-  }catch(e){ toast('Datei nicht lesbar: '+e.message); return; }
-  const namen=Object.keys(gef); if(!namen.length){ toast('Keine Kriterien in der Datei gefunden'); return; }
-  const K2=krit().map(k=>({n:k.n,w:k.w.slice()})); let nk=0, nw=0, nr=0;
-  namen.forEach(n=>{ const werte=[...gef[n]];
-    if(/^az$/i.test(n)) return;
-    if(/^raum$/i.test(n)){ const A2=areas().slice(); werte.forEach(w=>{ if(!A2.some(a=>a.n===w)){ A2.push({g:'aus pds Aufmaß plus',n:w}); nr++; } }); S.areas=A2; return; }
-    let k=K2.find(x=>x.n===n); if(!k){ k={n,w:[]}; K2.push(k); nk++; }
-    werte.forEach(w=>{ if(!k.w.includes(w)){ k.w.push(w); nw++; } });
-  });
-  S.krit=K2; save(); renderAll();
-  toast(`Übernommen: ${nk} Kriterien, ${nw} Werte, ${nr} Räume`);
-};
 
 /* ---------- Export „X31 für pds“ (X31_V1) ----------
    GAEB DA XML 3.3, Datenart X31 (Mengenermittlung nach REB 23.003), Aufbau wie von pds Aufmaß plus erzeugt.
@@ -1023,7 +1116,7 @@ async function x31Erstellen(g,btn){
 }
 $('#btnX31').onclick=()=>openX31();
 
-function renderAll(){ PJS.set({seite:'aufmass',pid:PROJ?.id||null,pname:PROJ?.name||'',erfassen:true}); renderAreas(); renderKrit(); renderPos(); renderSum(); renderHdr(); sigText(); if(typeof renderEntwurf==='function') renderEntwurf(); }
+function renderAll(){ PJS.set({seite:'aufmass',pid:PROJ?.id||null,pname:PROJ?.name||'',erfassen:true}); renderKrInfo(); renderCtx(); ortHinweis(); renderPos(); renderSum(); renderHdr(); sigText(); if(typeof renderEntwurf==='function') renderEntwurf(); }
 
 /* ---------- Datenbank-Abgleich ---------- */
 // Kriterien-Werte eines Eintrags als Text (leere Werte zählen nicht); nur angehängt, wenn vorhanden,
@@ -1036,7 +1129,7 @@ const krit=()=>Array.isArray(S.krit)?S.krit:[];
 const fKey=f=>JSON.stringify([f.p,f.b,f.me||'',f.t||'',f.ref||'']);
 const hKey=()=>JSON.stringify([S.head.bez||'',S.head.dat||'',S.head.mon||'',S.head.ag||'',S.head.bem||'',S.sig.sig1||null,S.sig.sig2||null,S.sig.ts||null,S.sig.aend?JSON.stringify(S.sig.aend):null]);
 const parseAend=v=>{ if(!v) return null; try{ const o=JSON.parse(v); return o&&o.ts?{text:o.text||'',ts:o.ts}:null; }catch(e){ return null; } };
-const aKey=a=>JSON.stringify((a||[]).map(x=>[x.g||'',x.n]));
+const aKey=a=>JSON.stringify((a||[]).map(x=>[x.n,x.kr||{}]));
 const fromE=e=>({id:e.id,key:e.pos_key,qty:e.menge,ort:e.ort||'',bem:e.bemerkung||'',rg:e.rg||'',pre:!!e.pre,ts:e.created_at||e.updated_at,von:e.erfasst_von||'',
   kr:(e.kriterien&&typeof e.kriterien==='object'&&!Array.isArray(e.kriterien))?e.kriterien:{},xa:e.x31_adr||null});
 const fromF=f=>({id:f.id,p:f.nr,b:f.bez,me:f.me||'',t:f.titel||'',ref:f.ref||''});
@@ -1047,13 +1140,14 @@ function baseFrom(srv){ // Serverstand in Vergleichswerte übersetzen
   return {e,f};
 }
 function diff(){
-  if(!BASE) return {e:[],f:[],de:[],df:[],head:false,areas:false,krit:false,n:0};
+  if(!BASE) return {e:[],f:[],de:[],df:[],head:false,areas:false,krit:false,ort:false,n:0};
   const e=S.entries.filter(x=>BASE.e[x.id]!==eKey(x));
   const f=S.free.filter(x=>BASE.f[x.id]!==fKey(x));
   const ids=new Set(S.entries.map(x=>x.id)), fids=new Set(S.free.map(x=>x.id));
   const de=Object.keys(BASE.e).filter(id=>!ids.has(id)), df=Object.keys(BASE.f).filter(id=>!fids.has(id));
-  const head=BASE.h!==hKey(), ar=BASE.a!==aKey(S.areas), kr=BASE.k!==undefined&&BASE.k!==kKey(krit());
-  return {e,f,de,df,head,areas:ar,krit:kr,n:e.length+f.length+de.length+df.length+(head?1:0)+(ar?1:0)+(kr?1:0)};
+  const head=BASE.h!==hKey(), ar=false, kr=false; // Räume und Kriterien werden im Projekt gepflegt (RAEUME_KRITERIEN_V1)
+  const ort=BASE.o!==undefined&&BASE.o!==(S.head.ort||'').trim();
+  return {e,f,de,df,head,areas:ar,krit:kr,ort,n:e.length+f.length+de.length+df.length+(head?1:0)+(ar?1:0)+(kr?1:0)+(ort?1:0)};
 }
 function setSync(kind,txt){ const el=$('#saveState'); el.innerHTML=IC(kind==='err'?'cloudoff':(txt.startsWith('✓')?'cloud':'sync'))+'<span>'+esc(txt.replace(/^✓ /,''))+'</span>'; el.style.color=kind==='err'?'var(--amber)':(txt.startsWith('✓')?'var(--ok)':''); }
 function syncStatus(){
@@ -1071,7 +1165,8 @@ function applyServer(srv, keepLocal){
   const srvE=srv.eintraege.map(fromE), srvF=srv.freipos.map(fromF);
   const k=srv.kopf;
   const srvHead={bez:k.bez||'',dat:k.datum||'',mon:k.monteur||'',ag:k.ag||'',bem:k.bemerkung||''}, srvSig={sig1:k.sig1||null,sig2:k.sig2||null,ts:k.sig_ts||null,aend:parseAend(k.sig_aenderung)};
-  const srvAreas=(srv.bereiche||[]).map(b=>({g:b.gruppe||'',n:b.name}));
+  const srvOrt=(k.sig_ort||'').trim(), ortLokal=!!(keepLocal&&BASE&&BASE.o!==undefined&&BASE.o!==(S.head.ort||'').trim());
+  const srvAreas=(srv.bereiche||[]).map(b=>({n:b.name,kr:(b.kr&&typeof b.kr==='object'&&!Array.isArray(b.kr))?b.kr:{}}));
   const srvKrit=(Array.isArray(PROJ&&PROJ.kriterien)?PROJ.kriterien:[]).filter(k=>k&&k.n).map(k=>({n:String(k.n),w:(k.w||[]).map(String)}));
   if(keepLocal && BASE){
     const d=diff();
@@ -1082,15 +1177,16 @@ function applyServer(srv, keepLocal){
     d.f.forEach(x=>{ if(!frs.some(y=>y.id===x.id)) frs.push(x); });
     S.entries=ents; S.free=frs;
     if(!d.head){ S.head=Object.assign(S.head,srvHead); S.sig=srvSig; }
-    if(!d.areas) S.areas=srvAreas;
-    if(!d.krit) S.krit=srvKrit;
+    S.areas=srvAreas; S.krit=srvKrit;
   } else {
     S.entries=srvE; S.free=srvF; S.head=Object.assign(S.head,srvHead); S.sig=srvSig; S.areas=srvAreas; S.krit=srvKrit;
   }
   // Exportstand (Adresse im pds-Aufmaß) kommt immer vom Server
   { const xa=new Map(srvE.map(x=>[x.id,x.xa])); S.entries.forEach(x=>{ x.xa=xa.get(x.id)||null; }); }
+  if(!ortLokal) S.head.ort=srvOrt;
   S.head.bv=[PROJ.nr,PROJ.name,PROJ.adresse].filter(Boolean).join(' · ');
   BASE=baseFrom(srv);
+  BASE.o=srvOrt;
   BASE.h=JSON.stringify([srvHead.bez,srvHead.dat,srvHead.mon,srvHead.ag,srvHead.bem,srvSig.sig1,srvSig.sig2,srvSig.ts,srvSig.aend?JSON.stringify(srvSig.aend):null]);
   BASE.a=aKey(srvAreas);
   BASE.k=kKey(srvKrit);
@@ -1105,7 +1201,7 @@ async function syncNow(){
   try{
     const d=diff(), t=new Date().toISOString();
     if(d.head) await api('aufmasse/'+AID,{method:'PUT',body:JSON.stringify({bez:S.head.bez,datum:S.head.dat,monteur:S.head.mon,ag:S.head.ag,bemerkung:S.head.bem,sig1:S.sig.sig1,sig2:S.sig.sig2,sig_ts:S.sig.ts,sig_aenderung:S.sig.aend?JSON.stringify(S.sig.aend):''})});
-    if(d.areas) await api('projekte/'+PROJ.id+'/bereiche',{method:'PUT',body:JSON.stringify(S.areas.map(a=>({gruppe:a.g,name:a.n})))});
+    if(d.ort) await PJ.rpc('pj_kr',{p:{aktion:'sig_ort',aufmass_id:AID,ort:(S.head.ort||'').trim()}});
     const body={
       eintraege:[...d.e.map(e=>({id:e.id,pos_key:e.key,menge:e.qty,ort:e.ort,bemerkung:e.bem,rg:e.rg,pre:e.pre?1:0,created_at:e.ts,updated_at:t})),
                  ...d.de.map(id=>({id,pos_key:'-',menge:0,updated_at:t,deleted:1}))],
@@ -1114,7 +1210,6 @@ async function syncNow(){
     };
     await api('aufmasse/'+AID+'/sync',{method:'POST',body:JSON.stringify(body)});
     // Kriterien (pj_kriterien_x31.sql): Liste des Projekts und Werte je Eintrag
-    if(d.krit) await PJ.rpc('pj_kr',{p:{aktion:'kriterien',projekt_id:PROJ.id,kriterien:krit()}});
     const krListe=d.e.filter(e=>krKey(e.kr)||(BASE.e[e.id]||'').length>0&&krit().length).map(e=>({id:e.id,kr:krSauber(e.kr)}));
     if(krListe.length && (krit().length || krListe.some(x=>Object.keys(x.kr).length))) await PJ.rpc('pj_kr',{p:{aktion:'werte',aufmass_id:AID,liste:krListe}});
     const srv=await api('aufmasse/'+AID);
