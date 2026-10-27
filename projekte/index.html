@@ -662,8 +662,14 @@ function parseLV(rows){
     const row=rows[r]; const t=c=>c>0?String(row.t[c]??'').trim():'', v=c=>c>0?row.v[c]:'';
     const typ=t(col.typ), pos=t(col.pos).replace(/\.$/,''), bez=t(col.bez);
     const vis=!row.hidden;
-    if(typ==='Los'){ started=true; out.push({typ:'L',pos,bez}); }
-    else if(typ==='Titel'){ out.push({typ:'T',pos,bez:bez.split('\n')[0]}); }
+    // LV_ZUSATZ_V1: „Gewerk“ wie ein Los, Titel ohne Nummer bekommt die Nummer der folgenden Positionen (z. B. 4.2),
+    // „Zusatzposition“ (nicht im Auftrags-LV, z. B. Nachtrag) wird eine normale Position, wenn sie eine Bezeichnung hat
+    if(typ==='Los'||(typ==='Gewerk'&&pos)){ started=true; out.push({typ:'L',pos,bez}); }
+    else if(typ==='Titel'){ let tp=pos;
+      if(!tp){ for(let j=r+1;j<rows.length&&j<r+400;j++){ const pj=String(rows[j].t[col.pos]??'').trim().replace(/\.$/,''); if(/^\d+(\.\d+)+$/.test(pj)){ tp=pj.split('.').slice(0,-1).join('.'); break; } } }
+      if(tp) out.push({typ:'T',pos:tp,bez:bez.split('\n')[0]}); }
+    else if(/^zusatz/i.test(typ)&&pos&&bez){ let me=t(col.me); if(/^st(c?k|\.)?$/i.test(me)) me='Stck'; if(me==='M') me='m';
+      out.push({typ:'P',pos,bez:bez.split('\n')[0],menge:num(v(col.menge))||0,me,in_liste:1,zeit:null}); }
     else if(typ==='Position'){ let me=t(col.me); if(/^st(c?k|\.)?$/i.test(me)) me='Stck'; if(me==='M') me='m';
       const z=col.zeit>0? Math.round(num(v(col.zeit))*col.zf*100)/100 : 0;
       out.push({typ:'P',pos,bez:bez.split('\n')[0],menge:num(v(col.menge))||0,me,in_liste:vis?1:0,zeit:z>0?z:null}); }
