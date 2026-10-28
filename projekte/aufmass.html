@@ -905,7 +905,7 @@ function mgStatus(){
     :man?'Von der Projektleitung als abgeschlossen markiert. Die Mengen zählen in späteren Aufmaßen als „bisher“.'
     :'In Arbeit. Die Mengen zählen in anderen Aufmaßen erst, wenn das Aufmaß unterschrieben ist.';
   el.innerHTML=`<div class="mgst${sig||man?' ok':''}">${IC(sig||man?'check':'clip','sm')}<span>${txt}${vor.length?`<small>„Bisher“ enthält: ${vor.map(a=>esc(a.bez||'Aufmaß')).join(', ')}</small>`:''}</span></div>
-    ${PJ.leitung()&&!sig&&MG?`<button class="btn ghost sm" id="mgAbs" style="margin-top:6px">${man?'Markierung „abgeschlossen“ zurücknehmen':'Ohne Unterschrift als abgeschlossen markieren'}</button>`:''}`;
+    ${PJ.leitung()&&!sig&&MG?`<button class="btn ghost sm" id="mgAbs" style="margin:0 0 12px">${man?'Markierung „abgeschlossen“ zurücknehmen':'Ohne Unterschrift als abgeschlossen markieren'}</button>`:''}`;
   const b=$('#mgAbs'); if(b) b.onclick=async()=>{
     if(!man&&!confirm('Dieses Aufmaß ohne Unterschrift als abgeschlossen markieren?\nDas ist für Aufmaße gedacht, die aus Excel übernommen wurden oder schon abgerechnet sind.')) return;
     try{ if(diff().n) await syncNow(); await PJ.rpc('pj_mengen',{p:{aktion:'abschluss',aufmass_id:AID,an:!man}}); toast(man?'Markierung zurückgenommen':'Als abgeschlossen markiert'); await mengenLaden(); }catch(e){ toast(e.message); } };

@@ -573,6 +573,24 @@ async function lvImport(pid){
     upd();
   }catch(e){ $('#lv_msg').innerHTML=`<div class="err">${esc(e.message)}</div>`; }
 }
+/* ZEITEN_NUR_V1: Zeiten aus der Datei über die Pos.-Nr. in das vorhandene LV schreiben, sonst nichts ändern */
+async function nurZeiten(pid,neu){
+  const b=$('#lv_zeit'); b.disabled=true;
+  try{
+    const d=await api('projekte/'+pid), alt=d.lv||[];
+    if(!alt.some(o=>o.typ==='P')) throw new Error('Im Projekt gibt es noch kein LV. Bitte „LV übernehmen“ nehmen.');
+    const Z={}; neu.filter(o=>o.typ==='P'&&o.zeit>0&&o.pos).forEach(o=>{ Z[o.pos]=o.zeit; });
+    const P=alt.filter(o=>o.typ==='P'), treffer=P.filter(o=>Z[o.pos]!=null), ohne=P.filter(o=>Z[o.pos]==null), fremd=Object.keys(Z).filter(k=>!P.some(o=>o.pos===k));
+    if(!treffer.length) throw new Error('Keine Pos.-Nr. aus der Datei passt zum LV im Projekt.');
+    const h=treffer.reduce((a,o)=>a+Z[o.pos]*(o.menge||0),0)/60;
+    if(!confirm(`${treffer.length} von ${P.length} Positionen bekommen eine Zeit (zusammen ${h.toLocaleString('de-DE',{maximumFractionDigits:1})} h für die LV-Mengen).`
+      +(ohne.length?`\n${ohne.length} Positionen bleiben ohne Zeit, z. B. ${ohne.slice(0,4).map(o=>o.pos).join(', ')}.`:'')
+      +(fremd.length?`\n${fremd.length} Pos.-Nr. aus der Datei gibt es im LV nicht, z. B. ${fremd.slice(0,4).join(', ')}.`:'')
+      +'\n\nPositionen, Mengen, Zusatzpositionen und Aufmaße bleiben unverändert. Übernehmen?')){ b.disabled=false; return; }
+    await api('projekte/'+pid+'/lv',{method:'PUT',body:JSON.stringify(alt.map(o=>({typ:o.typ,pos:o.pos,bez:o.bez,menge:o.menge,me:o.me,in_liste:o.in_liste,zeit:o.typ==='P'&&Z[o.pos]!=null?Z[o.pos]:(o.zeit||null)})))});
+    toast(`Zeiten für ${treffer.length} Positionen übernommen`); route();
+  }catch(e){ b.disabled=false; $('#lv_msg').insertAdjacentHTML('beforeend',`<div class="err">${esc(e.message)}</div>`); }
+}
 function zeigLV(pid,r,quelle){
         window._lv=r;
         const P=r.filter(o=>o.typ==='P'), mitZeit=P.filter(o=>o.zeit>0), h=P.reduce((a,o)=>a+(o.zeit||0)*(o.menge||0),0)/60;
@@ -581,7 +599,9 @@ function zeigLV(pid,r,quelle){
           ${P.some(o=>o.langtext)?`<p class="hint" style="margin-top:4px">Langtexte: ${P.filter(o=>o.langtext).length} Positionen. Sie sind im LV und im Aufmaß bei der Position aufklappbar.</p>`:''}
           ${P.some(o=>o.kennung)?`<p class="hint" style="margin-top:4px">${P.filter(o=>o.kennung==='alternativ').length?`${P.filter(o=>o.kennung==='alternativ').length} Alternativpositionen (nicht in der Aufmaß-Liste, im gesamten LV markiert). `:''}${P.filter(o=>o.kennung==='bedarf').length?`${P.filter(o=>o.kennung==='bedarf').length} Bedarfspositionen (in der Aufmaß-Liste, markiert).`:''}</p>`:''}
           ${r.hinweise&&r.hinweise.length?`<div class="err" style="margin-top:6px">${r.hinweise.map(esc).join('<br>')}</div>`:''}
-          <button class="btn cta block" id="lv_ok" style="margin-top:10px">LV übernehmen</button>`;
+          <button class="btn cta block" id="lv_ok" style="margin-top:10px">LV übernehmen</button>
+          ${mitZeit.length?`<button class="btn ghost block" id="lv_zeit" style="margin-top:8px">Nur Zeiten übernehmen, LV bleibt wie es ist</button>`:''}`;
+        if($('#lv_zeit')) $('#lv_zeit').onclick=()=>nurZeiten(pid,window._lv); // ZEITEN_NUR_V1
         $('#lv_ok').onclick=async()=>{ $('#lv_ok').disabled=true; let gespeichert=false;
           try{ const roh=window._lv, texte=roh.map((o,i)=>({sort:i,langtext:o.langtext||null,kennung:o.kennung||null})).filter(x=>x.langtext||x.kennung);
             await api('projekte/'+pid+'/lv',{method:'PUT',body:JSON.stringify(roh.map(({langtext,kennung,...o})=>o))}); gespeichert=true;
