@@ -49,6 +49,16 @@ button.sgrp .sc{font-weight:600;white-space:nowrap}
 .pos .bz{font-weight:650;overflow-wrap:anywhere;margin-top:1px}
 .pos .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;display:grid;justify-items:end;gap:4px}
 .pos .lv{font-size:12px;color:var(--ink-3)}
+/* MENGEN_V1 */
+.mg{font-size:12px;color:var(--blue);font-weight:650;margin-top:3px;font-variant-numeric:tabular-nums}
+.mg.over{color:var(--red,#c32328)}
+.mg .ia{color:var(--ink-3);font-weight:600}
+.mgz{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.mgz small{display:block;font-size:11.5px;color:var(--ink-3)}
+.mgz.arbeit,.mgz.spaeter{color:var(--ink-3)}
+.mgst{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink-2);background:var(--surface-2);border-radius:12px;padding:8px 10px;margin-bottom:10px}
+.mgst.ok{background:var(--ok-bg);color:var(--ink)}
+.mgst small{display:block;color:var(--ink-3);margin-top:2px}
 .soll{font-size:12px;color:var(--blue);font-weight:650}
 details.lt{margin-top:6px}details.lt summary{cursor:pointer;color:var(--blue);font-size:13px;font-weight:700;list-style:none}details.lt summary::-webkit-details-marker{display:none}
 details.lt div{white-space:pre-wrap;font-size:13.5px;line-height:1.45;background:var(--surface-2,#f1f3f7);border-radius:12px;padding:8px 10px;margin-top:6px;max-height:40vh;overflow:auto;overflow-wrap:anywhere}
@@ -263,6 +273,7 @@ nav.tabs .cnt{position:absolute;top:5px;right:calc(50% - 26px);min-width:20px;he
 
     <div class="card">
       <h2>Ausgabe</h2>
+      <div id="mgStatus"></div>
       <div class="grid2">
         <button class="btn" id="btnPdf">PDF erstellen</button>
         <button class="btn" id="btnXlsx">Excel erstellen</button>
@@ -516,9 +527,9 @@ $('#q').addEventListener('input',renderPos);
 function posRow(p,free){
   if(raumMode()) return posRowRaum(p,free);
   const s=sumOf(p.p), has=S.entries.some(e=>e.key===p.p), npre=S.entries.filter(e=>e.key===p.p&&e.pre).length;
-  const over = !free && p.m>0 && s>p.m;
+  const mgB=mengen(p.p).bis, over = !free && p.m>0 && s+mgB>p.m;
   return `<div class="pos${free?' free':''}" data-k="${esc(p.p)}">
-    <div class="l"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.ref?' · '+esc(p.ref):''):''}${!free&&!p.v&&S.filter==='list'?' · <span style="color:var(--warn)">nicht in Aufmaß-Liste</span>':''}</div><div class="bz">${esc(p.b)}</div>${npre?`<div class="src pre">Vorschlag ${preHer(S.entries.filter(e=>e.key===p.p&&e.pre))} · bitte prüfen</div>`:''}</div>
+    <div class="l"><div class="nr">${esc(p.p)}${free?' · freie Position'+(p.ref?' · '+esc(p.ref):''):''}${!free&&!p.v&&S.filter==='list'?' · <span style="color:var(--warn)">nicht in Aufmaß-Liste</span>':''}</div><div class="bz">${esc(p.b)}</div>${npre?`<div class="src pre">Vorschlag ${preHer(S.entries.filter(e=>e.key===p.p&&e.pre))} · bitte prüfen</div>`:''}${mgZeile(p,s,free)}</div>
     <div class="r">${has?`<span class="badge${over?' over':''}">${nf(s)} ${esc(p.me)}</span>`:''}
     ${!free?`<div class="lv">LV: ${nf(p.m)} ${esc(p.me)}</div>`:''}${!free&&ZEIT_ON&&p.z>0?`<div class="soll">${sollText(p)}</div>`:''}</div></div>`;
 }
@@ -642,8 +653,9 @@ function openPos(key, eid){
         <button class="btn cta" id="e_add">${ed?'Änderung speichern':'Aufmaß hinzufügen'}</button>
       </div>
     </div>
+    ${mgDetail(key,p)}
     <div class="card">
-      <h2 style="margin-bottom:4px">Bisher erfasst (${ents.length})</h2>
+      <h2 style="margin-bottom:4px">In diesem Aufmaß erfasst (${ents.length})</h2>
       ${ents.length? ents.map(e=>`<div class="ent"><div class="q">${nf(e.qty)} ${esc(p.me)}</div>
         <div class="o">${esc(e.ort)||'<span class="hint">ohne Ort</span>'}${krTags(e)}${e.bem?`<small>${esc(e.bem)}</small>`:''}${entSrc(e)}</div>
         <div class="x">${e.pre&&darfOk(e)?`<button class="icon ok" onclick="okEnt('${e.id}')" aria-label="Menge bestätigen">${IC('check')}</button>`:''}<button class="icon" onclick="openPos('${esc(key)}','${e.id}')" aria-label="Bearbeiten">${IC('edit')}</button><button class="icon" onclick="delEnt('${e.id}')" aria-label="Löschen">${IC('trash')}</button></div></div>`).join('')
@@ -847,10 +859,61 @@ function ortAusAdresse(a){ a=String(a||''); const m=a.match(/\b\d{5}\s+([^,;\n]+
 function sigOrt(){ return (S.head.ort||'').trim()||ortAusAdresse(PROJ&&PROJ.adresse); }
 function ortHinweis(){ const el=$('#h_ort'); if(el) el.placeholder=ortAusAdresse(PROJ&&PROJ.adresse)?'leer = '+ortAusAdresse(PROJ&&PROJ.adresse)+' (aus der Projektadresse)':'z. B. Clausthal-Zellerfeld'; }
 Object.entries(HF).forEach(([id,k])=>{ const el=$('#'+id); el.addEventListener('input',()=>{ S.head[k]=el.value; save(); renderHdr(); }); });
+/* ---------- MENGEN_V1: Mengen aus anderen Aufmaßen des Projekts (pj_mengen.sql) ----------
+   bisher  = abgeschlossene Aufmaße, die vor diesem liegen (Datum, dann Anlage)
+   in Arbeit = Aufmaße, die noch nicht abgeschlossen sind (nur Anzeige, zählt nicht) */
+let MG=null;
+const mgKey=()=>'pj_mengen_'+(PROJ&&PROJ.id||'');
+async function mengenLaden(){
+  if(!PROJ||!PROJ.id) return;
+  if(!MG){ try{ MG=JSON.parse(localStorage.getItem(mgKey())||'null'); if(MG&&!Array.isArray(MG.aufmasse)) MG=null; }catch(e){} if(MG){ renderPos(); mgStatus(); } }
+  if(!navigator.onLine||!PJ.rpc) return;
+  try{ const r=await PJ.rpc('pj_mengen',{p:{aktion:'projekt',projekt_id:PROJ.id}}); if(!r||!Array.isArray(r.aufmasse)) return; MG=r; try{ localStorage.setItem(mgKey(),JSON.stringify(MG)); }catch(e){} }
+  catch(e){ if(!/pj_mengen|function/i.test(e.message)) console.warn(e); return; }
+  renderPos(); mgStatus();
+}
+function mgIch(){ return MG? MG.aufmasse.find(a=>a.id===AID)||null : null; }
+function mgVorher(){ // abgeschlossene Aufmaße vor diesem
+  if(!MG) return []; const L=MG.aufmasse, i=L.findIndex(a=>a.id===AID), ich=L[i];
+  return L.filter((a,j)=>a.id!==AID&&a.abg&&(i<0? true : (a.datum||'')<(ich.datum||'')||((a.datum||'')===(ich.datum||'')&&j<i)));
+}
+function mengen(key){
+  const r={bis:0,arbeit:0,auf:[]}; if(!MG) return r;
+  const vor=new Set(mgVorher().map(a=>a.id));
+  MG.aufmasse.forEach(a=>{ if(a.id===AID) return; const q=(MG.m[a.id]||{})[key]||0; if(!q) return;
+    const art=vor.has(a.id)?'bis':a.abg?'spaeter':'arbeit';
+    if(art==='bis') r.bis+=q; if(art==='arbeit') r.arbeit+=q;
+    r.auf.push({bez:a.bez||'Aufmaß',datum:a.datum,q,art}); });
+  return r;
+}
+function mgZeile(p,s,free){
+  const g=mengen(p.p); if(!g.bis&&!g.arbeit) return '';
+  const ges=g.bis+s, pc=!free&&p.m>0?Math.round(ges/p.m*100):null;
+  return `<div class="mg${pc!==null&&ges>p.m?' over':''}">bisher ${nf(g.bis)} ${esc(p.me)}${s||g.bis?` · gesamt ${nf(ges)}${pc!==null?` von ${nf(p.m)} (${pc} %)`:''}`:''}${g.arbeit?` <span class="ia">+ ${nf(g.arbeit)} in Arbeit</span>`:''}</div>`;
+}
+function mgDetail(key,p){
+  const g=mengen(key); if(!g.auf.length) return '';
+  const T={bis:'abgeschlossen',arbeit:'in Arbeit',spaeter:'abgeschlossen, später'};
+  return `<div class="card"><h2 style="margin-bottom:4px">In anderen Aufmaßen</h2>${g.auf.map(a=>`<div class="mgz ${a.art}"><span>${esc(a.bez)}${a.datum?' · '+dDE(a.datum):''}<small>${T[a.art]}</small></span><b>${nf(a.q)} ${esc(p.me)}</b></div>`).join('')}
+    <div class="sum"><span>Bisher (zählt)</span><span>${nf(g.bis)} ${esc(p.me)}</span></div>
+    <div class="sum"><span>Gesamt mit diesem Aufmaß</span><span>${nf(g.bis+sumOf(key))} ${esc(p.me)}${POS[key]&&p.m>0?' von '+nf(p.m):''}</span></div></div>`;
+}
+function mgStatus(){
+  const el=$('#mgStatus'); if(!el) return;
+  const ich=mgIch(), sig=!!S.sig.sig1, man=!!(ich&&ich.manuell), vor=mgVorher();
+  const txt=sig?'Abgeschlossen (unterschrieben). Die Mengen zählen in späteren Aufmaßen als „bisher“.'
+    :man?'Von der Projektleitung als abgeschlossen markiert. Die Mengen zählen in späteren Aufmaßen als „bisher“.'
+    :'In Arbeit. Die Mengen zählen in anderen Aufmaßen erst, wenn das Aufmaß unterschrieben ist.';
+  el.innerHTML=`<div class="mgst${sig||man?' ok':''}">${IC(sig||man?'check':'clip','sm')}<span>${txt}${vor.length?`<small>„Bisher“ enthält: ${vor.map(a=>esc(a.bez||'Aufmaß')).join(', ')}</small>`:''}</span></div>
+    ${PJ.leitung()&&!sig&&MG?`<button class="btn ghost sm" id="mgAbs" style="margin-top:6px">${man?'Markierung „abgeschlossen“ zurücknehmen':'Ohne Unterschrift als abgeschlossen markieren'}</button>`:''}`;
+  const b=$('#mgAbs'); if(b) b.onclick=async()=>{
+    if(!man&&!confirm('Dieses Aufmaß ohne Unterschrift als abgeschlossen markieren?\nDas ist für Aufmaße gedacht, die aus Excel übernommen wurden oder schon abgerechnet sind.')) return;
+    try{ if(diff().n) await syncNow(); await PJ.rpc('pj_mengen',{p:{aktion:'abschluss',aufmass_id:AID,an:!man}}); toast(man?'Markierung zurückgenommen':'Als abgeschlossen markiert'); await mengenLaden(); }catch(e){ toast(e.message); } };
+}
 function fillHead(){ Object.entries(HF).forEach(([id,k])=>{ const el=$('#'+id); if(document.activeElement!==el) el.value=S.head[k]||''; }); }
 // ZURUECK_PROJEKT_V1: beide Zurück-Links zeigen auf das Projekt, sobald es bekannt ist
 function zurueckLinks(){ const h=PROJ&&PROJ.id?'index.html#p='+encodeURIComponent(PROJ.id):'index.html'; ['backBtn','backBtn2'].forEach(i=>{ const a=document.getElementById(i); if(a) a.href=h; }); }
-function renderHdr(){ zurueckLinks(); $('#hdrSub').textContent=(S.head.bez||'Aufmaß')+(S.head.dat?' · '+new Date(S.head.dat).toLocaleDateString('de-DE'):''); }
+function renderHdr(){ mgStatus(); zurueckLinks(); $('#hdrSub').textContent=(S.head.bez||'Aufmaß')+(S.head.dat?' · '+new Date(S.head.dat).toLocaleDateString('de-DE'):''); }
 
 /* ---------- Unterschrift ---------- */
 function setupSig(id){
@@ -911,7 +974,16 @@ async function makePdf(){
     body:[['Bauvorhaben',S.head.bv],['Aufmaß',S.head.bez],['Datum',dDE(S.head.dat)],['Aufgemessen von',S.head.mon],['Für AG / Bauleitung',S.head.ag]].concat(S.head.bem?[['Bemerkung',S.head.bem]]:[])});
   const hs={fillColor:[47,59,83],textColor:255,fontStyle:'bold',fontSize:9};
   doc.setTextColor(47,59,83); doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.text('1. Zusammenstellung je Position',M,doc.lastAutoTable.finalY+8);
-  doc.autoTable({startY:doc.lastAutoTable.finalY+10,margin:{left:M,right:M},headStyles:hs,styles:{fontSize:8.5,cellPadding:1.6,valign:'top'},
+  const vorP=mgVorher(); // MENGEN_V1
+  if(vorP.length){ doc.autoTable({startY:doc.lastAutoTable.finalY+10,margin:{left:M,right:M},headStyles:hs,styles:{fontSize:8.2,cellPadding:1.5,valign:'top'},
+    head:[['Pos.-Nr.','Bezeichnung','LV-Menge','bisher','dieses Aufmaß','gesamt','ME']],
+    columnStyles:{0:{cellWidth:22},2:{halign:'right',cellWidth:19},3:{halign:'right',cellWidth:16},4:{halign:'right',cellWidth:19,fontStyle:'bold'},5:{halign:'right',cellWidth:17},6:{cellWidth:11}},
+    didParseCell:d=>{ if(d.section==='body'&&d.column.index===5){ const x=g[d.row.index]; if(x&&!x.free&&x.p.m>0&&mengen(x.p.p).bis+x.sum>x.p.m) d.cell.styles.textColor=[195,35,40]; } },
+    body:g.map(x=>{ const b=mengen(x.p.p).bis; return [x.p.p,x.p.b+(x.free?'\n(freie Position'+(x.p.t?', Zuordnung '+titelOf(x.p.p):', ohne Zuordnung')+(x.p.ref?', '+x.p.ref:'')+')':''),x.free?'–':nf(x.p.m),nf(b),nf(x.sum),nf(b+x.sum),x.p.me]; })});
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(100);
+    doc.text(doc.splitTextToSize('bisher = abgeschlossene frühere Aufmaße: '+vorP.map(a=>(a.bez||'Aufmaß')+(a.datum?' ('+dDE(a.datum)+')':'')).join(', '),W-2*M),M,doc.lastAutoTable.finalY+4); doc.setTextColor(58,58,58);
+    doc.lastAutoTable.finalY+=4;
+  } else doc.autoTable({startY:doc.lastAutoTable.finalY+10,margin:{left:M,right:M},headStyles:hs,styles:{fontSize:8.5,cellPadding:1.6,valign:'top'},
     head:[['Pos.-Nr.','Bezeichnung','LV-Menge','Aufmaß','ME']],
     columnStyles:{0:{cellWidth:24},2:{halign:'right',cellWidth:20},3:{halign:'right',cellWidth:20,fontStyle:'bold'},4:{cellWidth:12}},
     body:g.map(x=>[x.p.p,x.p.b+(x.free?'\n(freie Position'+(x.p.t?', Zuordnung '+titelOf(x.p.p):', ohne Zuordnung')+(x.p.ref?', '+x.p.ref:'')+')':''),x.free?'–':nf(x.p.m),nf(x.sum),x.p.me])});
@@ -958,7 +1030,7 @@ async function makeXlsx(){
 
   // Blatt 1: Zusammenstellung (Spalten wie im Kalkulationsblatt: Menge Aufmaß / Ort Aufmaß / Bemerkung)
   const ws=wb.addWorksheet('Aufmaß Summen',{pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0},views:[{state:'frozen',ySplit:8}]});
-  ws.columns=[{width:14},{width:60},{width:12},{width:7},{width:14},{width:40},{width:40},{width:12},{width:40}];
+  ws.columns=[{width:14},{width:60},{width:12},{width:7},{width:14},{width:40},{width:40},{width:12},{width:40},{width:14},{width:14}];
   ws.getCell('A1').value='Aufmaß'; ws.getCell('A1').font={bold:true,size:16};
   ws.getCell('A1').font={bold:true,size:16,color:{argb:'FF2F3B53'},name:'Montserrat'};
   const lgx=await logoData(); if(lgx){ const li=wb.addImage({base64:lgx,extension:'png'}); ws.addImage(li,{tl:{col:6.2,row:0.2},ext:{width:170,height:170*91.014/200}}); }
@@ -967,7 +1039,9 @@ async function makeXlsx(){
     ws.getCell('A'+(i+2)).value=r[0]; ws.getCell('A'+(i+2)).font={bold:true}; ws.getCell('B'+(i+2)).value=r[1]||''; });
   ws.getCell('B4').numFmt='dd.mm.yyyy'; ws.getCell('B4').alignment={horizontal:'left'};
   if(S.head.bem){ ws.getCell('C2').value='Bemerkung: '+S.head.bem; }
-  ws.getRow(8).values=['Pos.-Nr.','Bezeichnung','LV-Menge','ME','Menge Aufmaß','Ort Aufmaß','Bemerkung','Anz. Einzelaufmaße','LV-Titel / Zuordnung'];
+  const vorX=mgVorher(); // MENGEN_V1
+  ws.getRow(8).values=['Pos.-Nr.','Bezeichnung','LV-Menge','ME','Menge Aufmaß','Ort Aufmaß','Bemerkung','Anz. Einzelaufmaße','LV-Titel / Zuordnung'].concat(vorX.length?['bisher (frühere Aufmaße)','gesamt']:[]);
+  if(vorX.length) ws.getCell('C7').value='bisher = abgeschlossene frühere Aufmaße: '+vorX.map(a=>(a.bez||'Aufmaß')+(a.datum?' ('+dDE(a.datum)+')':'')).join(', ');
   styleHead(ws.getRow(8));
   g.forEach(x=>{
     const r=ws.addRow([x.p.p,x.p.b+(x.free?' (freie Position'+(x.p.ref?': '+x.p.ref:'')+')':''),x.free?null:x.p.m,x.p.me,null,[...new Set(x.ents.map(e=>e.ort).filter(Boolean))].join('; '),x.ents.map(e=>e.bem).filter(Boolean).join('; '),x.ents.length,titelOf(x.p.p)||(x.free?'ohne Zuordnung':'')]);
@@ -976,7 +1050,9 @@ async function makeXlsx(){
     if(x.free) r.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF4E0'}};
   });
   // Formeln: Summe aus Einzelaufmaße
-  let rr=9; g.forEach(x=>{ ws.getCell('E'+rr).value={formula:`SUMIF('Einzelaufmaße'!A:A,A${rr},'Einzelaufmaße'!C:C)`,result:x.sum}; rr++; });
+  let rr=9; g.forEach(x=>{ ws.getCell('E'+rr).value={formula:`SUMIF('Einzelaufmaße'!A:A,A${rr},'Einzelaufmaße'!C:C)`,result:x.sum};
+    if(vorX.length){ const b=mengen(x.p.p).bis; ws.getCell('J'+rr).value=b; ws.getCell('K'+rr).value={formula:`E${rr}+J${rr}`,result:b+x.sum}; ['J','K'].forEach(c=>{ const z=ws.getCell(c+rr); z.numFmt=numFmt; z.border=bd; }); ws.getCell('K'+rr).font={bold:true}; }
+    rr++; });
 
   // Unterschriften
   let sy=rr+2;
@@ -1369,6 +1445,7 @@ async function boot(){
   }
   document.title='Aufmaß · '+(PROJ?PROJ.name:'');
   $('#hdrTitle').textContent=PROJ?PROJ.name:'Aufmaß';
+  mengenLaden(); // MENGEN_V1
 }
 window.addEventListener('online',()=>{ syncStatus(); syncNow(); });
 window.addEventListener('offline',syncStatus);
