@@ -157,7 +157,9 @@ async function uebersicht(el) {
   </div>
   ${ohne ? `<div class="card"><h2>Zuordnung</h2><p>${ohne} Personalnummern sind noch keinem App-Benutzer zugeordnet. <a href="#" id="zuMa" style="color:var(--blue);font-weight:700">Zuordnen</a></p></div>` : ''}`;
   $('#imp').onclick = async () => { const b = $('#imp'); b.disabled = true; b.textContent = 'Wird eingelesen …';
-    try { const r = await fn({ action: 'import', erzwingen: true }); toast(r.unveraendert ? 'Datei unverändert' : `${(r.uebernommen || 0).toLocaleString('de-DE')} Buchungen übernommen`); zeige() } catch (e) { toast(e.message); b.disabled = false; b.textContent = 'Jetzt einlesen' } };
+    try { let r = await fn({ action: 'import', erzwingen: true }); // Einlesen in Teilen (je Aufruf ein Stück der Datei)
+      for (let n = 0; r.weiter && n < 200; n++) { b.textContent = `Wird eingelesen … ${r.prozent || 0} %`; r = await fn({ action: 'weiter' }) }
+      toast(r.unveraendert ? 'Datei unverändert' : `${(r.uebernommen || 0).toLocaleString('de-DE')} Buchungen übernommen`); zeige() } catch (e) { toast(e.message); b.disabled = false; b.textContent = 'Jetzt einlesen' } };
   $('#qOk').onclick = async () => { $('#qMsg').innerHTML = '<p class="hint">Wird geprüft …</p>';
     try { const r = await fn({ action: 'quelle', site_id: $('#qSite').value.trim(), pfad: $('#qPfad').value.trim() }); $('#qMsg').innerHTML = `<p class="hint" style="color:var(--ok)">Gefunden: ${esc(r.datei.bibliothek)} / ${esc(r.datei.pfad)} · Stand ${tsDE(r.datei.stand)} · ${(r.datei.groesse / 1e6).toFixed(1)} MB</p>` }
     catch (e) { $('#qMsg').innerHTML = `<div class="err">${esc(e.message)}</div>` } };
