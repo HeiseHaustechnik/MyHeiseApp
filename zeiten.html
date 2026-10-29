@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f3b53">
+<title>Zeiten · My Heise App</title>
+<link rel="icon" href="icon-192.png">
+<style>
+@font-face{font-family:'Montserrat';src:url(montserrat.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{--bg:#f4f5f8;--surface:#fff;--surface-2:#eef0f4;--ink:#0d1524;--ink-2:#485468;--ink-3:#8491a3;--line:#e3e7ee;
+  --brand:#2f3b53;--accent:#e25304;--red:#c32328;--red-bg:#fdeceb;--amber:#b45309;--amber-bg:#fdeee5;--ok:#15803d;--ok-bg:#e6f6ec;--blue:#2c60a7;--blue-bg:#e3ecf8;
+  --shadow:0 1px 2px rgba(13,21,36,.04),0 10px 30px -14px rgba(13,21,36,.16);--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font:15px/1.5 Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:inherit;text-decoration:none}[hidden]{display:none!important}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t)) 16px 10px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px)}
+.top .zur{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow);flex:none;font-size:20px}
+.top b{font-size:17px;font-weight:780;display:block}.top small{font-size:12px;color:var(--ink-3);font-weight:600}
+.shell{max-width:980px;margin:0 auto;padding:4px 16px calc(40px + var(--safe-b))}
+.seg{display:inline-grid;grid-auto-flow:column;gap:4px;padding:4px;background:var(--surface-2);border-radius:14px;max-width:100%;overflow-x:auto;margin:6px 0 14px}
+.seg button{min-height:38px;padding:0 13px;border-radius:11px;font-weight:660;font-size:13.5px;color:var(--ink-2);white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(13,21,36,.16)}
+.card{background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:16px;margin:0 0 14px}
+.card h2{font-size:15.5px;font-weight:760;margin-bottom:8px}
+.hint{font-size:13px;color:var(--ink-3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 16px;border-radius:13px;font-weight:700;background:var(--brand);color:#fff}
+.btn.cta{background:var(--accent)}.btn.sec{background:var(--surface-2);color:var(--ink)}.btn.sm{min-height:34px;padding:0 12px;font-size:13px;border-radius:11px}.btn:disabled{opacity:.5}
+.inp,select{min-height:42px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);padding:0 10px;font-size:14px;max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}.kv dt{color:var(--ink-3);font-weight:600}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:8px;padding:1px 8px;background:var(--surface-2);color:var(--ink-2)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.warn{background:var(--amber-bg);color:var(--amber)}.pill.red{background:var(--red-bg);color:var(--red)}.pill.blue{background:var(--blue-bg);color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th{text-align:left;font-size:12px;color:var(--ink-3);font-weight:700;padding:6px 6px;border-bottom:1.5px solid var(--line)}
+td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.woche td{background:var(--surface-2);font-weight:700}tr.we td{color:var(--ink-3)}
+.tag{cursor:pointer}.det{font-size:12.5px;color:var(--ink-2)}.det div{padding:1px 0}
+.summen{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:10px}
+.summen div{background:var(--surface-2);border-radius:14px;padding:10px 12px}.summen b{display:block;font-size:20px;font-weight:780}.summen small{color:var(--ink-3);font-size:12px;font-weight:600}
+.hw{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.err{background:var(--red-bg);color:var(--red);border-radius:12px;padding:10px 12px;font-size:13.5px;margin:8px 0}
+.toast{position:fixed;left:50%;bottom:calc(20px + var(--safe-b));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:99}
+.scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="top"><a class="zur" href="index.html" aria-label="Zurück">‹</a><div><b>Zeiten aus DIGI</b><small id="unter">wird geladen …</small></div></div>
+<div class="shell">
+  <div id="boot" class="hint" style="padding:20px 0">Wird geladen …</div>
+  <div id="app" hidden>
+    <div class="seg" id="tabs"></div>
+    <div id="inhalt"></div>
+  </div>
+</div>
+<script>
+'use strict';
+/* ===================== Anmeldung (gemeinsame Sitzung heiseSession) ===================== */
+const SB = 'https://bbjzfoirefcsqqgztjpt.supabase.co', KEY = 'sb_publishable_foIFF173jDFlX6KQ70vJPQ_kdoTBk6H', SESS_KEY = 'heiseSession';
+const AUTH = { access: null, refresh: null, exp: 0 }; let refreshP = null;
+const storedRefresh = () => { try { return (JSON.parse(localStorage.getItem(SESS_KEY) || 'null') || {}).r || null } catch (e) { return null } };
+function authSave(j) { AUTH.access = j.access_token; AUTH.refresh = j.refresh_token; AUTH.exp = j.expires_at ? j.expires_at * 1000 : Date.now() + (j.expires_in || 3600) * 1000; try { localStorage.setItem(SESS_KEY, JSON.stringify({ r: AUTH.refresh })) } catch (e) { } }
+function toLogin() { location.replace('index.html?next=' + encodeURIComponent('zeiten.html' + location.hash)) }
+async function refresh() {
+  let r; try { r = await fetch(`${SB}/auth/v1/token?grant_type=refresh_token`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ refresh_token: AUTH.refresh }) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { try { localStorage.removeItem(SESS_KEY) } catch (e) { } toLogin(); throw new Error('Sitzung abgelaufen') }
+  authSave(j);
+}
+async function token() {
+  if (AUTH.access && AUTH.exp - Date.now() > 60000) return AUTH.access;
+  const r = storedRefresh() || AUTH.refresh; if (!r) { toLogin(); throw new Error('Nicht angemeldet') }
+  AUTH.refresh = r; if (!refreshP) refreshP = refresh().finally(() => { refreshP = null }); await refreshP; return AUTH.access;
+}
+async function dz(p) {
+  const t = await token(); let r;
+  try { r = await fetch(`${SB}/rest/v1/rpc/dz`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + t }, body: JSON.stringify({ p }) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((j && j.message) || r.statusText || 'Fehler');
+  return j;
+}
+async function fn(body) {
+  const t = await token(); let r;
+  try { r = await fetch(`${SB}/functions/v1/digi-import`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, 'x-user-token': t }, body: JSON.stringify(body) }) }
+  catch (e) { throw new Error('Keine Verbindung, bitte Netz prüfen') }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.error) throw new Error(j.error || ('Fehler ' + r.status));
+  return j;
+}
+
+/* ===================== Hilfen ===================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const hm = m => { m = Math.round(m || 0); const s = m < 0 ? '−' : ''; m = Math.abs(m); return s + Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0') };
+const WT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const dDE = s => { const [y, m, d] = String(s).slice(0, 10).split('-'); return `${d}.${m}.${y}` };
+const tsDE = s => s ? new Date(s).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' }) : '–';
+const monat = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') };
+const grenzen = m => { const [y, mo] = m.split('-').map(Number); const bis = new Date(Date.UTC(y, mo, 0)); return { von: `${m}-01`, bis: bis.toISOString().slice(0, 10) } };
+const kw = s => { const d = new Date(s + 'T12:00:00Z'); const t = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - t + 3); const j = new Date(Date.UTC(d.getUTCFullYear(), 0, 4)); return 1 + Math.round(((d - j) / 864e5 - 3 + ((j.getUTCDay() + 6) % 7)) / 7) };
+function toast(t) { const e = document.createElement('div'); e.className = 'toast'; e.textContent = t; document.body.appendChild(e); setTimeout(() => e.remove(), 2600) }
+
+/* ===================== Zustand ===================== */
+let R = {}, S = null, TAB = 'uebersicht', SEL = { pn: '', monat: monat() }, PM = monat();
+try { const v = JSON.parse(localStorage.getItem('dz_ansicht') || 'null'); if (v) { TAB = v.tab || TAB; SEL.pn = v.pn || '' } } catch (e) { }
+const merken = () => { try { localStorage.setItem('dz_ansicht', JSON.stringify({ tab: TAB, pn: SEL.pn })) } catch (e) { } };
+
+function tabs() {
+  const T = [];
+  if (R.admin) T.push(['uebersicht', 'Übersicht'], ['mitarbeiter', 'Mitarbeiter']);
+  if (R.admin || R.meine_zeiten) T.push(['zeiten', R.admin ? 'Vorschau Meine Zeiten' : 'Meine Zeiten']);
+  if (R.pruefhilfe) T.push(['pruefung', 'Prüfhilfe']);
+  if (!T.some(t => t[0] === TAB)) TAB = T[0] ? T[0][0] : '';
+  $('#tabs').innerHTML = T.map(([k, l]) => `<button data-t="${k}" class="${k === TAB ? 'on' : ''}">${l}</button>`).join('');
+  $('#tabs').querySelectorAll('button').forEach(b => b.onclick = () => { TAB = b.dataset.t; merken(); tabs(); zeige() });
+  $('#tabs').hidden = T.length < 2;
+}
+async function zeige() {
+  const el = $('#inhalt'); el.innerHTML = '<p class="hint">Wird geladen …</p>';
+  try {
+    if (TAB === 'uebersicht') await uebersicht(el);
+    else if (TAB === 'mitarbeiter') await mitarbeiter(el);
+    else if (TAB === 'zeiten') await zeiten(el);
+    else if (TAB === 'pruefung') await pruefung(el);
+    else el.innerHTML = '<div class="card">Für dich ist hier noch nichts freigeschaltet.</div>';
+  } catch (e) { el.innerHTML = `<div class="err">${esc(e.message)}</div>` }
+}
+
+/* ===================== Übersicht (Admin) ===================== */
+async function uebersicht(el) {
+  S = await dz({ aktion: 'status' });
+  const i = S.import, f = S.freigabe || {}, q = f.digi_quelle || {};
+  const ohne = S.mitarbeiter.filter(m => !m.benutzer_id).length;
+  const pruef = Array.isArray(f.pruefhilfe) ? f.pruefhilfe : [];
+  el.innerHTML = `
+  <div class="card"><h2>Letzter Import</h2>
+    ${i ? `<dl class="kv"><dt>Zeitpunkt</dt><dd>${tsDE(i.zeit)} ${i.ok ? '<span class="pill ok">ok</span>' : '<span class="pill red">Fehler</span>'}</dd>
+      <dt>Stand der Datei</dt><dd>${tsDE(i.datei_stand)}</dd><dt>Zeilen in der Datei</dt><dd>${(i.zeilen || 0).toLocaleString('de-DE')}</dd>
+      <dt>Übernommen ab</dt><dd>${i.ab ? dDE(i.ab) : '–'} · ${(i.uebernommen || 0).toLocaleString('de-DE')} Buchungen</dd>
+      ${i.meldung ? `<dt>Meldung</dt><dd>${esc(i.meldung)}</dd>` : ''}</dl>` : '<p class="hint">Noch kein Import gelaufen.</p>'}
+    <p class="hint" style="margin-top:8px">In der App: ${(S.buchungen || 0).toLocaleString('de-DE')} Buchungen${S.zeitraum && S.zeitraum.von ? ` vom ${dDE(S.zeitraum.von)} bis ${dDE(S.zeitraum.bis)}` : ''}.</p>
+    <div class="row" style="margin-top:10px"><button class="btn cta" id="imp">Jetzt einlesen</button></div>
+  </div>
+  <div class="card"><h2>Quelle der DIGI-Datei</h2>
+    <p class="hint" style="margin-bottom:8px">SharePoint-Site, in der der Ordner MyHeise-Modul-Projekte\\DIGI-Export liegt (Verwaltung Administration Marketing).</p>
+    <div class="row"><input class="inp" id="qSite" placeholder="Site-ID aus dem Graph Explorer" style="flex:1;min-width:260px" value="${esc(q.site_id || '')}"></div>
+    <div class="row" style="margin-top:8px"><input class="inp" id="qPfad" style="flex:1;min-width:260px" value="${esc(q.pfad || 'MyHeise-Modul-Projekte/DIGI-Export/myheise_zeiten.csv')}"><button class="btn sec" id="qOk">Speichern und prüfen</button></div>
+    <div id="qMsg"></div>
+  </div>
+  <div class="card"><h2>Freischaltung</h2>
+    <p class="hint" style="margin-bottom:8px">Solange hier nichts freigeschaltet ist, sehen nur Administratoren die Zeiten.</p>
+    <label class="row"><input type="checkbox" id="fMz" ${f.meine_zeiten === true ? 'checked' : ''}> <b>„Meine Zeiten“ für alle Mitarbeiter mit zugeordneter Personalnummer</b></label>
+    <p class="hint" style="margin:10px 0 6px">Prüfhilfe zusätzlich freigeben für:</p>
+    <div class="row">${S.benutzer.map(b => `<label class="pill"><input type="checkbox" data-pr="${b.id}" ${pruef.includes(b.id) ? 'checked' : ''}> ${esc(b.name)}</label>`).join('')}</div>
+    <div class="row" style="margin-top:10px"><button class="btn sec" id="fOk">Freischaltung speichern</button></div>
+  </div>
+  ${ohne ? `<div class="card"><h2>Zuordnung</h2><p>${ohne} Personalnummern sind noch keinem App-Benutzer zugeordnet. <a href="#" id="zuMa" style="color:var(--blue);font-weight:700">Zuordnen</a></p></div>` : ''}`;
+  $('#imp').onclick = async () => { const b = $('#imp'); b.disabled = true; b.textContent = 'Wird eingelesen …';
+    try { const r = await fn({ action: 'import', erzwingen: true }); toast(r.unveraendert ? 'Datei unverändert' : `${(r.uebernommen || 0).toLocaleString('de-DE')} Buchungen übernommen`); zeige() } catch (e) { toast(e.message); b.disabled = false; b.textContent = 'Jetzt einlesen' } };
+  $('#qOk').onclick = async () => { $('#qMsg').innerHTML = '<p class="hint">Wird geprüft …</p>';
+    try { const r = await fn({ action: 'quelle', site_id: $('#qSite').value.trim(), pfad: $('#qPfad').value.trim() }); $('#qMsg').innerHTML = `<p class="hint" style="color:var(--ok)">Gefunden: ${esc(r.datei.bibliothek)} / ${esc(r.datei.pfad)} · Stand ${tsDE(r.datei.stand)} · ${(r.datei.groesse / 1e6).toFixed(1)} MB</p>` }
+    catch (e) { $('#qMsg').innerHTML = `<div class="err">${esc(e.message)}</div>` } };
+  $('#fOk').onclick = async () => { try { await dz({ aktion: 'freigabe', meine_zeiten: $('#fMz').checked, pruefhilfe: [...document.querySelectorAll('[data-pr]:checked')].map(x => x.dataset.pr) }); toast('Freischaltung gespeichert') } catch (e) { toast(e.message) } };
+  if ($('#zuMa')) $('#zuMa').onclick = e => { e.preventDefault(); TAB = 'mitarbeiter'; merken(); tabs(); zeige() };
+}
+
+/* ===================== Mitarbeiter (Admin) ===================== */
+async function mitarbeiter(el) {
+  S = await dz({ aktion: 'status' });
+  const opt = id => `<option value="">– nicht zugeordnet –</option>` + S.benutzer.map(b => `<option value="${b.id}" ${b.id === id ? 'selected' : ''}>${esc(b.name)}</option>`).join('');
+  el.innerHTML = `<div class="card"><h2>Personalnummern aus DIGI</h2>
+    <p class="hint" style="margin-bottom:8px">Die App ordnet automatisch zu, wenn der Name eindeutig passt (DIGI „Nachname, Vorname“ = App „Vorname Nachname“). Den Rest hier von Hand.</p>
+    <div class="scroll"><table><thead><tr><th>Pers.-Nr.</th><th>Name in DIGI</th><th>Letzte Buchung</th><th>App-Benutzer</th></tr></thead><tbody>
+    ${S.mitarbeiter.map(m => `<tr><td>${esc(m.pn)}</td><td>${esc(m.name || '')}</td><td>${m.letztes ? dDE(m.letztes) : ''}</td><td><select data-pn="${esc(m.pn)}">${opt(m.benutzer_id)}</select></td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  el.querySelectorAll('select[data-pn]').forEach(s => s.onchange = async () => { try { await dz({ aktion: 'zuordnen', pn: s.dataset.pn, benutzer_id: s.value || null }); toast('Gespeichert') } catch (e) { toast(e.message) } });
+}
+
+/* ===================== Meine Zeiten (Vorschau für Admin) ===================== */
+async function zeiten(el) {
+  if (R.admin && !S) S = await dz({ aktion: 'status' });
+  const g = grenzen(SEL.monat);
+  const p = { aktion: 'zeiten', von: g.von, bis: g.bis }; if (R.admin) { if (!SEL.pn && S.mitarbeiter[0]) SEL.pn = S.mitarbeiter[0].pn; if (SEL.pn) p.pn = SEL.pn }
+  const d = await dz(p);
+  const tage = {}; d.buchungen.forEach(b => (tage[b.datum] = tage[b.datum] || []).push(b));
+  let html = '', sum = { arbeit: 0, pause: 0, fehl: 0, urlaub: 0, krank: 0 }, wo = null, ws = 0;
+  const tagListe = Object.keys(tage).sort();
+  const wocheZu = () => { if (wo !== null) html += `<tr class="woche"><td colspan="3">KW ${wo}</td><td class="n">${hm(ws)}</td><td colspan="2"></td></tr>` };
+  tagListe.forEach(t => {
+    const B = tage[t], k = kw(t);
+    if (wo !== k) { wocheZu(); wo = k; ws = 0 }
+    const arb = B.filter(b => !b.fehlzeit && b.leistung !== 'Pause'), pau = B.filter(b => b.leistung === 'Pause'), fz = B.filter(b => b.fehlzeit);
+    const a = arb.reduce((s, b) => s + b.min, 0), pa = pau.reduce((s, b) => s + b.min, 0), f = fz.reduce((s, b) => s + b.min, 0);
+    sum.arbeit += a; sum.pause += pa; sum.fehl += f; ws += a + f;
+    if (fz.some(b => /urlaub/i.test(b.fehlzeit))) sum.urlaub++; if (fz.some(b => /krank/i.test(b.fehlzeit))) sum.krank++;
+    const zeiten = arb.filter(b => b.von && b.bis), beginn = zeiten.map(b => b.von).sort()[0] || '', ende = zeiten.map(b => b.bis).sort().pop() || '';
+    const auf = [...new Set(arb.filter(b => b.auftrag).map(b => b.auftrag + (b.auftrag_bez ? ' ' + b.auftrag_bez : '')))];
+    const wd = new Date(t + 'T12:00:00').getDay();
+    html += `<tr class="tag${wd === 0 || wd === 6 ? ' we' : ''}" data-t="${t}"><td>${WT[wd]} ${dDE(t).slice(0, 6)}</td><td>${beginn ? esc(beginn + '–' + ende) : ''}</td>
+      <td>${fz.length ? `<span class="pill blue">${esc([...new Set(fz.map(b => b.fehlzeit))].join(', '))}</span>` : ''}${auf.length ? `<div class="hint">${esc(auf.slice(0, 2).join(' · '))}${auf.length > 2 ? ' …' : ''}</div>` : ''}</td>
+      <td class="n">${a ? hm(a) : ''}${f ? `<div class="hint">${hm(f)}</div>` : ''}</td><td class="n">${pa ? hm(pa) : ''}</td><td></td></tr>
+      <tr class="dd" data-d="${t}" hidden><td colspan="6"><div class="det">${B.map(b => `<div>${esc(b.von || '')}${b.bis ? '–' + esc(b.bis) : ''} · ${hm(b.min)} · ${esc(b.fehlzeit || b.leistung || '')}${b.auftrag ? ' · ' + esc(b.auftrag) + ' ' + esc(b.auftrag_bez || '') : ''}${b.bemerkung ? ' · „' + esc(b.bemerkung) + '“' : ''}</div>`).join('')}</div></td></tr>`;
+  });
+  wocheZu();
+  const vorlaeufig = SEL.monat >= monat();
+  el.innerHTML = `<div class="card">
+    ${R.admin ? `<p class="hint" style="margin-bottom:8px">Vorschau: So sieht der ausgewählte Mitarbeiter seine Zeiten, sobald „Meine Zeiten“ freigeschaltet ist.</p>` : ''}
+    <div class="row" style="margin-bottom:10px">
+      ${R.admin ? `<select id="zMa">${S.mitarbeiter.map(m => `<option value="${esc(m.pn)}" ${m.pn === SEL.pn ? 'selected' : ''}>${esc(m.name || m.pn)}${m.benutzer ? '' : ' (nicht zugeordnet)'}</option>`).join('')}</select>` : `<b>${esc(d.name || '')}</b>`}
+      <input type="month" class="inp" id="zMo" value="${SEL.monat}">
+      <span class="pill ${vorlaeufig ? 'warn' : 'ok'}">${vorlaeufig ? 'vorläufig, wird noch geprüft' : 'Monat abgeschlossen'}</span>
+    </div>
+    <div class="summen"><div><b>${hm(sum.arbeit)}</b><small>Arbeitszeit</small></div><div><b>${hm(sum.fehl)}</b><small>Urlaub, Feiertag, Krank …</small></div>
+      <div><b>${hm(sum.arbeit + sum.fehl)}</b><small>zusammen</small></div><div><b>${sum.urlaub}</b><small>Urlaubstage</small></div></div>
+    ${tagListe.length ? `<div class="scroll"><table><thead><tr><th>Tag</th><th>Von–Bis</th><th>Auftrag / Fehlzeit</th><th class="n">Std.</th><th class="n">Pause</th><th></th></tr></thead><tbody>${html}</tbody></table></div>
+      <p class="hint" style="margin-top:8px">Tag antippen für die einzelnen Buchungen. Stand: DIGI-Export vom ${tsDE(d.stand)}. Korrekturen in DIGI erscheinen nach dem nächsten Export.</p>` : '<p class="hint">Keine Buchungen in diesem Monat.</p>'}
+    <p class="hint" style="margin-top:6px">Der Stand des Überstundenkontos fehlt noch, dafür braucht die App die Soll-Stunden.</p></div>`;
+  if ($('#zMa')) $('#zMa').onchange = () => { SEL.pn = $('#zMa').value; merken(); zeige() };
+  $('#zMo').onchange = () => { SEL.monat = $('#zMo').value || monat(); zeige() };
+  el.querySelectorAll('tr.tag').forEach(r => r.onclick = () => { const x = el.querySelector(`tr.dd[data-d="${r.dataset.t}"]`); x.hidden = !x.hidden });
+}
+
+/* ===================== Prüfhilfe ===================== */
+async function pruefung(el) {
+  const g = grenzen(PM);
+  const d = await dz({ aktion: 'pruefung', von: g.von, bis: g.bis });
+  const zaehl = {}; d.tage.forEach(t => t.hinweise.forEach(h => zaehl[h] = (zaehl[h] || 0) + 1));
+  el.innerHTML = `<div class="card"><h2>Auffälligkeiten in den Zeitbuchungen</h2>
+    <div class="row" style="margin-bottom:10px"><input type="month" class="inp" id="pMo" value="${PM}"><span class="hint">Stand: DIGI-Export vom ${tsDE(d.stand)}</span></div>
+    <div class="row" style="margin-bottom:10px">${Object.entries(zaehl).map(([h, n]) => `<span class="pill warn">${n} × ${esc(h)}</span>`).join('') || '<span class="pill ok">keine Auffälligkeiten</span>'}</div>
+    ${d.tage.length ? `<div class="scroll"><table><thead><tr><th>Datum</th><th>Mitarbeiter</th><th>Von–Bis</th><th class="n">Arbeit</th><th class="n">Pause</th><th>Hinweis</th></tr></thead><tbody>
+    ${d.tage.map(t => `<tr><td>${WT[new Date(t.datum + 'T12:00:00').getDay()]} ${dDE(t.datum)}</td><td>${esc(t.name || t.pn)}</td><td>${t.beginn ? esc(t.beginn + '–' + (t.ende || '')) : ''}</td>
+      <td class="n">${hm(t.arbeit)}</td><td class="n">${t.pause ? hm(t.pause) : '–'}</td><td><div class="hw">${t.hinweise.map(h => `<span class="pill ${/Pause|10 Std|Überlapp|ohne/.test(h) ? 'red' : 'warn'}">${esc(h)}</span>`).join('')}</div>${t.fehlzeit ? `<div class="hint">${esc(t.fehlzeit)}</div>` : ''}</td></tr>`).join('')}
+    </tbody></table></div>` : ''}
+    <p class="hint" style="margin-top:8px">Die Liste zeigt Tage, die sich Frau Kreuz in DIGI ansehen sollte. Korrigiert wird in DIGI, die App ändert nichts. Arbeit am Wochenende kann Notdienst sein.</p></div>`;
+  $('#pMo').onchange = () => { PM = $('#pMo').value || monat(); zeige() };
+}
+
+/* ===================== Start ===================== */
+(async function start() {
+  if (!storedRefresh()) return toLogin();
+  try { R = await dz({ aktion: 'rechte' }) } catch (e) { $('#boot').textContent = /function|schema cache|dz\(/i.test(e.message) ? 'Die Zeiten sind noch nicht eingerichtet (zeiten.sql fehlt in Supabase).' : e.message; return }
+  $('#unter').textContent = R.admin ? 'Admin: Import, Zuordnung, Vorschau' : 'Deine Zeiten aus der Zeiterfassung';
+  $('#boot').hidden = true; $('#app').hidden = false; tabs(); zeige();
+})();
+</script>
+</body>
+</html>
